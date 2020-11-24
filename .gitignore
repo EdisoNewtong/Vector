@@ -1,0 +1,7 @@
+#
+# Ignore File List
+#
+
+main
+cpp/console/binaryCompare/binaryCmp
+**/build/*
