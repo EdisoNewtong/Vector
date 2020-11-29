@@ -1,13 +1,13 @@
 #!/bin/bash
 
 
-all:binaryWrite
+all:main
 	
 
-binaryWrite:binaryWrite.cpp
-	g++   -Wall  -std=c++11   -O3   -o   binaryWrite   binaryWrite.cpp
+main:binaryWrite.cpp
+	g++   -Wall  -std=c++11  -o   main   binaryWrite.cpp
 
 
 .PHONY:clean
 clean:
-	-rm   -Rf  *.o *.dSYM  binaryWrite
+	-rm   -Rf  *.o *.dSYM  main
