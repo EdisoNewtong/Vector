@@ -2,6 +2,9 @@
 # Ignore File List
 #
 
+.DS_Store
 main
+build-*
 cpp/console/binaryCompare/binaryCmp
 **/build/*
+*.pro.user

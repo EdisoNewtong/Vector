@@ -1,0 +1,10 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource prefix="/">
+    <file>image/branch-closed.png</file>
+    <file>image/branch-end.png</file>
+    <file>image/branch-more.png</file>
+    <file>image/branch-open.png</file>
+    <file>image/vline.png</file>
+</qresource>
+</RCC>
+
