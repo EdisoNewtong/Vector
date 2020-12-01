@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root>
+  <filename   aaa   ="bcd">testAll.xml</filename>
+  <text>他们</text>
+  <text>他a们b是</text>
+  <text>a我b们c是</text>
+  <text fontname="Arail" fontsize="35">中国</text>
+  <text fontname="KaiTi" fontsize="18" />
+</root>

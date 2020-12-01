@@ -15,6 +15,7 @@ using namespace rapidxml;
 // #include <iostream>
 using namespace std;
 
+using HighlightVec = QVector< QPair<QPair<int,int>, QColor>>;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -100,23 +101,14 @@ void MainWindow::on_parseBtn_clicked()
             begIdx = endIdx;
             endIdx += 2;
         } 
+
         //
         // High-Light the place where parse error occurs
         //
-        auto cursor = ui->xmlTextEdit->textCursor();
-        QTextCursor currentCursor(cursor);
-
-        QList<QTextEdit::ExtraSelection> sellst;
-        QTextEdit::ExtraSelection selection;
-        cursor.setPosition( begIdx, QTextCursor::MoveAnchor);
-        cursor.movePosition( QTextCursor::Right, QTextCursor::KeepAnchor, endIdx-begIdx);
-        selection.cursor = cursor;
-        selection.format.setBackground( QBrush(Qt::red) );
-        sellst.push_back(selection);
-
-        ui->xmlTextEdit->setExtraSelections( sellst );
-        currentCursor.setPosition( begIdx , QTextCursor::MoveAnchor);
-        ui->xmlTextEdit->setTextCursor(currentCursor);
+        HighlightVec hvec;
+        hvec.push_back( qMakePair(qMakePair(begIdx,endIdx), Qt::red) );
+        hightLightNodeText(hvec);
+        setXMLCurrentTextCursor(begIdx);
     } catch ( ... ) {
         ui->parseResultTextBox->setPlainText( QString("Parse XML Failed : Unknown Error ") );
     }
@@ -533,57 +525,24 @@ void MainWindow::highLightNode(QStandardItem* nodeInfo, int columnIdx)
                 break;
             case node_element:       //!< An element node. Name contains element name. Value contains text of first data node.
                 {
-                    auto cursor = ui->xmlTextEdit->textCursor();
-                    QTextCursor currentCursor(cursor);
-
                     const auto& bIsSingle = xmlNode->getIsSingleNode();
                     const auto& ots = xmlNode->getOpenTagBeginInfo();
                     const auto& ote = xmlNode->getOpenTagEndInfo();
 
-
-                    QList<QTextEdit::ExtraSelection> sellst;
+                    HighlightVec hvec;
                     if ( bIsSingle ) {
-                        QTextEdit::ExtraSelection selection1;
-                        cursor.setPosition( ots.cursor_idx, QTextCursor::MoveAnchor);
-                        cursor.movePosition( QTextCursor::Right, QTextCursor::KeepAnchor,  ote.cursor_idx - ots.cursor_idx  );
-                        selection1.cursor = cursor;
-                        selection1.format.setBackground( QBrush(Qt::yellow) );
-                        sellst.push_back(selection1);
+                        hvec.push_back( qMakePair(qMakePair(ots.cursor_idx, ote.cursor_idx), Qt::yellow) );
                     } else {
                         const auto& cts = xmlNode->getCloseTagBeginInfo();
                         const auto& cte = xmlNode->getCloseTagEndInfo();
-                        // Open-Tag
-                        QTextEdit::ExtraSelection selection1;
-                        cursor.setPosition( ots.cursor_idx, QTextCursor::MoveAnchor);
-                        cursor.movePosition( QTextCursor::Right, QTextCursor::KeepAnchor,  ote.cursor_idx - ots.cursor_idx  );
-                        selection1.cursor = cursor;
-                        selection1.format.setBackground( QBrush(Qt::yellow) );
 
-                        // content
-                        QTextEdit::ExtraSelection selection2;
-                        auto cursor2 = ui->xmlTextEdit->textCursor();
-                        cursor2.setPosition( ote.cursor_idx, QTextCursor::MoveAnchor);
-                        cursor2.movePosition( QTextCursor::Right, QTextCursor::KeepAnchor,  cts.cursor_idx -  ote.cursor_idx );
-                        selection2.cursor = cursor2;
-                        selection2.format.setBackground( QBrush(Qt::red) );
-
-                        // Close-Tag
-                        QTextEdit::ExtraSelection selection3;
-                        auto cursor3 = ui->xmlTextEdit->textCursor();
-                        cursor3.setPosition( cts.cursor_idx, QTextCursor::MoveAnchor);
-                        cursor3.movePosition( QTextCursor::Right, QTextCursor::KeepAnchor,  cte.cursor_idx -  cts.cursor_idx );
-                        selection3.cursor = cursor3;
-                        selection3.format.setBackground( QBrush(Qt::yellow) );
-
-                        sellst.push_back(selection1);
-                        sellst.push_back(selection2);
-                        sellst.push_back(selection3);
+                        hvec.push_back( qMakePair(qMakePair(ots.cursor_idx,  ote.cursor_idx), Qt::yellow) );
+                        hvec.push_back( qMakePair(qMakePair(ote.cursor_idx , cts.cursor_idx), Qt::red) );
+                        hvec.push_back( qMakePair(qMakePair(cts.cursor_idx,  cte.cursor_idx), Qt::yellow) );
                     }
 
-                    ui->xmlTextEdit->setExtraSelections( sellst );
-                    currentCursor.setPosition( ots.cursor_idx , QTextCursor::MoveAnchor);
-                    ui->xmlTextEdit->setTextCursor(currentCursor);
-
+                    hightLightNodeText(hvec);
+                    setXMLCurrentTextCursor(ots.cursor_idx);
                 }
                 break;
             case node_data:          //!< A data node. Name is empty. Value contains data text.
@@ -591,20 +550,10 @@ void MainWindow::highLightNode(QStandardItem* nodeInfo, int columnIdx)
                     const auto& vs = xmlNode->getValueBeginInfo();
                     const auto& ve = xmlNode->getValueEndInfo();
 
-                    auto cursor = ui->xmlTextEdit->textCursor();
-                    QTextCursor currentCursor(cursor);
-
-                    QList<QTextEdit::ExtraSelection> sellst;
-                    QTextEdit::ExtraSelection selection1;
-                    cursor.setPosition( vs.cursor_idx, QTextCursor::MoveAnchor);
-                    cursor.movePosition( QTextCursor::Right, QTextCursor::KeepAnchor,  ve.cursor_idx - vs.cursor_idx  );
-                    selection1.cursor = cursor;
-                    selection1.format.setBackground( QBrush(Qt::red) );
-                    sellst.push_back(selection1);
-                    ui->xmlTextEdit->setExtraSelections( sellst );
-
-                    currentCursor.setPosition( vs.cursor_idx , QTextCursor::MoveAnchor);
-                    ui->xmlTextEdit->setTextCursor(currentCursor);
+                    HighlightVec hvec;
+                    hvec.push_back( qMakePair(qMakePair(vs.cursor_idx, ve.cursor_idx), Qt::red) );
+                    hightLightNodeText(hvec);
+                    setXMLCurrentTextCursor( vs.cursor_idx );
                 }
                 break;
             case node_cdata:         //!< A CDATA node. Name is empty. Value contains data text.
@@ -617,46 +566,18 @@ void MainWindow::highLightNode(QStandardItem* nodeInfo, int columnIdx)
                     const auto& cte = xmlNode->getCloseTagEndInfo();
                     const auto& vs = xmlNode->getValueBeginInfo();
                     const auto& ve = xmlNode->getValueEndInfo();
-                    QTextCursor currentCursor(ui->xmlTextEdit->textCursor());
                     
-                    QList<QTextEdit::ExtraSelection> sellst;
-                    // Open-Tag
-                    auto cursor1 = ui->xmlTextEdit->textCursor();
-                    QTextEdit::ExtraSelection selection1;
-                    cursor1.setPosition( ots.cursor_idx, QTextCursor::MoveAnchor);
-                    cursor1.movePosition( QTextCursor::Right, QTextCursor::KeepAnchor,  ote.cursor_idx - ots.cursor_idx  );
-                    selection1.cursor = cursor1;
-                    selection1.format.setBackground( QBrush(Qt::yellow) );
-
-                    // content
-                    auto cursor2 = ui->xmlTextEdit->textCursor();
-                    QTextEdit::ExtraSelection selection2;
-                    cursor2.setPosition( vs.cursor_idx, QTextCursor::MoveAnchor);
-                    cursor2.movePosition( QTextCursor::Right, QTextCursor::KeepAnchor,  ve.cursor_idx -  vs.cursor_idx );
-                    selection2.cursor = cursor2;
-                    selection2.format.setBackground( QBrush(Qt::red) );
-
-                    // Close-Tag
-                    auto cursor3 = ui->xmlTextEdit->textCursor();
-                    QTextEdit::ExtraSelection selection3;
-                    cursor3.setPosition( cts.cursor_idx, QTextCursor::MoveAnchor);
-                    cursor3.movePosition( QTextCursor::Right, QTextCursor::KeepAnchor,  cte.cursor_idx -  cts.cursor_idx );
-                    selection3.cursor = cursor3;
-                    selection3.format.setBackground( QBrush(Qt::yellow) );
-
+                    HighlightVec hvec;
                     if ( columnIdx == 0 || columnIdx == 2 ) {
-                        sellst.push_back(selection1);
-                        sellst.push_back(selection2);
-                        sellst.push_back(selection3);
+                        hvec.push_back( qMakePair(qMakePair(ots.cursor_idx, ote.cursor_idx), Qt::yellow) );
+                        hvec.push_back( qMakePair(qMakePair(vs.cursor_idx, ve.cursor_idx), Qt::red) );
+                        hvec.push_back( qMakePair(qMakePair(cts.cursor_idx, cte.cursor_idx), Qt::yellow) );
                     } else {
-                        sellst.push_back(selection2);
+                        hvec.push_back( qMakePair(qMakePair(vs.cursor_idx, ve.cursor_idx), Qt::red) );
                     }
 
-                    ui->xmlTextEdit->setExtraSelections( sellst );
-
-                    currentCursor.setPosition( ots.cursor_idx , QTextCursor::MoveAnchor);
-                    ui->xmlTextEdit->setTextCursor(currentCursor);
-
+                    hightLightNodeText(hvec);
+                    setXMLCurrentTextCursor( ots.cursor_idx );
                 }
                 break;
             case node_declaration:   //!< A declaration node. Name and value are empty. Declaration parameters (version, encoding and standalone) are in node attributes.
@@ -666,20 +587,10 @@ void MainWindow::highLightNode(QStandardItem* nodeInfo, int columnIdx)
                     const auto& ots = xmlNode->getOpenTagBeginInfo();
                     const auto& ote = xmlNode->getOpenTagEndInfo();
                     // qDebug() << "in case node_declaration : from " << ots.cursor_idx << " ~ " << ote.cursor_idx;
-                    QTextCursor currentCursor(ui->xmlTextEdit->textCursor());
-
-                    QList<QTextEdit::ExtraSelection> sellst;
-                    auto cursor1 = ui->xmlTextEdit->textCursor();
-                    QTextEdit::ExtraSelection selection1;
-                    cursor1.setPosition( ots.cursor_idx, QTextCursor::MoveAnchor);
-                    cursor1.movePosition( QTextCursor::Right, QTextCursor::KeepAnchor,  ote.cursor_idx - ots.cursor_idx  );
-                    selection1.cursor = cursor1;
-                    selection1.format.setBackground( QBrush(Qt::yellow) );
-                    sellst.push_back(selection1);
-                    ui->xmlTextEdit->setExtraSelections( sellst );
-
-                    currentCursor.setPosition( ots.cursor_idx , QTextCursor::MoveAnchor);
-                    ui->xmlTextEdit->setTextCursor(currentCursor);
+                    HighlightVec hvec;
+                    hvec.push_back( qMakePair(qMakePair(ots.cursor_idx, ote.cursor_idx), Qt::yellow) );
+                    hightLightNodeText(hvec);
+                    setXMLCurrentTextCursor(ots.cursor_idx);
 
                 }
                 break;
@@ -698,43 +609,19 @@ void MainWindow::highLightNode(QStandardItem* nodeInfo, int columnIdx)
                     const auto& vs = xmlNode->getValueBeginInfo();
                     const auto& ve = xmlNode->getValueEndInfo();
 
-                    QTextCursor currentCursor(ui->xmlTextEdit->textCursor());
-
-                    QList<QTextEdit::ExtraSelection> sellst;
-                    auto cursor1 = ui->xmlTextEdit->textCursor();
-                    QTextEdit::ExtraSelection selection1;
-                    cursor1.setPosition( ns.cursor_idx, QTextCursor::MoveAnchor);
-                    cursor1.movePosition( QTextCursor::Right, QTextCursor::KeepAnchor,  ne.cursor_idx - ns.cursor_idx  );
-                    selection1.cursor = cursor1;
-                    selection1.format.setBackground( QBrush(Qt::yellow) );
-
-                    auto cursor2 = ui->xmlTextEdit->textCursor();
-                    QTextEdit::ExtraSelection selection2;
-                    cursor2.setPosition( vs.cursor_idx, QTextCursor::MoveAnchor);
-                    cursor2.movePosition( QTextCursor::Right, QTextCursor::KeepAnchor,  ve.cursor_idx - vs.cursor_idx  );
-                    selection2.cursor = cursor2;
-                    selection2.format.setBackground( QBrush(Qt::red) );
-
-                    auto cursor3 = ui->xmlTextEdit->textCursor();
-                    QTextEdit::ExtraSelection selection3;
-                    cursor3.setPosition( ots.cursor_idx, QTextCursor::MoveAnchor);
-                    cursor3.movePosition( QTextCursor::Right, QTextCursor::KeepAnchor,  ote.cursor_idx - ots.cursor_idx  );
-                    selection3.cursor = cursor3;
-                    selection3.format.setBackground( QBrush(Qt::yellow) );
-
+                    HighlightVec hvec;
                     if ( columnIdx == 0 ) {
                         // hight-light name()
-                        sellst.push_back(selection1);
+                        hvec.push_back( qMakePair(qMakePair(ns.cursor_idx, ne.cursor_idx), Qt::yellow) );
                     } else if ( columnIdx == 1) {
                         // hight-light value()
-                        sellst.push_back(selection2);
+                        hvec.push_back( qMakePair(qMakePair(vs.cursor_idx, ve.cursor_idx), Qt::red) );
                     } else {
-                        sellst.push_back(selection3);
+                        hvec.push_back( qMakePair(qMakePair(ots.cursor_idx, ote.cursor_idx), Qt::yellow) );
                     }
-                    ui->xmlTextEdit->setExtraSelections( sellst );
 
-                    currentCursor.setPosition( ots.cursor_idx , QTextCursor::MoveAnchor);
-                    ui->xmlTextEdit->setTextCursor(currentCursor);
+                    hightLightNodeText(hvec);
+                    setXMLCurrentTextCursor(ots.cursor_idx);
                 }
                 break;
             default:
@@ -795,46 +682,21 @@ void MainWindow::highLightAttribute(QStandardItem* node, int rowIdx, int columnI
             // qDebug() << "in here , attrCnt = " << attrCnt << " , rowIdx = " << rowIdx << " , colIdx = " << columnIdx;
             if ( attrCnt > 0  ) {
                 if ( rowIdx >=0 && rowIdx < attrCnt ) {
-                    QList<QTextEdit::ExtraSelection> sellst;
-
+                    HighlightVec hvec;
                     if ( columnIdx == 1 ) {
                         // selcted name
                         auto s = nameVec.at(rowIdx).first;
                         auto e = nameVec.at(rowIdx).second;
-
-                        auto cursor = ui->xmlTextEdit->textCursor();
-                        QTextCursor currentCursor(cursor);
-
-                        QTextEdit::ExtraSelection selection1;
-                        cursor.setPosition( s.cursor_idx, QTextCursor::MoveAnchor);
-                        cursor.movePosition( QTextCursor::Right, QTextCursor::KeepAnchor,  e.cursor_idx - s.cursor_idx  );
-                        selection1.cursor = cursor;
-                        selection1.format.setBackground( QBrush(Qt::yellow) );
-                        sellst.push_back(selection1);
-
-                        ui->xmlTextEdit->setExtraSelections( sellst );
-
-                        currentCursor.setPosition( s.cursor_idx , QTextCursor::MoveAnchor);
-                        ui->xmlTextEdit->setTextCursor(currentCursor);
+                        hvec.push_back( qMakePair(qMakePair(s.cursor_idx,e.cursor_idx), Qt::yellow) );
+                        hightLightNodeText(hvec);
+                        setXMLCurrentTextCursor(s.cursor_idx);
                     } else if ( columnIdx == 2 ) {
                         // selcted value
                         auto s = valueVec.at(rowIdx).first;
                         auto e = valueVec.at(rowIdx).second;
-
-                        auto cursor = ui->xmlTextEdit->textCursor();
-                        QTextCursor currentCursor(cursor);
-
-                        QTextEdit::ExtraSelection selection1;
-                        cursor.setPosition( s.cursor_idx, QTextCursor::MoveAnchor);
-                        cursor.movePosition( QTextCursor::Right, QTextCursor::KeepAnchor,  e.cursor_idx - s.cursor_idx  );
-                        selection1.cursor = cursor;
-                        selection1.format.setBackground( QBrush(Qt::yellow) );
-                        sellst.push_back(selection1);
-
-                        ui->xmlTextEdit->setExtraSelections( sellst );
-
-                        currentCursor.setPosition( s.cursor_idx , QTextCursor::MoveAnchor);
-                        ui->xmlTextEdit->setTextCursor(currentCursor);
+                        hvec.push_back( qMakePair(qMakePair(s.cursor_idx,e.cursor_idx), Qt::yellow) );
+                        hightLightNodeText(hvec);
+                        setXMLCurrentTextCursor(s.cursor_idx);
                     } else {
 
                     }
@@ -850,11 +712,42 @@ void MainWindow::highLightAttribute(QStandardItem* node, int rowIdx, int columnI
 
 
 
+void MainWindow::hightLightNodeText(const QVector< QPair<QPair<int,int>, QColor>>& hightLightInfoVec)
+{
+    QList<QTextEdit::ExtraSelection> lst;
+    for ( const auto& info : hightLightInfoVec ) {
+        auto begIdx = info.first.first;
+        auto endIdx = info.first.second;
+        auto highlightColor = info.second;
+
+        auto cursor = ui->xmlTextEdit->textCursor();
+        // QTextCursor currentCursor(cursor);
+        
+        QTextEdit::ExtraSelection selection;
+        cursor.setPosition( begIdx, QTextCursor::MoveAnchor);
+        cursor.movePosition( QTextCursor::Right, QTextCursor::KeepAnchor,  endIdx - begIdx );
+        selection.cursor = cursor;
+        selection.format.setBackground( QBrush(highlightColor) );
+
+        lst.push_back(selection);
+    }
+    ui->xmlTextEdit->setExtraSelections(lst);
+}
+
 
 void MainWindow::dehighLightTextBox()
 {
     QList<QTextEdit::ExtraSelection> lst;
     ui->xmlTextEdit->setExtraSelections(lst);
+}
+
+
+void MainWindow::setXMLCurrentTextCursor(int cursorIdx)
+{
+    QTextCursor currentCursor( ui->xmlTextEdit->textCursor() );
+    auto realIdx = cursorIdx<=0 ? 0 : cursorIdx;
+    currentCursor.setPosition(realIdx, QTextCursor::MoveAnchor);
+    ui->xmlTextEdit->setTextCursor(currentCursor);
 }
 
 
@@ -895,20 +788,4 @@ void MainWindow::onAttributeItemSelectionChanged(const QItemSelection & selected
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

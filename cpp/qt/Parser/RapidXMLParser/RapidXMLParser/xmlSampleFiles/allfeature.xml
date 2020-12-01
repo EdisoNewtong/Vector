@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" tagtest='𠄘a𠄘b' ?>
+<!DOCTYPE note [
+    <!ENTITY CompanyName 'Liquid Technologies 𠄘a𠄘b Ltd' >
+    <!ELEMENT note (to,from,heading, 𠄘a𠄘b body)>
+    <!ELEMENT to (#PCDATA)>
+    <!ELEMENT from (#PCDATA)>
+    <!ELEMENT heading (#PCDATA)>
+    <!ELEMENT body (#PCDATA)>
+]>
+<root>
+  <!-- 𠄘a𠄘b
+     Line 1
+     我a们b
+     a我b们
+       Ḁ	<ᴕw
+  -->
+
+  <![CDATA[𠄘a𠄘b
+      -- lua script
+
+      local a = 1
+      local b = 1
+      function add2Number(x,y)
+        return x+y
+      end
+
+      local sum = add2Number(a,b)
+      print("sum = ",sum)
+  ]]>
+  <?xxxx asdfadsf 𠄘a𠄘b ;jkdlfaj;dfja;?>
+  <text1byte>a</text1byte>
+  <text2byte>Ḁ</text2byte>
+  <text3byte>我</text3byte>
+  <text4byte>𠄘</text4byte>
+  <textMisc>𠄘a𠄘b</textMisc>
+  <textMultiLine>aaaa
+bbbb ccccc 中国XML Parser 𠄘a
+𠄘b</textMultiLine>
+  <nodeMisc>aaa <ccc abd="aaa" bbb="adfadf" cccc='大家' ddd="𠄘a𠄘b"/> <bbb>  	  	a  
+  </bbb> www.baidu.com 𠄘a𠄘b
+  </nodeMisc>
+  <text fontname="Arail" fontsize="35">bbb</text>
+</root>

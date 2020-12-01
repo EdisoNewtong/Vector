@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root>
+  <text1byte>a</text1byte>
+  <text2byte>
+Ḁ</text2byte>
+  <text3byte>
+我</text3byte>
+  <textMultiLine>aaaa
+bbbb ccccc 中国XML Parser
+</textMultiLine>
+</root>
+

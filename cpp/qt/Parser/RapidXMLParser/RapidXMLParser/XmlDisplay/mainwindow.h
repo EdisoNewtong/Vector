@@ -5,6 +5,10 @@
 #include <QStandardItemModel>
 #include <QItemSelection>
 
+#include <QVector>
+#include <QPair>
+#include <QColor>
+
 
 // #include "rapidxml.hpp"
 // using namespace rapidxml;
@@ -48,7 +52,11 @@ private:
     void refreshAttributeTree(rapidxml::xml_node<char>* node);
     void highLightNode(QStandardItem* node,int columnIdx); 
     void highLightAttribute(QStandardItem* node,int rowIdx, int columnIdx); 
+
+    void hightLightNodeText(const QVector< QPair<QPair<int,int>, QColor>>& hightLightInfoVec);
     void dehighLightTextBox();
+    void setXMLCurrentTextCursor(int cursorIdx);
+    
 
     Ui::MainWindow *ui;
 
