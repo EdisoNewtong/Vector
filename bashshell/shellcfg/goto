@@ -1,0 +1,93 @@
+#!/bin/bash
+
+# echo 'Hello Shell , in goto script'
+# /Users/Edison/work/me/src/github
+case "${1}" in
+	"jump")
+		cd  ~/work/projects/Jump/work/Jump
+		echo "Now u are @   ==> `pwd`"
+		;;
+	"jump2")
+		cd  ~/work/projects/Jump/backup/Jump
+		echo "Now u are @   ==> `pwd`"
+		;;
+	"lua")
+		cd  ~/work/me/src/lua/originalSrc
+		echo "Now u are @   ==> `pwd`"
+		;;
+	"lua51")
+		cd  ~/work/me/src/lua/originalSrc/lua-5.1.5
+		echo "Now u are @   ==> `pwd`"
+		;;
+	"cpp")
+		cd ~/work/me/src/gnu/cpp
+		echo "Now u are @   ==> `pwd`"
+		;;
+	"cpptools")
+		cd ~/work/me/src/gnu/cpp/tools
+		echo "Now u are @   ==> `pwd`"
+		;;
+	"cpp1")
+		cd ~/work/me/src/gnu/cpp/test/test1
+		echo "Now u are @   ==> `pwd`"
+		;;
+	"cpp2")
+		cd ~/work/me/src/gnu/cpp/test/test2
+		echo "Now u are @   ==> `pwd`"
+		;;
+	"cpp3")
+		cd ~/work/me/src/gnu/cpp/test/test3
+		echo "Now u are @   ==> `pwd`"
+		;;
+	"cpp4")
+		cd ~/work/me/src/gnu/cpp/test/test4
+		echo "Now u are @   ==> `pwd`"
+		;;
+	"cpp5")
+		cd ~/work/me/src/gnu/cpp/test/test5
+		echo "Now u are @   ==> `pwd`"
+		;;
+	"doc")
+		cd ~/Documents
+		echo "Now u are @   ==> `pwd`"
+		;;
+	"down")
+		cd ~/Downloads
+		echo "Now u are @   ==> `pwd`"
+		;;
+	"daily")
+		cd ~/work/me/myDoc/daily
+		echo "Now u are @   ==> `pwd`"
+		;;
+	"qt")
+		cd ~/work/me/src/qt
+		echo "Now u are @   ==> `pwd`"
+		;;
+    "github")
+		cd ~/work/me/src/github
+		echo "Now u are @   ==> `pwd`"
+		;;
+	"help" | "" | *)
+		echo "==========================================================="
+		echo "           No Matched tag, Please see the following help   "
+		echo "==========================================================="
+		echo "jump       -->   ~/work/projects/Jump/work/Jump"
+		echo "jump2      -->   ~/work/projects/Jump/backup/Jump"
+		echo "lua        -->   ~/work/me/src/lua/originalSrc"
+		echo "lua51      -->   ~/work/me/src/lua/originalSrc/lua-5.1.5"
+		echo "cpp        -->   ~/work/me/src/gnu/cpp"
+		echo "cpp1       -->   ~/work/me/src/gnu/cpp/test/test1"
+		echo "cpp2       -->   ~/work/me/src/gnu/cpp/test/test2"
+		echo "cpp3       -->   ~/work/me/src/gnu/cpp/test/test3"
+		echo "cpp4       -->   ~/work/me/src/gnu/cpp/test/test4"
+		echo "cpp5       -->   ~/work/me/src/gnu/cpp/test/test5"
+		echo "cpptools   -->   ~/work/me/src/gnu/cpp/tools"
+		echo "doc        -->   ~/Documents"
+		echo "down       -->   ~/Downloads"
+		echo "daily      -->   ~/work/me/myDoc/daily"
+		echo "qt         -->   ~/work/me/src/qt"
+        echo "github     -->   ~/work/me/src/github"
+	    ;;
+esac
+
+

@@ -1,0 +1,90 @@
+
+set nu
+set ruler
+set showcmd
+set noignorecase
+set hlsearch
+set incsearch
+
+set noswapfile
+set nobackup
+set noundofile
+set nowrap
+
+set cpoptions-=c
+set tabstop=4
+set softtabstop=4
+set shiftwidth=4
+set cindent tabstop=4
+set cindent softtabstop=4
+
+set expandtab
+
+set sessionoptions+=options,resize
+set cinoptions=>1s
+
+
+syntax enable
+syntax on
+
+set textwidth=1000 fo+=m
+autocmd FileType * setlocal textwidth=1000 formatoptions+=t
+
+set timeout
+set timeoutlen=3500
+
+
+set encoding=utf-8
+let &termencoding=&encoding
+set fileencoding=utf-8
+set fileencodings=ucs-bom,utf-8,default,latin1,cp936,gbk,gb2312,gb18030
+
+
+set cinkeys-=0#
+
+" if has("gui_running")
+	set guioptions-=e
+	set guioptions-=T
+	" set gvim transpancy
+	set transparency=25
+
+	"colorscheme evening
+	colorscheme desert
+	" set guifont=Fixedsys:h16
+
+	map <MiddleMouse> <Nop>
+	imap <MiddleMouse> <Nop>
+	map <2-MiddleMouse> <Nop>
+	imap <2-MiddleMouse> <Nop>
+	map <3-MiddleMouse> <Nop>
+	imap <3-MiddleMouse> <Nop>
+	map <4-MiddleMouse> <Nop>
+	imap <4-MiddleMouse> <Nop>
+
+	" map <Tab> gt
+	" map <C-Tab> gT
+	map <F2>  50<C-W>>
+	map <F3>  <C-W><C-W>
+	map <F4>  :Explore<CR>
+	map <F5>  :vsplit<CR>
+	map <F6>  :tab split<CR>
+	map <F7>  :put   =expand('%:p')<CR>
+
+	nnoremap <C-H> 5zh
+	nnoremap <C-L> 5zl
+
+	" highlight
+	highlight  StatusLineNC ctermbg=LightGray ctermfg=DarkGrey guibg=LightGray guifg=DarkGrey 
+	" highlight  StatusLine ctermfg=Green ctermbg=Red guibg=#EEEE00 guifg=Red
+	"highlight  StatusLine ctermfg=Green ctermbg=Red guibg=White guifg=Red
+	highlight  StatusLine ctermfg=Green ctermbg=Red guibg=Green guifg=Red
+	highlight  TabLineSel ctermbg=Red ctermfg=White guibg=Red guifg=White
+	highlight  TabLine ctermbg=LightGray ctermfg=DarkGrey guibg=LightGray guifg=DarkGrey
+
+	highlight  TabLineSel guibg=Red guifg=White
+	highlight  TabLine  guibg=LightGray guifg=DarkGrey
+	set guifont=Menlo\ Regular:h22
+" endif
+
+
+

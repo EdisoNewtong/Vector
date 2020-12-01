@@ -1,0 +1,17 @@
+#!/bin/bash
+
+alias cls='clear'
+alias mv='mv -i'
+alias cp='cp -i'
+alias rm='rm -i'
+alias ls='ls -AG'
+alias ll='ls -AlG'
+
+
+# git alias
+alias gb='git branch'
+alias gs='git status'
+alias gd='git diff'
+alias gl='git log --pretty="%C(yellow)%h%Creset  %C(red)%cn%Creset %cd %C(green)%s%Creset"'
+alias goto='source goto'
+
