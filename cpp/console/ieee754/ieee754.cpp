@@ -150,56 +150,66 @@ bool isAFloatNumber(const string& originalStr, ConvertFloatInfo* cvtInfo)
 
 string positiveIntpart2binary(const string& decimalstrNum)
 {
+    static constexpr int BASE = 2;
+    static constexpr char ZERO_ASCII_CODE = '0';
+    // cout << "calc num : " << decimalstrNum << endl;
     //------------------------------------
-    // 1011(2) = 8 + 3 = 11(10) = B
-    // 11
+    // e.g.
+    //          67
     //------------------------------------
-    // 11/2 = 5 ... 1
-    // 5 /2 = 2 ... 1
-    // 2 /2 = 1 ... 0
-    // 1 /2 = 0 ... 1
+    //          67/2 = 33 ... 1
+    //          33/2 = 16 ... 1
+    //          16/2 = 8  ... 0
+    //           8/2 = 4  ... 0
+    //           4/2 = 2  ... 0
+    //           2/2 = 1  ... 0
+    //           1/2 = 0  ... 1
+    /////////////////////////////////
+    //
+    // 67(10) = 0100 0011(2)
+    //
+    /////////////////////////////////
 
+    string retBinaryStr;
     list< pair<string,int> > calcProcessLst;
     calcProcessLst.clear();
     
-    auto dividend = decimalstrNum;
-    auto quotient = 0;
+    // fomula = dividend / divisor  = quotient ... remainder
+    auto strdividend = decimalstrNum;
+
     do {
+        string strNextQuotient = "";
 
-        auto hasPreFlag = false;
-        auto previousNum = 0;
+        auto nQuotient = 0;
+        auto nRemainder = 0;
+        auto nStrLen = static_cast<int>(strdividend.size());
 
-        auto num2 = 0;
-        auto quotient = 0;
-        auto mod = 0;
-
-        // calc = quotient 
-        for ( auto ch : dividend  ) {
-            int num = ch - '0';
-            if ( hasPreFlag ) {
-                num2 = previousNum * 10 + num;
-                quotient = num / 2;
-                mod = num % 2;
-                // calcProcessLst.push_front( make_pair() );
-            } else {
-                // not preFlag
-                if ( num < 2 ) {
-                    hasPreFlag = true;
-                    previousNum = num;
-                    continue;
-                } else {
-                    auto  quotient = num / 2;
-                    auto  mod = num % 2;
-                    
-                }
-            }
+        for ( auto i = 0; i < nStrLen; ++i ) {
+            char ch = strdividend.at(i);
+            int nNum = ch - ZERO_ASCII_CODE;
+            auto realDividend = nRemainder * 10 + nNum;
+            nQuotient = realDividend / BASE;
+            nRemainder = realDividend % BASE;
+            strNextQuotient += static_cast<char>(ZERO_ASCII_CODE + nQuotient);
         }
 
+        // trim the beginning  '0';
+        auto noneZeroPos = strNextQuotient.find_first_not_of('0');
+        if ( noneZeroPos != string::npos ) {
+            strNextQuotient = strNextQuotient.substr(noneZeroPos);
+        } else {
+            // all all '0'
+            strNextQuotient = "0";
+        }
+        strdividend = strNextQuotient;
+        calcProcessLst.push_back( make_pair(strdividend,  nRemainder) );
+    } while( strdividend != "0"  );
 
-    } while( quotient != 0  );
-
-
-    return "";
+    for ( auto it = calcProcessLst.rbegin(); it!= calcProcessLst.rend(); ++it ) {
+        retBinaryStr += static_cast<char>( ZERO_ASCII_CODE + it->second);
+    }
+    
+    return retBinaryStr;
 }
 
 
@@ -256,16 +266,15 @@ bool convertFloatIntoBinary(ConvertFloatInfo* cvt)
         // strnumBefore must contain  at least 1 number
         auto pos = cvt->strnumBefore.find_first_not_of('0');
         if ( pos == string::npos ) {
-            // all is '0'  , such as '0000000000'
+            // all the characters are '0'  , such as '0000000000'
         } else {
             // fount it , maybe   '000123' => 123
-            auto strgetridofbegin0 =  cvt->strnumBefore.substr(pos);
+            auto strGetRidOfBegin0 =  cvt->strnumBefore.substr(pos);
+            auto retIntStrNumBeforeDot = positiveIntpart2binary(strGetRidOfBegin0);
         }
     } else {
 
     }
-
-
 
     return true;
 }

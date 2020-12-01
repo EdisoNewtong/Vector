@@ -75,11 +75,6 @@ MainWindow::~MainWindow()
 }
 
 
-// ui->xmlTextEdit
-// ui->parseResultTextBox
-// ui->xmltreeView
-// ui->attributeView
-
 
 void MainWindow::on_parseBtn_clicked()
 {
@@ -126,8 +121,36 @@ void MainWindow::on_parseBtn_clicked()
         ui->parseResultTextBox->setPlainText( QString("Parse XML Failed : Unknown Error ") );
     }
 
-    if ( m_parseOK ) {
-        ui->parseResultTextBox->setPlainText( QStringLiteral("Parse XML Successful") );
+    if ( m_pXMLDoc!=nullptr && m_parseOK ) {
+        auto hasMultiRoot = false;
+
+        auto elementChildCnt = 0;
+        QString nodename1;
+        QString nodename2;
+        for ( auto child = m_pXMLDoc->first_node(); child != nullptr; child = child->next_sibling() ) {
+            if ( child->type() == node_element ) {
+                ++elementChildCnt;
+
+                if ( elementChildCnt == 1 ) {
+                    nodename1 = child->name();
+                } else if ( elementChildCnt == 2 ) {
+                    hasMultiRoot = true;
+                    nodename2 = child->name();
+                    break;
+                }
+            }
+        }
+
+
+        if ( hasMultiRoot  ) {
+            ui->parseResultTextBox->setPlainText( QStringLiteral(R"(Warning : Parse XML OK But Not !!!Well-Formed!!! Format
+with multiple element node
+1. %1
+2. %2)").arg(nodename1).arg(nodename2) );
+        } else {
+            ui->parseResultTextBox->setPlainText( QStringLiteral("Parse XML Successful") );
+        }
+
     } 
 }
 
