@@ -38,6 +38,11 @@ private slots:
     void onTreeItemSelectionChanged(const QItemSelection & selected, const QItemSelection & deselected);
     void onAttributeItemSelectionChanged(const QItemSelection & selected, const QItemSelection & deselected);
 
+
+    void on_useTabOrSpaceChk_clicked();
+
+    void on_prettyFormatBtn_clicked();
+
 private:
     void createTreeModelIfNecessary();
     void deleteTreeModelIfNecessary();

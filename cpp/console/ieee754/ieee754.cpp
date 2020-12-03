@@ -1,11 +1,16 @@
 #include <iostream>
 #include <string>
-#include <list>
+#include <vector>
 #include <map>
 #include <regex>
 using namespace std;
 
 
+namespace constPart
+{
+    static constexpr int BASE = 2;
+    static constexpr char ZERO_ASCII_CODE = '0';
+}
 
 struct ConvertFloatInfo
 {
@@ -24,11 +29,12 @@ struct ConvertFloatInfo
 
     size_t nAvalibleBits;
     char binaryAry[BINARY_ARY_SIZE];
-    bool bMeetLoop;
+    bool bMeetLoopDuringCalc;
+    bool bInfiniteCalc;
     size_t loopStart;
     size_t loopEnd;
 
-    map<string,int>  calcTmpMap;
+    vector< pair<string,int> >  calcTmpList;
 
     void reset() 
     {
@@ -47,11 +53,12 @@ struct ConvertFloatInfo
             binaryAry[i] = 0;
         }
 
-        bMeetLoop = false;
+        bMeetLoopDuringCalc = false;
+        bInfiniteCalc = true;
         loopStart = 0;
         loopEnd = 0;
 
-        calcTmpMap.clear();
+        calcTmpList.clear();
     }
 
     ConvertFloatInfo() 
@@ -148,10 +155,9 @@ bool isAFloatNumber(const string& originalStr, ConvertFloatInfo* cvtInfo)
     return bret;
 }
 
-string positiveIntpart2binary(const string& decimalstrNum)
+string positiveIntPart2Binary(const string& decimalstrNum)
 {
-    static constexpr int BASE = 2;
-    static constexpr char ZERO_ASCII_CODE = '0';
+    using namespace constPart;
     // cout << "calc num : " << decimalstrNum << endl;
     //------------------------------------
     // e.g.
@@ -171,7 +177,7 @@ string positiveIntpart2binary(const string& decimalstrNum)
     /////////////////////////////////
 
     string retBinaryStr;
-    list< pair<string,int> > calcProcessLst;
+    vector< pair<string,int> > calcProcessLst;
     calcProcessLst.clear();
     
     // fomula = dividend / divisor  = quotient ... remainder
@@ -194,7 +200,7 @@ string positiveIntpart2binary(const string& decimalstrNum)
         }
 
         // trim the beginning  '0';
-        auto noneZeroPos = strNextQuotient.find_first_not_of('0');
+        auto noneZeroPos = strNextQuotient.find_first_not_of(ZERO_ASCII_CODE);
         if ( noneZeroPos != string::npos ) {
             strNextQuotient = strNextQuotient.substr(noneZeroPos);
         } else {
@@ -212,35 +218,119 @@ string positiveIntpart2binary(const string& decimalstrNum)
     return retBinaryStr;
 }
 
-
-bool convertFloatIntoBinary(ConvertFloatInfo* cvt)
+string floatPart2Binary(ConvertFloatInfo* cvt)
 {
+    if ( cvt == nullptr ) {
+        return string("");
+    }
+
+    using namespace constPart;
+    string retBinaryStr;
+
+    string strCalcRet = cvt->strnumAfter;
+    // clear it first
+    // none empty => f => float
+    // empty      =>      double
+    int nloopCount = 0;
+    int loopMaxCnt = cvt->strFFlag.empty() ? 52 : 23;
+    while ( true )
+    {
+        // the only added bit must be 1 , because the biggest bit 9*2 = 18 , 18 is the biggest result among [0-9]*2
+        bool needAddtoNextBit = false;
+        auto calcMiddleStr = strCalcRet;
+        for ( int idx = strCalcRet.size()-1; idx>=0; --idx )
+        {
+            char ch = strCalcRet.at(idx);
+            int num = ch - ZERO_ASCII_CODE;
+            num = num * 2 + (needAddtoNextBit ? 1 : 0);
+            if ( num >= 10 ) {
+                needAddtoNextBit = true;
+                num -= 10;
+            } else {
+                needAddtoNextBit = false;
+            }
+
+            calcMiddleStr.at(idx) = ZERO_ASCII_CODE + num;
+        }
+        ++nloopCount;
+
+        auto leaderBit = needAddtoNextBit ? 1 : 0;
+        cvt->calcTmpList.push_back( make_pair(calcMiddleStr,  leaderBit) );
+
+        auto pos = calcMiddleStr.find_first_not_of( ZERO_ASCII_CODE );
+        if ( pos == string::npos ) {
+            // all bits are '0'
+            cvt->bInfiniteCalc = false; // calc successfully, set flag
+            break;
+        } else {
+            auto foundSame = false;
+            for ( auto it = cvt->calcTmpList.rbegin(); it!=cvt->calcTmpList.rend(); ++it ) {
+                if ( it->first == calcMiddleStr ) {
+                    foundSame = true;
+                    cvt->loopStart = distance(cvt->calcTmpList.begin() , it.base()) - 1; // - 1 to make sure the index is corrent
+                    cvt->loopEnd   = cvt->calcTmpList.size() - 1;
+
+                    break; // jump out of the loop
+                }
+            }
+
+            if ( foundSame ) {
+                cvt->bMeetLoopDuringCalc = true;
+                break;
+            } else {
+                if ( nloopCount >= loopMaxCnt ) {
+                    break;
+                }
+            }
+        }
+
+        strCalcRet = calcMiddleStr;
+    } // end while
+
+    if( !cvt->bInfiniteCalc ) {
+        for ( auto& ele : cvt->calcTmpList ) {
+            retBinaryStr += (ZERO_ASCII_CODE + ele.second);
+        }
+    } else if ( cvt->bMeetLoopDuringCalc ) {
+        auto nloop = 0;
+        auto hasReachLoopEnd = false;
+        do {
+            if ( !hasReachLoopEnd ) {
+                for ( auto& ele : cvt->calcTmpList ) {
+                    retBinaryStr += (ZERO_ASCII_CODE + ele.second);
+                }
+
+                hasReachLoopEnd = true;
+                nloop += cvt->calcTmpList.size();
+            } else {
+                for ( auto i = cvt->loopStart; i<=cvt->loopEnd; ++i ) {
+                    if ( nloop < loopMaxCnt ) {
+                        retBinaryStr += (ZERO_ASCII_CODE + cvt->calcTmpList.at(i).second);
+                        ++nloop;
+                    } else {
+                        break;
+                    }
+                }
+            }
+        } while( true );
+    } else {
+        // forever loop without stop
+        for ( auto& ele : cvt->calcTmpList ) {
+            retBinaryStr += (ZERO_ASCII_CODE + ele.second);
+        }
+    }
+
+    return retBinaryStr;
+}
+
+
+
+
+bool convert2Binary(ConvertFloatInfo* cvt)
+{
+    using namespace constPart;
     // 1+8+23  = 32(bits) :  float
     // 1+11+52 = 64(bits) :  double
-    
-    // 1.1...1 ( there is one 1 and 23 1     (not 22 bits 1)   )
-    /*    
-    
-    127-23 = 104
-
-    24-bits     104-bits
-    1...1        0...0    
-
-    128 bits
-
-    FFF
-    */
-    
-
-    // [ -128 ~  0 ~ 127 ]
-    // 1.1...1 (23bits1)
-    
-
-    // float : [ 1.17549e-38 ~ 3.40282e+38 ]
-
-
-    // 2^8 = 256    -128 ~ +127
-    
     if ( cvt == nullptr ) {
         cout << "[ERROR] : Sorry ConvertFloatInfo is a nullptr " << endl;
         return false;
@@ -257,6 +347,7 @@ bool convertFloatIntoBinary(ConvertFloatInfo* cvt)
     }
 
     auto hasDot = !cvt->strDot.empty();
+    // float/double
     auto hasFFlag = !cvt->strFFlag.empty(); // hasFFlag => float , else the data type is double
     (void)sign;
     (void)hasFFlag;
@@ -264,16 +355,47 @@ bool convertFloatIntoBinary(ConvertFloatInfo* cvt)
     if ( !hasDot ) {
         // only interger part 
         // strnumBefore must contain  at least 1 number
-        auto pos = cvt->strnumBefore.find_first_not_of('0');
+        auto pos = cvt->strnumBefore.find_first_not_of(ZERO_ASCII_CODE);
         if ( pos == string::npos ) {
             // all the characters are '0'  , such as '0000000000'
         } else {
             // fount it , maybe   '000123' => 123
             auto strGetRidOfBegin0 =  cvt->strnumBefore.substr(pos);
-            auto retIntStrNumBeforeDot = positiveIntpart2binary(strGetRidOfBegin0);
+            auto retIntStrNumBeforeDot = positiveIntPart2Binary(strGetRidOfBegin0);
         }
     } else {
+        // has dot ,  there are 3 conditions
+        // 1.     xxx.xxx
+        // 2.     .xxx
+        // 3.     xxx.
 
+        // complete number before if necessary
+        if ( cvt->strnumBefore.empty() ) {
+            cvt->strnumBefore = "0";
+        } else {
+            auto pos = cvt->strnumBefore.find_first_not_of( ZERO_ASCII_CODE );
+            if ( pos == string::npos ) {
+                // all the characters are '0'  , such as '0000000000'
+                cvt->strnumBefore = "0";
+            } else {
+                // trim head of zero
+                cvt->strnumBefore = cvt->strnumBefore.substr(pos);
+            }
+        }
+
+        // complete number after if necessary
+        if ( cvt->strnumAfter.empty() ) {
+            cvt->strnumAfter = "0";
+        } else {
+            auto pos = cvt->strnumAfter.find_last_not_of( ZERO_ASCII_CODE );
+            if ( pos == string::pos ) {
+                // from tail to head , all the characters are '0'  , such as '0000000000'
+                cvt->strnumAfter = "0";
+            } else {
+                // trim end of zero
+                cvt->strnumAfter = cvt->strnumAfter.substr(0, pos+1);
+            }
+        }
     }
 
     return true;
@@ -294,7 +416,7 @@ int main(int argc, char* argv[],  char* env[])
         cout << "==================================================" << endl;
         if ( b ) {
             cout << "\tOK : \"" << cvt.fullstr << "\" is a valid float " << endl;
-            b = convertFloatIntoBinary(&cvt);
+            b = convert2Binary(&cvt);
         } else {
             cout << "\tFailed : \"" << cvt.fullstr  << "\" is not a valid float " << endl;
         }
@@ -307,3 +429,5 @@ int main(int argc, char* argv[],  char* env[])
 
     return 0;
 }
+
+

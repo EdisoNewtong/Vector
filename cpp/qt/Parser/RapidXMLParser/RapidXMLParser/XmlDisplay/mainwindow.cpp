@@ -2,7 +2,7 @@
 #include "ui_mainwindow.h"
 
 #include "rapidxml.hpp"
-#include "rapidxml.hpp"
+#include "rapidxml_print.hpp"
 #include "xmlStandardItem.h"
 
 using namespace rapidxml;
@@ -184,6 +184,8 @@ void MainWindow::on_buildTreeBtn_clicked()
         invisibleRootItem->setChild(0,0, visibleRoot);
 
         buildXMLTree(visibleRoot,m_pXMLDoc, 0);
+
+        ui->xmltreeView->expandAll();
     }
 
 }
@@ -410,6 +412,8 @@ void MainWindow::refreshAttributeTree(rapidxml::xml_node<char>* node)
     default:
         break;
     }
+
+    ui->attributeView->expandAll();
 }
 
 
@@ -789,3 +793,33 @@ void MainWindow::onAttributeItemSelectionChanged(const QItemSelection & selected
     }
 }
 
+
+
+
+void MainWindow::on_useTabOrSpaceChk_clicked()
+{
+    auto bUseTab = ui->useTabOrSpaceChk->isChecked();
+    qDebug() << "bUseTab = " << bUseTab;
+    ui->spaceNumTextBox->setEnabled(!bUseTab);
+}
+
+void MainWindow::on_prettyFormatBtn_clicked()
+{
+    if( m_pXMLDoc!=nullptr && m_parseOK ) {
+        auto bUseTab = ui->useTabOrSpaceChk->isChecked();
+        QString strSpaceCnt = ui->spaceNumTextBox->text();
+        bool convertRet = false;
+        auto spaceCnt = strSpaceCnt.toInt(&convertRet,10);
+
+        if ( convertRet ) {
+            rapidxml::set_use_space_instead(!bUseTab, spaceCnt );
+        } else {
+            // spaceCnt is invalid
+        }
+
+        std::string fmtStr;
+        rapidxml::print( std::back_inserter(fmtStr) , *m_pXMLDoc, 0);
+        ui->xmlTextEdit->setPlainText( QString(fmtStr.c_str()) );
+    }
+
+}

@@ -22,8 +22,75 @@ namespace rapidxml
 
     const int print_no_indenting = 0x1;   //!< Printer flag instructing the printer to suppress indenting of XML. See print() function.
 
+    /*
+    e.g.
+        ==================================================
+        1.
+
+        std::string strbuf;
+        rapidxml::set_use_space_instead(true,2);
+
+        // you must include <iterator> header's if use   std::back_inserter(...)
+        rapidxml::print( std::back_inserter(strbuf), doc, 0);
+        cout << strbuf << endl;
+
+        ==================================================
+        2. 
+
+        char bufferAry[40960] = { 0 };                      // You are responsible for making the buffer large enough!
+        rapidxml::set_use_space_instead(true,2);
+        char *end = rapidxml::print(bufferAry, doc, 0);      // end contains pointer to character after last printed character
+        *end = 0;
+        cout << bufferAry  << endl;
+
+        ==================================================
+    */
+    // Added by Edison , you can use <Space> instead of Tab
+    /*const*/ int   print_use_space_count = 4; // none default
+    /*bool*/  bool  print_use_space_instead = false;
+
+    // Added by Edison
+    void set_use_space_instead(bool b_flag, int space_cnt)
+    {
+        print_use_space_instead = b_flag;
+        if ( b_flag ) {
+            print_use_space_count = (space_cnt > 0 ? space_cnt : 4);
+        }
+    }
+
+
     ///////////////////////////////////////////////////////////////////////
     // Internal
+
+    // Added by Edison
+    // previously defination
+    //
+    namespace internal
+    {
+        template<class OutIt, class Ch>
+        inline OutIt print_children(OutIt out, const xml_node<Ch> *node, int flags, int indent);
+
+        template<class OutIt, class Ch>
+        inline OutIt print_element_node(OutIt out, const xml_node<Ch> *node, int flags, int indent);
+
+        template<class OutIt, class Ch>
+        inline OutIt print_data_node(OutIt out, const xml_node<Ch> *node, int flags, int indent);
+
+        template<class OutIt, class Ch>
+        inline OutIt print_cdata_node(OutIt out, const xml_node<Ch> *node, int flags, int indent);
+        
+        template<class OutIt, class Ch>
+        inline OutIt print_declaration_node(OutIt out, const xml_node<Ch> *node, int flags, int indent);
+
+        template<class OutIt, class Ch>
+        inline OutIt print_comment_node(OutIt out, const xml_node<Ch> *node, int flags, int indent);
+
+        template<class OutIt, class Ch>
+        inline OutIt print_doctype_node(OutIt out, const xml_node<Ch> *node, int flags, int indent);
+
+        template<class OutIt, class Ch>
+        inline OutIt print_pi_node(OutIt out, const xml_node<Ch> *node, int flags, int indent);
+    }
 
     //! \cond internal
     namespace internal
@@ -84,8 +151,25 @@ namespace rapidxml
         template<class OutIt, class Ch>
         inline OutIt fill_chars(OutIt out, int n, Ch ch)
         {
-            for (int i = 0; i < n; ++i)
-                *out++ = ch;
+            // inside change the Ch ch's value
+            // Added by Edison , the ch must be Ch('\t')
+            Ch indentCh = print_use_space_instead ? Ch(' ') : ch;
+
+            // Origninal Code
+            // for (int i = 0; i < n; ++i)
+            //     *out++ = ch;
+            // return out;
+
+
+            for (int i = 0; i < n; ++i) {
+                if ( !print_use_space_instead ) {
+                    *out++ = indentCh;
+                } else {
+                    for ( int j = 0; j < print_use_space_count; ++j ) {
+                        *out++ = indentCh;
+                    }
+                }
+            }
             return out;
         }
 

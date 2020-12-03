@@ -3216,7 +3216,23 @@ namespace rapidxml
                 auto mustBackupLineInfo = l_info;
                 // Skip whitespace between > and node contents
                 Ch *contents_start = text;      // Store start of node contents before whitespace is skipped
-                skip<whitespace_pred, Flags>(text, l_info);
+
+
+                // Added by Edison , do not skip the begining space 
+                // to   Support 
+                // <aaa>   <aaa>   
+                // or   <aaa>\t  \t</aaa>
+                if ( node->first_node() != nullptr ) {
+                    skip<whitespace_pred, Flags>(text, l_info);
+                }
+
+                // Comment by Edison
+                // skip<whitespace_pred, Flags>(text, l_info);
+
+
+                // Added by Edison
+                // bool has_skip_some_white_space = (text != contents_start);
+
                 Ch next_char = *text;
 
                 // Added by edison , delta > 0 means that there must be some space between next parsed token
@@ -3283,6 +3299,35 @@ namespace rapidxml
                         internal::on_text_step_n(1, text,1, l_info);
                         // Child node
                         ++text;     // Skip '<'
+
+
+                        ////////////////////////////////////////////////////////////////////////////////////
+                        //
+                        // Added by Edison , special logic to delete the 1st only space node
+                        // to   Support 
+                        // <aaa>   <aaa>   
+                        // or   <aaa>\t  \t</aaa>
+                        xml_node<Ch>* node1st = node->first_node();
+                        if (    node1st != nullptr 
+                             && node1st->type() == node_data 
+                             && node1st->next_sibling() == nullptr ) 
+                        {
+                            auto isAllWhiteSpace = true;
+                            Ch* chbegin = node1st->value();
+                            for ( int i = 0; i < node1st->value_size(); ++i ) {
+                                Ch* pCurrentCh = chbegin + i;
+                                if ( !whitespace_pred::test(*pCurrentCh) ) {
+                                    isAllWhiteSpace = false;
+                                    break;
+                                }
+                            }
+
+                            if ( isAllWhiteSpace ) {
+                                node->remove_first_node();
+                            }
+                        }
+                        ////////////////////////////////////////////////////////////////////////////////////
+                        
                         if (xml_node<Ch> *child = parse_node<Flags>(text, l_info))
                             node->append_node(child);
                     }

@@ -130,8 +130,8 @@
      <rect>
       <x>20</x>
       <y>560</y>
-      <width>201</width>
-      <height>51</height>
+      <width>150</width>
+      <height>50</height>
      </rect>
     </property>
     <property name="text">
@@ -141,10 +141,10 @@
    <widget class="QPushButton" name="loadfileBtn">
     <property name="geometry">
      <rect>
-      <x>250</x>
+      <x>190</x>
       <y>560</y>
-      <width>201</width>
-      <height>51</height>
+      <width>150</width>
+      <height>50</height>
      </rect>
     </property>
     <property name="text">
@@ -154,10 +154,10 @@
    <widget class="QPushButton" name="buildTreeBtn">
     <property name="geometry">
      <rect>
-      <x>470</x>
+      <x>540</x>
       <y>560</y>
-      <width>201</width>
-      <height>51</height>
+      <width>150</width>
+      <height>50</height>
      </rect>
     </property>
     <property name="text">
@@ -167,10 +167,10 @@
    <widget class="QCheckBox" name="checkBox">
     <property name="geometry">
      <rect>
-      <x>720</x>
-      <y>560</y>
-      <width>191</width>
-      <height>51</height>
+      <x>830</x>
+      <y>550</y>
+      <width>141</width>
+      <height>31</height>
      </rect>
     </property>
     <property name="text">
@@ -179,6 +179,74 @@
     <property name="checked">
      <bool>true</bool>
     </property>
+   </widget>
+   <widget class="QPushButton" name="prettyFormatBtn">
+    <property name="geometry">
+     <rect>
+      <x>360</x>
+      <y>560</y>
+      <width>150</width>
+      <height>50</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Pretty Format</string>
+    </property>
+   </widget>
+   <widget class="QGroupBox" name="groupBox">
+    <property name="geometry">
+     <rect>
+      <x>700</x>
+      <y>540</y>
+      <width>121</width>
+      <height>81</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>PrettyFormat</string>
+    </property>
+    <widget class="QLineEdit" name="spaceNumTextBox">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>60</x>
+       <y>50</y>
+       <width>51</width>
+       <height>21</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_4">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>50</y>
+       <width>41</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Space</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="useTabOrSpaceChk">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>20</y>
+       <width>101</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string> Use Tab</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
    </widget>
   </widget>
   <widget class="QStatusBar" name="statusBar">
