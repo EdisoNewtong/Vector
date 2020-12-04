@@ -4,6 +4,7 @@
 #include "rapidxml.hpp"
 #include "rapidxml_print.hpp"
 #include "xmlStandardItem.h"
+#include "GraphicNode.h"
 
 using namespace rapidxml;
 
@@ -22,9 +23,11 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
     , m_pXMLDoc(nullptr)
     , m_parseOK(false)
+    , m_hasMultiRootNode(false)
     , m_pXMLTreeModel(nullptr)
     , m_pXMLAttrTreeModel(nullptr)
     , m_XmlTextByteArray()
+    , m_graphicRootNode(nullptr)
 {
     ui->setupUi(this);
     m_pXMLDoc = new xml_document<char>();
@@ -73,6 +76,10 @@ MainWindow::~MainWindow()
         m_pXMLDoc = nullptr;
     }
 
+    if ( m_graphicRootNode!=nullptr ) {
+        delete m_graphicRootNode;
+        m_graphicRootNode = nullptr;
+    }
 }
 
 
@@ -80,7 +87,10 @@ MainWindow::~MainWindow()
 void MainWindow::on_parseBtn_clicked()
 {
     ui->parseResultTextBox->setPlainText("");
+
     m_parseOK = false;
+    m_hasMultiRootNode = false;
+
     rapidxml::QtConfig<0>::supportQt4BytesFlag = ui->checkBox->isChecked();
 
 
@@ -133,7 +143,7 @@ void MainWindow::on_parseBtn_clicked()
             }
         }
 
-
+        m_hasMultiRootNode = hasMultiRoot;
         if ( hasMultiRoot  ) {
             ui->parseResultTextBox->setPlainText( QStringLiteral(R"(Warning : Parse XML OK But Not !!!Well-Formed!!! Format
 with multiple element node
@@ -171,6 +181,11 @@ void MainWindow::on_buildTreeBtn_clicked()
         return;
     }
 
+    if ( m_hasMultiRootNode ) {
+        ui->statusBar->showMessage( QStringLiteral("Multi-Root-Root, Can't Build Tree") );
+        return;
+    }
+
     // Parse Successful
     if ( m_pXMLDoc!=nullptr ) {
         clearXMLTree();
@@ -183,7 +198,12 @@ void MainWindow::on_buildTreeBtn_clicked()
         auto visibleRoot = new xmlStandardItem( QString("XMLDoc"), m_pXMLDoc);
         invisibleRootItem->setChild(0,0, visibleRoot);
 
-        buildXMLTree(visibleRoot,m_pXMLDoc, 0);
+        if( m_graphicRootNode == nullptr ) {
+            m_graphicRootNode = new GraphicNode(0,visibleRoot);
+        }
+
+        buildXMLTree(visibleRoot, m_graphicRootNode, m_pXMLDoc, 0);
+        m_graphicRootNode->updateSize();
 
         ui->xmltreeView->expandAll();
     }
@@ -191,9 +211,9 @@ void MainWindow::on_buildTreeBtn_clicked()
 }
 
 
-void MainWindow::buildXMLTree(QStandardItem* parent, xml_node<char>* node, int level)
+void MainWindow::buildXMLTree(QStandardItem* parent, GraphicNode* rootGraphicNode, xml_node<char>* node, int level)
 {
-    if ( node == nullptr ) {
+    if ( node == nullptr || rootGraphicNode == nullptr ) {
         return;
     }
 
@@ -230,6 +250,10 @@ void MainWindow::buildXMLTree(QStandardItem* parent, xml_node<char>* node, int l
                     parent->setChild(idx, 0, xmltagItem);
                     parent->setChild(idx, 1, xmltagValueItem);
                     parent->setChild(idx, 2, xmltagTypeItem);
+
+                    GraphicNode* gNode = new GraphicNode(level,xmltagItem);
+                    rootGraphicNode->appendChild(gNode);
+                    rootGraphicNode->updateSize();
                 } else if ( childCount == 1 ) {
                     auto child1st = child->first_node();
                     if ( child1st!=nullptr && child1st->type() == node_data ) {
@@ -241,6 +265,9 @@ void MainWindow::buildXMLTree(QStandardItem* parent, xml_node<char>* node, int l
                         parent->setChild(idx, 0, xml1tagItem);
                         parent->setChild(idx, 1, xmlvalueItem);
                         parent->setChild(idx, 2, xmltypeItem );
+
+                        GraphicNode* gNode = new GraphicNode(level,xml1tagItem);
+                        rootGraphicNode->appendChild(gNode);
                     } else {
                         // children count == 1  :  but 1st child is not a PCDATA node , so   recursively travelsal
                         auto newCreateParent = new xmlStandardItem( QString(child->name()), child );
@@ -249,7 +276,10 @@ void MainWindow::buildXMLTree(QStandardItem* parent, xml_node<char>* node, int l
                         parent->setChild(idx,1, nullptr);
                         parent->setChild(idx,2, nullptr);
 
-                        buildXMLTree(newCreateParent, child, level+1);
+                        GraphicNode* gNode = new GraphicNode(level,newCreateParent);
+
+                        buildXMLTree(newCreateParent, gNode, child, level+1);
+                        gNode->updateSize();
                     }
                 } else {
                     // children count >= 2 :  recursively travelsal
@@ -261,7 +291,10 @@ void MainWindow::buildXMLTree(QStandardItem* parent, xml_node<char>* node, int l
                     parent->setChild(idx, 1, xmlvalueItem);
                     parent->setChild(idx, 2, xmltypeItem);
 
-                    buildXMLTree(newParent,child, level+1);
+                    GraphicNode* gNode = new GraphicNode(level,newParent);
+
+                    buildXMLTree(newParent,gNode, child, level+1);
+                    gNode->updateSize();
                 }
             }
             break;
@@ -275,6 +308,9 @@ void MainWindow::buildXMLTree(QStandardItem* parent, xml_node<char>* node, int l
                 parent->setChild(idx,0, valueNode);
                 parent->setChild(idx,1, value2ndNode);
                 parent->setChild(idx,2, valueTypeNode);
+
+                GraphicNode* gNode = new GraphicNode(level,valueNode);
+                rootGraphicNode->appendChild(gNode);
             }
             break;
         case node_cdata:         //!< A CDATA node. Name is empty. Value contains data text.
@@ -286,6 +322,9 @@ void MainWindow::buildXMLTree(QStandardItem* parent, xml_node<char>* node, int l
                 parent->setChild(idx,0, valueNode);
                 parent->setChild(idx,1, value2ndNode);
                 parent->setChild(idx,2, valueTypeNode);
+
+                GraphicNode* gNode = new GraphicNode(level,valueNode);
+                rootGraphicNode->appendChild(gNode);
             }
             break;
         case node_comment:       //!< A comment node. Name is empty. Value contains comment text.
@@ -297,6 +336,9 @@ void MainWindow::buildXMLTree(QStandardItem* parent, xml_node<char>* node, int l
                 parent->setChild(idx,0, valueNode);
                 parent->setChild(idx,1, value2ndNode);
                 parent->setChild(idx,2, valueTypeNode);
+
+                GraphicNode* gNode = new GraphicNode(level,valueNode);
+                rootGraphicNode->appendChild(gNode);
             }
             break;
         case node_declaration:   //!< A declaration node. Name and value are empty. Declaration parameters (version, encoding and standalone) are in node attributes.
@@ -308,6 +350,9 @@ void MainWindow::buildXMLTree(QStandardItem* parent, xml_node<char>* node, int l
                 parent->setChild(idx,0, valueNode);
                 parent->setChild(idx,1, value2ndNode);
                 parent->setChild(idx,2, valueTypeNode);
+
+                GraphicNode* gNode = new GraphicNode(level,valueNode);
+                rootGraphicNode->appendChild(gNode);
             }
             break;
         case node_doctype:       //!< A DOCTYPE node. Name is empty. Value contains DOCTYPE text.
@@ -319,6 +364,9 @@ void MainWindow::buildXMLTree(QStandardItem* parent, xml_node<char>* node, int l
                 parent->setChild(idx,0, valueNode);
                 parent->setChild(idx,1, value2ndNode);
                 parent->setChild(idx,2, valueTypeNode);
+
+                GraphicNode* gNode = new GraphicNode(level,valueNode);
+                rootGraphicNode->appendChild(gNode);
             }
             break;
         case node_pi:             //!< A PI node. Name contains target. Value contains instructions.
@@ -329,12 +377,17 @@ void MainWindow::buildXMLTree(QStandardItem* parent, xml_node<char>* node, int l
                 parent->setChild(idx,0, valueNode);
                 parent->setChild(idx,1, value2ndNode);
                 parent->setChild(idx,2, valueTypeNode);
+
+                GraphicNode* gNode = new GraphicNode(level,valueNode);
+                rootGraphicNode->appendChild(gNode);
             }
             break;
         default:
             break;
         }
     }
+
+    rootGraphicNode->updateSize();
 }
 
 
@@ -459,6 +512,11 @@ void MainWindow::clearXMLTree()
 
     deleteTreeModelIfNecessary();
     ui->xmltreeView->setModel(nullptr);
+
+    if ( m_graphicRootNode!=nullptr ) {
+        delete m_graphicRootNode;
+        m_graphicRootNode = nullptr;
+    }
 }
 
 void MainWindow::preSetupXMLTree()

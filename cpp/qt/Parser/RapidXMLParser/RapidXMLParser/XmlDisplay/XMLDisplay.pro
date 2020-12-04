@@ -12,7 +12,8 @@ TARGET = XmlDisplay
 SOURCES += main.cpp \
            mainwindow.cpp \
            SuperTextEdit.cpp \
-           XMLModel/xmlStandardItem.cpp
+           XMLModel/xmlStandardItem.cpp \
+           XMLModel/GraphicNode.cpp
 
 
 INCLUDEPATH += ../XmlParser \
@@ -29,7 +30,8 @@ FORMS += mainwindow.ui
 
 HEADERS += mainwindow.h \
            SuperTextEdit.h \
-           XMLModel/xmlStandardItem.h
+           XMLModel/xmlStandardItem.h \
+           XMLModel/GraphicNode.h
 
 
 RESOURCES += xmldisplay.qrc

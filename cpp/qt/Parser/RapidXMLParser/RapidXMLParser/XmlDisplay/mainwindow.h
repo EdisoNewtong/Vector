@@ -22,6 +22,8 @@ namespace Ui {
 class MainWindow;
 }
 
+class GraphicNode;
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -53,7 +55,7 @@ private:
     void preSetupXMLTree();
     void clearXMLAttrTree();
     void preSetupAttrXMLTree();
-    void buildXMLTree(QStandardItem* parent,rapidxml::xml_node<char>* node, int level);
+    void buildXMLTree(QStandardItem* parent,GraphicNode* rootGraphicNode, rapidxml::xml_node<char>* node, int level);
     void refreshAttributeTree(rapidxml::xml_node<char>* node);
     void highLightNode(QStandardItem* node,int columnIdx); 
     void highLightAttribute(QStandardItem* node,int rowIdx, int columnIdx); 
@@ -68,10 +70,12 @@ private:
 
     rapidxml::xml_document<char>* m_pXMLDoc;
     bool m_parseOK;
+    bool m_hasMultiRootNode;
 	QStandardItemModel* m_pXMLTreeModel;
 	QStandardItemModel* m_pXMLAttrTreeModel;
     QByteArray  m_XmlTextByteArray;
-    
+
+    GraphicNode*  m_graphicRootNode;
 
 };
 
