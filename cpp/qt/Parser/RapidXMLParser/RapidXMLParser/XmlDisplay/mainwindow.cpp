@@ -799,7 +799,7 @@ void MainWindow::onAttributeItemSelectionChanged(const QItemSelection & selected
 void MainWindow::on_useTabOrSpaceChk_clicked()
 {
     auto bUseTab = ui->useTabOrSpaceChk->isChecked();
-    qDebug() << "bUseTab = " << bUseTab;
+    // qDebug() << "bUseTab = " << bUseTab;
     ui->spaceNumTextBox->setEnabled(!bUseTab);
 }
 
