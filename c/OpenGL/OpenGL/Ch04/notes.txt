@@ -1,0 +1,137 @@
+--------------------------------------------------
+Ch04
+--------------------------------------------------
+
+Notes:
+
+glVertex???
+
+3   ?  means:
+1st.	2/3/4 means   2d/3d/4d
+2nd.	i/s/f/d	  means  int/short/float/double
+3rd.	omit/v	  means	 n_count  numbers  /  vector
+
+e.g.
+
+glVertex2i(10,10)
+glVertex3f(1.0f,2.0f,3.0f);
+
+short ary[2] = { 20, 30 };
+glVertex2sv(ary);
+
+
+glBegin(drawType)
+drawType 有很多种类 , 下面先介绍一些画线的种类
+
+// 画线，每2个顶点为1组，画出的线，顶点间无共享，无关联，如果顶点的数量是奇数，那么最后一个顶点无与之配对的顶点构成1条线段，不绘制
+1. GL_LINES
+
+// 画连续线
+// a1 a2 a3 a4 a5 ... aN, 从a2起到a(n-1) ，这些点都是共享的，成为下一条要画的线的起始点 , 但是an 与 a1不相连
+// e.g.  
+// a1 a2 a3 a4 a5,  
+// 将画4条线  , 但 a5不连接a1
+// line1 : a1->a2
+// line2 : a2->a3
+// line3 : a3->a4
+// line4 : a4->a5
+2. GL_LINE_STRIP : 
+
+// 画闭合线段
+// 与 GL_LINE_STRIP 类似，只是最后 an 会与 a1 相连接
+3. GL_LINE_LOOP 
+
+!!!!!! [逆时针] !!!!!!
+
+画矩形
+glColor3f(1.0,0.0,0.0);	// 用红色来填充整个矩形
+glRect*(x1,y1,x2,y2);
+
+e.g.
+	(200,100) 矩形的右下角点
+	(50,250)  矩形的左上角点
+	glRecti(200,100,50,250);
+
+注意，
+1. 一定是矩形的一个顶点，与这个顶点对角线上的另一个顶点，组成一个完整的矩形
+2. 这个函数一定[!!!不能!!!!]放在 glBegin(...) 与 glEnd() 之间
+glBegin(...);
+	glRect*(...);
+glEnd();
+
+因为glBegin() [没有] 类似  GL_RECTANGLE这样子的绘制类型
+
+
+画多边形, 注意多边形的各个顶点必须 [逆时针] 加入到渲染队列中
+glBegin(GL_POLYGON)
+	...
+glEnd()
+
+画三角形 , 注意三角形的各个顶点必须 [逆时针] 加入到渲染队列中
+glBegin(GL_TRIANGLES);	//注意是 TRIANGLES ，尾部要加s
+	// 每3个顶点为1组
+	// 至少3个顶点, 顶点的个数应该是 3*n 个(n表示你要绘制的三角形的个数)
+	...
+glEnd();
+
+//
+// 6个点，获得6-2个三角形，N个点，获得N-2个三角形
+// ***** 如何获取三角形的3个点 *****
+// 举例说明:
+// 6个点，能画4个三角形
+// 这4个三角形，分别用代号 n=1, n=2, n=3, n=4 代码
+// 当n是奇数时 ，这个三角形的3个顶点分别是 n,n+1,n+2 ，即如果n=1时，顶点是 p1,p2,p6 (按glBegin() ... glEnd() 放置的顺序来定)
+// 当n是偶数时 ，这个三角形的3个顶点分别是 n+1,n,n+2 ，即如果n=2时，顶点是 p6,p2,p3 (按glBegin() ... glEnd() 放置的顺序来定)
+// 同理 ，即如果n=3时，p6,p3,p5
+// 同理 ，即如果n=4时，p5,p3,p4
+// 总之，永远以 [!!!逆时针!!!] 顺序安排三角边的三个顶点
+// 画连续的三角形,相邻的2个三角形，共享1条边
+glBegig(GL_TRIANGLE_STRIP)
+		glVertex2iv(p1);	// triangle1 : p1 p2 p6
+		glVertex2iv(p2);	// triangle2 : p6 p2 p3  shared p2-p6
+		glVertex2iv(p6);	// triangle3 : p6 p3 p5	 shared p3-p6
+		glVertex2iv(p3);	// triangle4 : p5 p3 p4  shared p5-p3
+		glVertex2iv(p5);	
+		glVertex2iv(p4);
+glEnd()
+
+// 画连续的三角形,相邻的2个三角形，共享1个顶点(第1个点)
+// 举例说明:
+// 三角形1 (n = 1) : p1 p2 p3 (1, n+1,n+2)
+// 三角形2 (n = 2) : p1 p3 p4 (1, n+1,n+2)
+// 三角形3 (n = 3) : p1 p4 p5 (1, n+1,n+2)
+// 三角形4 (n = 4) : p1 p5 p6 (1, n+1,n+2)
+glBegig(GL_TRIANGLE_FAN)
+		// *** 第1个顶点，就是这个fan的公共点 p1
+		glVertex2iv(p1);	// triangle1 : p1 p2 p3
+		glVertex2iv(p2);	// triangle2 : p1 p3 p4  shared p1
+		glVertex2iv(p3);	// triangle3 : p1 p4 p5	 shared p1
+		glVertex2iv(p4);	// triangle4 : p1 p5 p6  shared p1
+		glVertex2iv(p5);	
+		glVertex2iv(p6);
+glEnd()
+
+画1~n个四边形
+glBegin(GL_QUADS)
+	// 每4个为1组 , 各个顶点的顺序为 逆时针 加入渲染队列
+	...
+glEnd()
+
+//
+// 画多个连续4边形
+// 4个1组，
+//		第2组共享第1组最后2个顶点为公共边
+//		第3组共享第2组最后2个顶点为公共边
+//				   	
+// 8个顶点，依次是 p1,p2,p4,p3,p5,p6,p8,p7
+//
+// 每1分组的4个顶点的排序顺序依次是 2n-1,2n,2n+2,2n+1
+// e.g. 
+// 第1组: n=1 , 1,2,4,3 --> 对应8个顶点中的 p1,p2,p3,p4
+// 第2组: n=2 , 3,4,6,5 --> 对应8个顶点中的 p4,p3,p6,p5
+// 第3组: n=3 , 5,6,8,7 --> 对应8个顶点中的 p5,p6,p7,p8
+// 画连续4边形
+glBegin(GL_QUAD_STRIP)
+	...
+glEnd()
+

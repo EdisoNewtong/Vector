@@ -1,0 +1,98 @@
+
+glutInit(&argc,argv);
+
+glutInitDisplayMode( ... )	// GLUT_SINGLE | GLUT_RGB
+
+// 设置OpenGL 窗口在屏幕中摆放的位置，以屏幕左上角为坐标原点，向右为+X,向下为+Y
+glutInitWindowPosition(int x,int y)
+
+glutInitWindowSize(int width,int height)
+
+glutCreateWindow("Hello , OpenGL");
+
+glutDisplayFunc( void (*fn)(void) );
+
+glutMainLoop();
+
+// r/g/b/a  ranges [0.0,1.0]
+glClearColor(float r,float g,float b,float alpha);
+
+glMatrixMode(  GL_PROJECTION );
+// 正交垂直投影的区域规范围  x:[1.0,200.0] , y:[2.0,150.0] , 也就是说 x 坐标在 [1.0 ~ 200.0] 以外的将不显示 , 同理y坐标在 [2.0,150.0] 以外的将不显示 
+glOrtho2D(1.0, 200.0 , 2.0, 150.0);
+
+// 绘制 [点] 图元
+glBegin(GL_POINTS);
+	glColor3f(1.0,0.0,0.0);
+	glVertex2i( 10,10 );	// point 1	: red
+
+	glColor3f(0.0,1.0,0.0);
+	glVertex2i( 20,20 );	// point 2	: green
+
+	glColor3f(0.0,0.0,1.0);
+	glVertex2i( 30,30 );	// point 3	: blue
+glEnd();
+
+
+// 绘制一个 红色的 矩形， (200,10) 是右下角的端点， (50,250) 是左上角的端点
+// 注意， glRecti [!!!不!!!]需要放置在 glBegin(...) 与 glEnd() 之间
+glColor3f(1.0,0.0,0.0);
+glRecti(200,10,50,250);
+
+// 清理屏幕 BUFFER 缓存
+glClear( GL_COLOR_BUFFER_BIT );
+
+// 设置要绘制的图元的颜色 r/g/b : [0.0,1.0] ,以下设置成红色
+glColor3f(1.0,0.0,0.0);
+
+// OpenGL 坐标系为 ，---> 从左往右 +X , 从下往上 +Y
+glBegin( GL_LINES )
+	glVertex2i(0,0);		// 为线段的起始点 (0,0) , 窗口右下边点
+	glVertex2i( 10,10 );	// 指向窗口右上角45度方向的，一个点，为这条线段的终点
+glEnd();
+
+//
+// 设置要绘制的图元的颜色 
+//
+glBegin(GL_LINES);	// 设置为绘制图元模式 , 直线为2个顶点分为1组
+	// OpenGL Coordinate , left-bottom is the Original-Point
+	// Line 1
+	glColor3f(1.0,0.0,0.0);	// Red
+	glVertex2i(10,10);
+	glVertex2i(390,10);
+	// Line 2
+	glColor3f(1.0,1.0,0.0);	// Yellow
+	glVertex2i(10, 20);
+	glVertex2i(400, 20);
+	// Line 3
+	glColor3f(0.0,0.0,1.0);	// Blue
+	glVertex2i(10, 30);
+	glVertex2i(490, 30);
+	// Line 4
+	glColor3f(1.0,1.0,1.0);	// White
+	glVertex2i(10, 40);
+	glVertex2i(495, 40);
+glEnd();
+
+
+glFlush();
+
+//
+// 绘制模式的一些说明
+//
+GL_LINES : 画线，顶点数量是偶数，则画n/2 根线，如果是奇数，则忽略最后1个顶点
+e.g.
+	p1,p2,p3,p4,p5 : p1->p2 (line 1),  p3->p4 (line 2), p5忽略(因为没有p6)
+
+GL_LINE_STRIP : 画 折线
+e.g.
+	p1,p2,p3,p4,p5 : p1->p2 , p2->p3 , p3->p4 , p4->p5 , 但是p5->p1 这根线[!!!不!!!]画
+
+GL_LINE_LOOP : 画 闭合线段
+	p1,p2,p3,p4,p5 : p1->p2 , p2->p3 , p3->p4 , p4->p5 , 最终 p5->p1
+
+//
+// GL 开启/禁止  颜色混合
+//
+glEnable(GL_BLEND);
+gliDisable(GL_BLEND);

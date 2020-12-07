@@ -1,0 +1,51 @@
+survey			调查							P25
+virtually		实际上							P25
+undertaking		企业/保证						P25
+cumbersome		笨重的							P25
+routinely		常规地							P25
+diverse			不同的，多种多样的				P25
+plotted			以图表画出						P26
+slides			幻灯片							P26
+bulletins		公告，新闻快报，小报			P26
+bureaus			局，办事处						P26
+CAD : Computer-Aided Design	电脑辅助设计		P26
+CADD: Computer-Aided drafting(起草) and design	P26
+textile			纺织品							P26
+
+CRT: cathode-ray tube							P34
+LED: light-Emitting Diode						P43
+LCD: Liquid-Crystal Displays					P43
+
+CG API: Computer-Graphics Application-Programming-Interface		P60
+hypothetical	假设的，假想的					P60
+subdivide		再细分							P75
+conic			圆锥的							P76
+corresponding to  相当于						P76
+in terms of		就...而言						P76
+designate		指定							P78
+
+convex 			凸								P85
+concave 		凹								P85
+
+
+alleviate		缓和							P101
+consecutive		连续							P102
+respectively	分别							P103
+unaffected		未受影响的						P103
+stencil			模板							P105
+constitute		构成							P105
+stereoscopic	立体							P105
+overall			总体							P107
+typeface		字体							P107
+monospace		等宽							P108
+proportional	成比例的						P108
+distorting		扭曲							P108
+eliminate		消除							P111
+compensate		补偿							P113
+spacial			空间的							P116
+winding			曲折							P116
+slanted			倾斜的							P129
+diagonal		对角线的						P129
+intensity		强度							P129
+beams			光束，光线						P130
+

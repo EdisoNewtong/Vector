@@ -1,0 +1,22 @@
+OpenGL基础
+--------------------------------------------------
+OpenGL 的API通常以 gl开头，后面跟一个大写字母
+e.g.
+	glBegin(... )
+	glClear(...)
+	glEnd(... )
+
+
+OpenGL 的常量的特点 : GL开头，跟_ ,然后再跟大写字母的构造的单词
+e.g.
+	GL_2D
+	GL_RGB
+	GL_CCW
+
+在Mac OX下编写OpenGL 程序的一些说明
+header file :
+	#include <GLUT/glut.h>
+
+Compile link Options :  -framework OPENGL -framework GLUT
+	gcc -g -Wall -o main main.c -framework OPENGL -framework GLUT
+
