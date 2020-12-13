@@ -474,13 +474,24 @@ void MainWindow::fillDataIntoModel(QStandardItem* parent, rapidjson::Value* json
 
 	if( jsonValue->IsObject() || jsonValue->IsArray()  ) {
         QString type = QStringLiteral("%1").arg(jsonValue->IsObject() ? "Object" : "Array");
+        auto isObjFlag = jsonValue->IsObject();
+        QString displaystr;
+        auto isCompoundDataEmpty = false;
+        if ( isObjFlag ) {
+            isCompoundDataEmpty = jsonValue->ObjectEmpty();
+            displaystr = isCompoundDataEmpty ? "{ }" : "{ ... }";
+        } else {
+            isCompoundDataEmpty = jsonValue->Empty();
+            displaystr = isCompoundDataEmpty ? "[ ]" : "[ ... ]";
+        }
+
         if( tag == -1) {
-            currentParent->setChild(0, 1, new JSonStandardItem(QStringLiteral("..."), jsonValue) );
+            currentParent->setChild(0, 1, new JSonStandardItem(displaystr, jsonValue) );
             currentParent->setChild(0, 2, new JSonStandardItem(type, jsonValue) );
             currentParent = newRoot;
         } else {
             auto parent_of_parent = currentParent->parent();
-            parent_of_parent->setChild(tag, 1, new JSonStandardItem(QStringLiteral("..."), jsonValue) );
+            parent_of_parent->setChild(tag, 1, new JSonStandardItem(displaystr, jsonValue) );
             parent_of_parent->setChild(tag, 2, new JSonStandardItem(type, jsonValue) );
         }
 
