@@ -218,6 +218,7 @@ void MainWindow::on_buildTreeBtn_clicked()
         m_graphicRootNode->updateSize();
 
         ui->xmltreeView->expandAll();
+        ui->xmltreeView->update();
     }
 
 }
@@ -479,6 +480,7 @@ void MainWindow::refreshAttributeTree(rapidxml::xml_node<char>* node)
     }
 
     ui->attributeView->expandAll();
+    ui->attributeView->update();
 }
 
 

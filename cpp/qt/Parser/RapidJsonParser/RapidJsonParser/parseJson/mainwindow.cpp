@@ -121,6 +121,7 @@ void MainWindow::on_pushButton_4_clicked()
 		QStandardItem* rootNode = m_pTreeModel->invisibleRootItem();
 		fillDataIntoModel(rootNode, m_pDoc, -1);	// -1 : root is Doc
         ui->treeView->expandAll();
+        ui->treeView->update();
 	}
 }
 
