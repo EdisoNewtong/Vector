@@ -60,6 +60,14 @@ MainWindow::MainWindow(QWidget *parent)
                 image: url(:/image/branch-open.png);
         })"
     );
+
+
+    // Qt::Unchecked || Qt::Checked || Qt::PartiallyChecked
+    ui->checkBox->setCheckState(rapidxml::QtConfig<0>::supportQt4BytesFlag  ? Qt::Checked : Qt::Unchecked);
+    ui->checkBox_2->setCheckState(rapidxml::QtConfig<0>::supportBlankPCDATA ? Qt::Checked : Qt::Unchecked);
+    // ui->checkBox->setCheckState(Qt::PartiallyChecked);
+    // ui->checkBox_2->setCheckState(Qt::Unchecked);
+
 }
 
 MainWindow::~MainWindow()
@@ -92,7 +100,7 @@ void MainWindow::on_parseBtn_clicked()
     m_hasMultiRootNode = false;
 
     rapidxml::QtConfig<0>::supportQt4BytesFlag = ui->checkBox->isChecked();
-
+    rapidxml::QtConfig<0>::supportBlankPCDATA  = ui->checkBox_2->isChecked();
 
     try {
         if ( m_pXMLDoc!=nullptr ) {
@@ -153,6 +161,10 @@ with multiple element node
             ui->parseResultTextBox->setPlainText( QStringLiteral("Parse XML Successful") );
         }
 
+
+
+        // qDebug() << "Parse XML Successful => dehighLightTextBox()";
+        dehighLightTextBox();
     } 
 }
 
@@ -160,7 +172,7 @@ void MainWindow::on_loadfileBtn_clicked()
 {
     QString pickedFileName = QFileDialog::getOpenFileName(this, QStringLiteral("Select a XML File to Read") );
     if ( pickedFileName.isNull() || pickedFileName.isEmpty() ) {
-        qDebug() << "Not select";
+        // qDebug() << "Not select";
         return;
     }
 
@@ -245,7 +257,7 @@ void MainWindow::buildXMLTree(QStandardItem* parent, GraphicNode* rootGraphicNod
                 if ( childCount == 0 ) {
                     auto xmltagItem = new xmlStandardItem( QString(child->name()), child );
                     auto xmltagValueItem = new xmlStandardItem( QString(""), child );
-                    auto xmltagTypeItem = new xmlStandardItem( QString("Sigle-Element"), child );
+                    auto xmltagTypeItem = new xmlStandardItem( QString("Single-Element"), child );
 
                     parent->setChild(idx, 0, xmltagItem);
                     parent->setChild(idx, 1, xmltagValueItem);
@@ -590,19 +602,19 @@ void MainWindow::highLightNode(QStandardItem* nodeInfo, int columnIdx)
                     const auto& bIsSingle = xmlNode->getIsSingleNode();
                     const auto& ots = xmlNode->getOpenTagBeginInfo();
                     const auto& ote = xmlNode->getOpenTagEndInfo();
+                    const auto& cts = xmlNode->getCloseTagBeginInfo();
+                    const auto& cte = xmlNode->getCloseTagEndInfo();
 
                     HighlightVec hvec;
                     if ( bIsSingle ) {
-                        hvec.push_back( qMakePair(qMakePair(ots.cursor_idx, ote.cursor_idx), Qt::yellow) );
+                        hvec.push_back( qMakePair(qMakePair(ots.cursor_idx, cte.cursor_idx), Qt::yellow) );
                     } else {
-                        const auto& cts = xmlNode->getCloseTagBeginInfo();
-                        const auto& cte = xmlNode->getCloseTagEndInfo();
-
                         hvec.push_back( qMakePair(qMakePair(ots.cursor_idx,  ote.cursor_idx), Qt::yellow) );
                         hvec.push_back( qMakePair(qMakePair(ote.cursor_idx , cts.cursor_idx), Qt::red) );
                         hvec.push_back( qMakePair(qMakePair(cts.cursor_idx,  cte.cursor_idx), Qt::yellow) );
                     }
 
+                    // qDebug() << bIsSingle << " , hvec.size() = " << hvec.size();
                     hightLightNodeText(hvec);
                     setXMLCurrentTextCursor(ots.cursor_idx);
                 }
@@ -611,6 +623,7 @@ void MainWindow::highLightNode(QStandardItem* nodeInfo, int columnIdx)
                 {
                     const auto& vs = xmlNode->getValueBeginInfo();
                     const auto& ve = xmlNode->getValueEndInfo();
+                    // qDebug() << "vs.cursor_idx ~ ve.cursor_idx = " << vs.cursor_idx << " , " << ve.cursor_idx;
 
                     HighlightVec hvec;
                     hvec.push_back( qMakePair(qMakePair(vs.cursor_idx, ve.cursor_idx), Qt::red) );

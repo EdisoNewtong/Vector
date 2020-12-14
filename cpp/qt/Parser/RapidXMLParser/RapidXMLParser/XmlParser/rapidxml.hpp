@@ -68,6 +68,7 @@ namespace rapidxml
     struct QtConfig
     {
         static bool supportQt4BytesFlag;
+        static bool supportBlankPCDATA;
     };
 
     //
@@ -3217,12 +3218,15 @@ namespace rapidxml
                 // Skip whitespace between > and node contents
                 Ch *contents_start = text;      // Store start of node contents before whitespace is skipped
 
-
-                // Added by Edison , do not skip the begining space 
-                // to   Support 
-                // <aaa>   <aaa>   
-                // or   <aaa>\t  \t</aaa>
-                if ( node->first_node() != nullptr ) {
+                if ( QtConfig<0>::supportBlankPCDATA ) {
+                    // Added by Edison , do not skip the begining space 
+                    // to   Support 
+                    // <aaa>   <aaa>   
+                    // or   <aaa>\t  \t</aaa>
+                    if ( node->first_node() != nullptr ) {
+                        skip<whitespace_pred, Flags>(text, l_info);
+                    }
+                } else {
                     skip<whitespace_pred, Flags>(text, l_info);
                 }
 
@@ -3258,6 +3262,21 @@ namespace rapidxml
                         node_closeTagBeginInfo = l_info;
                         internal::on_text_step_n(2, text, 1, l_info);
 
+                        // Added by Edison , special logic to delete the 1st only space node
+                        // to   Support  , there are no elements inside tag <aaa> , append an empty text "" to its children list
+                        // <aaa></aaa>   
+                        if ( QtConfig<0>::supportBlankPCDATA && node->first_node() == nullptr && delta == 0 ) {
+                            xml_node<Ch> *blankData = this->allocate_node(node_data);
+                            // Added by Edison , set Line Info
+                            auto& data_beginLineInfo = blankData->getValueBeginInfo();
+                            data_beginLineInfo = mustBackupLineInfo;
+                            auto& data_endLineInfo = blankData->getValueEndInfo();
+                            data_endLineInfo = mustBackupLineInfo;
+                            data_endLineInfo.cursor_idx += 1; // for dummy string size only
+                            // do not set the empty string's value , because no matched text string to response
+                            node->append_node(blankData);
+                        }
+
                         // Node closing
                         text += 2;      // Skip '</'
                         if (Flags & parse_validate_closing_tags)
@@ -3291,43 +3310,48 @@ namespace rapidxml
                         ++text;     // Skip '>'
                         node_closeTagEndInfo = l_info;
 
+                        // Added by Edison , set Single Node
+                        node->getIsSingleNode() = (node->first_node() == nullptr);
+
                         return;     // Node closed, finished parsing contents
                     }
                     else
                     {
-                        // Added by Edison
-                        internal::on_text_step_n(1, text,1, l_info);
-                        // Child node
-                        ++text;     // Skip '<'
-
-
                         ////////////////////////////////////////////////////////////////////////////////////
                         //
                         // Added by Edison , special logic to delete the 1st only space node
                         // to   Support 
                         // <aaa>   <aaa>   
                         // or   <aaa>\t  \t</aaa>
-                        xml_node<Ch>* node1st = node->first_node();
-                        if (    node1st != nullptr 
-                             && node1st->type() == node_data 
-                             && node1st->next_sibling() == nullptr ) 
-                        {
-                            auto isAllWhiteSpace = true;
-                            Ch* chbegin = node1st->value();
-                            for ( int i = 0; i < node1st->value_size(); ++i ) {
-                                Ch* pCurrentCh = chbegin + i;
-                                if ( !whitespace_pred::test(*pCurrentCh) ) {
-                                    isAllWhiteSpace = false;
-                                    break;
+                        if ( QtConfig<0>::supportBlankPCDATA ) {
+                            xml_node<Ch>* node1st = node->first_node();
+                            if (    node1st != nullptr 
+                                 && node1st->type() == node_data 
+                                 && node1st->next_sibling() == nullptr ) 
+                            {
+                                auto isAllWhiteSpace = true;
+                                Ch* chbegin = node1st->value();
+                                for ( int i = 0; i < node1st->value_size(); ++i ) {
+                                    Ch* pCurrentCh = chbegin + i;
+                                    if ( !whitespace_pred::test(*pCurrentCh) ) {
+                                        isAllWhiteSpace = false;
+                                        break;
+                                    }
                                 }
-                            }
 
-                            if ( isAllWhiteSpace ) {
-                                node->remove_first_node();
+                                if ( isAllWhiteSpace ) {
+                                    node->remove_first_node();
+                                }
                             }
                         }
                         ////////////////////////////////////////////////////////////////////////////////////
-                        
+
+
+                        // Added by Edison
+                        internal::on_text_step_n(1, text,1, l_info);
+                        // Child node
+                        ++text;     // Skip '<'
+
                         if (xml_node<Ch> *child = parse_node<Flags>(text, l_info))
                             node->append_node(child);
                     }
@@ -3782,6 +3806,7 @@ namespace rapidxml
     // Added by Edison
     // static 
     template<int Dummy> bool QtConfig<Dummy>::supportQt4BytesFlag = true;
+    template<int Dummy> bool QtConfig<Dummy>::supportBlankPCDATA = false;
 
 }
 
