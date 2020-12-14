@@ -1,0 +1,13 @@
+----------------------------------------------------------------------------------------------------
+GDB User Manual
+----------------------------------------------------------------------------------------------------
+run(r) : 
+contuiue(c) : 
+next(n) : try to move the the next line (execute the current line)
+step(s) : step into a function
+finish : finish the current invoking function
+return (returnVal) : force finish the current invoking function with the given returnVal
+breakpoint(b) filenAme:functionName :
+breakpoint(b) filenAme:lineNumber :
+print(p) varibleName :
+
