@@ -80,6 +80,8 @@ MainWindow::~MainWindow()
     delete ui;
 
     if ( m_pXMLDoc!=nullptr ) {
+        m_pXMLDoc->clear();
+
         delete m_pXMLDoc;
         m_pXMLDoc = nullptr;
     }
@@ -104,6 +106,8 @@ void MainWindow::on_parseBtn_clicked()
 
     try {
         if ( m_pXMLDoc!=nullptr ) {
+            m_pXMLDoc->clear();
+
             auto text = ui->xmlTextEdit->toPlainText();
             m_XmlTextByteArray = text.toUtf8();
             m_pXMLDoc->parse<parse_full>( m_XmlTextByteArray.data() );
