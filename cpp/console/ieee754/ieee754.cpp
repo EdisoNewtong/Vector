@@ -1,431 +1,225 @@
+#include "floatNumberConverter.h"
+
 #include <iostream>
-#include <string>
-#include <vector>
-#include <map>
-#include <regex>
+#include <fstream>
 using namespace std;
 
-
-namespace constPart
+union intFloatNum
 {
-    static constexpr int BASE = 2;
-    static constexpr char ZERO_ASCII_CODE = '0';
-}
-
-struct ConvertFloatInfo
-{
-    static constexpr size_t   BINARY_ARY_SIZE = 64;
-
-    string fullstr;       //  full inputed string
-
-    string strBegSpace;   // \t  
-    string strPorN;       // +/-
-    string strnumBefore;  //  3.
-    string strDot;        // .
-    string strnumAfter;   //  .14
-    string strFFlag;      //  f/F
-    string strEndSpace;   //   \t   \t
-    string strCore;       // core part
-
-    size_t nAvalibleBits;
-    char binaryAry[BINARY_ARY_SIZE];
-    bool bMeetLoopDuringCalc;
-    bool bInfiniteCalc;
-    size_t loopStart;
-    size_t loopEnd;
-
-    vector< pair<string,int> >  calcTmpList;
-
-    void reset() 
-    {
-        fullstr.clear();
-        strBegSpace.clear();
-        strPorN.clear();
-        strnumBefore.clear();
-        strDot.clear();
-        strnumAfter.clear();
-        strFFlag.clear();
-        strEndSpace.clear();
-        strCore.clear();
-
-        nAvalibleBits = 0;
-        for ( size_t  i = 0; i < BINARY_ARY_SIZE; ++i ) {
-            binaryAry[i] = 0;
-        }
-
-        bMeetLoopDuringCalc = false;
-        bInfiniteCalc = true;
-        loopStart = 0;
-        loopEnd = 0;
-
-        calcTmpList.clear();
-    }
-
-    ConvertFloatInfo() 
-    {
-        reset();
-    }
-
-    ~ConvertFloatInfo() 
-    {
-        reset();
-    }
+    unsigned int i_num;
+    float        f_num;
 };
 
-
-
-bool isAFloatNumber(const string& originalStr, ConvertFloatInfo* cvtInfo)
+union llDoubleNum
 {
-    bool bret = false;
-    if ( cvtInfo == nullptr ) {
-        cout << "[ERROR] : Sorry ConvertFloatInfo is a nullptr " << endl;
-        return bret;
-    }
+    unsigned long long i_num;
+    double             f_num;
+};
 
-    try {
-        const string spaceGrp = "([ \t]*)";
-        const string positiveOrNegative = "([+-]?)";
-        const string numberGrp = "([0-9]*)";
-        const string dotGrp = "(\\.?)";
-        const string fGrp = "([fF]?)";
-
-        //                     "      "     +/-                 3             .       14159265    f/F     "    "
-        //                       grp1      grp2                 grp3         grp4     grp5        grp6     grp7
-        const string fullexp = spaceGrp + positiveOrNegative + numberGrp +  dotGrp + numberGrp + fGrp + spaceGrp;
-
-        regex floatReg( fullexp.c_str() );
-        std::cmatch m;
-        bool bMatched = regex_match(originalStr.c_str(), m, floatReg);
-        if ( bMatched ) {
-            size_t sz = m.size();
-            cout << "result : Matched , sz = " << sz << endl;
-
-            if ( sz == 8 ) {
-                // m[1].str()   // positive or negative      +/-
-                // m[2].str()   // number before    dot       .
-                // m[3].str()   //     has dot or not
-                // m[4].str()   // number after dot
-                
-                auto debugFlag = false;
-                if ( debugFlag  ) {
-                    cout << R"(+/-         :   ")" << m[2].str() << R"(")" << endl;
-                    cout << R"(number.     :   ")" << m[3].str() << R"(")" << endl;
-                    cout << R"(.           :   ")" << m[4].str() << R"(")" << endl;
-                    cout << R"(.number     :   ")" << m[5].str() << R"(")" << endl;
-                    cout << R"(.number     :   ")" << m[6].str() << R"(")" << endl;
-                }
-
-
-                // save seperate part of a float number
-                cvtInfo->fullstr = originalStr;
-
-                cvtInfo->strBegSpace = m[1].str();
-                cvtInfo->strPorN = m[2].str();
-                cvtInfo->strnumBefore = m[3].str();
-                cvtInfo->strDot = m[4].str();
-                cvtInfo->strnumAfter = m[5].str();
-                cvtInfo->strFFlag = m[6].str();
-                cvtInfo->strEndSpace = m[7].str();
-
-                cvtInfo->strCore = cvtInfo->strPorN 
-                                   + cvtInfo->strnumBefore 
-                                   + cvtInfo->strDot
-                                   + cvtInfo->strnumAfter 
-                                   + cvtInfo->strFFlag;
-
-                // It is not allow that there is not number existed in the string
-                if ( cvtInfo->strnumBefore.empty() && cvtInfo->strnumAfter.empty() ) {
-                    // such kind of string "." / "+" / "-" / "+." / "-." /        is an invalid float number
-                    bret = false;
-                } else {
-                    // OK
-                    bret = true;
-                }
-            } 
-        } else {
-            cout << "result : not Matched" << endl;
-        } 
-    } catch ( const regex_error& error ) {
-        cout << "[ERROR] : regex is not valid  "  << endl
-             << "        what = " << error.what() << endl
-             << "        code = " << error.code() << endl;
-        bret = false;
-    }
-
-    return bret;
-}
-
-string positiveIntPart2Binary(const string& decimalstrNum)
+string generateStrFloat(unsigned long long num, int intBits,int floatBits, bool setNegative, bool fSuffixFlag)
 {
-    using namespace constPart;
-    // cout << "calc num : " << decimalstrNum << endl;
-    //------------------------------------
-    // e.g.
-    //          67
-    //------------------------------------
-    //          67/2 = 33 ... 1
-    //          33/2 = 16 ... 1
-    //          16/2 = 8  ... 0
-    //           8/2 = 4  ... 0
-    //           4/2 = 2  ... 0
-    //           2/2 = 1  ... 0
-    //           1/2 = 0  ... 1
-    /////////////////////////////////
-    //
-    // 67(10) = 0100 0011(2)
-    //
-    /////////////////////////////////
+    auto requireBits = intBits + floatBits;
 
-    string retBinaryStr;
-    vector< pair<string,int> > calcProcessLst;
-    calcProcessLst.clear();
-    
-    // fomula = dividend / divisor  = quotient ... remainder
-    auto strdividend = decimalstrNum;
-
-    do {
-        string strNextQuotient = "";
-
-        auto nQuotient = 0;
-        auto nRemainder = 0;
-        auto nStrLen = static_cast<int>(strdividend.size());
-
-        for ( auto i = 0; i < nStrLen; ++i ) {
-            char ch = strdividend.at(i);
-            int nNum = ch - ZERO_ASCII_CODE;
-            auto realDividend = nRemainder * 10 + nNum;
-            nQuotient = realDividend / BASE;
-            nRemainder = realDividend % BASE;
-            strNextQuotient += static_cast<char>(ZERO_ASCII_CODE + nQuotient);
+    string finalStr;
+    string strNum = to_string(num);
+    auto sz = strNum.size();
+    if ( sz < requireBits ) {
+        auto delta = requireBits - sz;
+        for ( int i = 0; i < delta; ++i ) {
+            finalStr += '0';
         }
 
-        // trim the beginning  '0';
-        auto noneZeroPos = strNextQuotient.find_first_not_of(ZERO_ASCII_CODE);
-        if ( noneZeroPos != string::npos ) {
-            strNextQuotient = strNextQuotient.substr(noneZeroPos);
-        } else {
-            // all all '0'
-            strNextQuotient = "0";
-        }
-        strdividend = strNextQuotient;
-        calcProcessLst.push_back( make_pair(strdividend,  nRemainder) );
-    } while( strdividend != "0"  );
-
-    for ( auto it = calcProcessLst.rbegin(); it!= calcProcessLst.rend(); ++it ) {
-        retBinaryStr += static_cast<char>( ZERO_ASCII_CODE + it->second);
-    }
-    
-    return retBinaryStr;
-}
-
-string floatPart2Binary(ConvertFloatInfo* cvt)
-{
-    if ( cvt == nullptr ) {
-        return string("");
-    }
-
-    using namespace constPart;
-    string retBinaryStr;
-
-    string strCalcRet = cvt->strnumAfter;
-    // clear it first
-    // none empty => f => float
-    // empty      =>      double
-    int nloopCount = 0;
-    int loopMaxCnt = cvt->strFFlag.empty() ? 52 : 23;
-    while ( true )
-    {
-        // the only added bit must be 1 , because the biggest bit 9*2 = 18 , 18 is the biggest result among [0-9]*2
-        bool needAddtoNextBit = false;
-        auto calcMiddleStr = strCalcRet;
-        for ( int idx = strCalcRet.size()-1; idx>=0; --idx )
-        {
-            char ch = strCalcRet.at(idx);
-            int num = ch - ZERO_ASCII_CODE;
-            num = num * 2 + (needAddtoNextBit ? 1 : 0);
-            if ( num >= 10 ) {
-                needAddtoNextBit = true;
-                num -= 10;
-            } else {
-                needAddtoNextBit = false;
-            }
-
-            calcMiddleStr.at(idx) = ZERO_ASCII_CODE + num;
-        }
-        ++nloopCount;
-
-        auto leaderBit = needAddtoNextBit ? 1 : 0;
-        cvt->calcTmpList.push_back( make_pair(calcMiddleStr,  leaderBit) );
-
-        auto pos = calcMiddleStr.find_first_not_of( ZERO_ASCII_CODE );
-        if ( pos == string::npos ) {
-            // all bits are '0'
-            cvt->bInfiniteCalc = false; // calc successfully, set flag
-            break;
-        } else {
-            auto foundSame = false;
-            for ( auto it = cvt->calcTmpList.rbegin(); it!=cvt->calcTmpList.rend(); ++it ) {
-                if ( it->first == calcMiddleStr ) {
-                    foundSame = true;
-                    cvt->loopStart = distance(cvt->calcTmpList.begin() , it.base()) - 1; // - 1 to make sure the index is corrent
-                    cvt->loopEnd   = cvt->calcTmpList.size() - 1;
-
-                    break; // jump out of the loop
-                }
-            }
-
-            if ( foundSame ) {
-                cvt->bMeetLoopDuringCalc = true;
-                break;
-            } else {
-                if ( nloopCount >= loopMaxCnt ) {
-                    break;
-                }
-            }
-        }
-
-        strCalcRet = calcMiddleStr;
-    } // end while
-
-    if( !cvt->bInfiniteCalc ) {
-        for ( auto& ele : cvt->calcTmpList ) {
-            retBinaryStr += (ZERO_ASCII_CODE + ele.second);
-        }
-    } else if ( cvt->bMeetLoopDuringCalc ) {
-        auto nloop = 0;
-        auto hasReachLoopEnd = false;
-        do {
-            if ( !hasReachLoopEnd ) {
-                for ( auto& ele : cvt->calcTmpList ) {
-                    retBinaryStr += (ZERO_ASCII_CODE + ele.second);
-                }
-
-                hasReachLoopEnd = true;
-                nloop += cvt->calcTmpList.size();
-            } else {
-                for ( auto i = cvt->loopStart; i<=cvt->loopEnd; ++i ) {
-                    if ( nloop < loopMaxCnt ) {
-                        retBinaryStr += (ZERO_ASCII_CODE + cvt->calcTmpList.at(i).second);
-                        ++nloop;
-                    } else {
-                        break;
-                    }
-                }
-            }
-        } while( true );
+        finalStr += strNum;
     } else {
-        // forever loop without stop
-        for ( auto& ele : cvt->calcTmpList ) {
-            retBinaryStr += (ZERO_ASCII_CODE + ele.second);
-        }
+        finalStr = strNum;
     }
 
-    return retBinaryStr;
+    string intPart   = finalStr.substr(0, intBits);
+    string floatPart = finalStr.substr(intBits);
+
+    intPart = HelperUtil::numberTrimmed(intPart, true);
+    floatPart = HelperUtil::numberTrimmed(floatPart, false);
+
+    finalStr = "";
+    if ( setNegative ) {
+        finalStr = "-";
+    }
+
+    finalStr += intPart;
+    finalStr += ".";
+    finalStr += floatPart;
+
+    if ( fSuffixFlag ) {
+        finalStr += "f";
+    }
+
+    return finalStr;
 }
 
 
-
-
-bool convert2Binary(ConvertFloatInfo* cvt)
+bool checkStringFloat(const string& text)
 {
-    using namespace constPart;
-    // 1+8+23  = 32(bits) :  float
-    // 1+11+52 = 64(bits) :  double
-    if ( cvt == nullptr ) {
-        cout << "[ERROR] : Sorry ConvertFloatInfo is a nullptr " << endl;
+    string err;
+    FloatConverter cvt;
+    auto b = false;
+
+    // string strFloatNumber = "0.05f";
+    // string strFloatNumber = "0.36f";
+    string strFloatNumber = text;
+    b = cvt.isValidFloat(strFloatNumber,err);
+    string floatOrDoubleString = !cvt.getCvt().fFlag.second.empty() ? "float" : "double";
+
+    if ( !b ) {
+        cout << strFloatNumber << "| " << err << " | Sorry : is <Not> a Valid Float-Point number" << endl;
         return false;
-    }
-
-    // string strPorN;       // +/-
-    // string strnumBefore;  //  3.   : the number is without  +/-
-    // string strDot;        // .
-    // string strnumAfter;   //  .14
-    // string strFFlag;      //  f/F
-    int  sign = 0;
-    if ( !cvt->strPorN.empty() ) {
-        sign = (cvt->strPorN == "+" ? 1 : -1); // else "-"
-    }
-
-    auto hasDot = !cvt->strDot.empty();
-    // float/double
-    auto hasFFlag = !cvt->strFFlag.empty(); // hasFFlag => float , else the data type is double
-    (void)sign;
-    (void)hasFFlag;
-
-    if ( !hasDot ) {
-        // only interger part 
-        // strnumBefore must contain  at least 1 number
-        auto pos = cvt->strnumBefore.find_first_not_of(ZERO_ASCII_CODE);
-        if ( pos == string::npos ) {
-            // all the characters are '0'  , such as '0000000000'
-        } else {
-            // fount it , maybe   '000123' => 123
-            auto strGetRidOfBegin0 =  cvt->strnumBefore.substr(pos);
-            auto retIntStrNumBeforeDot = positiveIntPart2Binary(strGetRidOfBegin0);
-        }
     } else {
-        // has dot ,  there are 3 conditions
-        // 1.     xxx.xxx
-        // 2.     .xxx
-        // 3.     xxx.
-
-        // complete number before if necessary
-        if ( cvt->strnumBefore.empty() ) {
-            cvt->strnumBefore = "0";
+        cout << strFloatNumber << "   is a <Valid> " << floatOrDoubleString << " number" << endl;
+        b = cvt.doConvert(err);
+        if ( !b ) {
+            cout << strFloatNumber << " | " << err << " | Sorry doConvert(...)  Failed  " << endl;
+            return false;
         } else {
-            auto pos = cvt->strnumBefore.find_first_not_of( ZERO_ASCII_CODE );
-            if ( pos == string::npos ) {
-                // all the characters are '0'  , such as '0000000000'
-                cvt->strnumBefore = "0";
-            } else {
-                // trim head of zero
-                cvt->strnumBefore = cvt->strnumBefore.substr(pos);
-            }
-        }
+            const auto& coreObj = cvt.getCvt();
 
-        // complete number after if necessary
-        if ( cvt->strnumAfter.empty() ) {
-            cvt->strnumAfter = "0";
-        } else {
-            auto pos = cvt->strnumAfter.find_last_not_of( ZERO_ASCII_CODE );
-            if ( pos == string::pos ) {
-                // from tail to head , all the characters are '0'  , such as '0000000000'
-                cvt->strnumAfter = "0";
+            if ( !coreObj.fFlag.second.empty()  ) {
+                // float type
+                intFloatNum uNum;
+                uNum.f_num = static_cast<float>( atof(strFloatNumber.c_str() ));
+
+                if ( uNum.i_num == coreObj.cvtIntBinary ) {
+                    cout << strFloatNumber << " Convert OK " << endl;
+                } else {
+                    cout << strFloatNumber << " | Sorry : Convert <Not> Equal  " << endl;
+                    cout << "uNum.i_num           = 0x" << std::hex << uNum.i_num << endl;
+                    cout << "coreObj.cvtIntBinary = 0x" << std::hex << coreObj.cvtIntBinary << endl;
+                    return false;
+                }
             } else {
-                // trim end of zero
-                cvt->strnumAfter = cvt->strnumAfter.substr(0, pos+1);
+                // double type
+                llDoubleNum llNum;
+                llNum.f_num = atof(strFloatNumber.c_str() );
+
+                if ( llNum.i_num == coreObj.cvtLLBinary ) {
+                    cout << strFloatNumber << " Convert OK " << endl;
+                } else {
+                    cout << strFloatNumber << " | Sorry : Convert <Not> Equal  " << endl;
+                    cout << "llNum.i_num           = 0x" << std::hex << llNum.i_num << endl;
+                    cout << "coreObj.cvtLLBinary   = 0x" << std::hex << coreObj.cvtLLBinary << endl;
+                    return false;
+                }
             }
+
         }
     }
 
     return true;
 }
 
-
-int main(int argc, char* argv[],  char* env[])
+void readFloatByGenerate(int intBits,int floatBits, bool neFlag, bool fFlag)
 {
-    string choice;
-    ConvertFloatInfo cvt;
-    do {
-        string strnumber;
-        cvt.reset();
-        cout << "Please input a string to check if it is a float number or not : ";
-        getline(cin, strnumber);
-
-        auto b = isAFloatNumber(strnumber, &cvt);
-        cout << "==================================================" << endl;
-        if ( b ) {
-            cout << "\tOK : \"" << cvt.fullstr << "\" is a valid float " << endl;
-            b = convert2Binary(&cvt);
-        } else {
-            cout << "\tFailed : \"" << cvt.fullstr  << "\" is not a valid float " << endl;
+    unsigned long long maxNum = static_cast<unsigned long long>( pow(10, intBits+floatBits) );
+    for ( unsigned long long i = 0; i < maxNum; ++i ) {
+        auto strRet = generateStrFloat(i, intBits, floatBits, neFlag, fFlag);
+        auto b = checkStringFloat(strRet);
+        if ( !b ) {
+            cout << "[ERROR] : convert float/double on string \"" << strRet << "\"" << endl;
+            break;
         }
-        cout << "==================================================" << endl;
+    }
+}
 
-        choice.clear();
-        cout << "again (q to Quit) ? ";
-        getline(cin, choice);
-    } while( choice != "q");
+
+void testOnly()
+{
+    string err;
+    FloatConverter cvt;
+    auto b = false;
+    string checkFloatStr = "0.01f";
+
+    b = cvt.isValidFloat(checkFloatStr,err);
+    if ( !b ) {
+        cout << checkFloatStr << "| " << err << " | Sorry : is <Not> a Valid Float-Point number" << endl;
+        return;
+    } else {
+        b = cvt.doConvert(err);
+        if ( !b ) {
+            cout << "0.01f" << " | " << err << " | Sorry doConvert(...)  Failed  " << endl;
+            return;
+        } else {
+            const auto& coreObj = cvt.getCvt();
+
+            if ( !coreObj.fFlag.second.empty()  ) {
+                // float type
+                intFloatNum uNum;
+                /********************************
+                   replace the hard-code number here
+                ********************************/
+                uNum.f_num = 0.01f;
+
+                if ( uNum.i_num == coreObj.cvtIntBinary ) {
+                    cout << checkFloatStr << " Convert OK " << endl;
+                } else {
+                    cout << checkFloatStr  << " | Sorry : Convert <Not> Equal  " << endl;
+                    cout << "uNum.i_num           = 0x" << std::hex << uNum.i_num << endl;
+                    cout << "coreObj.cvtIntBinary = 0x" << std::hex << coreObj.cvtIntBinary << endl;
+                    return;
+                }
+            } else {
+                // double type
+                llDoubleNum llNum;
+                /********************************
+                   replace the hard-code number here
+                ********************************/
+                llNum.f_num = 0.01;
+
+                if ( llNum.i_num == coreObj.cvtLLBinary ) {
+                    cout << checkFloatStr << " Convert OK " << endl;
+                } else {
+                    cout << checkFloatStr << " | Sorry : Convert <Not> Equal  " << endl;
+                    cout << "llNum.i_num           = 0x" << std::hex << llNum.i_num << endl;
+                    cout << "coreObj.cvtLLBinary   = 0x" << std::hex << coreObj.cvtLLBinary << endl;
+                    return;
+                }
+            }
+        }
+    }
+
+}
+
+
+int main(int argc, char* argv[],char* env[])
+{
+    auto testFlag = 0;
+    if ( testFlag == 1 ) {
+        testOnly();
+        return 0;
+    }
+
+
+    if ( argc != 5 ) {
+        cout << "Missing generate args " << endl;
+        cout << "          int part   float part     negative       f|F flag"  << endl;
+        cout << "./main   <intBits>   <floatBits>   <[ne|other]>  <[f|other]>" << endl;
+        return -1;
+    }
+
+    int intBits = atoi(argv[1]);
+    if ( intBits <= 0 ) {
+        cout << "int bit count must > 0 " << endl;
+        return -1;
+    }
+    int floatBits = atoi(argv[2]);
+    if ( floatBits <= 0 ) {
+        cout << "floatBits bit count must > 0 " << endl;
+        return -1;
+    }
+
+    string negativeStr = argv[3];
+    string fStr = argv[4];
+    auto neFlag = (negativeStr == "ne");    // negative flag
+    auto fFlag  = (fStr == "f");            // f|F   flag
+
+    readFloatByGenerate(intBits, floatBits, neFlag, fFlag);
 
     return 0;
 }
