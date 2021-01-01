@@ -7,5 +7,8 @@
 main
 build-*
 cpp/console/binaryCompare/binaryCmp
+lua/sourceCodeStudy/lua-5.1.5/src/lua
+lua/sourceCodeStudy/lua-5.1.5/src/luac
+lua/sourceCodeStudy/lua-5.1.5/src/*.a
 **/build/*
 *.pro.user
