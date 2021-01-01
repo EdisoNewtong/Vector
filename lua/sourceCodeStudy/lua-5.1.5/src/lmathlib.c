@@ -156,8 +156,9 @@ static int math_min (lua_State *L) {
   int i;
   for (i=2; i<=n; i++) {
     lua_Number d = luaL_checknumber(L, i);
-    if (d < dmin)
+    if (d < dmin) {
       dmin = d;
+    }
   }
   lua_pushnumber(L, dmin);
   return 1;
@@ -170,8 +171,9 @@ static int math_max (lua_State *L) {
   int i;
   for (i=2; i<=n; i++) {
     lua_Number d = luaL_checknumber(L, i);
-    if (d > dmax)
+    if (d > dmax) {
       dmax = d;
+    }
   }
   lua_pushnumber(L, dmax);
   return 1;
@@ -200,7 +202,9 @@ static int math_random (lua_State *L) {
       lua_pushnumber(L, floor(r*(u-l+1))+l);  /* int between `l' and `u' */
       break;
     }
-    default: return luaL_error(L, "wrong number of arguments");
+    default: { 
+      return luaL_error(L, "wrong number of arguments");
+    }
   }
   return 1;
 }

@@ -38,16 +38,23 @@ int luaO_int2fb (unsigned int x) {
     x = (x+1) >> 1;
     e++;
   }
-  if (x < 8) return x;
-  else return ((e+1) << 3) | (cast_int(x) - 8);
+  if (x < 8) { 
+    return x;
+  } else { 
+    return ((e+1) << 3) | (cast_int(x) - 8);
+  }
 }
 
 
 /* converts back */
 int luaO_fb2int (int x) {
   int e = (x >> 3) & 31;
-  if (e == 0) return x;
-  else return ((x & 7)+8) << (e - 1);
+  if (e == 0) { 
+    return x;
+  }
+  else { 
+    return ((x & 7)+8) << (e - 1);
+  }
 }
 
 
@@ -63,26 +70,38 @@ int luaO_log2 (unsigned int x) {
     8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8
   };
   int l = -1;
-  while (x >= 256) { l += 8; x >>= 8; }
+  while (x >= 256) { 
+      l += 8; 
+      x >>= 8; 
+  }
   return l + log_2[x];
 
 }
 
 
 int luaO_rawequalObj (const TValue *t1, const TValue *t2) {
-  if (ttype(t1) != ttype(t2)) return 0;
-  else switch (ttype(t1)) {
-    case LUA_TNIL:
-      return 1;
-    case LUA_TNUMBER:
-      return luai_numeq(nvalue(t1), nvalue(t2));
-    case LUA_TBOOLEAN:
-      return bvalue(t1) == bvalue(t2);  /* boolean true must be 1 !! */
-    case LUA_TLIGHTUSERDATA:
-      return pvalue(t1) == pvalue(t2);
-    default:
-      lua_assert(iscollectable(t1));
-      return gcvalue(t1) == gcvalue(t2);
+  if (ttype(t1) != ttype(t2)) { 
+      return 0;
+  } else {
+    switch (ttype(t1)) 
+    {
+      case LUA_TNIL: {
+        return 1;
+      }
+      case LUA_TNUMBER: {
+        return luai_numeq(nvalue(t1), nvalue(t2));
+      }
+      case LUA_TBOOLEAN: {
+        return bvalue(t1) == bvalue(t2);  /* boolean true must be 1 !! */
+      }
+      case LUA_TLIGHTUSERDATA: {
+        return pvalue(t1) == pvalue(t2);
+      }
+      default: {
+        lua_assert(iscollectable(t1));
+        return gcvalue(t1) == gcvalue(t2);
+      }
+    }
   }
 }
 
@@ -90,12 +109,21 @@ int luaO_rawequalObj (const TValue *t1, const TValue *t2) {
 int luaO_str2d (const char *s, lua_Number *result) {
   char *endptr;
   *result = lua_str2number(s, &endptr);
-  if (endptr == s) return 0;  /* conversion failed */
-  if (*endptr == 'x' || *endptr == 'X')  /* maybe an hexadecimal constant? */
+  if (endptr == s) { 
+    return 0;  /* conversion failed */
+  }
+  if (*endptr == 'x' || *endptr == 'X') {  /* maybe an hexadecimal constant? */
     *result = cast_num(strtoul(s, &endptr, 16));
-  if (*endptr == '\0') return 1;  /* most common case */
-  while (isspace(cast(unsigned char, *endptr))) endptr++;
-  if (*endptr != '\0') return 0;  /* invalid trailing characters? */
+  }
+  if (*endptr == '\0') { 
+    return 1;  /* most common case */
+  }
+  while (isspace(cast(unsigned char, *endptr))) { 
+    endptr++;
+  }
+  if (*endptr != '\0') { 
+    return 0;  /* invalid trailing characters? */
+  }
   return 1;
 }
 
@@ -113,13 +141,17 @@ const char *luaO_pushvfstring (lua_State *L, const char *fmt, va_list argp) {
   pushstr(L, "");
   for (;;) {
     const char *e = strchr(fmt, '%');
-    if (e == NULL) break;
+    if (e == NULL) { 
+      break;
+    }
     setsvalue2s(L, L->top, luaS_newlstr(L, fmt, e-fmt));
     incr_top(L);
     switch (*(e+1)) {
       case 's': {
         const char *s = va_arg(argp, char *);
-        if (s == NULL) s = "(null)";
+        if (s == NULL) { 
+          s = "(null)";
+        }
         pushstr(L, s);
         break;
       }
@@ -200,15 +232,19 @@ void luaO_chunkid (char *out, const char *source, size_t bufflen) {
     else {  /* out = [string "string"] */
       size_t len = strcspn(source, "\n\r");  /* stop at first newline */
       bufflen -= sizeof(" [string \"...\"] ");
-      if (len > bufflen) len = bufflen;
+      if (len > bufflen) { 
+        len = bufflen;
+      }
       strcpy(out, "[string \"");
       if (source[len] != '\0') {  /* must truncate? */
         strncat(out, source, len);
         strcat(out, "...");
       }
-      else
+      else {
         strcat(out, source);
+      }
       strcat(out, "\"]");
     }
   }
 }
+

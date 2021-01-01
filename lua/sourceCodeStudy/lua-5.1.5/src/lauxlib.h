@@ -16,19 +16,16 @@
 
 
 #if defined(LUA_COMPAT_GETN)
-LUALIB_API int (luaL_getn) (lua_State *L, int t);
-LUALIB_API void (luaL_setn) (lua_State *L, int t, int n);
+  LUALIB_API int (luaL_getn) (lua_State *L, int t);
+  LUALIB_API void (luaL_setn) (lua_State *L, int t, int n);
 #else
-#define luaL_getn(L,i)          ((int)lua_objlen(L, i))
-#define luaL_setn(L,i,j)        ((void)0)  /* no op! */
+  #define luaL_getn(L,i)          ((int)lua_objlen(L, i))
+  #define luaL_setn(L,i,j)        ((void)0)  /* no op! */
 #endif
 
 #if defined(LUA_COMPAT_OPENLIB)
-#define luaI_openlib	luaL_openlib
-#endif
-
-
-/* extra error code for `luaL_load' */
+  #define luaI_openlib	luaL_openlib
+#endif /* extra error code for `luaL_load' */ 
 #define LUA_ERRFILE     (LUA_ERRERR+1)
 
 

@@ -40,11 +40,11 @@
 
 
 /* thread status; 0 is OK */
-#define LUA_YIELD	1
-#define LUA_ERRRUN	2
-#define LUA_ERRSYNTAX	3
-#define LUA_ERRMEM	4
-#define LUA_ERRERR	5
+#define LUA_YIELD       1
+#define LUA_ERRRUN      2
+#define LUA_ERRSYNTAX   3
+#define LUA_ERRMEM      4
+#define LUA_ERRERR      5
 
 
 typedef struct lua_State lua_State;
@@ -69,17 +69,17 @@ typedef void * (*lua_Alloc) (void *ud, void *ptr, size_t osize, size_t nsize);
 /*
 ** basic types
 */
-#define LUA_TNONE		(-1)
+#define LUA_TNONE           (-1)
 
-#define LUA_TNIL		0
-#define LUA_TBOOLEAN		1
-#define LUA_TLIGHTUSERDATA	2
-#define LUA_TNUMBER		3
-#define LUA_TSTRING		4
-#define LUA_TTABLE		5
-#define LUA_TFUNCTION		6
-#define LUA_TUSERDATA		7
-#define LUA_TTHREAD		8
+#define LUA_TNIL             0
+#define LUA_TBOOLEAN         1
+#define LUA_TLIGHTUSERDATA	 2
+#define LUA_TNUMBER          3
+#define LUA_TSTRING          4
+#define LUA_TTABLE           5
+#define LUA_TFUNCTION        6
+#define LUA_TUSERDATA        7
+#define LUA_TTHREAD          8
 
 
 
@@ -218,14 +218,14 @@ LUA_API int  (lua_status) (lua_State *L);
 ** garbage-collection function and options
 */
 
-#define LUA_GCSTOP		0
-#define LUA_GCRESTART		1
-#define LUA_GCCOLLECT		2
-#define LUA_GCCOUNT		3
-#define LUA_GCCOUNTB		4
-#define LUA_GCSTEP		5
-#define LUA_GCSETPAUSE		6
-#define LUA_GCSETSTEPMUL	7
+#define LUA_GCSTOP          0
+#define LUA_GCRESTART       1
+#define LUA_GCCOLLECT       2
+#define LUA_GCCOUNT         3
+#define LUA_GCCOUNTB        4
+#define LUA_GCSTEP          5
+#define LUA_GCSETPAUSE      6
+#define LUA_GCSETSTEPMUL    7
 
 LUA_API int (lua_gc) (lua_State *L, int what, int data);
 
@@ -308,20 +308,20 @@ LUA_API void lua_setlevel	(lua_State *from, lua_State *to);
 /*
 ** Event codes
 */
-#define LUA_HOOKCALL	0
-#define LUA_HOOKRET	1
-#define LUA_HOOKLINE	2
-#define LUA_HOOKCOUNT	3
+#define LUA_HOOKCALL    0
+#define LUA_HOOKRET     1
+#define LUA_HOOKLINE    2
+#define LUA_HOOKCOUNT   3
 #define LUA_HOOKTAILRET 4
 
 
 /*
 ** Event masks
 */
-#define LUA_MASKCALL	(1 << LUA_HOOKCALL)
-#define LUA_MASKRET	(1 << LUA_HOOKRET)
-#define LUA_MASKLINE	(1 << LUA_HOOKLINE)
-#define LUA_MASKCOUNT	(1 << LUA_HOOKCOUNT)
+#define LUA_MASKCALL    (1 << LUA_HOOKCALL)
+#define LUA_MASKRET     (1 << LUA_HOOKRET)
+#define LUA_MASKLINE    (1 << LUA_HOOKLINE)
+#define LUA_MASKCOUNT   (1 << LUA_HOOKCOUNT)
 
 typedef struct lua_Debug lua_Debug;  /* activation record */
 

@@ -251,11 +251,11 @@ enum OpArgMask {
 
 LUAI_DATA const lu_byte luaP_opmodes[NUM_OPCODES];
 
-#define getOpMode(m)	(cast(enum OpMode, luaP_opmodes[m] & 3))
-#define getBMode(m)	(cast(enum OpArgMask, (luaP_opmodes[m] >> 4) & 3))
-#define getCMode(m)	(cast(enum OpArgMask, (luaP_opmodes[m] >> 2) & 3))
-#define testAMode(m)	(luaP_opmodes[m] & (1 << 6))
-#define testTMode(m)	(luaP_opmodes[m] & (1 << 7))
+#define getOpMode(m)    (cast(enum OpMode, luaP_opmodes[m] & 3))
+#define getBMode(m)     (cast(enum OpArgMask, (luaP_opmodes[m] >> 4) & 3))
+#define getCMode(m)     (cast(enum OpArgMask, (luaP_opmodes[m] >> 2) & 3))
+#define testAMode(m)    (luaP_opmodes[m] & (1 << 6))
+#define testTMode(m)    (luaP_opmodes[m] & (1 << 7))
 
 
 LUAI_DATA const char *const luaP_opnames[NUM_OPCODES+1];  /* opcode names */
