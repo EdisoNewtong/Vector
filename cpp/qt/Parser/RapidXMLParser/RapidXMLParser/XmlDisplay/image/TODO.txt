@@ -1,0 +1,11 @@
+the save the disk space and the git repo's capacity   of reused resource , now <Delete> 5 png(s) 
+
+copy 5 png(s) file Here    from the following directory
+
+<gitroot>/cpp/qt/CommonResource/img/tree/
+
+    1.  branch-closed.png
+    2.  branch-end.png
+    3.  branch-more.png
+    4.  branch-open.png
+    5.  vline.png

@@ -154,6 +154,7 @@ void binarytreeview::contextMenuEvent(QContextMenuEvent* event) // Q_DECL_OVERRI
         }
 
         m_pPopupMenu->popup( event->globalPos() );
+        m_pPopupMenu->setFocus(Qt::PopupFocusReason);
     }
 }
 
