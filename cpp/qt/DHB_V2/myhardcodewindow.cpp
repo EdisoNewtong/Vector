@@ -1051,6 +1051,19 @@ void myhardcodewindow::updateCharBits()
     auto succ = false;
     signed short code = 0;
 
+    static const int mapSz1 = 8;
+    static const int mapSz2 = 2;
+    static const char mapedOctAry[mapSz1][mapSz2] = {
+        { '0' , '0' },
+        { '1' , '1' },
+        { '2' , '2' },
+        { '3' , '3' },
+        { '4' , '0' },
+        { '5' , '1' },
+        { '6' , '2' },
+        { '7' , '3' }
+    };
+
     if ( letAscii == 0 ) {
         // Single Letter Mode
         if ( inputText.size() == 1 && ((code = static_cast<signed short>(inputText.at(0).unicode())) <= 127 ) ) {
@@ -1110,8 +1123,25 @@ void myhardcodewindow::updateCharBits()
         m_byteBin = m_byteBin.rightJustified(m_charBits,  '0' , truncateFlag);
         m_byteOct = m_byteOct.rightJustified(m_charBits/3 + 1, '0', truncateFlag);
         m_byteHex = m_byteHex.rightJustified(m_charBits/4, '0', truncateFlag);
-    } 
+    }
     m_byteHex = m_byteHex.toUpper();
+    if ( m_byteOct.size() == 3 ) {
+        // Special Process Octal Mode Bytes , mapedOctAry
+        auto found = false;
+        int foundIdx = 0;
+        for ( int i = 0; i < mapSz1; ++i ) {
+            if ( m_byteOct[0] == mapedOctAry[i][0] ) {
+                foundIdx = i;
+                found = true;
+                break;
+            }
+        }
+        
+        if ( found ) {
+            m_byteOct[0] = mapedOctAry[foundIdx][1];
+        }
+    }
+
     innerBitsUpdate(m_charBits);
 }
 
