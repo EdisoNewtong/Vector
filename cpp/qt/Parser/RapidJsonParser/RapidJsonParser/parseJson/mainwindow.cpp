@@ -34,6 +34,9 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 	m_visitStack.clear();
+    m_itemPositionMap.clear();
+
+    connect( ui->plainTextEdit, SIGNAL( cursorPositionChanged() ), this, SLOT( onJsonTextBoxCursorChanged() ) );
 
     ui->treeView->setStyleSheet(R"(
        QTreeView::branch:has-siblings:!adjoins-item {
@@ -119,6 +122,8 @@ void MainWindow::on_pushButton_4_clicked()
 		setupTreeModel();
 
 		QStandardItem* rootNode = m_pTreeModel->invisibleRootItem();
+        m_itemPositionMap.clear();
+
 		fillDataIntoModel(rootNode, m_pDoc, -1);	// -1 : root is Doc
         ui->treeView->expandAll();
         ui->treeView->update();
@@ -385,7 +390,7 @@ void MainWindow::printValueDetail(rapidjson::Value* jsonValue,int nStep)
 
 void MainWindow::highLightText(int startpos,int endpos)
 {
-    qDebug() <<QStringLiteral("startpos = %1, endpos = %2").arg(startpos).arg(endpos);
+    // qDebug() <<QStringLiteral("startpos = %1, endpos = %2").arg(startpos).arg(endpos);
 	// plainTextEdit
     if( startpos>=0 &&  endpos>=0 && endpos>=startpos ) {
 		auto delta = endpos - startpos;
@@ -409,7 +414,9 @@ void MainWindow::highLightText(int startpos,int endpos)
         ui->plainTextEdit->setExtraSelections(lst);
         
         // Real move cursor , scroll-bar will move focus automatically
+        disconnect( ui->plainTextEdit, SIGNAL( cursorPositionChanged() ), this, SLOT( onJsonTextBoxCursorChanged() ) );
         ui->plainTextEdit->setTextCursor(currentCursor);
+        connect( ui->plainTextEdit, SIGNAL( cursorPositionChanged() ), this, SLOT( onJsonTextBoxCursorChanged() ) );
     } else {
         // qDebug() << "Can't Select Block";
     }
@@ -470,6 +477,7 @@ void MainWindow::fillDataIntoModel(QStandardItem* parent, rapidjson::Value* json
     JSonStandardItem* newRoot = nullptr;
     if( tag == -1) {
         newRoot = new JSonStandardItem("Root", jsonValue);
+        refreshPostionMap(newRoot);
         currentParent->setChild(0, 0, newRoot);
     }
 
@@ -487,13 +495,18 @@ void MainWindow::fillDataIntoModel(QStandardItem* parent, rapidjson::Value* json
         }
 
         if( tag == -1) {
-            currentParent->setChild(0, 1, new JSonStandardItem(displaystr, jsonValue) );
+            auto jsitem1 = new JSonStandardItem(displaystr, jsonValue);
+            currentParent->setChild(0, 1, jsitem1  );
             currentParent->setChild(0, 2, new JSonStandardItem(type, jsonValue) );
             currentParent = newRoot;
+
+            refreshPostionMap(jsitem1);
         } else {
             auto parent_of_parent = currentParent->parent();
-            parent_of_parent->setChild(tag, 1, new JSonStandardItem(displaystr, jsonValue) );
+            auto jsitem2 = new JSonStandardItem(displaystr, jsonValue);
+            parent_of_parent->setChild(tag, 1, jsitem2 );
             parent_of_parent->setChild(tag, 2, new JSonStandardItem(type, jsonValue) );
+            refreshPostionMap(jsitem2);
         }
 
         auto idx = 0;
@@ -508,6 +521,8 @@ void MainWindow::fillDataIntoModel(QStandardItem* parent, rapidjson::Value* json
                 auto key_treeItem = new JSonStandardItem(key_Object->GetString() , key_Object);
                 currentParent->setChild(idx,0, key_treeItem);
                 
+                refreshPostionMap(key_treeItem);
+
                 // Value
                 auto value_Object = &(iter->value);
                 // auto isValueObjectArray = value_Object->IsObject() || value_Object->IsArray();
@@ -523,6 +538,8 @@ void MainWindow::fillDataIntoModel(QStandardItem* parent, rapidjson::Value* json
                 auto real_idx = basedOn0 ? idx : idx+1;
                 auto idx_treeItem = new JSonStandardItem(QStringLiteral("%1").arg(real_idx) , eleIt);
                 currentParent->setChild(idx,0, idx_treeItem);
+
+                refreshPostionMap(idx_treeItem);
                 
                 // Core Code : Recursively
                 auto isCompoundType = eleIt->IsObject() || eleIt->IsArray();
@@ -534,28 +551,42 @@ void MainWindow::fillDataIntoModel(QStandardItem* parent, rapidjson::Value* json
         auto child_idx = (tag==-1 ? 0 : tag);
         // auto child_idx = 0;
         if( jsonValue->IsNull() ) {
-            currentParent->setChild(child_idx,1, new JSonStandardItem(QStringLiteral("null") ,jsonValue));
+            auto nulljsitem = new JSonStandardItem(QStringLiteral("null") ,jsonValue);
+            currentParent->setChild(child_idx,1, nulljsitem);
             currentParent->setChild(child_idx,2, new JSonStandardItem(QStringLiteral("Null Type"),jsonValue));
+            refreshPostionMap(nulljsitem);
         } else if( jsonValue->IsBool() ) {
-            currentParent->setChild(child_idx,1, new JSonStandardItem(QStringLiteral("%1").arg(jsonValue->GetBool() ? "true" : "false") ,jsonValue));
+            auto booljsitem = new JSonStandardItem(QStringLiteral("%1").arg(jsonValue->GetBool() ? "true" : "false") ,jsonValue);
+            currentParent->setChild(child_idx,1, booljsitem);
             currentParent->setChild(child_idx,2, new JSonStandardItem(QStringLiteral("bool"),jsonValue));
+            refreshPostionMap( booljsitem );
         } else if( jsonValue->IsString() ) {
-            currentParent->setChild(child_idx,1, new JSonStandardItem(QStringLiteral("%1").arg(jsonValue->GetString() ) ,jsonValue));
+            auto stringjsitem = new JSonStandardItem(QStringLiteral("%1").arg(jsonValue->GetString() ) ,jsonValue);
+            currentParent->setChild(child_idx,1, stringjsitem);
             currentParent->setChild(child_idx,2, new JSonStandardItem(QStringLiteral("string"), jsonValue));
+            refreshPostionMap( stringjsitem );
         } else {
             // Type is  Number
+            JSonStandardItem* numberItem = nullptr;
             if( jsonValue->IsInt() ) {
-                currentParent->setChild(child_idx,1, new JSonStandardItem(QStringLiteral("%1").arg(jsonValue->GetInt() ) ,jsonValue));
+                numberItem = new JSonStandardItem(QStringLiteral("%1").arg(jsonValue->GetInt() ) ,jsonValue);
+                currentParent->setChild(child_idx,1,  numberItem);
             } else if( jsonValue->IsUint() ) {
-                currentParent->setChild(child_idx,1, new JSonStandardItem(QStringLiteral("%1").arg(jsonValue->GetUint() ) ,jsonValue));
+                numberItem = new JSonStandardItem(QStringLiteral("%1").arg(jsonValue->GetUint() ) ,jsonValue);
+                currentParent->setChild(child_idx,1, numberItem);
             } else if( jsonValue->IsInt64() ) {
-                currentParent->setChild(child_idx,1, new JSonStandardItem(QStringLiteral("%1").arg(jsonValue->GetInt64() ) ,jsonValue));
+                numberItem = new JSonStandardItem(QStringLiteral("%1").arg(jsonValue->GetInt64() ) ,jsonValue);
+                currentParent->setChild(child_idx,1, numberItem );
             } else if( jsonValue->IsUint64() ) {
-                currentParent->setChild(child_idx,1, new JSonStandardItem(QStringLiteral("%1").arg(jsonValue->GetUint64() ) ,jsonValue));
+                numberItem = new JSonStandardItem(QStringLiteral("%1").arg(jsonValue->GetUint64() ) ,jsonValue);
+                currentParent->setChild(child_idx,1, numberItem );
             } else if( jsonValue->IsDouble() ) {
-                currentParent->setChild(child_idx,1, new JSonStandardItem(QStringLiteral("%1").arg(jsonValue->GetDouble() ) ,jsonValue));
+                numberItem = new JSonStandardItem(QStringLiteral("%1").arg(jsonValue->GetDouble() ) ,jsonValue);
+                currentParent->setChild(child_idx,1, numberItem );
             }
-            currentParent->setChild(child_idx,2, new JSonStandardItem(QStringLiteral("number"), jsonValue));
+            refreshPostionMap( numberItem );
+            currentParent->setChild(child_idx,2, new JSonStandardItem(QStringLiteral("number"), jsonValue) );
+            // refreshPostionMap( numjsitem );
         }
 	}
 #endif
@@ -564,6 +595,8 @@ void MainWindow::fillDataIntoModel(QStandardItem* parent, rapidjson::Value* json
 
 void MainWindow::onTreeItemSelectionChanged(const QItemSelection & selected, const QItemSelection & deselected)
 {
+    auto selModel = ui->treeView->selectionModel();
+
     Q_UNUSED(deselected);
     if( m_pTreeModel!=nullptr ) {
         auto selectList = selected.indexes();
@@ -573,11 +606,76 @@ void MainWindow::onTreeItemSelectionChanged(const QItemSelection & selected, con
 
         auto selectItem = dynamic_cast<JSonStandardItem*>( m_pTreeModel->itemFromIndex( selectList.at(0)   ) );
         if( selectItem!=nullptr ) {
+            disconnect(selModel,&QItemSelectionModel::selectionChanged, this, &MainWindow::onTreeItemSelectionChanged);
+            updateInheritInfo(selectItem);
+            connect(selModel ,&QItemSelectionModel::selectionChanged, this, &MainWindow::onTreeItemSelectionChanged);
+
             auto jsonValue = selectItem->getJsonValue();
             if( jsonValue!=nullptr ) {
                 auto s = jsonValue->getLineStartInfo();
                 auto e = jsonValue->getLineEndInfo();
+
+                // qDebug() << "selection changed : highlight";
                 highLightText(s.cursorOffset , e.cursorOffset );
+            }
+        }
+    }
+
+    // connect(selModel ,&QItemSelectionModel::selectionChanged, this, &MainWindow::onTreeItemSelectionChanged);
+}
+
+
+
+void MainWindow::refreshPostionMap(JSonStandardItem* pItem)
+{
+    if ( pItem == nullptr ) {
+        return;
+    }
+
+    auto jsonValue = pItem->getJsonValue();
+    if ( jsonValue == nullptr ) {
+        return;
+    }
+
+    auto s = jsonValue->getLineStartInfo();
+    auto e = jsonValue->getLineEndInfo();
+    for( int i = s.cursorOffset; i <= e.cursorOffset; ++i ) {
+        auto it = m_itemPositionMap.find(i);
+        if ( it == m_itemPositionMap.end() ) {
+            m_itemPositionMap.insert(i, pItem);
+        } else {
+            // replace the previous pointer
+            *it = pItem;
+        }
+    }
+}
+
+void MainWindow::onJsonTextBoxCursorChanged()
+{
+    if ( m_itemPositionMap.isEmpty() ) {
+        return;
+    }
+
+    auto textcursor = ui->plainTextEdit->textCursor();
+    int curPos = textcursor.position();
+    auto it = m_itemPositionMap.find(curPos);
+    if ( it != m_itemPositionMap.end() ) {
+        auto jsitem =  it.value();
+        if ( jsitem != nullptr ) {
+            auto modelIdx = jsitem->index();
+            auto selModel = ui->treeView->selectionModel();
+            if ( selModel!=nullptr ) {
+               // qDebug() << "cursor changed , Do select";
+
+               disconnect( selModel,&QItemSelectionModel::selectionChanged, this, &MainWindow::onTreeItemSelectionChanged);
+
+               selModel->select(modelIdx, QItemSelectionModel::ClearAndSelect);
+               ui->treeView->scrollTo(modelIdx);
+
+               updateInheritInfo( jsitem );
+
+               connect(selModel ,&QItemSelectionModel::selectionChanged, this, &MainWindow::onTreeItemSelectionChanged);
+
             }
         }
     }
@@ -585,3 +683,74 @@ void MainWindow::onTreeItemSelectionChanged(const QItemSelection & selected, con
 
 
 
+void MainWindow::updateInheritInfo(JSonStandardItem* item)
+{
+   if ( item == nullptr ) {
+       return;
+   }
+
+   QList<QString> inheritInfo;
+   inheritInfo.clear();
+
+   auto sepecialFlag = false;
+   int nRow = item->row();
+   int nCol = item->column();
+   // qDebug() << "nRow = " << nRow << " , nCol = " << nCol;
+   if( nCol == 0 ) {
+       inheritInfo.push_front( item->text() );
+   } else {
+       // nCol == 1 or == 2
+      sepecialFlag = true;
+   }
+
+   auto selModel = ui->treeView->selectionModel();
+   auto p = item->parent();
+   while ( p!=nullptr ) {
+       auto needAdditionalSet = false;
+       decltype(p) selP = p;
+       if ( sepecialFlag ) {
+            auto leftPart = p->child(nRow, 0);
+            selP = leftPart;
+            if ( leftPart!=nullptr ) {
+                inheritInfo.push_front( leftPart->text() );
+                inheritInfo.push_front( p->text() );
+            }
+            sepecialFlag = false;
+            needAdditionalSet = true;
+       } else {
+            inheritInfo.push_front( p->text() );
+       }
+
+
+       if( selModel!=nullptr  ) {
+            if ( needAdditionalSet && selP!=nullptr ) {
+                selModel->select( selP->index(), QItemSelectionModel::Select);
+            }
+
+            selModel->select(p->index(), QItemSelectionModel::Select);
+       }
+       p = p->parent();
+   }
+   
+   QString inheritStr1;
+   QString inheritStr2;
+   for ( auto idx = 0; idx!= inheritInfo.size();  ++idx ) {
+       auto ele = inheritInfo.at(idx);
+       QString indent;
+       if ( idx > 0 ) {
+            indent.fill( QChar(' '), idx * 2);
+       }
+
+       inheritStr1 += QString("%1%2.  %3\n").arg(indent).arg(idx).arg(ele); 
+       if ( idx != inheritInfo.size() - 1 ) {
+           inheritStr2 += QString("%1 -> ").arg( ele );
+       } else {
+           inheritStr2 += QString("%1").arg( ele );
+       }
+       // qDebug() << idx << ".  " << *it;
+   }
+   
+   ui->plainTextEdit_2->setPlainText( inheritStr1 );
+   ui->statusbar->showMessage( inheritStr2 );
+
+}

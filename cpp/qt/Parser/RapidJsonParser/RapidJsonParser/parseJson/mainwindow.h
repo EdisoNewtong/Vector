@@ -4,10 +4,11 @@
 #include <QMainWindow>
 #include <QStack>
 #include <QStandardItemModel>
+#include <QMap>
 
 #include "rapidjson/document.h"
 
-
+class JSonStandardItem;
 
 namespace Ui {
 class MainWindow;
@@ -62,7 +63,7 @@ private slots:
 
 	void onTreeItemSelectionChanged(const QItemSelection & selected, const QItemSelection & deselected);
 
-
+    void onJsonTextBoxCursorChanged();
 
 private:
     Ui::MainWindow *ui;
@@ -73,7 +74,7 @@ private:
 	rapidjson::Value::ValueIterator  m_eleIt;	// Array's element iterator
 	QStack<VisitInfo> m_visitStack;
 
-
+    QMap<int,JSonStandardItem*>  m_itemPositionMap;
 
 	bool m_isParseOK;
 	Visit_Step m_visitTag;
@@ -84,7 +85,8 @@ private:
 
     void printValueDetail(rapidjson::Value* jsonValue,int nStep);
     void highLightText(int startpos,int endpos);
-
+    void refreshPostionMap(JSonStandardItem* pItem);
+    void updateInheritInfo(JSonStandardItem* item);
 
 	// For Tree Show
 	QStandardItemModel* m_pTreeModel;
