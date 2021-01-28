@@ -27,10 +27,16 @@ MainWindow::MainWindow(QWidget *parent)
     , m_pXMLTreeModel(nullptr)
     , m_pXMLAttrTreeModel(nullptr)
     , m_XmlTextByteArray()
+    , m_xmlNodePositionMap()
     , m_graphicRootNode(nullptr)
 {
     ui->setupUi(this);
     m_pXMLDoc = new xml_document<char>();
+
+    m_xmlNodePositionMap.clear();
+
+    connect(ui->xmlTextEdit , SIGNAL(cursorPositionChanged()), this, SLOT(onXmlTextBoxCursorChanged()) );
+
 
     createTreeModelIfNecessary();
     createTreeAttrModelIfnecessary();
@@ -218,6 +224,7 @@ void MainWindow::on_buildTreeBtn_clicked()
             m_graphicRootNode = new GraphicNode(0,visibleRoot);
         }
 
+        m_xmlNodePositionMap.clear();
         buildXMLTree(visibleRoot, m_graphicRootNode, m_pXMLDoc, 0);
         m_graphicRootNode->updateSize();
 
@@ -268,6 +275,8 @@ void MainWindow::buildXMLTree(QStandardItem* parent, GraphicNode* rootGraphicNod
                     parent->setChild(idx, 1, xmltagValueItem);
                     parent->setChild(idx, 2, xmltagTypeItem);
 
+                    refreshPostionMap(xmltagItem, 0);
+
                     GraphicNode* gNode = new GraphicNode(level,xmltagItem);
                     rootGraphicNode->appendChild(gNode);
                     rootGraphicNode->updateSize();
@@ -283,6 +292,9 @@ void MainWindow::buildXMLTree(QStandardItem* parent, GraphicNode* rootGraphicNod
                         parent->setChild(idx, 1, xmlvalueItem);
                         parent->setChild(idx, 2, xmltypeItem );
 
+                        refreshPostionMap(xml1tagItem, 0);
+                        refreshPostionMap(xmlvalueItem, 1);
+
                         GraphicNode* gNode = new GraphicNode(level,xml1tagItem);
                         rootGraphicNode->appendChild(gNode);
                     } else {
@@ -292,6 +304,8 @@ void MainWindow::buildXMLTree(QStandardItem* parent, GraphicNode* rootGraphicNod
                         parent->setChild(idx,0, newCreateParent);
                         parent->setChild(idx,1, nullptr);
                         parent->setChild(idx,2, nullptr);
+
+                        refreshPostionMap(newCreateParent, 0);
 
                         GraphicNode* gNode = new GraphicNode(level,newCreateParent);
 
@@ -307,6 +321,8 @@ void MainWindow::buildXMLTree(QStandardItem* parent, GraphicNode* rootGraphicNod
                     parent->setChild(idx, 0, newParent);
                     parent->setChild(idx, 1, xmlvalueItem);
                     parent->setChild(idx, 2, xmltypeItem);
+
+                    refreshPostionMap(newParent, 0);
 
                     GraphicNode* gNode = new GraphicNode(level,newParent);
 
@@ -326,6 +342,8 @@ void MainWindow::buildXMLTree(QStandardItem* parent, GraphicNode* rootGraphicNod
                 parent->setChild(idx,1, value2ndNode);
                 parent->setChild(idx,2, valueTypeNode);
 
+                refreshPostionMap(valueNode, 1);
+
                 GraphicNode* gNode = new GraphicNode(level,valueNode);
                 rootGraphicNode->appendChild(gNode);
             }
@@ -339,6 +357,8 @@ void MainWindow::buildXMLTree(QStandardItem* parent, GraphicNode* rootGraphicNod
                 parent->setChild(idx,0, valueNode);
                 parent->setChild(idx,1, value2ndNode);
                 parent->setChild(idx,2, valueTypeNode);
+
+                refreshPostionMap(value2ndNode, 1);
 
                 GraphicNode* gNode = new GraphicNode(level,valueNode);
                 rootGraphicNode->appendChild(gNode);
@@ -354,6 +374,8 @@ void MainWindow::buildXMLTree(QStandardItem* parent, GraphicNode* rootGraphicNod
                 parent->setChild(idx,1, value2ndNode);
                 parent->setChild(idx,2, valueTypeNode);
 
+                refreshPostionMap(value2ndNode, 1);
+
                 GraphicNode* gNode = new GraphicNode(level,valueNode);
                 rootGraphicNode->appendChild(gNode);
             }
@@ -367,6 +389,8 @@ void MainWindow::buildXMLTree(QStandardItem* parent, GraphicNode* rootGraphicNod
                 parent->setChild(idx,0, valueNode);
                 parent->setChild(idx,1, value2ndNode);
                 parent->setChild(idx,2, valueTypeNode);
+
+                refreshPostionMap(value2ndNode, 1);
 
                 GraphicNode* gNode = new GraphicNode(level,valueNode);
                 rootGraphicNode->appendChild(gNode);
@@ -382,6 +406,8 @@ void MainWindow::buildXMLTree(QStandardItem* parent, GraphicNode* rootGraphicNod
                 parent->setChild(idx,1, value2ndNode);
                 parent->setChild(idx,2, valueTypeNode);
 
+                refreshPostionMap(value2ndNode,  1);
+
                 GraphicNode* gNode = new GraphicNode(level,valueNode);
                 rootGraphicNode->appendChild(gNode);
             }
@@ -394,6 +420,8 @@ void MainWindow::buildXMLTree(QStandardItem* parent, GraphicNode* rootGraphicNod
                 parent->setChild(idx,0, valueNode);
                 parent->setChild(idx,1, value2ndNode);
                 parent->setChild(idx,2, valueTypeNode);
+
+                refreshPostionMap(valueNode, 1);
 
                 GraphicNode* gNode = new GraphicNode(level,valueNode);
                 rootGraphicNode->appendChild(gNode);
@@ -591,9 +619,11 @@ void MainWindow::highLightNode(QStandardItem* nodeInfo, int columnIdx)
 {
     auto selectXMLInfo = dynamic_cast<xmlStandardItem*>( nodeInfo );
     if ( selectXMLInfo!=nullptr ) {
-        rapidxml::xml_node<char>* xmlNode = (rapidxml::xml_node<char>*)( selectXMLInfo->getXmlNode() );
+        rapidxml::xml_node<char>* xmlNode = selectXMLInfo->getXmlNode();
         if ( xmlNode!=nullptr ) {
             
+            disconnect(ui->xmlTextEdit , SIGNAL(cursorPositionChanged()), this, SLOT(onXmlTextBoxCursorChanged()) );
+
             auto tp = xmlNode->type();
             switch( tp )
             {
@@ -709,6 +739,8 @@ void MainWindow::highLightNode(QStandardItem* nodeInfo, int columnIdx)
                 break;
             }
 
+            connect(ui->xmlTextEdit , SIGNAL(cursorPositionChanged()), this, SLOT(onXmlTextBoxCursorChanged()) );
+
             refreshAttributeTree(xmlNode);
         }
     }
@@ -727,6 +759,9 @@ void MainWindow::highLightAttribute(QStandardItem* node, int rowIdx, int columnI
         // qDebug() << "return 2";
         return;
     }
+
+
+    disconnect(ui->xmlTextEdit , SIGNAL(cursorPositionChanged()), this, SLOT(onXmlTextBoxCursorChanged()) );
 
     // xmlNode!= nullptr
     dehighLightTextBox();
@@ -788,6 +823,8 @@ void MainWindow::highLightAttribute(QStandardItem* node, int rowIdx, int columnI
     default:
         break;
     }
+
+    connect(ui->xmlTextEdit , SIGNAL(cursorPositionChanged()), this, SLOT(onXmlTextBoxCursorChanged()) );
     
 }
 
@@ -841,9 +878,21 @@ void MainWindow::onTreeItemSelectionChanged(const QItemSelection & selected, con
         if( selectList.empty() ) {
             return;
         }
+
+
         auto& selitem = selectList.at(0);
         auto selectNodeInfo = m_pXMLTreeModel->itemFromIndex( selitem  );
         if( selectNodeInfo!=nullptr ) {
+
+	        auto selectionModel = ui->xmltreeView->selectionModel();
+            if ( selectionModel != nullptr ) {
+		        disconnect(selectionModel,&QItemSelectionModel::selectionChanged, this, &MainWindow::onTreeItemSelectionChanged);
+            }
+            updateInheritInfo(selectNodeInfo);
+            if ( selectionModel != nullptr ) {
+		        connect(selectionModel,&QItemSelectionModel::selectionChanged, this, &MainWindow::onTreeItemSelectionChanged);
+            }
+
             highLightNode(selectNodeInfo, selitem.column() );
         }
     }
@@ -898,5 +947,192 @@ void MainWindow::on_prettyFormatBtn_clicked()
         rapidxml::print( std::back_inserter(fmtStr) , *m_pXMLDoc, 0);
         ui->xmlTextEdit->setPlainText( QString(fmtStr.c_str()) );
     }
+
+}
+
+
+
+void MainWindow::refreshPostionMap(xmlStandardItem* pItem,int tp)
+{
+    if ( pItem == nullptr ) {
+        return;
+    }
+
+    rapidxml::xml_node<char>* xmlnode = pItem->getXmlNode();
+    if ( xmlnode == nullptr ) {
+        return;
+    }
+
+    if ( tp == 0 ) {
+        // =>   element Type
+        const auto& bIsSingle = xmlnode->getIsSingleNode();
+        auto ots = xmlnode->getOpenTagBeginInfo().cursor_idx;
+        auto ote = xmlnode->getOpenTagEndInfo().cursor_idx;
+        if ( bIsSingle ) {
+            if ( ots >=0 && ote >=0 && ots < ote ) {
+                for ( int i = ots; i <=ote; ++i ) {
+                    auto it = m_xmlNodePositionMap.find(i);
+                    if ( it == m_xmlNodePositionMap.end() ) {
+                        m_xmlNodePositionMap.insert(i, pItem);
+                    } else {
+                        *it = pItem;
+                    }
+                }
+            }
+        } else {
+            auto cts = xmlnode->getCloseTagBeginInfo().cursor_idx;
+            auto cte = xmlnode->getCloseTagEndInfo().cursor_idx;
+            // push open tag
+            if ( ots >=0 && ote >=0 && ots < ote ) {
+                for ( int i = ots; i <=ote; ++i ) {
+                    auto it = m_xmlNodePositionMap.find(i);
+                    if ( it == m_xmlNodePositionMap.end() ) {
+                        m_xmlNodePositionMap.insert(i, pItem);
+                    } else {
+                        // replace
+                        *it = pItem;
+                    }
+                }
+            }
+
+            // push end tag
+            if ( cts >=0 && cte >=0 && cts < cte ) {
+                for ( int i = cts; i <=cte; ++i ) {
+                    auto it = m_xmlNodePositionMap.find(i);
+                    if ( it == m_xmlNodePositionMap.end() ) {
+                        m_xmlNodePositionMap.insert(i, pItem);
+                    } else {
+                        // replace
+                        *it = pItem;
+                    }
+                }
+            }
+        }
+    } else {
+        // =>  data / value
+        auto vs = xmlnode->getValueBeginInfo().cursor_idx;
+        auto ve = xmlnode->getValueEndInfo().cursor_idx;
+        if ( vs >=0 && ve >=0 && vs < ve ) {
+            for ( int i = vs; i <=ve; ++i ) {
+                auto it = m_xmlNodePositionMap.find(i);
+                if ( it == m_xmlNodePositionMap.end() ) {
+                    m_xmlNodePositionMap.insert(i, pItem);
+                } else {
+                    // replace
+                    *it = pItem;
+                }
+            }
+        }
+    }
+    
+    
+}
+
+
+
+void MainWindow::onXmlTextBoxCursorChanged()
+{
+    if ( m_xmlNodePositionMap.isEmpty() ) {
+        return;
+    }
+
+    auto pos = ui->xmlTextEdit->textCursor().position();
+    auto it = m_xmlNodePositionMap.find(pos);
+    if ( it == m_xmlNodePositionMap.end() ) {
+        return;
+    }
+
+    auto item = *it;
+    if ( item!=nullptr ) {
+        auto selIdx = item->index();
+
+        auto selectionModel = ui->xmltreeView->selectionModel();
+        if ( selectionModel!=nullptr ) {
+            disconnect(selectionModel,&QItemSelectionModel::selectionChanged, this, &MainWindow::onTreeItemSelectionChanged);
+        }
+
+        // do select
+        selectionModel->select(selIdx, QItemSelectionModel::ClearAndSelect);
+        ui->xmltreeView->scrollTo(selIdx);
+
+        updateInheritInfo(item);
+
+        if ( selectionModel!=nullptr ) {
+            connect(selectionModel,&QItemSelectionModel::selectionChanged, this, &MainWindow::onTreeItemSelectionChanged);
+        }
+    }
+
+}
+
+
+void MainWindow::updateInheritInfo(QStandardItem* item)
+{
+    if ( item == nullptr ) {
+        return;
+    }
+
+    QVector<QString> inheritVec;
+    inheritVec.clear();
+
+    auto nRow = item->row();
+    auto nCol = item->column();
+    auto spFlag = false;
+    
+    if ( nCol == 0 ) {
+        inheritVec.push_front( item->text() );
+    } else {
+       spFlag = true;
+    }
+
+    auto selectionModel = ui->xmltreeView->selectionModel();
+    auto p = item->parent();
+    while ( p != nullptr ) {
+        auto needAdditionalSet = false;
+        auto selP = p;
+        if ( spFlag ) {
+            auto leftPart = p->child(nRow,0);
+            selP = leftPart; 
+            if ( leftPart!=nullptr ) {
+                inheritVec.push_front( leftPart->text() );
+                inheritVec.push_front( p->text() );
+            }
+            spFlag = false;
+            needAdditionalSet = true;
+        } else {
+            inheritVec.push_front( p->text() );
+        }
+
+        if ( selectionModel != nullptr ) {
+            if ( needAdditionalSet && selP!=nullptr ) {
+                selectionModel->select( selP->index(), QItemSelectionModel::Select);
+            }
+
+            selectionModel->select( p->index(), QItemSelectionModel::Select);
+        }
+
+
+        p = p->parent();
+    }
+
+    QString inheritMsgInfo1;
+    QString inheritMsgInfo2;
+    for ( int i = 0; i < inheritVec.size(); ++i ) {
+        auto ele = inheritVec.at(i);
+        QString indent;
+        if ( i > 0 ) {
+            indent = indent.fill(QChar(' '), i*2);
+        }
+        inheritMsgInfo1 += QString("%1%2. %3\n").arg(indent).arg(i).arg(ele);
+
+        if ( i == inheritVec.size() - 1 ) {
+            inheritMsgInfo2 += QString("%1").arg(ele);
+        } else {
+            inheritMsgInfo2 += QString("%1 ->").arg(ele);
+        }
+    }
+
+    ui->parseResultTextBox->setPlainText( inheritMsgInfo1 );
+    ui->statusBar->showMessage( inheritMsgInfo2 );
+    // ui->
 
 }

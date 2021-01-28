@@ -8,6 +8,7 @@
 #include <QVector>
 #include <QPair>
 #include <QColor>
+#include <QMap>
 
 
 // #include "rapidxml.hpp"
@@ -17,6 +18,9 @@ namespace rapidxml
     template<class Ch> class xml_document;
     template<class Ch> class xml_node;
 }
+
+
+class xmlStandardItem;
 
 namespace Ui {
 class MainWindow;
@@ -45,6 +49,8 @@ private slots:
 
     void on_prettyFormatBtn_clicked();
 
+    void onXmlTextBoxCursorChanged();
+
 private:
     void createTreeModelIfNecessary();
     void deleteTreeModelIfNecessary();
@@ -63,6 +69,10 @@ private:
     void hightLightNodeText(const QVector< QPair<QPair<int,int>, QColor>>& hightLightInfoVec);
     void dehighLightTextBox();
     void setXMLCurrentTextCursor(int cursorIdx);
+
+
+    void refreshPostionMap(xmlStandardItem* pItem,int tp);
+    void updateInheritInfo(QStandardItem* item);
     
 
     Ui::MainWindow *ui;
@@ -74,6 +84,8 @@ private:
 	QStandardItemModel* m_pXMLTreeModel;
 	QStandardItemModel* m_pXMLAttrTreeModel;
     QByteArray  m_XmlTextByteArray;
+
+    QMap<int,QStandardItem*> m_xmlNodePositionMap;
 
     GraphicNode*  m_graphicRootNode;
 
