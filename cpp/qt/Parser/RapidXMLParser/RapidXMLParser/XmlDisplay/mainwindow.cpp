@@ -1133,6 +1133,6 @@ void MainWindow::updateInheritInfo(QStandardItem* item)
 
     ui->parseResultTextBox->setPlainText( inheritMsgInfo1 );
     ui->statusBar->showMessage( inheritMsgInfo2 );
-    // ui->
-
 }
+
+
