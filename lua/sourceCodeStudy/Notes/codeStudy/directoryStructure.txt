@@ -1,0 +1,43 @@
+lua-5.1.5/src/
+
+Total : 55 source code file ( include   xxx.h     and   xxx.c )
+
+Group : 20 groups ( 19*2 + 1*3 ) = 41
+   1.    lapi.h           lapi.c                        // Lua API  ( Only used inside C Program )
+   2.    lauxlib.h        lauxlib.c                     // Auxiliary functions for building Lua libraries  ( Only used inside C Program )
+   3.    lcode.h          lcode.c                       // Code generator for Lua 
+   4.    ldebug.h         ldebug.c                      // Debug Interface
+   5.    ldo.h            ldo.c                         // Stack and Call structure of Lua
+   6.    lfunc.h          lfunc.c                       // Auxiliary functions to manipulate prototypes and closures
+   7.    lgc.h            lgc.c                         // Garbage Collector
+   8.    llex.h           llex.c                        // Lexical Analyzer
+   9.    lmem.h           lmem.c                        // Interface to Memory Manager
+   10.   lobject.h        lobject.c                     // Some generic functions over Lua objects
+   11.   lopcodes.h       lopcodes.c                    // 在lua 的debug 库 , 与 print.c 中有被引用到, 用于打印 lua 代码的一些具体信息
+   12.   lparser.h        lparser.c                     // Lua Parser
+   13.   lstate.h         lstate.c                      // Lua Global State
+   14.   lstring.h        lstring.c                     // String table (keeps all strings handled by Lua)
+   15.   ltable.h         ltable.c                      // Lua tables (hash)
+   16.   ltm.h            ltm.c                         // Tag methods
+   17.   lundump.h        lundump.c                     // load precompiled Lua chunks
+   18.   lvm.h            lvm.c                         // Lua virtual machine
+   19.   lzio.h           lzio.c                        // a generic input stream interface
+   20.   lua.h            lua.c      luac.c             // lua 2 main entries :  1. lua   2. luac
+
+Single : 14
+    1.  llimits.h                                       // Limits, basic types, and some other `installation-dependent' definitions 
+    2.  luaconf.h                                       // Configuration file for Lua
+    3.  lualib.h                                        // Lua standard libraries
+    4.  lbaselib.c                                      // Basic library
+    5.  ldblib.c                                        // Interface from Lua to its debug API
+    6.  ldump.c                                         // save precompiled Lua chunks
+    7.  linit.c                                         // Initialization of libraries for lua.c
+    8.  liolib.c                                        // Standard I/O (and system) library
+    9.  lmathlib.c                                      // Standard mathematical library
+    10. loadlib.c                                       // Dynamic library loader for Lua
+    11. loslib.c                                        // Standard Operating System library
+    12. lstrlib.c                                       // Standard library for string operations and pattern-matching
+    13. ltablib.c                                       // Library for Table Manipulation
+    14. print.c                                         // print Binary bytecodes
+
+
