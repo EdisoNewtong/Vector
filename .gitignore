@@ -12,5 +12,9 @@ lua/sourceCodeStudy/lua-5.1.5/src/luac
 lua/sourceCodeStudy/lua-5.1.5/src/*.a
 lua/lua_C_Lab/basic/lualib/*.a
 lua/lua_C_Lab/basic/lualib/*.lib
+lua/sourceCodeStudy/xcodeLuaStudy
+
 **/build/*
 *.pro.user
+
+
