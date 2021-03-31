@@ -488,10 +488,10 @@ void MainWindow::fillDataIntoModel(QStandardItem* parent, rapidjson::Value* json
         auto isCompoundDataEmpty = false;
         if ( isObjFlag ) {
             isCompoundDataEmpty = jsonValue->ObjectEmpty();
-            displaystr = isCompoundDataEmpty ? "{ }" : "{ ... }";
+            displaystr = isCompoundDataEmpty ? "{ }" : QString("{ ... } %1 k-v pair(s)").arg(jsonValue->MemberCount());
         } else {
             isCompoundDataEmpty = jsonValue->Empty();
-            displaystr = isCompoundDataEmpty ? "[ ]" : "[ ... ]";
+            displaystr = isCompoundDataEmpty ? "[ ]" : QString("[ ... ] %1 element(s)").arg(jsonValue->Size());
         }
 
         if( tag == -1) {
