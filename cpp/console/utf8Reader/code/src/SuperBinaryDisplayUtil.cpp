@@ -1407,7 +1407,12 @@ void printFileInfo(const FileInfo& fileInfo, string& retStr, bool needPrintToCon
 				size_t rawHexSz = fileInfo.rawHexVec.size();
 				for ( size_t bomIdx = 0; bomIdx < SIZE_BOM; ++bomIdx ) {
 					if ( bomIdx < rawHexSz ) {
-						outstr << "| " << fileInfo.rawHexVec.at(bomIdx) << " ";
+						string* pStr = fileInfo.rawHexVec.at(bomIdx);
+						if ( pStr != nullptr ) {
+							outstr << "| " << *pStr << " ";
+						} else {
+							outstr << "| " << "??" << " ";
+						}
 					}
 				}
 				outstr << "|" << endl;
