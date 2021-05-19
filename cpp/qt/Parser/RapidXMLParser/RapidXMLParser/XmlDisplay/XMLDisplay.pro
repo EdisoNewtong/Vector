@@ -21,8 +21,12 @@ INCLUDEPATH += ../XmlParser \
 
 LIBS += -L../XmlParser -lXmlParser
 
-win32 {
+win32:debug {
     LIBS += -L../XmlParser/debug
+}
+
+win32:release {
+    LIBS += -L../XmlParser/release
 }
 
 
