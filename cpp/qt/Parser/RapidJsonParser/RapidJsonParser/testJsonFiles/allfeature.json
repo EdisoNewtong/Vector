@@ -1,0 +1,9 @@
+{
+    "aaa" : "𠄘a𠄘b我",
+    "bbb" : 123,
+    "ccc" : {
+        "a1" : [ "𠄘a𠄘b", 123, true, "𠄘a𠄘b们",  null ],
+        "b1" : "Hello World",
+        "c1" : "World World 123"
+    }
+}
