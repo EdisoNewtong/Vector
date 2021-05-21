@@ -148,7 +148,8 @@ void SuperTextEdit::dropEvent(QDropEvent* event)  // Q_DECL_OVERRIDE;
 
     bool hasLeftButtonPressed = false;
 #ifdef Q_OS_WIN
-    hasLeftButtonPressed = ( (btnState & Qt::LeftButton)!=0 );
+    // hasLeftButtonPressed = ( (btnState & Qt::LeftButton)!=0 );
+    hasLeftButtonPressed = true;
 #elif defined(Q_OS_MAC)
     (void)btnState;
     hasLeftButtonPressed = true;
