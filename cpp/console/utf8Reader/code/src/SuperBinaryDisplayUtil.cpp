@@ -1436,6 +1436,23 @@ void printFileInfo(const FileInfo& fileInfo, string& retStr, bool needPrintToCon
 				auto lineNo = it->second;
 
 				if ( singleLine !=nullptr ) {
+					////////////////////////////////////////////////////////////////////////////////////////////////////
+					// Before all , print the original file's line content
+					////////////////////////////////////////////////////////////////////////////////////////////////////
+					if ( lineLineAtFront ) {
+						outstr << setw(total_width) << setfill(' ') << "";
+					}
+
+					for ( auto pWord = singleLine->begin(); pWord != singleLine->end(); ++pWord ) 
+					{
+						auto pSingleCharacter = *pWord;
+						if ( pSingleCharacter != nullptr  ) {
+							outstr << pSingleCharacter->display_str;
+						}
+					}
+					outstr << endl;
+
+
 					//////////////////////////////////////////////////
 					// For every single ling, There are 3 Steps to Do
 					//////////////////////////////////////////////////
