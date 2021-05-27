@@ -1325,6 +1325,9 @@ bool readFileRapidly(const string& filename, FileInfo& fInfo)
 
 void printFileInfo(const FileInfo& fileInfo, string& retStr, bool needPrintToConsole /* = false */)
 {
+     // indicate whether the string    " line : xxx " is at the front or the tail
+     auto lineLineAtFront =  true;
+
      stringstream outstr;
      if ( !fileInfo.isValid ) {
          outstr << "File named  :  " << fileInfo.filename << "  not existed or open failed" << endl;
@@ -1428,7 +1431,6 @@ void printFileInfo(const FileInfo& fileInfo, string& retStr, bool needPrintToCon
 
 			// flag of print lineNo     front / tail ?
 			size_t iCharacterCount = 0;
-			auto lineLineAtFront =  true;
 			for ( auto it = fileInfo.lineVec.begin(); it != fileInfo.lineVec.end(); ++it ) 
 			{
 				// vector< vector<SingleCharacter*>* > lineVec;
@@ -1437,7 +1439,7 @@ void printFileInfo(const FileInfo& fileInfo, string& retStr, bool needPrintToCon
 
 				if ( singleLine !=nullptr ) {
 					////////////////////////////////////////////////////////////////////////////////////////////////////
-					// Before all , print the original file's line content
+					// Step-0. Prefix Print :  Before all , print the original file's line content
 					////////////////////////////////////////////////////////////////////////////////////////////////////
 					if ( lineLineAtFront ) {
 						outstr << setw(total_width) << setfill(' ') << "";
