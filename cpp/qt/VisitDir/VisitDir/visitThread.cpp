@@ -24,22 +24,22 @@ void VisitThread::run() // override
 	}
 
 	visitDir( qpath.absolutePath(), 0);
-	emit onVisitDone(); // end up here
+	emit onVisitDone(); // !!!Done!!! travelsal the entire dir  end up here
 }
 
 
 void VisitThread::visitDir(const QString &dpath, int level)
 {
-    qDebug() << "dpath => " << dpath;
+    // qDebug() << "dpath => " << dpath;
     // ready to visit
     QDir dir2visit(dpath);
-    const auto &fileInfoList = dir2visit.entryInfoList();
+    const auto &fileInfoList = dir2visit.entryInfoList(QDir::NoDotAndDotDot | QDir::AllEntries | QDir::Hidden);
 	for ( auto i = 0; i < fileInfoList.size(); ++i ) 
 	{
 		const auto &finfo = fileInfoList.at(i); 
 
 		auto strpath = finfo.absoluteFilePath();
-        qDebug() << "\tvisit => " << strpath;
+        // qDebug() << "\tvisit => " << strpath;
 		//
 		// Useful API:
 		//		finfo.isFile();    or    finfo.isDir();

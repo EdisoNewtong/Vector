@@ -3,6 +3,7 @@
 import sys
 import os
 import os.path
+import time
 
 def checkIsV3():
     # win32  darwin(MacOS)  linux
@@ -32,7 +33,7 @@ def collectExtension(path):
     for path,dirname,flist in os.walk( visitPath ):
         # print(path, dirname, flist)
         for fname in flist:
-            full_path = os.path.join(path , fname)
+            # full_path = os.path.join(path , fname)
             extAry = os.path.splitext(fname)
             ext = extAry[1]
 
@@ -41,16 +42,19 @@ def collectExtension(path):
                 key_ext = key_ext[1:]
 
             if not (key_ext in extObj):
-                extObj[key_ext] = { "file_list" : [ full_path ], "count" : 1 }
+                # extObj[key_ext] = { "file_list" : [ full_path ], "count" : 1 }
+                extObj[key_ext] = 1
             else:
-                extObj[key_ext]["count"] = extObj[key_ext]["count"] + 1
-                extObj[key_ext]["file_list"].append(full_path)
+                # extObj[key_ext]["count"] = extObj[key_ext]["count"] + 1
+                # extObj[key_ext]["file_list"].append(full_path)
+                extObj[key_ext] = extObj[key_ext] + 1
+                # extObj[key_ext]["file_list"].append(full_path)
 
 
 
     printDetialFlag = False
+    nHowMany = 0
     if printDetialFlag:
-        nHowMany = 0
         for extstr,infoObj in extObj.items():
             nHowMany = nHowMany + 1
             print("==================================================")
@@ -60,15 +64,15 @@ def collectExtension(path):
                 print("     {}.  {}".format(idx+1, name) )
             print()
     else:
-        print("==================================================")
-        nHowMany = 0
+        # print("==================================================")
         for extstr,infoObj in extObj.items():
             nHowMany = nHowMany + 1
-            print("{}. *.{}  |  total count = {}".format(nHowMany,extstr, infoObj["count"] ) )
-        print("==================================================")
+            # print("{}. *.{}  |  total count = {}".format(nHowMany,extstr, infoObj["count"] ) )
+        # print("==================================================")
 
 
     print("How Many kinds of extention  = {}".format(nHowMany))
+    return extObj
 
 
 def main():
@@ -76,11 +80,27 @@ def main():
         print("You must run this script under python3")
         return
     
+    start = time.time()
+    strstart = time.asctime()
+    print("start Time = {}".format(strstart) )
     arglen = len(sys.argv)
+    retObj = None
     if arglen==1:
-        collectExtension("")
+        retObj = collectExtension("")
     else:
-        collectExtension( sys.argv[1] )
+        retObj = collectExtension( sys.argv[1] )
+
+    end = time.time()
+    strend = time.asctime()
+    print("end = {}".format(strend) )
+    elapsedTime = end - start
+    print("elapsedtime = {} ".format(elapsedTime) )
+
+    print("retObj.len = {}".format(len(retObj)) )
+    if "cpp" in retObj:
+        print("OK.    \".cpp\" .count = {}".format( retObj["cpp"]) )
+    else:
+        print("Sorry. \".cpp\" .count = 0")
 
 
 if __name__ == "__main__":
