@@ -20,11 +20,12 @@ void VisitThread::run() // override
 	if ( !qpath.exists() ) 
 	{
 		// emit resultReady(result);
+		emit onVisitDone(0);
 		return;
 	}
 
 	visitDir( qpath.absolutePath(), 0);
-	emit onVisitDone(); // !!!Done!!! travelsal the entire dir  end up here
+	emit onVisitDone(1); // !!!Done!!! travelsal the entire dir  end up here
 }
 
 

@@ -12,6 +12,7 @@ namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
 #include <QFileInfo>
+#include <QJsonDocument>
 // class QFileInfo;
 
 struct suffixFileInfo
@@ -67,9 +68,18 @@ private slots:
 
     void on_pushButton_clicked();
 
+    void on_pushButton_2_clicked();
+
+
+
 private:
 	void releaseMemory();
 	void processFileBySuffix(const QString &fileAbsPath);
+
+	void loadCacheFileForResult(const QString& dirPath);
+	void forceScanDir(const QString& dirPath);
+	void saveToJson(QJsonDocument& doc);
+	void loadFromJson(const QString& path);
 private:
     Ui::MainWindow *ui;
 	// QThread*        m_runningThread;

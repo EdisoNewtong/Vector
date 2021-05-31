@@ -18,7 +18,7 @@ public:
 
 signals:
 	void onStartVisit(const QString &dPath,int type, int level);
-	void onVisitDone();
+	void onVisitDone(int hasError);
 protected:
 	void visitDir(const QString &dpath, int level);
 
