@@ -53,7 +53,7 @@ void VisitThread::visitDir(const QString &dpath, int level)
             visitDir( strpath,  level+1);
 		} else if ( finfo.isFile() ) {
 			// visit file
-			emit onStartVisit(strpath, 1, level);
+            emit onStartVisit(strpath, 1, level);
 		} else {
 			// the path is neither dir nor file , it exists with special type ?
 			emit onStartVisit(strpath, 2, level);

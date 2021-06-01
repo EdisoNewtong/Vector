@@ -4,7 +4,8 @@
 #include <QMainWindow>
 #include <QElapsedTimer>
 #include <QMap>
-#include <QVector>
+// #include <QVector>
+#include <QList>
 
 
 QT_BEGIN_NAMESPACE
@@ -44,8 +45,8 @@ struct suffixFileInfo
     // virtual void dummyFunc() { }
 	
 
-	QVector<QFileInfo*>                     singleExtList;
-	QMap<QString, QVector<QFileInfo*> >     multiExtMap;
+	QList<QFileInfo*>                     singleExtList;
+	QMap<QString, QList<QFileInfo*> >     multiExtMap;
 };
 
 
@@ -64,7 +65,7 @@ public:
 
 private slots:
 	void onVisitSomething(const QString &what,int type, int level);
-	void onVisitEntireDirDone();
+	void onVisitEntireDirDone(int error);
 
     void on_pushButton_clicked();
 
@@ -78,17 +79,19 @@ private:
 
 	void loadCacheFileForResult(const QString& dirPath);
 	void forceScanDir(const QString& dirPath);
-	void saveToJson(QJsonDocument& doc);
-	void loadFromJson(const QString& path);
+	void saveToRecord();
+	void loadFromRecord(const QString& path);
 private:
     Ui::MainWindow *ui;
 	// QThread*        m_runningThread;
 	QString         m_travelsalDirPath;
 	QElapsedTimer   m_timer;
 	int             m_runningStatus;
+	quint64         m_totalFileCnt;
 
 	
-	QVector<QFileInfo*>             m_noExtFileList;
+	QList<QFileInfo*>               m_noExtFileList;
 	QMap<QString, suffixFileInfo*>  m_ExtFileMap;
+	QList<QString>				    m_dirList;
 };
 #endif // MAINWINDOW_H
