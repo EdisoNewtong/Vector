@@ -64,40 +64,46 @@
     <property name="geometry">
      <rect>
       <x>450</x>
-      <y>140</y>
+      <y>160</y>
       <width>321</width>
-      <height>371</height>
+      <height>351</height>
      </rect>
+    </property>
+    <property name="lineWrapMode">
+     <enum>QPlainTextEdit::NoWrap</enum>
     </property>
    </widget>
    <widget class="QPushButton" name="pushButton_2">
     <property name="geometry">
      <rect>
       <x>700</x>
-      <y>100</y>
+      <y>80</y>
       <width>71</width>
-      <height>31</height>
+      <height>71</height>
      </rect>
     </property>
     <property name="text">
      <string>Search</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEdit">
+   <widget class="QLineEdit" name="searchWhat">
     <property name="geometry">
      <rect>
       <x>450</x>
-      <y>100</y>
+      <y>120</y>
       <width>241</width>
       <height>31</height>
      </rect>
+    </property>
+    <property name="placeholderText">
+     <string>Search File ?</string>
     </property>
    </widget>
    <widget class="QCheckBox" name="checkBox">
     <property name="geometry">
      <rect>
       <x>570</x>
-      <y>40</y>
+      <y>30</y>
       <width>91</width>
       <height>31</height>
      </rect>
@@ -107,6 +113,19 @@
     </property>
     <property name="checked">
      <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="extFilter">
+    <property name="geometry">
+     <rect>
+      <x>450</x>
+      <y>80</y>
+      <width>241</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="placeholderText">
+     <string>Extension Filter With ;</string>
     </property>
    </widget>
   </widget>

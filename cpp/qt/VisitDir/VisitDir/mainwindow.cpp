@@ -411,15 +411,151 @@ void MainWindow::processFileBySuffix(const QString &fileAbsPath)
 void MainWindow::on_pushButton_2_clicked()
 {
 	ui->searchResultList->setPlainText("");
-	auto searchFileName = ui->lineEdit->text();
+    auto strFilter = ui->extFilter->text();
+	strFilter = strFilter.trimmed();
+
+	auto searchFileName = ui->searchWhat->text();
 	searchFileName = searchFileName.trimmed();
+
 	if ( searchFileName.isEmpty() ) {
 		return;
 	}
 
+	if ( m_ExtFileMap.empty()  ) {
+		ui->searchResultList->setPlainText( QString(R"(
+==================================================
+[ERROR] : Search Cache hasn't been prepared yet
+==================================================)") );
+		return;
+	}
+
+    QList<QFileInfo*> searchRet;
+    searchRet.clear();
+
+	QStringList extAry;
+	extAry.clear();
+	if ( strFilter.isEmpty() ) {
+		extAry.clear();
+	} else {
+		if ( strFilter.indexOf(";") == -1 ) {
+			extAry.push_back( strFilter );
+		} else {
+			extAry = strFilter.split(";");
+		}
+	}
+
+    auto pushItIfMatchFunc = [searchFileName,&searchRet](QFileInfo* pFileInfo) {
+        if ( pFileInfo != nullptr ) {
+            QString onlyName = pFileInfo->fileName();
+			auto foundIdx = onlyName.indexOf(searchFileName, 0, Qt::CaseInsensitive);
+			if ( foundIdx != -1 ) {
+				searchRet.push_back( pFileInfo );
+			}
+		}
+	};
+
+	if ( extAry.empty() ) {
+		//
+		// Fuzzy mode
+		//
+
+		// No Ext
+		for ( auto it = m_noExtFileList.begin(); it != m_noExtFileList.end(); ++it )
+		{
+			QFileInfo* pFileInfo = *it;
+			pushItIfMatchFunc(pFileInfo);
+		}
+
+		for ( auto it = m_ExtFileMap.begin(); it != m_ExtFileMap.end(); ++it )
+		{
+			suffixFileInfo* sInfo = it.value();
+			if ( sInfo != nullptr ) {
+				// Single
+				for ( auto sit = sInfo->singleExtList.begin(); sit != sInfo->singleExtList.end(); ++sit ) 
+				{
+					QFileInfo* pFileInfo = *sit;
+					pushItIfMatchFunc(pFileInfo);
+				}
+
+				// Multi
+				for ( auto mit = sInfo->multiExtMap.begin(); mit != sInfo->multiExtMap.end(); ++mit ) 
+				{
+					auto lst = mit.value();
+					for ( auto eleit = lst.begin(); eleit != lst.end(); ++eleit ) 
+					{
+						QFileInfo* pFileInfo = *eleit;
+						pushItIfMatchFunc(pFileInfo);
+					}
+				}
+			}
+		}
+
+	} else {
+		// Acturucy mode
+		for ( auto it = extAry.begin(); it != extAry.end(); ++it ) 
+		{
+			auto oldext = *it;
+			auto ext = oldext.trimmed();
+			if ( ext.isEmpty() ) {
+				continue;
+			}
+
+			if ( ext.startsWith(".") ) {
+				// only leave   extension without   "."
+				ext = ext.mid(1);
+			}
+
+			for ( auto itExt = m_ExtFileMap.begin(); itExt != m_ExtFileMap.end(); ++itExt )
+			{
+				QString keyStr = itExt.key();
+				auto cmpRet = QString::compare(keyStr, ext , Qt::CaseInsensitive);
+				if ( cmpRet != 0 ) {
+					continue;
+				}
+
+				// cmpRet == 0
+				suffixFileInfo* sInfo = itExt.value();
+				if ( sInfo != nullptr ) {
+					for ( auto sit = sInfo->singleExtList.begin(); sit != sInfo->singleExtList.end(); ++sit ) 
+					{
+						QFileInfo* pFileInfo = *sit;
+						pushItIfMatchFunc(pFileInfo);
+					}
+
+					// Multi
+					for ( auto mit = sInfo->multiExtMap.begin(); mit != sInfo->multiExtMap.end(); ++mit ) 
+					{
+						auto lst = mit.value();
+						for ( auto eleit = lst.begin(); eleit != lst.end(); ++eleit ) 
+						{
+							QFileInfo* pFileInfo = *eleit;
+							pushItIfMatchFunc(pFileInfo);
+						}
+					}
+				}
+			}
+
+		}
+	}
 	
-	
-	// ui->searchResultList->setPlainText("");
+	if( searchRet.empty() ) {
+		ui->searchResultList->setPlainText("Sorry : Not Found :( ");
+	} else {
+		QString retStr;
+		int idx = 1;
+		retStr += QString("Totally :Found %1 result(s)\n").arg( searchRet.size() );
+		retStr += QString("==================================================\n");
+		for( auto it = searchRet.begin(); it != searchRet.end(); ++it, ++idx ) {
+			QFileInfo* pFileInfo = *it;
+			if ( pFileInfo != nullptr ) {
+				retStr += QString("%1. | %2 | %3\n").arg(idx).arg( pFileInfo->fileName() ).arg( pFileInfo->absoluteFilePath() );
+			}
+		}
+		retStr += QString("==================================================\n");
+
+		ui->searchResultList->setPlainText(retStr);
+	}
+
 }
 
 
@@ -551,7 +687,8 @@ void MainWindow::loadFromRecord(const QString& path)
 		processPath = processPath.mid(0, processPath.length()-1 );
 	}
 	QFileInfo fInfo(processPath);
-	strRecordFilePath += (fInfo.fileName() + ".txt");
+    QString cfgFileName = (fInfo.fileName() + ".txt");
+	strRecordFilePath += cfgFileName;
 
 	QFileInfo recordFileInfo(strRecordFilePath);
 	if ( !recordFileInfo.isFile() ) {
@@ -589,6 +726,9 @@ void MainWindow::loadFromRecord(const QString& path)
 	QString visitExt;
 	QString lastExt;
 	quint64 lineNo = 1;
+
+	QString errorLog;
+	auto meetError = false;
 	for ( auto it = spBa.begin(); it != spBa.end(); ++it, ++lineNo ) {
 		QString line = QString(*it);
 		auto trimline = line.trimmed();
@@ -600,12 +740,13 @@ void MainWindow::loadFromRecord(const QString& path)
 		if ( idx1 == 0 ) {
 			QString rest = line.mid( G_ROOT_STR.length() );
 			if( fInfo.absoluteFilePath() != rest ) {
-				ui->outputBox->setPlainText( QString(R"(
+				errorLog = QString(R"(
 ==================================================
 [ERROR] : RootPath is not equal to the file record
-==================================================)") );
+==================================================)");
+				meetError = true;
 				break;
-			} 
+			}
 			// Status is OK
 			// Read the rest of content of the file
 		} else if ( idx1 == -1 ) {
@@ -636,13 +777,15 @@ void MainWindow::loadFromRecord(const QString& path)
 						// == 2 , single
 						auto foundIt = m_ExtFileMap.find( visitExt );
 						if ( foundIt == m_ExtFileMap.end() ) {
-							qDebug() << QString("[ERROR] : Can't found Single Ext %1 @ LINE : %2").arg(visitExt).arg(lineNo);
+							errorLog += QString("[ERROR] : Can't found Single Ext %1 @ LINE : %2\n").arg(visitExt).arg(lineNo);
+							meetError = true;
 						} else {
 							suffixFileInfo* sInfo = *foundIt;
 							if ( sInfo != nullptr ) {
 								sInfo->singleExtList.push_back( new QFileInfo(abspath) );
 							} else {
-								qDebug() << QString("[ERROR] : sInfo == nullptr @ LINE : %2").arg(lineNo);
+								errorLog += QString("[ERROR] : sInfo == nullptr @ LINE : %2\n").arg(lineNo);
+								meetError = true;
 							}
 						}
 					} else {
@@ -650,7 +793,8 @@ void MainWindow::loadFromRecord(const QString& path)
 						auto realExt = lastExt.mid(1);
 						auto foundIt = m_ExtFileMap.find( visitExt );
 						if ( foundIt == m_ExtFileMap.end() ) {
-							qDebug() << QString("[ERROR] : Can't found MultiExt ext %1 @ LINE : %2").arg(lastExt).arg(lineNo);
+							errorLog += QString("[ERROR] : Can't found MultiExt ext %1 @ LINE : %2\n").arg(lastExt).arg(lineNo);
+							meetError = true;
 						} else {
 							suffixFileInfo* sInfo = *foundIt;
 							if ( sInfo != nullptr ) {
@@ -661,7 +805,8 @@ void MainWindow::loadFromRecord(const QString& path)
 									multiIt.value().push_back( new QFileInfo(abspath) );
 								}
 							} else {
-								qDebug() << QString("[ERROR] : sInfo == nullptr @ LINE : %2").arg(lineNo);
+								errorLog += QString("[ERROR] : sInfo == nullptr @ LINE : %2\n").arg(lineNo);
+								meetError = true;
 							}
 						}
 					}
@@ -679,21 +824,22 @@ void MainWindow::loadFromRecord(const QString& path)
 						suffixFileInfo* createNewObj = new suffixFileInfo;
 						m_ExtFileMap.insert(ext,createNewObj);
 					} else {
-						qDebug() << "[ERROR] At Line : " << lineNo << " , Strange Version";
+						errorLog += QString("[ERROR] At Line : %1 , Strange Version\n").arg(lineNo);
+						meetError = true;
 					}
 				}
 			}	
 		}
 	}
 
-
-
+	if (  !meetError ) {
+		ui->outputBox->setPlainText( QString(R"(==============================
+Load File <%1>  Successful  :)
+==============================)").arg(cfgFileName) );
+	} else {
+		ui->outputBox->setPlainText(errorLog);
+	}
 	
-	//
-	// Open Successful
-	//
 
-
-	
 }
 

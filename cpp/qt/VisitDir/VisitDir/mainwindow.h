@@ -92,6 +92,7 @@ private:
 	
 	QList<QFileInfo*>               m_noExtFileList;
 	QMap<QString, suffixFileInfo*>  m_ExtFileMap;
+
 	QList<QString>				    m_dirList;
 };
 #endif // MAINWINDOW_H
