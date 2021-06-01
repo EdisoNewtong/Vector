@@ -17,7 +17,7 @@ static const QString G_BASE_GEN_DIR("Travelsal_Log");
 static const QString G_ROOT_STR("RootDir = ");
 static const QString G_NO_EXT_FILE_FLAG("<No Extension File>");
 static const QString G_TAB_1("\t");
-static const QString G_TAB_2("\t");
+static const QString G_TAB_2("\t\t");
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -583,8 +583,8 @@ void MainWindow::loadFromRecord(const QString& path)
 	// qDebug() << "End   Read Time : " << QTime::currentTime();
 
 	// qDebug() << "Start Sep Time : " << QTime::currentTime();
-    //  QChar eol('\n');
-    auto spBa = ba.split( '\n' );
+	//  QChar eol('\n');
+	auto spBa = ba.split( '\n' );
 	auto reachNoExtPart = false;
 	QString visitExt;
 	QString lastExt;
@@ -596,10 +596,6 @@ void MainWindow::loadFromRecord(const QString& path)
 			continue;
 		}
 
-		// G_ROOT_STR
-		// G_NO_EXT_FILE_FLAG
-		// \t
-		// \t\t
 		auto idx1 = line.indexOf(G_ROOT_STR);
 		if ( idx1 == 0 ) {
 			QString rest = line.mid( G_ROOT_STR.length() );
@@ -611,15 +607,18 @@ void MainWindow::loadFromRecord(const QString& path)
 				break;
 			} 
 			// Status is OK
+			// Read the rest of content of the file
 		} else if ( idx1 == -1 ) {
 			if ( line.startsWith(G_TAB_1) ) {
 				if ( !line.startsWith(G_TAB_2) ) {
+					//
 					// Only 1 Tab
+					//
 					if ( !reachNoExtPart ) {
-						auto dotIdx = trimline.lastIndexOf("\"");
-						auto quotestr = trimline.mid(0, dotIdx+1);
-						auto innerQuote = quotestr.mid(2,quotestr.length()-3);
-						lastExt = innerQuote;
+						auto commaIdx = trimline.lastIndexOf("\"");
+						auto quotestr = trimline.mid(0, commaIdx+1);
+						auto innerStr = quotestr.mid(1, quotestr.length()-2 );
+						lastExt = innerStr;
 					} else {
 						auto part3Ary = trimline.split("|");
 						QString abspath = part3Ary.at(2);
@@ -631,9 +630,10 @@ void MainWindow::loadFromRecord(const QString& path)
 					auto part3Ary = trimline.split("|");
 					QString abspath = part3Ary.at(2);
 					abspath = abspath.trimmed();
-					auto nextDotIdx = lastExt.lastIndexOf(".");
-					if ( nextDotIdx == -1 ) {
-						// single
+					// auto nextDotIdx = lastExt.lastIndexOf(".");
+					auto spDotAry = lastExt.split(".");
+					if ( spDotAry.size() == 2 ) {
+						// == 2 , single
 						auto foundIt = m_ExtFileMap.find( visitExt );
 						if ( foundIt == m_ExtFileMap.end() ) {
 							qDebug() << QString("[ERROR] : Can't found Single Ext %1 @ LINE : %2").arg(visitExt).arg(lineNo);
@@ -646,17 +646,17 @@ void MainWindow::loadFromRecord(const QString& path)
 							}
 						}
 					} else {
-						// multi
-						auto onlyExt = lastExt.mid( nextDotIdx + 1);
-						auto foundIt = m_ExtFileMap.find( onlyExt );
+						// == 3 , multi
+						auto realExt = lastExt.mid(1);
+						auto foundIt = m_ExtFileMap.find( visitExt );
 						if ( foundIt == m_ExtFileMap.end() ) {
 							qDebug() << QString("[ERROR] : Can't found MultiExt ext %1 @ LINE : %2").arg(lastExt).arg(lineNo);
 						} else {
 							suffixFileInfo* sInfo = *foundIt;
 							if ( sInfo != nullptr ) {
-								auto multiIt = sInfo->multiExtMap.find( lastExt );
+								auto multiIt = sInfo->multiExtMap.find( realExt );
 								if ( multiIt == sInfo->multiExtMap.end() ) {
-									sInfo->multiExtMap[lastExt].push_back( new QFileInfo(abspath) );
+									sInfo->multiExtMap[realExt].push_back( new QFileInfo(abspath) );
 								} else {
 									multiIt.value().push_back( new QFileInfo(abspath) );
 								}
@@ -671,8 +671,11 @@ void MainWindow::loadFromRecord(const QString& path)
 					reachNoExtPart = true;
 				} else {
 					if ( line.indexOf("\"") == 0 ) {
-						auto ext = line.mid(2, (line.length() - 3 ));
-						visitExt = ext;
+					auto noQuote = trimline.mid(1);
+					noQuote = noQuote.mid(0, noQuote.length() -1 );
+					auto ext = noQuote.mid(1);
+					visitExt = ext; // such as   "cpp"
+					// Create and Insert
 						suffixFileInfo* createNewObj = new suffixFileInfo;
 						m_ExtFileMap.insert(ext,createNewObj);
 					} else {
@@ -682,8 +685,7 @@ void MainWindow::loadFromRecord(const QString& path)
 			}	
 		}
 	}
-	// qDebug() << "line.count = " << spBa.size();
-	// qDebug() << "End Sep Time : " << QTime::currentTime();
+
 
 
 	
