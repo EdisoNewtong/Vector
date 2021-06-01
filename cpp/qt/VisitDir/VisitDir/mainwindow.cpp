@@ -429,8 +429,8 @@ void MainWindow::on_pushButton_2_clicked()
 		return;
 	}
 
-    QList<QFileInfo*> searchRet;
-    searchRet.clear();
+	QList<QFileInfo*> searchRet;
+	searchRet.clear();
 
 	QStringList extAry;
 	extAry.clear();
@@ -444,9 +444,9 @@ void MainWindow::on_pushButton_2_clicked()
 		}
 	}
 
-    auto pushItIfMatchFunc = [searchFileName,&searchRet](QFileInfo* pFileInfo) {
-        if ( pFileInfo != nullptr ) {
-            QString onlyName = pFileInfo->fileName();
+	auto pushItIfMatchFunc = [searchFileName,&searchRet](QFileInfo* pFileInfo) {
+		if ( pFileInfo != nullptr ) {
+			QString onlyName = pFileInfo->fileName();
 			auto foundIdx = onlyName.indexOf(searchFileName, 0, Qt::CaseInsensitive);
 			if ( foundIdx != -1 ) {
 				searchRet.push_back( pFileInfo );
