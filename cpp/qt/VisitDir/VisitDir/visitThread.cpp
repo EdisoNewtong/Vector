@@ -29,34 +29,39 @@ void VisitThread::run() // override
 }
 
 
-void VisitThread::visitDir(const QString &dpath, int level)
+void VisitThread::visitDir(const QString &dpath,  int level)
 {
-    // qDebug() << "dpath => " << dpath;
+    // qDebug() << "dpath => " << dpath << " , level = " << level;
     // ready to visit
     QDir dir2visit(dpath);
     const auto &fileInfoList = dir2visit.entryInfoList(QDir::NoDotAndDotDot | QDir::AllEntries | QDir::Hidden);
+	
+	if( level == 0 ) {
+		emit onGetLevelItemCount(fileInfoList.size() );
+	}
+
 	for ( auto i = 0; i < fileInfoList.size(); ++i ) 
 	{
 		const auto &finfo = fileInfoList.at(i); 
 
 		auto strpath = finfo.absoluteFilePath();
-        // qDebug() << "\tvisit => " << strpath;
-		//
-		// Useful API:
-		//		finfo.isFile();    or    finfo.isDir();
 		// 0: dir
 		// 1: file
 		// 2: others
 		if ( finfo.isDir() ) {
 			// travelsal folder recursively
 			emit onStartVisit(strpath, 0, level+1);
-            visitDir( strpath,  level+1);
+            visitDir( strpath, level+1);
 		} else if ( finfo.isFile() ) {
 			// visit file
             emit onStartVisit(strpath, 1, level);
 		} else {
 			// the path is neither dir nor file , it exists with special type ?
 			emit onStartVisit(strpath, 2, level);
+		}
+
+		if( level == 0 ) {
+			emit onFinishScanLevelItem(i);
 		}
 	}
 

@@ -55,6 +55,7 @@ struct suffixFileInfo
 
 
 
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -67,11 +68,12 @@ private slots:
 	void onVisitSomething(const QString &what,int type, int level);
 	void onVisitEntireDirDone(int error);
 
+	void onGetRootCount(int cnt);
+	void onUpdateProgressBar(int idx);
+
     void on_pushButton_clicked();
 
     void on_pushButton_2_clicked();
-
-
 
 private:
 	void releaseMemory();
@@ -81,6 +83,8 @@ private:
 	void forceScanDir(const QString& dirPath);
 	void saveToRecord();
 	void loadFromRecord(const QString& path);
+
+	QString getElapseTimeStr(qint64 tick);
 private:
     Ui::MainWindow *ui;
 	// QThread*        m_runningThread;
@@ -88,11 +92,14 @@ private:
 	QElapsedTimer   m_timer;
 	int             m_runningStatus;
 	quint64         m_totalFileCnt;
+	int				m_taskCount;
 
 	
 	QList<QFileInfo*>               m_noExtFileList;
 	QMap<QString, suffixFileInfo*>  m_ExtFileMap;
 
 	QList<QString>				    m_dirList;
+
+
 };
 #endif // MAINWINDOW_H

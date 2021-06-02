@@ -19,11 +19,14 @@ public:
 signals:
 	void onStartVisit(const QString &dPath,int type, int level);
 	void onVisitDone(int hasError);
+
+	void onGetLevelItemCount(int count);
+	void onFinishScanLevelItem(int nIndex);
+
 protected:
-	void visitDir(const QString &dpath, int level);
+	void visitDir(const QString &dpath,  int level);
 
 	QString m_visitPath;
 };
 
 #endif
-

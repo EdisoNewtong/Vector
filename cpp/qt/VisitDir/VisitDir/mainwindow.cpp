@@ -26,6 +26,7 @@ MainWindow::MainWindow(QWidget *parent)
 	// , m_runningThread(nullptr)
 	, m_runningStatus(0)
 	, m_totalFileCnt(0ULL)
+	, m_taskCount(0)
 {
     ui->setupUi(this);
 	setWindowTitle( QStringLiteral("Travelsal Dir Recursively") );
@@ -60,6 +61,7 @@ void MainWindow::releaseMemory()
 		}
 	}
 	m_ExtFileMap.clear();
+
 }
 
 /*
@@ -97,7 +99,20 @@ void testOnly()
 void MainWindow::loadCacheFileForResult(const QString& dirPath)
 {
 	releaseMemory();
+
+	ui->statusbar->showMessage("Running ... ");
+	qDebug() << "Start Time : " << QTime::currentTime();
+	m_timer.restart();
+
 	loadFromRecord(dirPath);
+
+	auto duringms = m_timer.elapsed();
+	qDebug() << "End   Time : " << QTime::currentTime();
+	auto strUsedTime = getElapseTimeStr(duringms);
+    // ui->statusbar->showMessage("Done ... ");
+
+    ui->statusbar->showMessage( QString("Done!!     Elapsed Time  =>    %1 ").arg(strUsedTime) );
+
 }
 
 void MainWindow::forceScanDir(const QString& path2Visit)
@@ -111,8 +126,10 @@ void MainWindow::forceScanDir(const QString& path2Visit)
 
 	// otherwise  m_runningStatus != 1  , it must be == 0
 	releaseMemory();
+	m_taskCount = 0;
 	// m_extensionFileMap.clear();
     ui->statusbar->showMessage("Running ... ");
+	ui->progressBar->setValue(0);
 
 	m_travelsalDirPath = path2Visit;
 	ui->outputBox->setPlainText(QString(R"(Begin Travelsal Dir  => %1
@@ -125,8 +142,11 @@ void MainWindow::forceScanDir(const QString& path2Visit)
 	// void onStartVisit(const QString &dPath,int type, int level);
 	connect(workthread, &VisitThread::onStartVisit, this, &MainWindow::onVisitSomething );
 	connect(workthread, &VisitThread::onVisitDone, this,  &MainWindow::onVisitEntireDirDone );
+    connect(workthread, &VisitThread::onGetLevelItemCount, this, &MainWindow::onGetRootCount );
+    connect(workthread, &VisitThread::onFinishScanLevelItem, this, &MainWindow::onUpdateProgressBar );
     connect(workthread, &VisitThread::finished, workthread, &QObject::deleteLater );
 	workthread->start();
+
 	qDebug() << "Start Time : " << QTime::currentTime();
 	m_timer.restart();
 }
@@ -190,24 +210,17 @@ void MainWindow::onVisitSomething(const QString &what, int type, int level)
 	}
 }
 
-
-
-void MainWindow::onVisitEntireDirDone(int error)
+QString MainWindow::getElapseTimeStr(qint64 tick)
 {
-	auto oldstr = ui->outputBox->toPlainText();
-
-	auto duringms = m_timer.elapsed();
-	qDebug() << "End   Time : " << QTime::currentTime();
-
-
-	auto intSecs = duringms / 1000L;
 	QString strUsedTime;
+
+	auto intSecs = tick / 1000L;
 	int hours = static_cast<int>(intSecs / 3600);
 	int mins = (intSecs / 60) % 60;
 	int secs = intSecs % 60;
 
 	QString strFloatPart; 
-	strFloatPart.setNum( (duringms / 1000.0f) - intSecs );
+	strFloatPart.setNum( (tick / 1000.0f) - intSecs );
 	// qDebug() << "strFloatPart = " << strFloatPart;
 	int idxOfDot = strFloatPart.indexOf(".");
 	if ( idxOfDot != -1 ) {
@@ -237,7 +250,17 @@ void MainWindow::onVisitEntireDirDone(int error)
 		}
 	}
 
+	return strUsedTime;
+}
 
+
+void MainWindow::onVisitEntireDirDone(int error)
+{
+	auto oldstr = ui->outputBox->toPlainText();
+
+	qDebug() << "End   Time : " << QTime::currentTime();
+	auto duringms = m_timer.elapsed();
+	QString strUsedTime = getElapseTimeStr(duringms);
 
 	auto newstr = oldstr + "\n" + QString(R"(End Travelsal Dir  => %1 , Used  %2 seconds
 )").arg(m_travelsalDirPath).arg(strUsedTime);
@@ -538,6 +561,9 @@ void MainWindow::on_pushButton_2_clicked()
 		}
 	}
 	
+	//
+	// Display the search result in   textbox
+	//
 	if( searchRet.empty() ) {
 		ui->searchResultList->setPlainText("Sorry : Not Found :( ");
 	} else {
@@ -561,6 +587,7 @@ void MainWindow::on_pushButton_2_clicked()
 
 void MainWindow::saveToRecord()
 {
+	static const bool    needPrintLog = false;
 	static const QString NEWLINE("\n");
 
 	QFileInfo visitPath( m_travelsalDirPath );
@@ -591,18 +618,19 @@ void MainWindow::saveToRecord()
 		QString header = QString("\".%1\"\n").arg(ext);
 		storedfile.write( header.toUtf8() );
 		// qDebug() << QString("\".%1\"").arg(ext);
-		qDebug() << "\"." << ext.toStdString().c_str() << "\"";
+		if ( needPrintLog ) {
+			qDebug() << "\"." << ext.toStdString().c_str() << "\"";
+		}
 
 		suffixFileInfo* pFileInfo = it.value();
 		if ( pFileInfo != nullptr ) {
-			// QList<QFileInfo*>                     singleExtList;
-			// QMap<QString, QList<QFileInfo*> >     multiExtMap;
 			if ( !pFileInfo->singleExtList.empty() ) {
 				QString header2 = QString("\t\".%1\" , count : %2\n").arg(ext).arg( pFileInfo->singleExtList.size() );
 				storedfile.write( header2.toUtf8() );
 
-				// qDebug() << QString("\t\".%1\" , count : %2").arg(ext).arg( pFileInfo->singleExtList.size() );
-				qDebug() << "\t\"." <<  ext.toStdString().c_str() << "\" , count : " << pFileInfo->singleExtList.size();
+				if ( needPrintLog ) {
+					qDebug() << "\t\"." <<  ext.toStdString().c_str() << "\" , count : " << pFileInfo->singleExtList.size();
+				}
 			}
 
 			int iidx = 1;
@@ -626,8 +654,9 @@ void MainWindow::saveToRecord()
 				QString header3 = QString("\t\".%1\" , count : %2\n").arg(multiKey).arg( lst.size() );
 				storedfile.write( header3.toUtf8() );
 
-				// qDebug() << QString("\t\".%1\" , count : %2").arg(multiKey).arg( lst.size() );
-				qDebug() << "\t\"." << multiKey.toStdString().c_str() << "\" , count : " << lst.size();
+				if ( needPrintLog ) {
+					qDebug() << "\t\"." << multiKey.toStdString().c_str() << "\" , count : " << lst.size();
+				}
 
 				iidx = 1;
 				for ( auto it4 = lst.begin(); it4 != lst.end(); ++it4, ++iidx )
@@ -642,7 +671,9 @@ void MainWindow::saveToRecord()
 				storedfile.write( NEWLINE.toUtf8() );
 			}
 
-			qDebug() << "\n";
+			if ( needPrintLog ) {
+				qDebug() << "\n";
+			}
 
 			storedfile.write( NEWLINE.toUtf8() );
 		}
@@ -839,7 +870,24 @@ Load File <%1>  Successful  :)
 	} else {
 		ui->outputBox->setPlainText(errorLog);
 	}
-	
+}
 
+
+
+
+
+void MainWindow::onGetRootCount(int cnt)
+{
+	m_taskCount = cnt;
+}
+
+void MainWindow::onUpdateProgressBar(int idx)
+{
+	int nCnt = idx + 1;
+	if ( m_taskCount > 0 ) {
+		float percent = (nCnt * 1.0f / m_taskCount) * 100.0f;
+		auto  nPercent = static_cast<int>(percent);
+		ui->progressBar->setValue( nPercent );
+	}
 }
 
