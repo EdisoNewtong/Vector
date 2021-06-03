@@ -31,7 +31,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
 	setWindowTitle( QStringLiteral("Travelsal Dir Recursively") );
     // m_extensionFileMap.clear();
-
+	// ui->visitPath->setPlainText("C:\\work\\Perforce\\edzhang_core_dev");
 	releaseMemory();
 }
 
@@ -145,6 +145,8 @@ void MainWindow::forceScanDir(const QString& path2Visit)
     connect(workthread, &VisitThread::onGetLevelItemCount, this, &MainWindow::onGetRootCount );
     connect(workthread, &VisitThread::onFinishScanLevelItem, this, &MainWindow::onUpdateProgressBar );
     connect(workthread, &VisitThread::finished, workthread, &QObject::deleteLater );
+	auto incFlag = (ui->checkBox_2->checkState() == Qt::Checked);
+	workthread->setIncludeFlag( incFlag );
 	workthread->start();
 
 	qDebug() << "Start Time : " << QTime::currentTime();
@@ -467,12 +469,23 @@ void MainWindow::on_pushButton_2_clicked()
 		}
 	}
 
-	auto pushItIfMatchFunc = [searchFileName,&searchRet](QFileInfo* pFileInfo) {
+	auto wholeWordFlag = (ui->checkBox_3->checkState() == Qt::Checked);
+	auto casesensitiveFlag = (ui->checkBox_4->checkState() == Qt::Checked);
+	// compare str func
+	auto pushItIfMatchFunc = [searchFileName,wholeWordFlag,casesensitiveFlag,&searchRet](QFileInfo* pFileInfo) {
 		if ( pFileInfo != nullptr ) {
 			QString onlyName = pFileInfo->fileName();
-			auto foundIdx = onlyName.indexOf(searchFileName, 0, Qt::CaseInsensitive);
-			if ( foundIdx != -1 ) {
-				searchRet.push_back( pFileInfo );
+			if ( !wholeWordFlag ) {
+				auto foundIdx = onlyName.indexOf(searchFileName, 0, (casesensitiveFlag ? Qt::CaseSensitive : Qt::CaseInsensitive) );
+				if ( foundIdx != -1 ) {
+					searchRet.push_back( pFileInfo );
+				}
+			} else {
+				QString baseName = pFileInfo->baseName();
+				auto cmpRet2 = QString::compare(baseName, searchFileName, (casesensitiveFlag ? Qt::CaseSensitive : Qt::CaseInsensitive) );
+				if ( cmpRet2 == 0 ) {
+					searchRet.push_back( pFileInfo );
+				}
 			}
 		}
 	};
@@ -531,7 +544,7 @@ void MainWindow::on_pushButton_2_clicked()
 			for ( auto itExt = m_ExtFileMap.begin(); itExt != m_ExtFileMap.end(); ++itExt )
 			{
 				QString keyStr = itExt.key();
-				auto cmpRet = QString::compare(keyStr, ext , Qt::CaseInsensitive);
+				auto cmpRet = QString::compare(keyStr, ext , (casesensitiveFlag ? Qt::CaseSensitive : Qt::CaseInsensitive) );
 				if ( cmpRet != 0 ) {
 					continue;
 				}

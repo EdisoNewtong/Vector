@@ -15,7 +15,7 @@ public:
 
 	
 	void setVisitPath(const QString &path);
-
+	void setIncludeFlag(bool flag);
 signals:
 	void onStartVisit(const QString &dPath,int type, int level);
 	void onVisitDone(int hasError);
@@ -27,6 +27,7 @@ protected:
 	void visitDir(const QString &dpath,  int level);
 
 	QString m_visitPath;
+	bool    m_includeHiddenFlag;
 };
 
 #endif

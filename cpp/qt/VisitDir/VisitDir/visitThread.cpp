@@ -7,6 +7,7 @@
 VisitThread::VisitThread(QObject *parent /* = nullptr */)
 	: QThread(parent)
 	, m_visitPath("")
+	, m_includeHiddenFlag(false)
 {
 }
 
@@ -34,7 +35,13 @@ void VisitThread::visitDir(const QString &dpath,  int level)
     // qDebug() << "dpath => " << dpath << " , level = " << level;
     // ready to visit
     QDir dir2visit(dpath);
-    const auto &fileInfoList = dir2visit.entryInfoList(QDir::NoDotAndDotDot | QDir::AllEntries | QDir::Hidden);
+	QDir::Filters filterFlag;
+	if ( m_includeHiddenFlag ) {
+		filterFlag = QDir::NoDotAndDotDot | QDir::AllEntries | QDir::Hidden;
+	} else {
+		filterFlag = QDir::NoDotAndDotDot | QDir::AllEntries;
+	}
+    const auto &fileInfoList = dir2visit.entryInfoList( filterFlag );
 	
 	if( level == 0 ) {
 		emit onGetLevelItemCount(fileInfoList.size() );
@@ -73,4 +80,9 @@ void VisitThread::setVisitPath(const QString &path)
 	m_visitPath = path;
 }
 
+
+void VisitThread::setIncludeFlag(bool flag)
+{
+	m_includeHiddenFlag = flag;
+}
 
