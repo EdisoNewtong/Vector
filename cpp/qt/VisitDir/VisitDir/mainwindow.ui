@@ -125,7 +125,7 @@
      </rect>
     </property>
     <property name="placeholderText">
-     <string>Extension Filter With ;</string>
+     <string>Extension Filter With ; e.g : .jpg;.png</string>
     </property>
    </widget>
    <widget class="QCheckBox" name="checkBox_2">
