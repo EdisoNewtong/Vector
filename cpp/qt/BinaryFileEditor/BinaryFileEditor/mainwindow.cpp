@@ -38,7 +38,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    this->setWindowTitle( tr("Binary Editor") );
+    this->setWindowTitle( tr("Binary File Editor") );
 
     connect( ui->textEdit, SIGNAL(cursorPositionChanged()), this, SLOT(onBinEditorTextCursorChanged()) );
     connect( ui->textEdit, SIGNAL(textChanged()), this, SLOT(onBinEditorTextContentChanged()) );
