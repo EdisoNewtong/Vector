@@ -24,6 +24,8 @@ MainWindow::MainWindow(QWidget *parent)
     , m_pXMLDoc(nullptr)
     , m_parseOK(false)
     , m_hasMultiRootNode(false)
+    , m_bIsEnableResponseCursorChanged( true )
+    , m_bIsEnableResponseTreeSelected( true )
     , m_pXMLTreeModel(nullptr)
     , m_pXMLAttrTreeModel(nullptr)
     , m_XmlTextByteArray()
@@ -580,6 +582,7 @@ void MainWindow::preSetupXMLTree()
 	auto selectionModel = ui->xmltreeView->selectionModel();
 	if( selectionModel!=nullptr ) {
 		connect(selectionModel,&QItemSelectionModel::selectionChanged, this, &MainWindow::onTreeItemSelectionChanged);
+        m_bIsEnableResponseTreeSelected = true;
 	}
 }
 
@@ -622,7 +625,8 @@ void MainWindow::highLightNode(QStandardItem* nodeInfo, int columnIdx)
         rapidxml::xml_node<char>* xmlNode = selectXMLInfo->getXmlNode();
         if ( xmlNode!=nullptr ) {
             
-            disconnect(ui->xmlTextEdit , SIGNAL(cursorPositionChanged()), this, SLOT(onXmlTextBoxCursorChanged()) );
+            m_bIsEnableResponseCursorChanged = false;
+            // disconnect(ui->xmlTextEdit , SIGNAL(cursorPositionChanged()), this, SLOT(onXmlTextBoxCursorChanged()) );
 
             auto tp = xmlNode->type();
             switch( tp )
@@ -739,7 +743,8 @@ void MainWindow::highLightNode(QStandardItem* nodeInfo, int columnIdx)
                 break;
             }
 
-            connect(ui->xmlTextEdit , SIGNAL(cursorPositionChanged()), this, SLOT(onXmlTextBoxCursorChanged()) );
+            // connect(ui->xmlTextEdit , SIGNAL(cursorPositionChanged()), this, SLOT(onXmlTextBoxCursorChanged()) );
+            m_bIsEnableResponseCursorChanged = true;
 
             refreshAttributeTree(xmlNode);
         }
@@ -761,7 +766,8 @@ void MainWindow::highLightAttribute(QStandardItem* node, int rowIdx, int columnI
     }
 
 
-    disconnect(ui->xmlTextEdit , SIGNAL(cursorPositionChanged()), this, SLOT(onXmlTextBoxCursorChanged()) );
+    m_bIsEnableResponseCursorChanged = false;
+    // disconnect(ui->xmlTextEdit , SIGNAL(cursorPositionChanged()), this, SLOT(onXmlTextBoxCursorChanged()) );
 
     // xmlNode!= nullptr
     dehighLightTextBox();
@@ -824,7 +830,8 @@ void MainWindow::highLightAttribute(QStandardItem* node, int rowIdx, int columnI
         break;
     }
 
-    connect(ui->xmlTextEdit , SIGNAL(cursorPositionChanged()), this, SLOT(onXmlTextBoxCursorChanged()) );
+    // connect(ui->xmlTextEdit , SIGNAL(cursorPositionChanged()), this, SLOT(onXmlTextBoxCursorChanged()) );
+    m_bIsEnableResponseCursorChanged = true;
     
 }
 
@@ -873,7 +880,7 @@ void MainWindow::onTreeItemSelectionChanged(const QItemSelection & selected, con
 {
 
     Q_UNUSED(deselected);
-    if ( m_pXMLTreeModel!=nullptr ) {
+    if ( m_pXMLTreeModel!=nullptr &&  m_bIsEnableResponseTreeSelected ) {
         auto selectList = selected.indexes();
         if( selectList.empty() ) {
             return;
@@ -886,11 +893,13 @@ void MainWindow::onTreeItemSelectionChanged(const QItemSelection & selected, con
 
 	        auto selectionModel = ui->xmltreeView->selectionModel();
             if ( selectionModel != nullptr ) {
-		        disconnect(selectionModel,&QItemSelectionModel::selectionChanged, this, &MainWindow::onTreeItemSelectionChanged);
+		        // disconnect(selectionModel,&QItemSelectionModel::selectionChanged, this, &MainWindow::onTreeItemSelectionChanged);
+                m_bIsEnableResponseTreeSelected = false;
             }
             updateInheritInfo(selectNodeInfo);
             if ( selectionModel != nullptr ) {
-		        connect(selectionModel,&QItemSelectionModel::selectionChanged, this, &MainWindow::onTreeItemSelectionChanged);
+		        // connect(selectionModel,&QItemSelectionModel::selectionChanged, this, &MainWindow::onTreeItemSelectionChanged);
+                m_bIsEnableResponseTreeSelected = true;
             }
 
             highLightNode(selectNodeInfo, selitem.column() );
@@ -1036,6 +1045,10 @@ void MainWindow::onXmlTextBoxCursorChanged()
         return;
     }
 
+    if ( !m_bIsEnableResponseCursorChanged ) {
+        return;
+    }
+
     auto pos = ui->xmlTextEdit->textCursor().position();
     auto it = m_xmlNodePositionMap.find(pos);
     if ( it == m_xmlNodePositionMap.end() ) {
@@ -1048,7 +1061,8 @@ void MainWindow::onXmlTextBoxCursorChanged()
 
         auto selectionModel = ui->xmltreeView->selectionModel();
         if ( selectionModel!=nullptr ) {
-            disconnect(selectionModel,&QItemSelectionModel::selectionChanged, this, &MainWindow::onTreeItemSelectionChanged);
+            // disconnect(selectionModel,&QItemSelectionModel::selectionChanged, this, &MainWindow::onTreeItemSelectionChanged);
+            m_bIsEnableResponseTreeSelected = false;
         }
 
         // do select
@@ -1058,7 +1072,8 @@ void MainWindow::onXmlTextBoxCursorChanged()
         updateInheritInfo(item);
 
         if ( selectionModel!=nullptr ) {
-            connect(selectionModel,&QItemSelectionModel::selectionChanged, this, &MainWindow::onTreeItemSelectionChanged);
+            // connect(selectionModel,&QItemSelectionModel::selectionChanged, this, &MainWindow::onTreeItemSelectionChanged);
+            m_bIsEnableResponseTreeSelected = true;
         }
     }
 

@@ -81,6 +81,10 @@ private:
     rapidxml::xml_document<char>* m_pXMLDoc;
     bool m_parseOK;
     bool m_hasMultiRootNode;
+    bool m_bIsEnableResponseCursorChanged;
+    bool m_bIsEnableResponseTreeSelected;
+
+
 	QStandardItemModel* m_pXMLTreeModel;
 	QStandardItemModel* m_pXMLAttrTreeModel;
     QByteArray  m_XmlTextByteArray;

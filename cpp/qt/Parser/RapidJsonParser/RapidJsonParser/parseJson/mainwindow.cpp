@@ -30,6 +30,8 @@ MainWindow::MainWindow(QWidget *parent)
     , m_isParseOK(false)
 	, m_visitTag(E_NONE)
 	, m_visitStep(-1)
+    , m_enableResponseTextCursorChanged( true )
+    , m_enableResponseTreeItemSelected( true )
 	, m_pTreeModel(nullptr)
 {
     ui->setupUi(this);
@@ -414,9 +416,11 @@ void MainWindow::highLightText(int startpos,int endpos)
         ui->plainTextEdit->setExtraSelections(lst);
         
         // Real move cursor , scroll-bar will move focus automatically
-        disconnect( ui->plainTextEdit, SIGNAL( cursorPositionChanged() ), this, SLOT( onJsonTextBoxCursorChanged() ) );
+        // disconnect( ui->plainTextEdit, SIGNAL( cursorPositionChanged() ), this, SLOT( onJsonTextBoxCursorChanged() ) );
+        m_enableResponseTextCursorChanged = false;
         ui->plainTextEdit->setTextCursor(currentCursor);
-        connect( ui->plainTextEdit, SIGNAL( cursorPositionChanged() ), this, SLOT( onJsonTextBoxCursorChanged() ) );
+        m_enableResponseTextCursorChanged = true;
+        // connect( ui->plainTextEdit, SIGNAL( cursorPositionChanged() ), this, SLOT( onJsonTextBoxCursorChanged() ) );
     } else {
         // qDebug() << "Can't Select Block";
     }
@@ -598,7 +602,7 @@ void MainWindow::onTreeItemSelectionChanged(const QItemSelection & selected, con
     auto selModel = ui->treeView->selectionModel();
 
     Q_UNUSED(deselected);
-    if( m_pTreeModel!=nullptr ) {
+    if( m_pTreeModel!=nullptr &&  m_enableResponseTreeItemSelected ) {
         auto selectList = selected.indexes();
         if( selectList.empty() ) {
             return;
@@ -606,9 +610,11 @@ void MainWindow::onTreeItemSelectionChanged(const QItemSelection & selected, con
 
         auto selectItem = dynamic_cast<JSonStandardItem*>( m_pTreeModel->itemFromIndex( selectList.at(0)   ) );
         if( selectItem!=nullptr ) {
-            disconnect(selModel,&QItemSelectionModel::selectionChanged, this, &MainWindow::onTreeItemSelectionChanged);
+            // disconnect(selModel,&QItemSelectionModel::selectionChanged, this, &MainWindow::onTreeItemSelectionChanged);
+            m_enableResponseTreeItemSelected = false;
             updateInheritInfo(selectItem);
-            connect(selModel ,&QItemSelectionModel::selectionChanged, this, &MainWindow::onTreeItemSelectionChanged);
+            m_enableResponseTreeItemSelected = true;
+            // connect(selModel ,&QItemSelectionModel::selectionChanged, this, &MainWindow::onTreeItemSelectionChanged);
 
             auto jsonValue = selectItem->getJsonValue();
             if( jsonValue!=nullptr ) {
@@ -656,6 +662,10 @@ void MainWindow::onJsonTextBoxCursorChanged()
         return;
     }
 
+    if ( !m_enableResponseTextCursorChanged ) {
+        return;
+    }
+
     auto textcursor = ui->plainTextEdit->textCursor();
     int curPos = textcursor.position();
     auto it = m_itemPositionMap.find(curPos);
@@ -667,14 +677,15 @@ void MainWindow::onJsonTextBoxCursorChanged()
             if ( selModel!=nullptr ) {
                // qDebug() << "cursor changed , Do select";
 
-               disconnect( selModel,&QItemSelectionModel::selectionChanged, this, &MainWindow::onTreeItemSelectionChanged);
-
+               // disconnect( selModel,&QItemSelectionModel::selectionChanged, this, &MainWindow::onTreeItemSelectionChanged);
+               m_enableResponseTreeItemSelected = false;
                selModel->select(modelIdx, QItemSelectionModel::ClearAndSelect);
                ui->treeView->scrollTo(modelIdx);
 
                updateInheritInfo( jsitem );
 
-               connect(selModel ,&QItemSelectionModel::selectionChanged, this, &MainWindow::onTreeItemSelectionChanged);
+               // connect(selModel ,&QItemSelectionModel::selectionChanged, this, &MainWindow::onTreeItemSelectionChanged);
+               m_enableResponseTreeItemSelected = true;
 
             }
         }

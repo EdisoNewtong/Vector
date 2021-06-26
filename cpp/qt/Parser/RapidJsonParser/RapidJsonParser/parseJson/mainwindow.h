@@ -79,6 +79,8 @@ private:
 	bool m_isParseOK;
 	Visit_Step m_visitTag;
 	int  m_visitStep;
+    bool m_enableResponseTextCursorChanged;
+    bool m_enableResponseTreeItemSelected; 
 
 	void clearDoc();
 	void do_Parse(const char* content);
