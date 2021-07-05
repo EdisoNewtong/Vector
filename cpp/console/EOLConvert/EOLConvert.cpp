@@ -13,8 +13,8 @@ using namespace std;
 void printUsage()
 {
 	string usage = R"(usage : 
-              $ eofconvert   <filename>  --[unix|linux|dos|win|mac]
-           or $ eofconvert   <filename>  --[unix|linux|dos|win|mac]  --override)";
+              $ EOLConvert   <filename>  --[unix|linux|dos|win|mac]
+           or $ EOLConvert   <filename>  --[unix|linux|dos|win|mac]  --override)";
 
 	cout << "---------------------------------------------------------------------------" << endl;
 	cout << usage << endl;
