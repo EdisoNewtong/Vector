@@ -576,7 +576,7 @@ void FloatConverter::floatPart2Binary()
             } else {
                 calcProcessLst.push_back( make_pair(multiplier,additive) );
                 m_floatCvtInfo.floatPartCalcList.push_back( make_pair(multiplier,additive) );
-                if ( calcProcessLst.size() == maxCount ) {
+                if ( static_cast<int>( calcProcessLst.size() ) == maxCount ) {
                     needSkip = true;
                 }
             }
@@ -594,7 +594,7 @@ void FloatConverter::floatPart2Binary()
 
             // add '0' at the end of the string to fill the full bit
             int nCalcIdx = 0;
-            while ( m_floatCvtInfo.convertFloatPart.size() < maxCount ) {
+            while ( static_cast<int>( m_floatCvtInfo.convertFloatPart.size() ) < maxCount ) {
                 if ( !loopFlag ) {
                     m_floatCvtInfo.convertFloatPart += "0";
                 } else {
@@ -603,7 +603,7 @@ void FloatConverter::floatPart2Binary()
                     m_floatCvtInfo.convertFloatPart += num2Char(curIt->second);
 
                     ++nCalcIdx;
-                    if ( nCalcIdx >= loopLst.size() ) {
+                    if ( nCalcIdx >= static_cast<int>( loopLst.size() ) ) {
                        nCalcIdx = 0; 
                     }
                 }
@@ -851,7 +851,7 @@ if the 24th bit is 1 , then increase to 23th
 
 
             m_floatCvtInfo.cvtLLBinary  = 0UL;
-            for ( unsigned long long i = 0; i < maxSz; ++i ) {
+            for ( unsigned long long i = 0; i < static_cast<unsigned long long>(maxSz); ++i ) {
                 auto bit = m_floatCvtInfo.binaryAry[i];
                 if ( bit == ONE_ASCII_CODE ) {
                     // unsigned long long mask = 1UL << (maxSz-i-1);
