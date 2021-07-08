@@ -1,10 +1,39 @@
 #!/bin/bash
 
-demo:demo.cpp floatNumberConverter.cpp floatNumberConverter.h
-	g++   -Wall   -std=c++11   -c -o    demo.o    demo.cpp
+
+
+
+all:ieee754 demo genTools
+
+
+ieee754:ieee754.cpp floatNumberConverter.cpp floatNumberConverter.h
+	@echo "=============== Build <ieee754> project ==============="
 	g++   -Wall   -std=c++11   -c -o    floatNumberConverter.o    floatNumberConverter.cpp
+	g++   -Wall   -std=c++11   -c -o    ieee754.o    ieee754.cpp
+	g++   -Wall   -std=c++11      -o    ieee754    ieee754.o floatNumberConverter.o
+
+
+demo:demo.cpp floatNumberConverter.cpp floatNumberConverter.h
+	@echo "=============== Build <Demo> project ==============="
+	g++   -Wall   -std=c++11   -c -o    floatNumberConverter.o    floatNumberConverter.cpp
+	g++   -Wall   -std=c++11   -c -o    demo.o    demo.cpp
 	g++   -Wall   -std=c++11      -o    demo    demo.o floatNumberConverter.o
+
+
+
+genTools:genTools.cpp floatNumberConverter.cpp floatNumberConverter.h
+	@echo "=============== Build <genTools> project ==============="
+	g++   -Wall   -std=c++11   -c -o    floatNumberConverter.o    floatNumberConverter.cpp
+	g++   -Wall   -std=c++11   -c -o    genTools.o    genTools.cpp
+	g++   -Wall   -std=c++11      -o    genTools    genTools.o floatNumberConverter.o
+
+genCode:genCode.cpp floatNumberConverter.cpp floatNumberConverter.h
+	@echo "=============== Build <genCode> project ==============="
+	g++   -Wall   -std=c++11   -c -o    floatNumberConverter.o    floatNumberConverter.cpp
+	g++   -Wall   -std=c++11   -c -o    genCode.o    genCode.cpp
+	g++   -Wall   -std=c++11      -o    genCode      genCode.o floatNumberConverter.o
+
 
 .PHONY:clean
 clean:
-	-rm    -Rf    *.o   ieee754   demo *.dSYM
+	-rm    -Rf    *.o   ieee754   demo genCode  genTools *.dSYM

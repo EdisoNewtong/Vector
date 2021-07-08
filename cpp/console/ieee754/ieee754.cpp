@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <cmath> // for math function pow use
 using namespace std;
 
 union intFloatNum
@@ -23,8 +24,8 @@ string generateStrFloat(unsigned long long num, int intBits,int floatBits, bool 
     string finalStr;
     string strNum = to_string(num);
     auto sz = strNum.size();
-    if ( sz < requireBits ) {
-        auto delta = requireBits - sz;
+    if ( static_cast<int>(sz) < requireBits ) {
+        auto delta = static_cast<int>(requireBits - sz);
         for ( int i = 0; i < delta; ++i ) {
             finalStr += '0';
         }

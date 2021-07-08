@@ -29,7 +29,7 @@ int main( int argc, char* argv[], char* env[] )
 
 	stringfloatpair ary[] = {
 		make_pair( MAKE_STRING_FLOAT_PAIR( 1.1f) ),
-		make_pair( MAKE_STRING_FLOAT_PAIR(2.3f) ),
+		make_pair( MAKE_STRING_FLOAT_PAIR(0.1f) ),
 		make_pair( MAKE_STRING_FLOAT_PAIR(3.4f) ),
 	};
 
