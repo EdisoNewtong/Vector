@@ -117,7 +117,8 @@ namespace SuperBinaryDisplayUtil
         int bytesCount;
         int characterCount;
         int lineCnt;			// 行数
-		int hybridLineNo;	// 多重 EOF，初次被确定的那一行
+		int hybridLineNo;	// 多重 EOF，初次被确定为 hybrid 形式的那一行
+		pair<string,string> hybridDetail; // former and later
         E_ENDLINE_MODE endlineMode;
         
         int    firstBinaryByte_Idx;

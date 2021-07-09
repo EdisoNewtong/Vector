@@ -172,6 +172,7 @@ FileInfo::FileInfo()
     , characterCount(0)
     , lineCnt(1) // 即使是2进制文件，也至少有1行
     , hybridLineNo(0)
+	, hybridDetail("","")
     , endlineMode(E_UNKNOWN_ENDLINE)
     , firstBinaryByte_Idx(0)
     , firstBinaryByte_Row(-1)
@@ -393,8 +394,12 @@ bool readFile_V0(const string& filename, FileInfo& fInfo)
                                         // !!! no need to check !!! whether the previous letter is \r or not 
                                         // because check \r\n at the case E_SPECIAL_CHAR_TAG::E_SR
                                         // ============= Core conception =============
-                                        if ( fInfo.endlineMode != FileInfo::E_UNIX ) {
+                                        if ( fInfo.endlineMode != FileInfo::E_HYBRID   &&   fInfo.endlineMode != FileInfo::E_UNIX ) {
+											fInfo.hybridDetail.first = "\\n";
+											fInfo.hybridDetail.second = (fInfo.endlineMode == FileInfo::E_WIN ? "\\r\\n" : "\\r"); 
+
                                             fInfo.endlineMode = FileInfo::E_HYBRID;
+											fInfo.hybridLineNo = nRow;
                                         } else {
                                             // last EOF mode is E_UNIX , keep it 
                                         }
@@ -448,9 +453,12 @@ bool readFile_V0(const string& filename, FileInfo& fInfo)
                                             if ( fileContentBuf[nextIdx] == G_CHAR_GN.ch ) { 
                                                 // \r\n
                                                 // treat as EOF WIN , check is HYBIRD ???
-                                                if( fInfo.endlineMode != FileInfo::E_WIN ) {
+                                                if ( fInfo.endlineMode != FileInfo::E_HYBRID  &&  fInfo.endlineMode != FileInfo::E_WIN ) {
+													fInfo.hybridDetail.first = "\\r\\n";
+													fInfo.hybridDetail.second = (fInfo.endlineMode == FileInfo::E_UNIX ? "\\n" : "\\r"); 
                                                     // treat as WIN , but previous EOF mode is not win 
                                                     fInfo.endlineMode = FileInfo::E_HYBRID;
+													fInfo.hybridLineNo = nRow;
                                                 } else {
                                                     // last EOF mode is E_WIN , keep it
                                                 }
@@ -469,8 +477,12 @@ bool readFile_V0(const string& filename, FileInfo& fInfo)
                                             } else {
                                                 // treat as EOF MAC , check is HYBIRD or not
                                                 // current is \r , but the next letter is valid but not \n
-                                                if ( fInfo.endlineMode != FileInfo::E_MAC ) {
+                                                if ( fInfo.endlineMode != FileInfo::E_HYBRID &&  fInfo.endlineMode != FileInfo::E_MAC ) {
+													fInfo.hybridDetail.first = "\\r";
+													fInfo.hybridDetail.second = (fInfo.endlineMode == FileInfo::E_UNIX ? "\\n" : "\\r\\n"); 
+
                                                     fInfo.endlineMode = FileInfo::E_HYBRID;
+													fInfo.hybridLineNo = nRow;
                                                 } else {
                                                     // last EOF mode is E_MAC , keep it
                                                 }
@@ -482,8 +494,12 @@ bool readFile_V0(const string& filename, FileInfo& fInfo)
                                             }
                                         } else {
                                             // \r is the last letter in the file
-                                            if ( fInfo.endlineMode != FileInfo::E_MAC ) {
+                                            if ( fInfo.endlineMode != FileInfo::E_HYBRID && fInfo.endlineMode != FileInfo::E_MAC ) {
+												fInfo.hybridDetail.first = "\\r";
+												fInfo.hybridDetail.second = (fInfo.endlineMode == FileInfo::E_UNIX ? "\\n" : "\\r\\n"); 
+
                                                 fInfo.endlineMode = FileInfo::E_HYBRID;
+												fInfo.hybridLineNo = nRow;
                                             }
 
                                             if( last_EOF_flag != 0 ) {
@@ -827,24 +843,27 @@ bool readFile_V1(const string& filename, FileInfo& fInfo)
 								// \r is the last letter of the file content
 								current_EOF_flag = 3;	// Mac EOL mode and this is the last letter
 								if ( treatEOFAsByte ) {
-									fInfo.characterCount += 1;
+									++fInfo.characterCount;
 								}
 							}
 						} else {
 							// \n
 							current_EOF_flag = 1;	// Unix EOL mode
 
-								if ( treatEOFAsByte ) {
-									fInfo.characterCount += 1;
-								}
+							if ( treatEOFAsByte ) {
+								++fInfo.characterCount;
+							}
 						}
 
 						// decide the file EOF mode 
 						if( fInfo.endlineMode == FileInfo::E_UNKNOWN_ENDLINE ) {
 							fInfo.endlineMode = static_cast<FileInfo::E_ENDLINE_MODE>(current_EOF_flag);
-						} else if( static_cast<int>(fInfo.endlineMode) != current_EOF_flag ) {
-							fInfo.hybridLineNo = nRow;
+						} else if( fInfo.endlineMode != FileInfo::E_HYBRID  &&   (static_cast<int>(fInfo.endlineMode) != current_EOF_flag) ) {
+							fInfo.hybridDetail.first = (fInfo.endlineMode == FileInfo::E_UNIX ? "\\n" : (fInfo.endlineMode == FileInfo::E_WIN ? "\\r\\n" : "\\r") ); 
+							fInfo.hybridDetail.second = (current_EOF_flag==1  ?  "\\n" : (current_EOF_flag==2 ?  "\\r\\n" : "\\r") );
+
 							fInfo.endlineMode = FileInfo::E_HYBRID;
+							fInfo.hybridLineNo = nRow;
 						}
 
 						auto eol_SCObj = SingleCharacter::generate_ASCII_Character(ch, nRow, nCol, current_EOF_flag);
@@ -901,7 +920,7 @@ bool readFile_V1(const string& filename, FileInfo& fInfo)
 							u32code = (code & (FULL_BITS >> 3));
 							// set the 2nd byte
 							u32code <<= 6;
-							u32code |= (code_2_2 & (FULL_BITS >> 2));	
+							u32code |= (code_2_2 & (FULL_BITS >> 2));
 
 							pMultiBytesCharacter = SingleCharacter::generate_MultiBytes_Character(singleCharacter, u32code, nRow, nCol);
 
@@ -1141,7 +1160,10 @@ bool readFileRapidly(const string& filename, FileInfo& fInfo)
 				// decide the file EOF mode 
 				if( fInfo.endlineMode == FileInfo::E_UNKNOWN_ENDLINE ) {
 					fInfo.endlineMode = static_cast<FileInfo::E_ENDLINE_MODE>(current_EOF_flag);
-				} else if( static_cast<int>(fInfo.endlineMode) != current_EOF_flag ) {
+				} else if( fInfo.endlineMode != FileInfo::E_HYBRID    &&  (static_cast<int>(fInfo.endlineMode) != current_EOF_flag) ) {
+					fInfo.hybridDetail.first = (fInfo.endlineMode == FileInfo::E_UNIX ? "\\n" : (fInfo.endlineMode == FileInfo::E_WIN ? "\\r\\n" : "\\r") ); 
+					fInfo.hybridDetail.second = (current_EOF_flag==1  ?  "\\n" : (current_EOF_flag==2 ?  "\\r\\n" : "\\r") );
+
 					fInfo.endlineMode = FileInfo::E_HYBRID;
 					fInfo.hybridLineNo = nRow;
 				}
@@ -1361,7 +1383,17 @@ void printFileInfo(const FileInfo& fileInfo, string& retStr, bool needPrintToCon
              enum_str = "E_MAC";
              break;
          case FileInfo::E_HYBRID:
-             enum_str = "E_HYBRID";
+			 {
+				 enum_str = "E_HYBRID";
+				 std::string tmpstr("    ");
+				 if ( fileInfo.hybridLineNo-1 > 1 ) {
+					tmpstr += (std::string("// Previous lines from 1 ~ ") + std::to_string(fileInfo.hybridLineNo-1) + std::string(" use ") + fileInfo.hybridDetail.first + std::string(", different line start at line:") + std::to_string(fileInfo.hybridLineNo)  + std::string(" use ") + fileInfo.hybridDetail.second);
+				 } else {
+					 // == 1
+					tmpstr += (std::string("// Previous lines:1  ") + std::string(" use ") + fileInfo.hybridDetail.first + std::string(", different line start at line:") + std::to_string(fileInfo.hybridLineNo)  + std::string(" use ") + fileInfo.hybridDetail.second);
+				 } 
+				 enum_str += tmpstr;
+			}
              break;
          default:
              enum_str = "E_UNKNOWN_ENDLINE";
