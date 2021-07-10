@@ -7,14 +7,17 @@ using namespace std;
 
 //
 // usage :
-//        $ eofconvert   <filename>   --[dos][unix][mac]   [--override]
+//        $ eolconvert   <filename>   --[dos][unix][mac]   [--override]
 //
 
 void printUsage()
 {
 	string usage = R"(usage : 
-              $ EOLConvert   <filename>  --[unix|linux|dos|win|mac]
-           or $ EOLConvert   <filename>  --[unix|linux|dos|win|mac]  --override)";
+====================================================================================================
+    $ eolconvert  <filename>  --[unix|linux|dos|win|mac]
+ or $ eolconvert  <filename>  --[unix|linux|dos|win|mac]  --override
+====================================================================================================
+)";
 
 	cout << "---------------------------------------------------------------------------" << endl;
 	cout << usage << endl;
