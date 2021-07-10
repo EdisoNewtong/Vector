@@ -1,6 +1,6 @@
 #!/bin/bash
 
-all:spacetabconvert.cpp
+spacetabconvert:spacetabconvert.cpp
 	g++ -Wall -std=c++11  -O3  -o spacetabconvert  spacetabconvert.cpp
 
 

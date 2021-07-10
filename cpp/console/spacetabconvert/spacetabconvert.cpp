@@ -8,33 +8,26 @@ using namespace std;
 
 /*
 
-$ spacetabconvert  --2space <n-tab>    <filename>
-$ spacetabconvert  --2tab   <n-space>  <filename>
+$ spacetabconvert  --2space <1-tab   -> n-space>      --head|tail|headtail  [--force]  <filename>
+$ spacetabconvert  --2tab   <n-space -> 1-tab>    --head|tail|headtail  [--force]  <filename>
 
-	try {
-		iIntPartBit = std::stoi( string(argv[4]) );
-		parseIntPart = true;
-	} catch ( const invalid_argument& invError ) {
-		error = string(argv[4]) + " is invalid int number";
-	} catch (const out_of_range& overflow ) {
-		error = string(argv[4]) + " is out of range";
-	}	
 */
 
 typedef struct requiredArg
 {
 	bool bSpace2Tab; // true => space -> tab;   false => tab -> space
 	int  convertNumber;
+	int  convertFlag; // 1:head , 2:tail 3:headtail
+	bool isForce;	  // force replace if all bytes are   <space>/<tab>
 	string filename;
 } requiredArg;
 
 void printUsage()
 {
-	const auto usage = R"(
+	static const auto usage = R"(
 Usage :
-	$ spacetabconvert  --2space <n-tab>    <filename>
-	$ spacetabconvert  --2tab   <n-space>  <filename>
-
+	$ spacetabconvert  --2space <1-tab   -> n-space>  --head|tail|headtail  [--force]  <filename>
+	$ spacetabconvert  --2tab   <n-space -> 1-tab>    --head|tail|headtail  [--force]  <filename>
 )";
 	cout << usage << endl;
 
@@ -45,8 +38,8 @@ Usage :
 
 bool parseArgs(int argc, char* argv[], string& error, requiredArg& reqInfo)
 {
-	if ( argc != 4 ) {
-		error = "argc != 4";
+	if ( argc < 5 ) {
+		error = "argc < 5";
 		return false;
 	}
 
@@ -72,7 +65,43 @@ bool parseArgs(int argc, char* argv[], string& error, requiredArg& reqInfo)
 		return false;
 	}
 	reqInfo.convertNumber = cvtnumber;
-	reqInfo.filename = argv[3];
+
+
+	string arg3 = argv[3];
+	if ( arg3 == "--head" ) {
+		reqInfo.convertFlag = 1;
+	} else if ( arg3 == "--tail" ) {
+		reqInfo.convertFlag = 2;
+	} else if ( arg3 == "--headtail" ) {
+		reqInfo.convertFlag = 3;
+	} else {
+		error = "convert number must >= 1";
+		return false;
+	}
+
+	string arg4 = argv[4];
+	if (  argc <= 5 ) {
+		// filename
+		if ( arg4 == "--force" ) {
+			error = "arg5 must be a existed file name";
+			return false;
+		} else {
+			reqInfo.isForce  = false;
+			reqInfo.filename = arg4;
+		}
+	} else {
+		// > 5  :   == 6
+		string arg5 = argv[5];
+
+		if ( arg4 == "--force" ) {
+			reqInfo.isForce  = true;
+		} else {
+			error = "unknown options , available option is   --force";
+			return false;
+		}	
+
+		reqInfo.filename = arg5;
+	}
 
 	return true;
 }
@@ -188,8 +217,16 @@ bool doCvt(const requiredArg& arginfo, string& errorMsg)
 			string postBlank;
 			string replacestr;
 			if ( foundpos == string::npos ) {
-				// all line are full of Space/Tab
-				replacestr = genReplacementStr(linestr, isSpace2tab, cvtNum);
+				// line content are full of Space/Tab
+				if ( arginfo.convertFlag == 1 || arginfo.convertFlag == 3  ) {
+					if ( arginfo.isForce ) {
+						replacestr = genReplacementStr(linestr, isSpace2tab, cvtNum);
+					} else {
+						replacestr = linestr;
+					}
+				} else {
+					replacestr = linestr;
+				}
 			} else {
 				// find first letter
 				preBlank = linestr.substr(0, foundpos);
@@ -203,9 +240,29 @@ bool doCvt(const requiredArg& arginfo, string& errorMsg)
 					postBlank = linestr.substr(foundlast + 1);
 				}
 
-				replacestr += genReplacementStr(preBlank, isSpace2tab, cvtNum);
+				//
+				// Head
+				//
+				if ( arginfo.convertFlag == 1 || arginfo.convertFlag == 3  ) {
+					replacestr += genReplacementStr(preBlank, isSpace2tab, cvtNum);
+				} else {
+					replacestr += preBlank;
+				}
+
+				//
+				// Middle
+				//
 				replacestr += validpart;
-				replacestr += genReplacementStr(postBlank, isSpace2tab, cvtNum);
+				//
+
+				//
+				// Tail
+				//
+				if ( arginfo.convertFlag == 2 || arginfo.convertFlag == 3  ) {
+					replacestr += genReplacementStr(postBlank, isSpace2tab, cvtNum);
+				} else {
+					replacestr += postBlank;
+				}
 			}
 
 			pr.first = replacestr;
