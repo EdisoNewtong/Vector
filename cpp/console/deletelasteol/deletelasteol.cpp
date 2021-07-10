@@ -7,7 +7,7 @@ using namespace std;
 void printUsage()
 {
 	cout << R"(Usage :
-	$ deleteLastEOL [-f] <filename>
+	$ deleteLastEOL [-f] <filename> // -f means force delete last eol   , no matter whether aaa\n or not  (\n\n)
 )" << endl;
 }
 
@@ -51,7 +51,7 @@ int main(int argc, char* argv[], char* env[])
 	}
 
 	inputFile.seekg(0, ios::end);
-	unsigned long long flength = static_cast<unsigned long long>( inputFile.tellg() );
+	size_t flength = static_cast<size_t>( inputFile.tellg() );
 	inputFile.seekg(0, ios::beg);
 
 	if ( flength == 0 ) {
@@ -133,10 +133,10 @@ int main(int argc, char* argv[], char* env[])
 	} else {
 		// >= 3ULL
 		auto needReWrite = false;
-		unsigned long long lastCharIdx   = flength - 1; 
-		unsigned long long lastButOneIdx = flength - 2; 
-		unsigned long long lastButTwoIdx = flength - 3;
-		unsigned long long minusChar = 0;
+		size_t lastCharIdx   = flength - 1; 
+		size_t lastButOneIdx = flength - 2; 
+		size_t lastButTwoIdx = flength - 3;
+		size_t minusChar = 0;
 		if( content[lastButOneIdx] == '\r' && content[lastCharIdx] == '\n' ) {
 			needReWrite = forceDeleteOption || (content[lastButTwoIdx] != '\n');
 			minusChar   = 2;

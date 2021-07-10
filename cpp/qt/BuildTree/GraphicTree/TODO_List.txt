@@ -1,0 +1,60 @@
+1. Tree Tree
+   Display Node Index ( Level )
+
+   Create a new Node
+   Delete an existed Node ( Recursively )
+   Modified the tree Node's value ( Use None Empty String as the default Data Type , optional task : change its shape )
+   Search a certain node by String Value ( it's possible that multi candidate nodes match the condition ) 
+   Switch the Visibility of a node (it will appear / disappear in the Graphic View )
+   
+   Adjust the Positions of two nodes in the same level 
+
+       Insert a node Before
+       Insert a node After
+
+    *** Difficult Task ***
+    ****************************************************************************************************
+        Adjust the Level of one node ( i.e.  Premote it from high level to low level ,  make it lower than before )
+    ****************************************************************************************************
+
+    Select Multi Nodes in the Same Level ( Copy / Move(Cut) )
+    Paste the node that is mentioned previously
+
+
+    ****************************************************************************************************
+    Special HighLight a node by Expand / Collapse  in a striking way
+
+        e.g.
+            Root                                             Root                                                                                
+            - node#1                                         - ...
+            -- node#11                                       - node#2
+            --- node#111                                     -- node#22
+            ---- node#1111                                    ...
+            ----- node#11111                                 -- node#26                                        
+            ------ node#111111                               --- node#261                                      - node#26                                        
+            ------- node#1111111                             ---- node#2611                                    -- node#261                                      
+            -------- node#11111111                           ---- node#2612                                    --- node#2611                                    
+            --------- node#111111111                         ----- node#26121                                  --- node#2612                                    
+            - node#2                                         ------ node#261211                                ---- node#26121                                  
+            -- node#22                                       -      ...                                        ----- node#261211                                
+            -- node#23                                                                                               ...
+            -- node#24                                       
+            -- node#25                                       
+            -- node#26
+            --- node#261                                     
+            ---- node#2611
+            ---- node#2612
+            ----- node#26121
+            ------ node#261211
+            ------- node#2612111
+            -------- node#26121111
+            --------- node#26121111
+            ---- node#2612
+            ---- node#2613
+            ---- node#2614
+    ****************************************************************************************************
+    
+    ReDo - Undo Operation
+
+
+2. Graphic View to display tree

@@ -27,7 +27,7 @@ void printUsage()
 
 
 
-pair<char*,unsigned long long> readFile(const string& fname)
+pair<char*,size_t> readFile(const string& fname)
 {
 	ifstream file(fname.c_str(), ios::in | ios::binary);
 	if ( !file ) {
@@ -39,7 +39,7 @@ pair<char*,unsigned long long> readFile(const string& fname)
 
 	char* content = nullptr;
 	file.seekg(0, ios::end);
-	unsigned long long filesize = file.tellg();
+	size_t filesize = static_cast<size_t>( file.tellg() );
 	file.seekg(0, ios::beg);
 
 	if ( filesize > 0UL ) {

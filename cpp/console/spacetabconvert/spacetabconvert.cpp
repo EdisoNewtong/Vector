@@ -55,8 +55,10 @@ bool parseArgs(int argc, char* argv[], string& error, requiredArg& reqInfo)
 	try {
 		cvtnumber = std::stoi( arg2 );
 	} catch ( const invalid_argument& invError ) {
+        (void)invError;
 		error = arg2 + " is invalid int number";
 	} catch (const out_of_range& overflow ) {
+        (void)overflow;
 		error = arg2 + " is out of range";
 	}
 
