@@ -54,6 +54,7 @@ int main( int argc, char* argv[], char* env[] )
 			if ( !bret ) {
 				cout << "[ERROR] , Convert String as Float Failed : " << errorMsg << endl;
 			} else {
+				cvt.printConvertDetail();
 				if ( cvtRet.cvtIntBinary == fui.ui_num ) {
 					cout << "[SUCCESSFUL] , Convert Equal : "   <<  " , number = " <<  strfloat <<  " = 0x" << std::hex << fui.ui_num << endl;
 				} else {

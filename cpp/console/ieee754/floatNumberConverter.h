@@ -53,7 +53,7 @@ struct floatInfo
     int    loopStartIdx;
     int    loopEndIdx;
 
-    int    power2;
+    // int    power2;
     char   binaryAry[constPart::BINARY_ARRAY_SIZE];
 
     unsigned int       cvtIntBinary;
@@ -73,6 +73,7 @@ public:
     bool isValidFloat(const string& content, string& errorStr);
     bool doConvert(string& errorMsg);
     const floatInfo& getCvt() const;
+	void  printConvertDetail();
 protected:
     void positiveIntPart2Binary();
     void floatPart2Binary();

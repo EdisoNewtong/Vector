@@ -94,7 +94,7 @@ void floatInfo::reset()
     isFloatPartLoop = false;
     loopStartIdx = 0;
     loopEndIdx = 0;
-    power2 = 0;
+    // power2 = 0;
 
     cvtIntBinary = 0U;
     cvtLLBinary = 0UL;
@@ -875,6 +875,39 @@ if the 24th bit is 1 , then increase to 23th
 const floatInfo& FloatConverter::getCvt() const
 {
     return m_floatCvtInfo;
+}
+
+
+
+void  FloatConverter::printConvertDetail()
+{
+	cout << "============================================================" << endl;
+	cout << "inputString = " << m_floatCvtInfo.inputString << endl;
+	cout << "sign = \"" << m_floatCvtInfo.sign1.second << "\"" << endl;
+	cout << "processedString = " << m_floatCvtInfo.processedString << endl;
+	cout << "convertIntPart(2) = " << m_floatCvtInfo.convertIntPart << endl;
+	string loopStr;
+	if ( m_floatCvtInfo.isFloatPartLoop ) {
+		string prestr;
+		if ( m_floatCvtInfo.loopStartIdx > 0 ) {
+			prestr = m_floatCvtInfo.convertFloatPart.substr(0, static_cast<string::size_type>(m_floatCvtInfo.loopStartIdx) );
+		} 
+		string subseqloopstr = m_floatCvtInfo.convertFloatPart.substr( m_floatCvtInfo.loopStartIdx, static_cast<string::size_type>( m_floatCvtInfo.loopEndIdx - m_floatCvtInfo.loopStartIdx + 1) );
+		loopStr += (prestr + "[" + subseqloopstr + "]" + "*");
+	}
+
+	if ( !m_floatCvtInfo.isFloatPartLoop ) {
+		cout << "convertFloatPart(2) = " << m_floatCvtInfo.convertFloatPart << endl;
+	} else {
+		cout << "convertFloatPart(2) = " << m_floatCvtInfo.convertFloatPart << " => " << loopStr << endl;
+	}
+
+	cout << "isFloatPartLoop = " << (m_floatCvtInfo.isFloatPartLoop ? "true": "false") << endl;
+	if ( m_floatCvtInfo.isFloatPartLoop ) {
+		cout << "loopStartIdx = " << m_floatCvtInfo.loopStartIdx << endl;
+		cout << "loopEndIdx = " << m_floatCvtInfo.loopEndIdx << endl;
+	}
+	cout << "============================================================" << endl;
 }
 
 
