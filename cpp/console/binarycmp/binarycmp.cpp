@@ -23,7 +23,7 @@ int main(int argc, char* argv[], char* env[])
 		return -1;
 	}
 	f1.seekg(0, ios::end);
-	sz1 = f1.tellg();
+	sz1 = static_cast<size_t>( f1.tellg() );
 	f1.seekg(0, ios::beg);
 
 	ifstream f2(argv[2], ios::in | ios::binary);
@@ -33,7 +33,7 @@ int main(int argc, char* argv[], char* env[])
 		return -1;
 	}
 	f2.seekg(0, ios::end);
-	sz2 = f2.tellg();
+	sz2 = static_cast<size_t>( f2.tellg() );
 	f2.seekg(0, ios::beg);
 
 
