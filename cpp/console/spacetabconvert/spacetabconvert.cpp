@@ -284,7 +284,7 @@ bool doCvt(const requiredArg& arginfo, string& errorMsg)
 	int arysz = static_cast<int>( sizeof(eolary) / sizeof(eolary[0]) );
 
 	if ( replacefile ) {
-		for ( const auto pr : lineVec ) {
+		for ( const auto& pr : lineVec ) {
 			auto linestr = pr.first;
 			auto eolflag = pr.second;
 			if ( !linestr.empty() ) {
