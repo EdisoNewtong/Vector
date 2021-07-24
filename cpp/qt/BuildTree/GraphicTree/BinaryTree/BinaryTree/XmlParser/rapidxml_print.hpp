@@ -239,10 +239,38 @@ namespace rapidxml
                 assert(0);
                 break;
             }
-            
+
+            /*
+             *************************************************
+                Comment by Edison
+             *************************************************
             // If indenting not disabled, add line break after node
             if (!(flags & print_no_indenting))
                 *out = Ch('\n'), ++out;
+            */
+
+            bool needPrintNewLine = true;
+            if ( node->type() == node_document ) {
+                needPrintNewLine = false;
+            } else {
+                // xml_node<Ch> *parent = node->parent();
+                // if ( parent != nullptr ) {
+                //     rapidxml::node_type tp = parent->type();
+                //     if ( tp == node_document ) {
+                //         xml_node<Ch> *nextchild = node->next_sibling();
+                //         if ( nextchild == nullptr ) {
+                //             needPrintNewLine = false;
+                //         }
+                //     }
+                // }
+            }
+
+            // modifiedy by Edison
+            if (!(flags & print_no_indenting) && needPrintNewLine ) {
+                *out = Ch('\n'), ++out;
+            }
+
+
 
             // Return modified iterator
             return out;
