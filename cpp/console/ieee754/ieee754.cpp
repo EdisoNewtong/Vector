@@ -74,7 +74,7 @@ bool checkStringFloat(const string& text)
         cout << strFloatNumber << "| " << err << " | Sorry : is <Not> a Valid Float-Point number" << endl;
         return false;
     } else {
-        cout << strFloatNumber << "   is a <Valid> " << floatOrDoubleString << " number" << endl;
+        cout << strFloatNumber << "   is a <Valid> " << floatOrDoubleString << " number. ";
         b = cvt.doConvert(err);
         if ( !b ) {
             cout << strFloatNumber << " | " << err << " | Sorry doConvert(...)  Failed  " << endl;
@@ -200,7 +200,7 @@ int main(int argc, char* argv[],char* env[])
     if ( argc != 5 ) {
         cout << "Missing generate args " << endl;
         cout << "          int part   float part     negative       f|F flag"  << endl;
-        cout << "./main   <intBits>   <floatBits>   <[ne|other]>  <[f|other]>" << endl;
+        cout << "./ieee754   <intBits>   <floatBits>   <[ne|other]>  <[f|other]>" << endl;
         return -1;
     }
 
@@ -217,8 +217,8 @@ int main(int argc, char* argv[],char* env[])
 
     string negativeStr = argv[3];
     string fStr = argv[4];
-    auto neFlag = (negativeStr == "ne");    // negative flag
-    auto fFlag  = (fStr == "f");            // f|F   flag
+    auto neFlag = (negativeStr == "ne");    // negative flag , if the number is none negative , set the argv[3] as  any arbitrary string
+    auto fFlag  = (fStr == "f");            // f|F   flag , if double , set as none "f"
 
     readFloatByGenerate(intBits, floatBits, neFlag, fFlag);
 

@@ -1,6 +1,6 @@
 /* Usage :
  *   $ ./generateTestCase   
- *		  --datetype <float/double>  
+ *		  --datatype <float/double>  
  *		  --intBit     <number>        // a number >=1
  *		  --floatBit   <number>        // a number >=1
  *		  (--negativeSign)
@@ -112,8 +112,8 @@ void printUsage()
 	const string helpContext = R"(
 Command Line Usage : 
 ======================================================================
-    $ ./generateTestCase   
- 		  --datetype <float/double>  
+    $ ./genTools
+ 		  --datatype <float/double>  
  		  --intBit     <number>        // a number >=1
  		  --floatBit   <number>        // a number >=1
  		  (--negativeSign)
@@ -137,7 +137,7 @@ bool getRequiredArgs(int argc, char* argv[], bool &isFloat, int &iIntPartBit, in
 		error = "Arguments greater than 8";
 	} else {
 		// argc is in range [7,8]
-		const string Sarg1("--datetype");
+		const string Sarg1("--datatype");
 		const string Sarg3("--intBit");
 		const string Sarg5("--floatBit");
 		const string Sarg7("--negativeSign");

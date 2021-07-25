@@ -28,9 +28,9 @@ int main( int argc, char* argv[], char* env[] )
 {
 
 	stringfloatpair ary[] = {
-		make_pair( MAKE_STRING_FLOAT_PAIR( 1.1f) ),
+		make_pair( MAKE_STRING_FLOAT_PAIR(1.1f) ),
 		make_pair( MAKE_STRING_FLOAT_PAIR(0.1f) ),
-		make_pair( MAKE_STRING_FLOAT_PAIR(3.4f) ),
+		make_pair( MAKE_STRING_FLOAT_PAIR(-3.4f) ),
 	};
 
 	for ( size_t i = 0; i < sizeof(ary)/sizeof(ary[0]); ++i ) {
@@ -56,7 +56,7 @@ int main( int argc, char* argv[], char* env[] )
 			} else {
 				cvt.printConvertDetail();
 				if ( cvtRet.cvtIntBinary == fui.ui_num ) {
-					cout << "[SUCCESSFUL] , Convert Equal : "   <<  " , number = " <<  strfloat <<  " = 0x" << std::hex << fui.ui_num << endl;
+					cout << "[SUCCESSFUL] , Convert Equal. "   <<  "Number = " <<  strfloat <<  " = 0x" << std::hex << fui.ui_num << endl;
 				} else {
 					cout << "[FAILED] , Convert <Not> Equal ! "       <<  endl
 						 << "number = \""   << strfloat  << "\"" << endl
