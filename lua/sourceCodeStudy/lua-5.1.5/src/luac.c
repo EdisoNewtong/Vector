@@ -26,29 +26,31 @@
 #define PROGNAME	"luac"		/* default program name */
 #define	OUTPUT		PROGNAME ".out"	/* default output file */
 
-static int listing = 0;			/* list bytecodes? */
-static int dumping = 1;			/* dump bytecodes? */
-static int stripping = 0;			/* strip debug information? */
-static char Output[] = { OUTPUT };	/* default output file name */
-static const char* output = Output;	/* actual output file name */
-static const char* progname = PROGNAME;	/* actual program name */
+static int listing = 0; /* list bytecodes? */
+static int dumping = 1; /* dump bytecodes? */
+static int stripping = 0; /* strip debug information? */
+static char Output[] = { "luac" ".out" }; /* default output file name */
+static const char* output = Output; /* actual output file name */
+static const char* progname = "luac"; /* actual program name */
 
 static void fatal(const char* message)
 {
   fprintf(stderr,"%s: %s\n",progname,message);
-  exit(EXIT_FAILURE);
+  exit(1);
 }
+
 
 static void cannot(const char* what)
 {
-  fprintf(stderr,"%s: cannot %s %s: %s\n",progname,what,output,strerror(errno));
-  exit(EXIT_FAILURE);
+  fprintf(stderr,"%s: cannot %s %s: %s\n",progname,what,output,strerror((*__errno_location ())));
+  exit(1);
 }
+
 
 static void usage(const char* message)
 {
   if (*message == '-') {
-    fprintf(stderr,"%s: unrecognized option " LUA_QS "\n",progname,message);
+    fprintf(stderr,"%s: unrecognized option " "'" "%s" "'" "\n",progname,message);
   } else {
     fprintf(stderr,"%s: %s\n",progname,message);
   }
@@ -57,60 +59,59 @@ static void usage(const char* message)
           "Available options are:\n"
           "  -        process stdin\n"
           "  -l       list\n"
-          "  -o name  output to file " LUA_QL("name") " (default is \"%s\")\n"
+          "  -o name  output to file " "'" "name" "'" " (default is \"%s\")\n"
           "  -p       parse only\n"
           "  -s       strip debug information\n"
           "  -v       show version information\n"
           "  --       stop handling options\n",
           progname,Output);
-  exit(EXIT_FAILURE);
+  exit(1);
 }
 
-#define	IS(s)	(strcmp(argv[i],s) == 0)
 
 static int doargs(int argc, char* argv[])
 {
   int i;
   int version = 0;
-  if (argv[0] != NULL && *argv[0] != 0) { 
+  if (argv[0] != ((void *)0) && *argv[0] != 0) {
     progname = argv[0];
   }
   for (i = 1; i<argc; i++)
   {
-    if (*argv[i] != '-') {			/* end of options; keep it */
+    if (*argv[i] != '-') { /* end of options; keep it */
       break;
     }
-    else if (IS("--"))			/* end of options; skip it */
+    else if ((strcmp(argv[i],"--") == 0)) /* end of options; skip it */
     {
       ++i;
-      if (version) { 
+      if (version) {
         ++version;
       }
       break;
     }
-    else if (IS("-")) {			/* end of options; use stdin */
+    else if ((strcmp(argv[i],"-") == 0)) { /* end of options; use stdin */
       break;
-    } else if (IS("-l")) {			/* list */
+    } else if ((strcmp(argv[i],"-l") == 0)) { /* list */
       ++listing;
     }
-    else if (IS("-o"))			/* output file */
+    else if ((strcmp(argv[i],"-o") == 0)) /* output file */
     {
      output = argv[++i];
-     if (output == NULL || *output == 0 ) { 
-       usage(LUA_QL("-o") " needs argument");
+     if (output == ((void *)0) || *output == 0 ) {
+       usage("'" "-o" "'" " needs argument");
      }
-     if (IS("-")) { 
-       output = NULL;
+     if ((strcmp(argv[i],"-") == 0)) {
+       output = ((void *)0);
      }
     }
-    else if (IS("-p")) {			/* parse only */
+    else if ((strcmp(argv[i],"-p") == 0)) { /* parse only */
       dumping = 0;
     }
-    else if (IS("-s")) {			/* strip debug information */
+    else if ((strcmp(argv[i],"-s") == 0)) { /* strip debug information */
       stripping = 1;
-    } else if (IS("-v")) {			/* show version */
+    } else if ((strcmp(argv[i],"-v") == 0)) { /* show version */
       ++version;
-    } else {					/* unknown option */
+    } else { /* unknown option */
       usage(argv[i]);
     }
   }
@@ -121,53 +122,55 @@ static int doargs(int argc, char* argv[])
   }
   if (version)
   {
-    printf("%s  %s\n",LUA_RELEASE,LUA_COPYRIGHT);
-    if ( version == argc-1 ) { 
-      exit(EXIT_SUCCESS);
+    printf("%s  %s\n","Lua 5.1.5","Copyright (C) 1994-2012 Lua.org, PUC-Rio");
+    if ( version == argc-1 ) {
+      exit(0);
     }
   }
   return i;
 }
 
-#define toproto(L,i) (clvalue(L->top+(i))->l.p)
 
 static const Proto* combine(lua_State* L, int n)
 {
  if (n == 1) {
-   return toproto(L,-1);
+   return ((&(L->top+(-1))->value.gc->cl)->l.p);
  } else {
    int i,pc;
    Proto* f = luaF_newproto(L);
-   setptvalue2s(L,L->top,f); incr_top(L);
-   f->source = luaS_newliteral(L,"=(" PROGNAME ")");
+   { TValue *i_o=(L->top); i_o->value.gc=((GCObject *)((f))); i_o->tt=(8 +1); ((void)0); }; {if ((char *)L->stack_last - (char *)L->top <= (1)*(int)sizeof(TValue)) luaD_growstack(L, 1); else ((void)0);; L->top++;};
+   f->source = (luaS_newlstr(L, "" "=(" "luac" ")", (sizeof("=(" "luac" ")")/sizeof(char))-1));
    f->maxstacksize = 1;
    pc = 2*n+1;
-   f->code = luaM_newvector(L,pc,Instruction);
+   f->code = ((Instruction *)(((((size_t)((pc)+1)) <= ((size_t)(~(size_t)0)-2)/(sizeof(Instruction))) ? luaM_realloc_(L, (((void *)0)), (0)*(sizeof(Instruction)), (pc)*(sizeof(Instruction))) : luaM_toobig(L))));
    f->sizecode = pc;
-   f->p = luaM_newvector(L,n,Proto*);
+   f->p = ((Proto* *)(((((size_t)((n)+1)) <= ((size_t)(~(size_t)0)-2)/(sizeof(Proto*))) ? luaM_realloc_(L, (((void *)0)), (0)*(sizeof(Proto*)), (n)*(sizeof(Proto*))) : luaM_toobig(L))));
    f->sizep = n;
    pc = 0;
    for (i = 0; i<n; i++)
    {
-     f->p[i]= toproto(L,i-n-1);
-     f->code[pc++] = CREATE_ABx(OP_CLOSURE,0,i);
-     f->code[pc++] = CREATE_ABC(OP_CALL,0,1,1);
+     f->p[i]= ((&(L->top+(i-n-1))->value.gc->cl)->l.p);
+     f->code[pc++] = ((((Instruction)(OP_CLOSURE))<<0) | (((Instruction)(0))<<(0 + 6)) | (((Instruction)(i))<<((0 + 6) + 8)));
+     f->code[pc++] = ((((Instruction)(OP_CALL))<<0) | (((Instruction)(0))<<(0 + 6)) | (((Instruction)(1))<<(((0 + 6) + 8) + 9)) | (((Instruction)(1))<<((0 + 6) + 8)));
    }
-   f->code[pc++] = CREATE_ABC(OP_RETURN,0,1,0);
+   f->code[pc++] = ((((Instruction)(OP_RETURN))<<0) | (((Instruction)(0))<<(0 + 6)) | (((Instruction)(1))<<(((0 + 6) + 8) + 9)) | (((Instruction)(0))<<((0 + 6) + 8)));
    return f;
  }
 }
 
+
 static int writer(lua_State* L, const void* p, size_t size, void* u)
 {
-  UNUSED(L);
+  ((void)(L));
   return (fwrite(p,size,1,(FILE*)u) != 1) && (size != 0);
 }
+
 
 struct Smain {
  int argc;
  char** argv;
 };
+
 
 static int pmain(lua_State* L)
 {
@@ -176,59 +179,61 @@ static int pmain(lua_State* L)
   char** argv = s->argv;
   const Proto* f;
   int i;
-  if (!lua_checkstack(L,argc)) { 
+  if (!lua_checkstack(L,argc)) {
     fatal("too many input files");
   }
   for (i = 0; i<argc; i++)
   {
-    const char* filename = IS("-") ? NULL : argv[i];
-    if (luaL_loadfile(L,filename)!=0) { 
-      fatal(lua_tostring(L,-1));
+    const char* filename = (strcmp(argv[i],"-") == 0) ? ((void *)0) : argv[i];
+    if (luaL_loadfile(L,filename)!=0) {
+      fatal(lua_tolstring(L, (-1), ((void *)0)));
     }
   }
   f = combine(L,argc);
-  if (listing) { 
+  if (listing) {
     luaU_print(f,listing>1);
   }
   if (dumping)
   {
-    FILE* D = (output == NULL) ? stdout : fopen(output,"wb");
-    if (D == NULL) { 
+    FILE* D = (output == ((void *)0)) ? stdout : fopen(output,"wb");
+    if (D == ((void *)0)) {
       cannot("open");
     }
-    lua_lock(L);
+    ((void) 0);
     luaU_dump(L,f,writer,D,stripping);
-    lua_unlock(L);
-    if (ferror(D)) { 
+    ((void) 0);
+    if (ferror(D)) {
       cannot("write");
     }
-    if (fclose(D)) { 
+    if (fclose(D)) {
       cannot("close");
     }
   }
   return 0;
 }
 
+
 int main(int argc, char* argv[])
 {
   lua_State* L;
   struct Smain s;
   int i = doargs(argc,argv);
-  argc -= i; 
+  argc -= i;
   argv += i;
-  if (argc <= 0) { 
+  if (argc <= 0) {
     usage("no input files given");
   }
-  L = lua_open();
-  if (L == NULL) { 
+  L = luaL_newstate();
+  if (L == ((void *)0)) {
     fatal("not enough memory for state");
   }
   s.argc = argc;
   s.argv = argv;
-  if (lua_cpcall(L,pmain,&s) != 0) { 
-    fatal(lua_tostring(L,-1));
+  if (lua_cpcall(L,pmain,&s) != 0) {
+    fatal(lua_tolstring(L, (-1), ((void *)0)));
   }
   lua_close(L);
-  return EXIT_SUCCESS;
+  return 0;
 }
+
 

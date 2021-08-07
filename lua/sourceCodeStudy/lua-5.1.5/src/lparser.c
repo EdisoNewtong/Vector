@@ -38,13 +38,12 @@
 ** nodes for block list (list of active blocks)
 */
 typedef struct BlockCnt {
-  struct BlockCnt *previous;  /* chain */
-  int breaklist;  /* list of jumps out of this loop */
-  lu_byte nactvar;  /* # active locals outside the breakable structure */
-  lu_byte upval;  /* true if some variable in the block is an upvalue */
-  lu_byte isbreakable;  /* true if `block' is a loop */
+  struct BlockCnt *previous; /* chain */
+  int breaklist; /* list of jumps out of this loop */
+  lu_byte nactvar; /* # active locals outside the breakable structure */
+  lu_byte upval; /* true if some variable in the block is an upvalue */
+  lu_byte isbreakable; /* true if `block' is a loop */
 } BlockCnt;
-
 
 
 /*
@@ -57,14 +56,14 @@ static void expr (LexState *ls, expdesc *v);
 static void anchor_token (LexState *ls) {
   if (ls->t.token == TK_NAME || ls->t.token == TK_STRING) {
     TString *ts = ls->t.seminfo.ts;
-    luaX_newstring(ls, getstr(ts), ts->tsv.len);
+    luaX_newstring(ls, ((const char *)((ts) + 1)), ts->tsv.len);
   }
 }
 
 
 static void error_expected (LexState *ls, int token) {
   luaX_syntaxerror(ls,
-      luaO_pushfstring(ls->L, LUA_QS " expected", luaX_token2str(ls, token)));
+      luaO_pushfstring(ls->L, "'" "%s" "'" " expected", luaX_token2str(ls, token)));
 }
 
 
@@ -82,7 +81,7 @@ static int testnext (LexState *ls, int c) {
     luaX_next(ls);
     return 1;
   }
-  else { 
+  else {
     return 0;
   }
 }
@@ -94,14 +93,11 @@ static void check (LexState *ls, int c) {
   }
 }
 
+
 static void checknext (LexState *ls, int c) {
   check(ls, c);
   luaX_next(ls);
 }
-
-
-#define check_condition(ls,c,msg)	{ if (!(c)) luaX_syntaxerror(ls, msg); }
-
 
 
 static void check_match (LexState *ls, int what, int who, int where) {
@@ -110,7 +106,7 @@ static void check_match (LexState *ls, int what, int who, int where) {
       error_expected(ls, what);
     } else {
       luaX_syntaxerror(ls, luaO_pushfstring(ls->L,
-             LUA_QS " expected (to close " LUA_QS " at line %d)",
+             "'" "%s" "'" " expected (to close " "'" "%s" "'" " at line %d)",
               luaX_token2str(ls, what), luaX_token2str(ls, who), where));
     }
   }
@@ -127,7 +123,7 @@ static TString *str_checkname (LexState *ls) {
 
 
 static void init_exp (expdesc *e, expkind k, int i) {
-  e->f = e->t = NO_JUMP;
+  e->f = e->t = (-1);
   e->k = k;
   e->u.s.info = i;
 }
@@ -147,33 +143,28 @@ static int registerlocalvar (LexState *ls, TString *varname) {
   FuncState *fs = ls->fs;
   Proto *f = fs->f;
   int oldsize = f->sizelocvars;
-  luaM_growvector(ls->L, f->locvars, fs->nlocvars, f->sizelocvars,
-                  LocVar, SHRT_MAX, "too many local variables");
-  while (oldsize < f->sizelocvars) { 
-    f->locvars[oldsize++].varname = NULL;
+  if ((fs->nlocvars)+1 > (f->sizelocvars)) ((f->locvars)=((LocVar *)(luaM_growaux_(ls->L,f->locvars,&(f->sizelocvars),sizeof(LocVar),32767,"too many local variables"))));
+  while (oldsize < f->sizelocvars) {
+    f->locvars[oldsize++].varname = ((void *)0);
   }
   f->locvars[fs->nlocvars].varname = varname;
-  luaC_objbarrier(ls->L, f, varname);
+  { if (((((((GCObject *)((varname)))))->gch.marked) & ((((1<<(0)) | (1<<(1)))))) && ((((((GCObject *)((f)))))->gch.marked) & ((1<<(2))))) luaC_barrierf(ls->L,(((GCObject *)((f)))),(((GCObject *)((varname))))); };
   return fs->nlocvars++;
 }
 
 
-#define new_localvarliteral(ls,v,n) \
-  new_localvar(ls, luaX_newstring(ls, "" v, (sizeof(v)/sizeof(char))-1), n)
-
-
 static void new_localvar (LexState *ls, TString *name, int n) {
   FuncState *fs = ls->fs;
-  luaY_checklimit(fs, fs->nactvar+n+1, LUAI_MAXVARS, "local variables");
-  fs->actvar[fs->nactvar+n] = cast(unsigned short, registerlocalvar(ls, name));
+  if ((fs->nactvar+n+1)>(200)) errorlimit(fs,200,"local variables");
+  fs->actvar[fs->nactvar+n] = ((unsigned short)(registerlocalvar(ls, name)));
 }
 
 
 static void adjustlocalvars (LexState *ls, int nvars) {
   FuncState *fs = ls->fs;
-  fs->nactvar = cast_byte(fs->nactvar + nvars);
+  fs->nactvar = ((lu_byte)((fs->nactvar + nvars)));
   for (; nvars; nvars--) {
-    getlocvar(fs, fs->nactvar - nvars).startpc = fs->pc;
+    ((fs)->f->locvars[(fs)->actvar[fs->nactvar - nvars]]).startpc = fs->pc;
   }
 }
 
@@ -181,7 +172,7 @@ static void adjustlocalvars (LexState *ls, int nvars) {
 static void removevars (LexState *ls, int tolevel) {
   FuncState *fs = ls->fs;
   while (fs->nactvar > tolevel) {
-    getlocvar(fs, --fs->nactvar).endpc = fs->pc;
+    ((fs)->f->locvars[(fs)->actvar[--fs->nactvar]]).endpc = fs->pc;
   }
 }
 
@@ -192,22 +183,21 @@ static int indexupvalue (FuncState *fs, TString *name, expdesc *v) {
   int oldsize = f->sizeupvalues;
   for (i=0; i<f->nups; i++) {
     if (fs->upvalues[i].k == v->k && fs->upvalues[i].info == v->u.s.info) {
-      lua_assert(f->upvalues[i] == name);
+      ((void)0);
       return i;
     }
   }
   /* new one */
-  luaY_checklimit(fs, f->nups + 1, LUAI_MAXUPVALUES, "upvalues");
-  luaM_growvector(fs->L, f->upvalues, f->nups, f->sizeupvalues,
-                  TString *, MAX_INT, "");
-  while (oldsize < f->sizeupvalues) { 
-    f->upvalues[oldsize++] = NULL;
+  if ((f->nups + 1)>(60)) errorlimit(fs,60,"upvalues");
+  if ((f->nups)+1 > (f->sizeupvalues)) ((f->upvalues)=((TString * *)(luaM_growaux_(fs->L,f->upvalues,&(f->sizeupvalues),sizeof(TString *),(2147483647 -2),""))));
+  while (oldsize < f->sizeupvalues) {
+    f->upvalues[oldsize++] = ((void *)0);
   }
   f->upvalues[f->nups] = name;
-  luaC_objbarrier(fs->L, f, name);
-  lua_assert(v->k == VLOCAL || v->k == VUPVAL);
-  fs->upvalues[f->nups].k = cast_byte(v->k);
-  fs->upvalues[f->nups].info = cast_byte(v->u.s.info);
+  { if (((((((GCObject *)((name)))))->gch.marked) & ((((1<<(0)) | (1<<(1)))))) && ((((((GCObject *)((f)))))->gch.marked) & ((1<<(2))))) luaC_barrierf(fs->L,(((GCObject *)((f)))),(((GCObject *)((name))))); };
+  ((void)0);
+  fs->upvalues[f->nups].k = ((lu_byte)((v->k)));
+  fs->upvalues[f->nups].info = ((lu_byte)((v->u.s.info)));
   return f->nups++;
 }
 
@@ -215,45 +205,45 @@ static int indexupvalue (FuncState *fs, TString *name, expdesc *v) {
 static int searchvar (FuncState *fs, TString *n) {
   int i;
   for (i=fs->nactvar-1; i >= 0; i--) {
-    if (n == getlocvar(fs, i).varname) {
+    if (n == ((fs)->f->locvars[(fs)->actvar[i]]).varname) {
       return i;
     }
   }
-  return -1;  /* not found */
+  return -1; /* not found */
 }
 
 
 static void markupval (FuncState *fs, int level) {
   BlockCnt *bl = fs->bl;
-  while (bl && bl->nactvar > level) { 
+  while (bl && bl->nactvar > level) {
     bl = bl->previous;
   }
-  if (bl) { 
+  if (bl) {
     bl->upval = 1;
   }
 }
 
 
 static int singlevaraux (FuncState *fs, TString *n, expdesc *var, int base) {
-  if (fs == NULL) {  /* no more levels? */
-    init_exp(var, VGLOBAL, NO_REG);  /* default is global variable */
+  if (fs == ((void *)0)) { /* no more levels? */
+    init_exp(var, VGLOBAL, ((1<<8)-1)); /* default is global variable */
     return VGLOBAL;
   }
   else {
-    int v = searchvar(fs, n);  /* look up at current level */
+    int v = searchvar(fs, n); /* look up at current level */
     if (v >= 0) {
       init_exp(var, VLOCAL, v);
       if (!base) {
-        markupval(fs, v);  /* local will be used as an upval */
+        markupval(fs, v); /* local will be used as an upval */
       }
       return VLOCAL;
     }
-    else {  /* not found at current level; try upper one */
+    else { /* not found at current level; try upper one */
       if (singlevaraux(fs->prev, n, var, 0) == VGLOBAL) {
         return VGLOBAL;
       }
-      var->u.s.info = indexupvalue(fs, n, var);  /* else was LOCAL or UPVAL */
-      var->k = VUPVAL;  /* upvalue in this level */
+      var->u.s.info = indexupvalue(fs, n, var); /* else was LOCAL or UPVAL */
+      var->k = VUPVAL; /* upvalue in this level */
       return VUPVAL;
     }
   }
@@ -264,7 +254,7 @@ static void singlevar (LexState *ls, expdesc *var) {
   TString *varname = str_checkname(ls);
   FuncState *fs = ls->fs;
   if (singlevaraux(fs, varname, var, 1) == VGLOBAL) {
-    var->u.s.info = luaK_stringK(fs, varname);  /* info points to global name */
+    var->u.s.info = luaK_stringK(fs, varname); /* info points to global name */
   }
 }
 
@@ -272,19 +262,19 @@ static void singlevar (LexState *ls, expdesc *var) {
 static void adjust_assign (LexState *ls, int nvars, int nexps, expdesc *e) {
   FuncState *fs = ls->fs;
   int extra = nvars - nexps;
-  if (hasmultret(e->k)) {
-    extra++;  /* includes call itself */
-    if (extra < 0) { 
+  if (((e->k) == VCALL || (e->k) == VVARARG)) {
+    extra++; /* includes call itself */
+    if (extra < 0) {
       extra = 0;
     }
-    luaK_setreturns(fs, e, extra);  /* last exp. provides the difference */
-    if (extra > 1) { 
+    luaK_setreturns(fs, e, extra); /* last exp. provides the difference */
+    if (extra > 1) {
       luaK_reserveregs(fs, extra-1);
     }
   }
   else {
-    if (e->k != VVOID) { 
-      luaK_exp2nextreg(fs, e);  /* close last expression */
+    if (e->k != VVOID) {
+      luaK_exp2nextreg(fs, e); /* close last expression */
     }
     if (extra > 0) {
       int reg = fs->freereg;
@@ -296,23 +286,20 @@ static void adjust_assign (LexState *ls, int nvars, int nexps, expdesc *e) {
 
 
 static void enterlevel (LexState *ls) {
-  if (++ls->L->nCcalls > LUAI_MAXCCALLS) {
-	luaX_lexerror(ls, "chunk has too many syntax levels", 0);
+  if (++ls->L->nCcalls > 200) {
+ luaX_lexerror(ls, "chunk has too many syntax levels", 0);
   }
 }
 
 
-#define leavelevel(ls)	((ls)->L->nCcalls--)
-
-
 static void enterblock (FuncState *fs, BlockCnt *bl, lu_byte isbreakable) {
-  bl->breaklist = NO_JUMP;
+  bl->breaklist = (-1);
   bl->isbreakable = isbreakable;
   bl->nactvar = fs->nactvar;
   bl->upval = 0;
   bl->previous = fs->bl;
   fs->bl = bl;
-  lua_assert(fs->freereg == fs->nactvar);
+  ((void)0);
 }
 
 
@@ -324,9 +311,9 @@ static void leaveblock (FuncState *fs) {
     luaK_codeABC(fs, OP_CLOSE, bl->nactvar, 0, 0);
   }
   /* a block either controls scope or breaks (never both) */
-  lua_assert(!bl->isbreakable || !bl->upval);
-  lua_assert(bl->nactvar == fs->nactvar);
-  fs->freereg = fs->nactvar;  /* free registers */
+  ((void)0);
+  ((void)0);
+  fs->freereg = fs->nactvar; /* free registers */
   luaK_patchtohere(fs, bl->breaklist);
 }
 
@@ -336,13 +323,12 @@ static void pushclosure (LexState *ls, FuncState *func, expdesc *v) {
   Proto *f = fs->f;
   int oldsize = f->sizep;
   int i;
-  luaM_growvector(ls->L, f->p, fs->np, f->sizep, Proto *,
-                  MAXARG_Bx, "constant table overflow");
-  while (oldsize < f->sizep) { 
-    f->p[oldsize++] = NULL;
+  if ((fs->np)+1 > (f->sizep)) ((f->p)=((Proto * *)(luaM_growaux_(ls->L,f->p,&(f->sizep),sizeof(Proto *),((1<<(9 + 9))-1),"constant table overflow"))));
+  while (oldsize < f->sizep) {
+    f->p[oldsize++] = ((void *)0);
   }
   f->p[fs->np++] = func->f;
-  luaC_objbarrier(ls->L, f, func->f);
+  { if (((((((GCObject *)((func->f)))))->gch.marked) & ((((1<<(0)) | (1<<(1)))))) && ((((((GCObject *)((f)))))->gch.marked) & ((1<<(2))))) luaC_barrierf(ls->L,(((GCObject *)((f)))),(((GCObject *)((func->f))))); };
   init_exp(v, VRELOCABLE, luaK_codeABx(fs, OP_CLOSURE, 0, fs->np-1));
   for (i=0; i<func->f->nups; i++) {
     OpCode o = (func->upvalues[i].k == VLOCAL) ? OP_MOVE : OP_GETUPVAL;
@@ -355,27 +341,27 @@ static void open_func (LexState *ls, FuncState *fs) {
   lua_State *L = ls->L;
   Proto *f = luaF_newproto(L);
   fs->f = f;
-  fs->prev = ls->fs;  /* linked list of funcstates */
+  fs->prev = ls->fs; /* linked list of funcstates */
   fs->ls = ls;
   fs->L = L;
   ls->fs = fs;
   fs->pc = 0;
   fs->lasttarget = -1;
-  fs->jpc = NO_JUMP;
+  fs->jpc = (-1);
   fs->freereg = 0;
   fs->nk = 0;
   fs->np = 0;
   fs->nlocvars = 0;
   fs->nactvar = 0;
-  fs->bl = NULL;
+  fs->bl = ((void *)0);
   f->source = ls->source;
-  f->maxstacksize = 2;  /* registers 0/1 are always valid */
+  f->maxstacksize = 2; /* registers 0/1 are always valid */
   fs->h = luaH_new(L, 0, 0);
   /* anchor table of constants and prototype (to avoid being collected) */
-  sethvalue2s(L, L->top, fs->h);
-  incr_top(L);
-  setptvalue2s(L, L->top, f);
-  incr_top(L);
+  { TValue *i_o=(L->top); i_o->value.gc=((GCObject *)((fs->h))); i_o->tt=5; ((void)0); };
+  {if ((char *)L->stack_last - (char *)L->top <= (1)*(int)sizeof(TValue)) luaD_growstack(L, 1); else ((void)0);; L->top++;};
+  { TValue *i_o=(L->top); i_o->value.gc=((GCObject *)((f))); i_o->tt=(8 +1); ((void)0); };
+  {if ((char *)L->stack_last - (char *)L->top <= (1)*(int)sizeof(TValue)) luaD_growstack(L, 1); else ((void)0);; L->top++;};
 }
 
 
@@ -384,27 +370,27 @@ static void close_func (LexState *ls) {
   FuncState *fs = ls->fs;
   Proto *f = fs->f;
   removevars(ls, 0);
-  luaK_ret(fs, 0, 0);  /* final return */
-  luaM_reallocvector(L, f->code, f->sizecode, fs->pc, Instruction);
+  luaK_ret(fs, 0, 0); /* final return */
+  ((f->code)=((Instruction *)(((((size_t)((fs->pc)+1)) <= ((size_t)(~(size_t)0)-2)/(sizeof(Instruction))) ? luaM_realloc_(L, (f->code), (f->sizecode)*(sizeof(Instruction)), (fs->pc)*(sizeof(Instruction))) : luaM_toobig(L)))));
   f->sizecode = fs->pc;
-  luaM_reallocvector(L, f->lineinfo, f->sizelineinfo, fs->pc, int);
+  ((f->lineinfo)=((int *)(((((size_t)((fs->pc)+1)) <= ((size_t)(~(size_t)0)-2)/(sizeof(int))) ? luaM_realloc_(L, (f->lineinfo), (f->sizelineinfo)*(sizeof(int)), (fs->pc)*(sizeof(int))) : luaM_toobig(L)))));
   f->sizelineinfo = fs->pc;
-  luaM_reallocvector(L, f->k, f->sizek, fs->nk, TValue);
+  ((f->k)=((TValue *)(((((size_t)((fs->nk)+1)) <= ((size_t)(~(size_t)0)-2)/(sizeof(TValue))) ? luaM_realloc_(L, (f->k), (f->sizek)*(sizeof(TValue)), (fs->nk)*(sizeof(TValue))) : luaM_toobig(L)))));
   f->sizek = fs->nk;
-  luaM_reallocvector(L, f->p, f->sizep, fs->np, Proto *);
+  ((f->p)=((Proto * *)(((((size_t)((fs->np)+1)) <= ((size_t)(~(size_t)0)-2)/(sizeof(Proto *))) ? luaM_realloc_(L, (f->p), (f->sizep)*(sizeof(Proto *)), (fs->np)*(sizeof(Proto *))) : luaM_toobig(L)))));
   f->sizep = fs->np;
-  luaM_reallocvector(L, f->locvars, f->sizelocvars, fs->nlocvars, LocVar);
+  ((f->locvars)=((LocVar *)(((((size_t)((fs->nlocvars)+1)) <= ((size_t)(~(size_t)0)-2)/(sizeof(LocVar))) ? luaM_realloc_(L, (f->locvars), (f->sizelocvars)*(sizeof(LocVar)), (fs->nlocvars)*(sizeof(LocVar))) : luaM_toobig(L)))));
   f->sizelocvars = fs->nlocvars;
-  luaM_reallocvector(L, f->upvalues, f->sizeupvalues, f->nups, TString *);
+  ((f->upvalues)=((TString * *)(((((size_t)((f->nups)+1)) <= ((size_t)(~(size_t)0)-2)/(sizeof(TString *))) ? luaM_realloc_(L, (f->upvalues), (f->sizeupvalues)*(sizeof(TString *)), (f->nups)*(sizeof(TString *))) : luaM_toobig(L)))));
   f->sizeupvalues = f->nups;
-  lua_assert(luaG_checkcode(f));
-  lua_assert(fs->bl == NULL);
+  ((void)0);
+  ((void)0);
   ls->fs = fs->prev;
   /* last token read was anchored in defunct function; must reanchor it */
-  if (fs) { 
+  if (fs) {
     anchor_token(ls);
   }
-  L->top -= 2;  /* remove table and prototype from the stack */
+  L->top -= 2; /* remove table and prototype from the stack */
 }
 
 
@@ -412,32 +398,29 @@ Proto *luaY_parser (lua_State *L, ZIO *z, Mbuffer *buff, const char *name) {
   struct LexState lexstate;
   struct FuncState funcstate;
   lexstate.buff = buff;
-  luaX_setinput(L, &lexstate, z, luaS_new(L, name));
+  luaX_setinput(L, &lexstate, z, (luaS_newlstr(L, name, strlen(name))));
   open_func(&lexstate, &funcstate);
-  funcstate.f->is_vararg = VARARG_ISVARARG;  /* main func. is always vararg */
-  luaX_next(&lexstate);  /* read first token */
+  funcstate.f->is_vararg = 2; /* main func. is always vararg */
+  luaX_next(&lexstate); /* read first token */
   chunk(&lexstate);
   check(&lexstate, TK_EOS);
   close_func(&lexstate);
-  lua_assert(funcstate.prev == NULL);
-  lua_assert(funcstate.f->nups == 0);
-  lua_assert(lexstate.fs == NULL);
+  ((void)0);
+  ((void)0);
+  ((void)0);
   return funcstate.f;
 }
-
 
 
 /*============================================================*/
 /* GRAMMAR RULES */
 /*============================================================*/
-
-
 static void field (LexState *ls, expdesc *v) {
   /* field -> ['.' | ':'] NAME */
   FuncState *fs = ls->fs;
   expdesc key;
   luaK_exp2anyreg(fs, v);
-  luaX_next(ls);  /* skip the dot or colon */
+  luaX_next(ls); /* skip the dot or colon */
   checkname(ls, &key);
   luaK_indexed(fs, v, &key);
 }
@@ -445,7 +428,7 @@ static void field (LexState *ls, expdesc *v) {
 
 static void yindex (LexState *ls, expdesc *v) {
   /* index -> '[' expr ']' */
-  luaX_next(ls);  /* skip the '[' */
+  luaX_next(ls); /* skip the '[' */
   expr(ls, v);
   luaK_exp2val(ls->fs, v);
   checknext(ls, ']');
@@ -457,14 +440,12 @@ static void yindex (LexState *ls, expdesc *v) {
 ** Rules for Constructors
 ** =======================================================================
 */
-
-
 struct ConsControl {
-  expdesc v;  /* last list item read */
-  expdesc *t;  /* table descriptor */
-  int nh;  /* total number of `record' elements */
-  int na;  /* total number of array elements */
-  int tostore;  /* number of array elements pending to be stored */
+  expdesc v; /* last list item read */
+  expdesc *t; /* table descriptor */
+  int nh; /* total number of `record' elements */
+  int na; /* total number of array elements */
+  int tostore; /* number of array elements pending to be stored */
 };
 
 
@@ -475,10 +456,10 @@ static void recfield (LexState *ls, struct ConsControl *cc) {
   expdesc key, val;
   int rkkey;
   if (ls->t.token == TK_NAME) {
-    luaY_checklimit(fs, cc->nh, MAX_INT, "items in a constructor");
+    if ((cc->nh)>((2147483647 -2))) errorlimit(fs,(2147483647 -2),"items in a constructor");
     checkname(ls, &key);
   }
-  else {  /* ls->t.token == '[' */
+  else { /* ls->t.token == '[' */
     yindex(ls, &key);
   }
   cc->nh++;
@@ -486,19 +467,19 @@ static void recfield (LexState *ls, struct ConsControl *cc) {
   rkkey = luaK_exp2RK(fs, &key);
   expr(ls, &val);
   luaK_codeABC(fs, OP_SETTABLE, cc->t->u.s.info, rkkey, luaK_exp2RK(fs, &val));
-  fs->freereg = reg;  /* free registers */
+  fs->freereg = reg; /* free registers */
 }
 
 
 static void closelistfield (FuncState *fs, struct ConsControl *cc) {
-  if (cc->v.k == VVOID) { 
-    return;  /* there is no list item */
+  if (cc->v.k == VVOID) {
+    return; /* there is no list item */
   }
   luaK_exp2nextreg(fs, &cc->v);
   cc->v.k = VVOID;
-  if (cc->tostore == LFIELDS_PER_FLUSH) {
-    luaK_setlist(fs, cc->t->u.s.info, cc->na, cc->tostore);  /* flush */
-    cc->tostore = 0;  /* no more items pending */
+  if (cc->tostore == 50) {
+    luaK_setlist(fs, cc->t->u.s.info, cc->na, cc->tostore); /* flush */
+    cc->tostore = 0; /* no more items pending */
   }
 }
 
@@ -507,10 +488,10 @@ static void lastlistfield (FuncState *fs, struct ConsControl *cc) {
   if (cc->tostore == 0) {
     return;
   }
-  if (hasmultret(cc->v.k)) {
-    luaK_setmultret(fs, &cc->v);
-    luaK_setlist(fs, cc->t->u.s.info, cc->na, LUA_MULTRET);
-    cc->na--;  /* do not count last expression (unknown number of elements) */
+  if (((cc->v.k) == VCALL || (cc->v.k) == VVARARG)) {
+    luaK_setreturns(fs, &cc->v, (-1));
+    luaK_setlist(fs, cc->t->u.s.info, cc->na, (-1));
+    cc->na--; /* do not count last expression (unknown number of elements) */
   }
   else {
     if (cc->v.k != VVOID) {
@@ -523,7 +504,7 @@ static void lastlistfield (FuncState *fs, struct ConsControl *cc) {
 
 static void listfield (LexState *ls, struct ConsControl *cc) {
   expr(ls, &cc->v);
-  luaY_checklimit(ls->fs, cc->na, MAX_INT, "items in a constructor");
+  if ((cc->na)>((2147483647 -2))) errorlimit(ls->fs,(2147483647 -2),"items in a constructor");
   cc->na++;
   cc->tostore++;
 }
@@ -538,30 +519,30 @@ static void constructor (LexState *ls, expdesc *t) {
   cc.na = cc.nh = cc.tostore = 0;
   cc.t = t;
   init_exp(t, VRELOCABLE, pc);
-  init_exp(&cc.v, VVOID, 0);  /* no value (yet) */
-  luaK_exp2nextreg(ls->fs, t);  /* fix it at stack top (for gc) */
+  init_exp(&cc.v, VVOID, 0); /* no value (yet) */
+  luaK_exp2nextreg(ls->fs, t); /* fix it at stack top (for gc) */
   checknext(ls, '{');
   do {
-    lua_assert(cc.v.k == VVOID || cc.tostore > 0);
-    if (ls->t.token == '}') { 
+    ((void)0);
+    if (ls->t.token == '}') {
       break;
     }
     closelistfield(fs, &cc);
     switch(ls->t.token) {
-      case TK_NAME: {  /* may be listfields or recfields */
+      case TK_NAME: { /* may be listfields or recfields */
         luaX_lookahead(ls);
-        if (ls->lookahead.token != '=') {  /* expression? */
+        if (ls->lookahead.token != '=') { /* expression? */
           listfield(ls, &cc);
         } else {
           recfield(ls, &cc);
         }
         break;
       }
-      case '[': {  /* constructor_item -> recfield */
+      case '[': { /* constructor_item -> recfield */
         recfield(ls, &cc);
         break;
       }
-      default: {  /* constructor_part -> listfield */
+      default: { /* constructor_part -> listfield */
         listfield(ls, &cc);
         break;
       }
@@ -569,46 +550,42 @@ static void constructor (LexState *ls, expdesc *t) {
   } while (testnext(ls, ',') || testnext(ls, ';'));
   check_match(ls, '}', '{', line);
   lastlistfield(fs, &cc);
-  SETARG_B(fs->f->code[pc], luaO_int2fb(cc.na)); /* set initial array size */
-  SETARG_C(fs->f->code[pc], luaO_int2fb(cc.nh));  /* set initial table size */
+  ((fs->f->code[pc]) = (((fs->f->code[pc])&(~((~((~(Instruction)0)<<9))<<(((0 + 6) + 8) + 9)))) | ((((Instruction)(luaO_int2fb(cc.na)))<<(((0 + 6) + 8) + 9))&((~((~(Instruction)0)<<9))<<(((0 + 6) + 8) + 9))))); /* set initial array size */
+  ((fs->f->code[pc]) = (((fs->f->code[pc])&(~((~((~(Instruction)0)<<9))<<((0 + 6) + 8)))) | ((((Instruction)(luaO_int2fb(cc.nh)))<<((0 + 6) + 8))&((~((~(Instruction)0)<<9))<<((0 + 6) + 8))))); /* set initial table size */
 }
 
+
 /* }====================================================================== */
-
-
-
 static void parlist (LexState *ls) {
   /* parlist -> [ param { `,' param } ] */
   FuncState *fs = ls->fs;
   Proto *f = fs->f;
   int nparams = 0;
   f->is_vararg = 0;
-  if (ls->t.token != ')') {  /* is `parlist' not empty? */
+  if (ls->t.token != ')') { /* is `parlist' not empty? */
     do {
       switch (ls->t.token) {
-        case TK_NAME: {  /* param -> NAME */
+        case TK_NAME: { /* param -> NAME */
           new_localvar(ls, str_checkname(ls), nparams++);
           break;
         }
-        case TK_DOTS: {  /* param -> `...' */
+        case TK_DOTS: { /* param -> `...' */
           luaX_next(ls);
-#if defined(LUA_COMPAT_VARARG)
           /* use `arg' as default name */
-          new_localvarliteral(ls, "arg", nparams++);
-          f->is_vararg = VARARG_HASARG | VARARG_NEEDSARG;
-#endif
-          f->is_vararg |= VARARG_ISVARARG;
+          new_localvar(ls, luaX_newstring(ls, "" "arg", (sizeof("arg")/sizeof(char))-1), nparams++);
+          f->is_vararg = 1 | 4;
+          f->is_vararg |= 2;
           break;
         }
-        default: { 
-          luaX_syntaxerror(ls, "<name> or " LUA_QL("...") " expected");
+        default: {
+          luaX_syntaxerror(ls, "<name> or " "'" "..." "'" " expected");
         }
       }
     } while (!f->is_vararg && testnext(ls, ','));
   }
   adjustlocalvars(ls, nparams);
-  f->numparams = cast_byte(fs->nactvar - (f->is_vararg & VARARG_HASARG));
-  luaK_reserveregs(fs, fs->nactvar);  /* reserve register for parameters */
+  f->numparams = ((lu_byte)((fs->nactvar - (f->is_vararg & 1))));
+  luaK_reserveregs(fs, fs->nactvar); /* reserve register for parameters */
 }
 
 
@@ -619,7 +596,7 @@ static void body (LexState *ls, expdesc *e, int needself, int line) {
   new_fs.f->linedefined = line;
   checknext(ls, '(');
   if (needself) {
-    new_localvarliteral(ls, "self", 0);
+    new_localvar(ls, luaX_newstring(ls, "" "self", (sizeof("self")/sizeof(char))-1), 0);
     adjustlocalvars(ls, 1);
   }
   parlist(ls);
@@ -634,7 +611,7 @@ static void body (LexState *ls, expdesc *e, int needself, int line) {
 
 static int explist1 (LexState *ls, expdesc *v) {
   /* explist1 -> expr { `,' expr } */
-  int n = 1;  /* at least one expression */
+  int n = 1; /* at least one expression */
   expr(ls, v);
   while (testnext(ls, ',')) {
     luaK_exp2nextreg(ls->fs, v);
@@ -651,27 +628,27 @@ static void funcargs (LexState *ls, expdesc *f) {
   int base, nparams;
   int line = ls->linenumber;
   switch (ls->t.token) {
-    case '(': {  /* funcargs -> `(' [ explist1 ] `)' */
+    case '(': { /* funcargs -> `(' [ explist1 ] `)' */
       if (line != ls->lastline) {
         luaX_syntaxerror(ls,"ambiguous syntax (function call x new statement)");
       }
       luaX_next(ls);
-      if (ls->t.token == ')') {  /* arg list is empty? */
+      if (ls->t.token == ')') { /* arg list is empty? */
         args.k = VVOID;
       } else {
         explist1(ls, &args);
-        luaK_setmultret(fs, &args);
+        luaK_setreturns(fs, &args, (-1));
       }
       check_match(ls, ')', '(', line);
       break;
     }
-    case '{': {  /* funcargs -> constructor */
+    case '{': { /* funcargs -> constructor */
       constructor(ls, &args);
       break;
     }
-    case TK_STRING: {  /* funcargs -> STRING */
+    case TK_STRING: { /* funcargs -> STRING */
       codestring(ls, &args, ls->t.seminfo.ts);
-      luaX_next(ls);  /* must use `seminfo' before `next' */
+      luaX_next(ls); /* must use `seminfo' before `next' */
       break;
     }
     default: {
@@ -679,23 +656,21 @@ static void funcargs (LexState *ls, expdesc *f) {
       return;
     }
   }
-  lua_assert(f->k == VNONRELOC);
-  base = f->u.s.info;  /* base register for call */
-  if (hasmultret(args.k)) {
-    nparams = LUA_MULTRET;  /* open call */
+  ((void)0);
+  base = f->u.s.info; /* base register for call */
+  if (((args.k) == VCALL || (args.k) == VVARARG)) {
+    nparams = (-1); /* open call */
   } else {
     if (args.k != VVOID) {
-      luaK_exp2nextreg(fs, &args);  /* close last argument */
+      luaK_exp2nextreg(fs, &args); /* close last argument */
     }
     nparams = fs->freereg - (base+1);
   }
   init_exp(f, VCALL, luaK_codeABC(fs, OP_CALL, base, nparams+1, 2));
   luaK_fixline(fs, line);
-  fs->freereg = base+1;  /* call remove function and arguments and leaves
+  fs->freereg = base+1; /* call remove function and arguments and leaves
                             (unless changed) one result */
 }
-
-
 
 
 /*
@@ -703,8 +678,6 @@ static void funcargs (LexState *ls, expdesc *f) {
 ** Expression parsing
 ** =======================================================================
 */
-
-
 static void prefixexp (LexState *ls, expdesc *v) {
   /* prefixexp -> NAME | '(' expr ')' */
   switch (ls->t.token) {
@@ -735,18 +708,18 @@ static void primaryexp (LexState *ls, expdesc *v) {
   prefixexp(ls, v);
   for (;;) {
     switch (ls->t.token) {
-      case '.': {  /* field */
+      case '.': { /* field */
         field(ls, v);
         break;
       }
-      case '[': {  /* `[' exp1 `]' */
+      case '[': { /* `[' exp1 `]' */
         expdesc key;
         luaK_exp2anyreg(fs, v);
         yindex(ls, &key);
         luaK_indexed(fs, v, &key);
         break;
       }
-      case ':': {  /* `:' NAME funcargs */
+      case ':': { /* `:' NAME funcargs */
         expdesc key;
         luaX_next(ls);
         checkname(ls, &key);
@@ -754,14 +727,14 @@ static void primaryexp (LexState *ls, expdesc *v) {
         funcargs(ls, v);
         break;
       }
-      case '(': 
-      case TK_STRING: 
-      case '{': {  /* funcargs */
+      case '(':
+      case TK_STRING:
+      case '{': { /* funcargs */
         luaK_exp2nextreg(fs, v);
         funcargs(ls, v);
         break;
       }
-      default: { 
+      default: {
         return;
       }
     }
@@ -794,15 +767,14 @@ static void simpleexp (LexState *ls, expdesc *v) {
       init_exp(v, VFALSE, 0);
       break;
     }
-    case TK_DOTS: {  /* vararg */
+    case TK_DOTS: { /* vararg */
       FuncState *fs = ls->fs;
-      check_condition(ls, fs->f->is_vararg,
-                      "cannot use " LUA_QL("...") " outside a vararg function");
-      fs->f->is_vararg &= ~VARARG_NEEDSARG;  /* don't need 'arg' */
+      { if (!(fs->f->is_vararg)) luaX_syntaxerror(ls, "cannot use " "'" "..." "'" " outside a vararg function"); };
+      fs->f->is_vararg &= ~4; /* don't need 'arg' */
       init_exp(v, VVARARG, luaK_codeABC(fs, OP_VARARG, 0, 1, 0));
       break;
     }
-    case '{': {  /* constructor */
+    case '{': { /* constructor */
       constructor(ls, v);
       return;
     }
@@ -822,13 +794,13 @@ static void simpleexp (LexState *ls, expdesc *v) {
 
 static UnOpr getunopr (int op) {
   switch (op) {
-    case TK_NOT: { 
+    case TK_NOT: {
       return OPR_NOT;
     }
-    case '-': { 
+    case '-': {
       return OPR_MINUS;
     }
-    case '#': { 
+    case '#': {
       return OPR_LEN;
     }
     default: {
@@ -840,52 +812,52 @@ static UnOpr getunopr (int op) {
 
 static BinOpr getbinopr (int op) {
   switch (op) {
-    case '+': { 
+    case '+': {
       return OPR_ADD;
     }
-    case '-': { 
+    case '-': {
       return OPR_SUB;
     }
-    case '*': { 
+    case '*': {
       return OPR_MUL;
     }
-    case '/': { 
+    case '/': {
       return OPR_DIV;
     }
-    case '%': { 
+    case '%': {
       return OPR_MOD;
     }
-    case '^': { 
+    case '^': {
       return OPR_POW;
     }
-    case TK_CONCAT: { 
+    case TK_CONCAT: {
       return OPR_CONCAT;
     }
-    case TK_NE: { 
+    case TK_NE: {
       return OPR_NE;
     }
-    case TK_EQ: { 
+    case TK_EQ: {
       return OPR_EQ;
     }
-    case '<': { 
+    case '<': {
       return OPR_LT;
     }
-    case TK_LE: { 
+    case TK_LE: {
       return OPR_LE;
     }
-    case '>': { 
+    case '>': {
       return OPR_GT;
     }
-    case TK_GE: { 
+    case TK_GE: {
       return OPR_GE;
     }
-    case TK_AND: { 
+    case TK_AND: {
       return OPR_AND;
     }
-    case TK_OR: { 
+    case TK_OR: {
       return OPR_OR;
     }
-    default: { 
+    default: {
       return OPR_NOBINOPR;
     }
   }
@@ -893,17 +865,15 @@ static BinOpr getbinopr (int op) {
 
 
 static const struct {
-  lu_byte left;  /* left priority for each binary operator */
+  lu_byte left; /* left priority for each binary operator */
   lu_byte right; /* right priority */
-} priority[] = {  /* ORDER OPR */
-   {6, 6}, {6, 6}, {7, 7}, {7, 7}, {7, 7},  /* `+' `-' `/' `%' */
-   {10, 9}, {5, 4},                 /* power and concat (right associative) */
-   {3, 3}, {3, 3},                  /* equality and inequality */
-   {3, 3}, {3, 3}, {3, 3}, {3, 3},  /* order */
-   {2, 2}, {1, 1}                   /* logical (and/or) */
+} priority[] = { /* ORDER OPR */
+   {6, 6}, {6, 6}, {7, 7}, {7, 7}, {7, 7}, /* `+' `-' `/' `%' */
+   {10, 9}, {5, 4}, /* power and concat (right associative) */
+   {3, 3}, {3, 3}, /* equality and inequality */
+   {3, 3}, {3, 3}, {3, 3}, {3, 3}, /* order */
+   {2, 2}, {1, 1} /* logical (and/or) */
 };
-
-#define UNARY_PRIORITY	8  /* priority for unary operators */
 
 
 /*
@@ -917,10 +887,10 @@ static BinOpr subexpr (LexState *ls, expdesc *v, unsigned int limit) {
   uop = getunopr(ls->t.token);
   if (uop != OPR_NOUNOPR) {
     luaX_next(ls);
-    subexpr(ls, v, UNARY_PRIORITY);
+    subexpr(ls, v, 8);
     luaK_prefix(ls->fs, uop, v);
   }
-  else { 
+  else {
     simpleexp(ls, v);
   }
   /* expand while operators have priorities higher than `limit' */
@@ -935,8 +905,8 @@ static BinOpr subexpr (LexState *ls, expdesc *v, unsigned int limit) {
     luaK_posfix(ls->fs, op, v, &v2);
     op = nextop;
   }
-  leavelevel(ls);
-  return op;  /* return first untreated operator */
+  ((ls)->L->nCcalls--);
+  return op; /* return first untreated operator */
 }
 
 
@@ -944,27 +914,23 @@ static void expr (LexState *ls, expdesc *v) {
   subexpr(ls, v, 0);
 }
 
+
 /* }==================================================================== */
-
-
-
 /*
 ** {======================================================================
 ** Rules for Statements
 ** =======================================================================
 */
-
-
 static int block_follow (int token) {
   switch (token) {
-    case TK_ELSE: 
-    case TK_ELSEIF: 
+    case TK_ELSE:
+    case TK_ELSEIF:
     case TK_END:
-    case TK_UNTIL: 
+    case TK_UNTIL:
     case TK_EOS: {
       return 1;
     }
-    default: { 
+    default: {
       return 0;
     }
   }
@@ -977,7 +943,7 @@ static void block (LexState *ls) {
   BlockCnt bl;
   enterblock(fs, &bl, 0);
   chunk(ls);
-  lua_assert(bl.breaklist == NO_JUMP);
+  ((void)0);
   leaveblock(fs);
 }
 
@@ -988,7 +954,7 @@ static void block (LexState *ls) {
 */
 struct LHS_assign {
   struct LHS_assign *prev;
-  expdesc v;  /* variable (global, local, upvalue, or indexed) */
+  expdesc v; /* variable (global, local, upvalue, or indexed) */
 };
 
 
@@ -1000,22 +966,22 @@ struct LHS_assign {
 */
 static void check_conflict (LexState *ls, struct LHS_assign *lh, expdesc *v) {
   FuncState *fs = ls->fs;
-  int extra = fs->freereg;  /* eventual position to save local variable */
+  int extra = fs->freereg; /* eventual position to save local variable */
   int conflict = 0;
   for (; lh; lh = lh->prev) {
     if (lh->v.k == VINDEXED) {
-      if (lh->v.u.s.info == v->u.s.info) {  /* conflict? */
+      if (lh->v.u.s.info == v->u.s.info) { /* conflict? */
         conflict = 1;
-        lh->v.u.s.info = extra;  /* previous assignment will use safe copy */
+        lh->v.u.s.info = extra; /* previous assignment will use safe copy */
       }
-      if (lh->v.u.s.aux == v->u.s.info) {  /* conflict? */
+      if (lh->v.u.s.aux == v->u.s.info) { /* conflict? */
         conflict = 1;
-        lh->v.u.s.aux = extra;  /* previous assignment will use safe copy */
+        lh->v.u.s.aux = extra; /* previous assignment will use safe copy */
       }
     }
   }
   if (conflict) {
-    luaK_codeABC(fs, OP_MOVE, fs->freereg, v->u.s.info, 0);  /* make copy */
+    luaK_codeABC(fs, OP_MOVE, fs->freereg, v->u.s.info, 0); /* make copy */
     luaK_reserveregs(fs, 1);
   }
 }
@@ -1023,36 +989,34 @@ static void check_conflict (LexState *ls, struct LHS_assign *lh, expdesc *v) {
 
 static void assignment (LexState *ls, struct LHS_assign *lh, int nvars) {
   expdesc e;
-  check_condition(ls, VLOCAL <= lh->v.k && lh->v.k <= VINDEXED,
-                      "syntax error");
-  if (testnext(ls, ',')) {  /* assignment -> `,' primaryexp assignment */
+  { if (!(VLOCAL <= lh->v.k && lh->v.k <= VINDEXED)) luaX_syntaxerror(ls, "syntax error"); };
+  if (testnext(ls, ',')) { /* assignment -> `,' primaryexp assignment */
     struct LHS_assign nv;
     nv.prev = lh;
     primaryexp(ls, &nv.v);
     if (nv.v.k == VLOCAL) {
       check_conflict(ls, lh, &nv.v);
     }
-    luaY_checklimit(ls->fs, nvars, LUAI_MAXCCALLS - ls->L->nCcalls,
-                    "variables in assignment");
+    if ((nvars)>(200 - ls->L->nCcalls)) errorlimit(ls->fs,200 - ls->L->nCcalls,"variables in assignment");
     assignment(ls, &nv, nvars+1);
   }
-  else {  /* assignment -> `=' explist1 */
+  else { /* assignment -> `=' explist1 */
     int nexps;
     checknext(ls, '=');
     nexps = explist1(ls, &e);
     if (nexps != nvars) {
       adjust_assign(ls, nvars, nexps, &e);
       if (nexps > nvars) {
-        ls->fs->freereg -= nexps - nvars;  /* remove extra values */
+        ls->fs->freereg -= nexps - nvars; /* remove extra values */
       }
     }
     else {
-      luaK_setoneret(ls->fs, &e);  /* close last expression */
+      luaK_setoneret(ls->fs, &e); /* close last expression */
       luaK_storevar(ls->fs, &lh->v, &e);
-      return;  /* avoid default */
+      return; /* avoid default */
     }
   }
-  init_exp(&e, VNONRELOC, ls->fs->freereg-1);  /* default assignment */
+  init_exp(&e, VNONRELOC, ls->fs->freereg-1); /* default assignment */
   luaK_storevar(ls->fs, &lh->v, &e);
 }
 
@@ -1060,9 +1024,9 @@ static void assignment (LexState *ls, struct LHS_assign *lh, int nvars) {
 static int cond (LexState *ls) {
   /* cond -> exp */
   expdesc v;
-  expr(ls, &v);  /* read condition */
-  if (v.k == VNIL) { 
-    v.k = VFALSE;  /* `falses' are all equal here */
+  expr(ls, &v); /* read condition */
+  if (v.k == VNIL) {
+    v.k = VFALSE; /* `falses' are all equal here */
   }
   luaK_goiftrue(ls->fs, &v);
   return v.f;
@@ -1093,7 +1057,7 @@ static void whilestat (LexState *ls, int line) {
   int whileinit;
   int condexit;
   BlockCnt bl;
-  luaX_next(ls);  /* skip WHILE */
+  luaX_next(ls); /* skip WHILE */
   whileinit = luaK_getlabel(fs);
   condexit = cond(ls);
   enterblock(fs, &bl, 1);
@@ -1102,7 +1066,7 @@ static void whilestat (LexState *ls, int line) {
   luaK_patchlist(fs, luaK_jump(fs), whileinit);
   check_match(ls, TK_END, TK_WHILE, line);
   leaveblock(fs);
-  luaK_patchtohere(fs, condexit);  /* false conditions finish the loop */
+  luaK_patchtohere(fs, condexit); /* false conditions finish the loop */
 }
 
 
@@ -1112,23 +1076,23 @@ static void repeatstat (LexState *ls, int line) {
   FuncState *fs = ls->fs;
   int repeat_init = luaK_getlabel(fs);
   BlockCnt bl1, bl2;
-  enterblock(fs, &bl1, 1);  /* loop block */
-  enterblock(fs, &bl2, 0);  /* scope block */
-  luaX_next(ls);  /* skip REPEAT */
+  enterblock(fs, &bl1, 1); /* loop block */
+  enterblock(fs, &bl2, 0); /* scope block */
+  luaX_next(ls); /* skip REPEAT */
   chunk(ls);
   check_match(ls, TK_UNTIL, TK_REPEAT, line);
-  condexit = cond(ls);  /* read condition (inside scope block) */
-  if (!bl2.upval) {  /* no upvalues? */
-    leaveblock(fs);  /* finish scope */
-    luaK_patchlist(ls->fs, condexit, repeat_init);  /* close the loop */
+  condexit = cond(ls); /* read condition (inside scope block) */
+  if (!bl2.upval) { /* no upvalues? */
+    leaveblock(fs); /* finish scope */
+    luaK_patchlist(ls->fs, condexit, repeat_init); /* close the loop */
   }
-  else {  /* complete semantics when there are upvalues */
-    breakstat(ls);  /* if condition then break */
-    luaK_patchtohere(ls->fs, condexit);  /* else... */
-    leaveblock(fs);  /* finish scope... */
-    luaK_patchlist(ls->fs, luaK_jump(fs), repeat_init);  /* and repeat */
+  else { /* complete semantics when there are upvalues */
+    breakstat(ls); /* if condition then break */
+    luaK_patchtohere(ls->fs, condexit); /* else... */
+    leaveblock(fs); /* finish scope... */
+    luaK_patchlist(ls->fs, luaK_jump(fs), repeat_init); /* and repeat */
   }
-  leaveblock(fs);  /* finish loop */
+  leaveblock(fs); /* finish loop */
 }
 
 
@@ -1147,18 +1111,18 @@ static void forbody (LexState *ls, int base, int line, int nvars, int isnum) {
   BlockCnt bl;
   FuncState *fs = ls->fs;
   int prep, endfor;
-  adjustlocalvars(ls, 3);  /* control variables */
+  adjustlocalvars(ls, 3); /* control variables */
   checknext(ls, TK_DO);
-  prep = isnum ? luaK_codeAsBx(fs, OP_FORPREP, base, NO_JUMP) : luaK_jump(fs);
-  enterblock(fs, &bl, 0);  /* scope for declared variables */
+  prep = isnum ? luaK_codeABx(fs,OP_FORPREP,base,((-1))+(((1<<(9 + 9))-1)>>1)) : luaK_jump(fs);
+  enterblock(fs, &bl, 0); /* scope for declared variables */
   adjustlocalvars(ls, nvars);
   luaK_reserveregs(fs, nvars);
   block(ls);
-  leaveblock(fs);  /* end of scope for declared variables */
+  leaveblock(fs); /* end of scope for declared variables */
   luaK_patchtohere(fs, prep);
-  endfor = (isnum) ? luaK_codeAsBx(fs, OP_FORLOOP, base, NO_JUMP) :
+  endfor = (isnum) ? luaK_codeABx(fs,OP_FORLOOP,base,((-1))+(((1<<(9 + 9))-1)>>1)) :
                      luaK_codeABC(fs, OP_TFORLOOP, base, 0, nvars);
-  luaK_fixline(fs, line);  /* pretend that `OP_FOR' starts the loop */
+  luaK_fixline(fs, line); /* pretend that `OP_FOR' starts the loop */
   luaK_patchlist(fs, (isnum ? endfor : luaK_jump(fs)), prep + 1);
 }
 
@@ -1167,17 +1131,17 @@ static void fornum (LexState *ls, TString *varname, int line) {
   /* fornum -> NAME = exp1,exp1[,exp1] forbody */
   FuncState *fs = ls->fs;
   int base = fs->freereg;
-  new_localvarliteral(ls, "(for index)", 0);
-  new_localvarliteral(ls, "(for limit)", 1);
-  new_localvarliteral(ls, "(for step)", 2);
+  new_localvar(ls, luaX_newstring(ls, "" "(for index)", (sizeof("(for index)")/sizeof(char))-1), 0);
+  new_localvar(ls, luaX_newstring(ls, "" "(for limit)", (sizeof("(for limit)")/sizeof(char))-1), 1);
+  new_localvar(ls, luaX_newstring(ls, "" "(for step)", (sizeof("(for step)")/sizeof(char))-1), 2);
   new_localvar(ls, varname, 3);
   checknext(ls, '=');
-  exp1(ls);  /* initial value */
+  exp1(ls); /* initial value */
   checknext(ls, ',');
-  exp1(ls);  /* limit */
+  exp1(ls); /* limit */
   if (testnext(ls, ',')) {
-    exp1(ls);  /* optional step */
-  } else {  /* default step = 1 */
+    exp1(ls); /* optional step */
+  } else { /* default step = 1 */
     luaK_codeABx(fs, OP_LOADK, fs->freereg, luaK_numberK(fs, 1));
     luaK_reserveregs(fs, 1);
   }
@@ -1193,9 +1157,9 @@ static void forlist (LexState *ls, TString *indexname) {
   int line;
   int base = fs->freereg;
   /* create control variables */
-  new_localvarliteral(ls, "(for generator)", nvars++);
-  new_localvarliteral(ls, "(for state)", nvars++);
-  new_localvarliteral(ls, "(for control)", nvars++);
+  new_localvar(ls, luaX_newstring(ls, "" "(for generator)", (sizeof("(for generator)")/sizeof(char))-1), nvars++);
+  new_localvar(ls, luaX_newstring(ls, "" "(for state)", (sizeof("(for state)")/sizeof(char))-1), nvars++);
+  new_localvar(ls, luaX_newstring(ls, "" "(for control)", (sizeof("(for control)")/sizeof(char))-1), nvars++);
   /* create declared variables */
   new_localvar(ls, indexname, nvars++);
   while (testnext(ls, ',')) {
@@ -1204,7 +1168,7 @@ static void forlist (LexState *ls, TString *indexname) {
   checknext(ls, TK_IN);
   line = ls->linenumber;
   adjust_assign(ls, 3, explist1(ls, &e), &e);
-  luaK_checkstack(fs, 3);  /* extra space to call generator */
+  luaK_checkstack(fs, 3); /* extra space to call generator */
   forbody(ls, base, line, nvars - 3, 0);
 }
 
@@ -1214,35 +1178,35 @@ static void forstat (LexState *ls, int line) {
   FuncState *fs = ls->fs;
   TString *varname;
   BlockCnt bl;
-  enterblock(fs, &bl, 1);  /* scope for loop and control variables */
-  luaX_next(ls);  /* skip `for' */
-  varname = str_checkname(ls);  /* first variable name */
+  enterblock(fs, &bl, 1); /* scope for loop and control variables */
+  luaX_next(ls); /* skip `for' */
+  varname = str_checkname(ls); /* first variable name */
   switch (ls->t.token) {
-    case '=': { 
-      fornum(ls, varname, line); 
+    case '=': {
+      fornum(ls, varname, line);
       break;
     }
-    case ',': 
-    case TK_IN: { 
-      forlist(ls, varname); 
+    case ',':
+    case TK_IN: {
+      forlist(ls, varname);
       break;
     }
-    default: { 
-      luaX_syntaxerror(ls, LUA_QL("=") " or " LUA_QL("in") " expected");
+    default: {
+      luaX_syntaxerror(ls, "'" "=" "'" " or " "'" "in" "'" " expected");
     }
   }
   check_match(ls, TK_END, TK_FOR, line);
-  leaveblock(fs);  /* loop scope (`break' jumps to this point) */
+  leaveblock(fs); /* loop scope (`break' jumps to this point) */
 }
 
 
 static int test_then_block (LexState *ls) {
   /* test_then_block -> [IF | ELSEIF] cond THEN block */
   int condexit;
-  luaX_next(ls);  /* skip IF or ELSEIF */
+  luaX_next(ls); /* skip IF or ELSEIF */
   condexit = cond(ls);
   checknext(ls, TK_THEN);
-  block(ls);  /* `then' part */
+  block(ls); /* `then' part */
   return condexit;
 }
 
@@ -1251,18 +1215,18 @@ static void ifstat (LexState *ls, int line) {
   /* ifstat -> IF cond THEN block {ELSEIF cond THEN block} [ELSE block] END */
   FuncState *fs = ls->fs;
   int flist;
-  int escapelist = NO_JUMP;
-  flist = test_then_block(ls);  /* IF cond THEN block */
+  int escapelist = (-1);
+  flist = test_then_block(ls); /* IF cond THEN block */
   while (ls->t.token == TK_ELSEIF) {
     luaK_concat(fs, &escapelist, luaK_jump(fs));
     luaK_patchtohere(fs, flist);
-    flist = test_then_block(ls);  /* ELSEIF cond THEN block */
+    flist = test_then_block(ls); /* ELSEIF cond THEN block */
   }
   if (ls->t.token == TK_ELSE) {
     luaK_concat(fs, &escapelist, luaK_jump(fs));
     luaK_patchtohere(fs, flist);
-    luaX_next(ls);  /* skip ELSE (after patch, for correct line info) */
-    block(ls);  /* `else' part */
+    luaX_next(ls); /* skip ELSE (after patch, for correct line info) */
+    block(ls); /* `else' part */
   }
   else {
     luaK_concat(fs, &escapelist, flist);
@@ -1282,7 +1246,7 @@ static void localfunc (LexState *ls) {
   body(ls, &b, 0, ls->linenumber);
   luaK_storevar(fs, &v, &b);
   /* debug information will only see the variable after this point! */
-  getlocvar(fs, fs->nactvar - 1).startpc = fs->pc;
+  ((fs)->f->locvars[(fs)->actvar[fs->nactvar - 1]]).startpc = fs->pc;
 }
 
 
@@ -1324,11 +1288,11 @@ static void funcstat (LexState *ls, int line) {
   /* funcstat -> FUNCTION funcname body */
   int needself;
   expdesc v, b;
-  luaX_next(ls);  /* skip FUNCTION */
+  luaX_next(ls); /* skip FUNCTION */
   needself = funcname(ls, &v);
   body(ls, &b, needself, line);
   luaK_storevar(ls->fs, &v, &b);
-  luaK_fixline(ls->fs, line);  /* definition `happens' in the first line */
+  luaK_fixline(ls->fs, line); /* definition `happens' in the first line */
 }
 
 
@@ -1337,10 +1301,10 @@ static void exprstat (LexState *ls) {
   FuncState *fs = ls->fs;
   struct LHS_assign v;
   primaryexp(ls, &v.v);
-  if (v.v.k == VCALL) {  /* stat -> func */
-    SETARG_C(getcode(fs, &v.v), 1);  /* call statement uses no results */
-  } else {  /* stat -> assignment */
-    v.prev = NULL;
+  if (v.v.k == VCALL) { /* stat -> func */
+    ((((fs)->f->code[(&v.v)->u.s.info])) = (((((fs)->f->code[(&v.v)->u.s.info]))&(~((~((~(Instruction)0)<<9))<<((0 + 6) + 8)))) | ((((Instruction)(1))<<((0 + 6) + 8))&((~((~(Instruction)0)<<9))<<((0 + 6) + 8))))); /* call statement uses no results */
+  } else { /* stat -> assignment */
+    v.prev = ((void *)0);
     assignment(ls, &v, 1);
   }
 }
@@ -1350,28 +1314,28 @@ static void retstat (LexState *ls) {
   /* stat -> RETURN explist */
   FuncState *fs = ls->fs;
   expdesc e;
-  int first, nret;  /* registers with returned values */
-  luaX_next(ls);  /* skip RETURN */
+  int first, nret; /* registers with returned values */
+  luaX_next(ls); /* skip RETURN */
   if (block_follow(ls->t.token) || ls->t.token == ';') {
-    first = nret = 0;  /* return no values */
+    first = nret = 0; /* return no values */
   } else {
-    nret = explist1(ls, &e);  /* optional return values */
-    if (hasmultret(e.k)) {
-      luaK_setmultret(fs, &e);
-      if (e.k == VCALL && nret == 1) {  /* tail call? */
-        SET_OPCODE(getcode(fs,&e), OP_TAILCALL);
-        lua_assert(GETARG_A(getcode(fs,&e)) == fs->nactvar);
+    nret = explist1(ls, &e); /* optional return values */
+    if (((e.k) == VCALL || (e.k) == VVARARG)) {
+      luaK_setreturns(fs, &e, (-1));
+      if (e.k == VCALL && nret == 1) { /* tail call? */
+        ((((fs)->f->code[(&e)->u.s.info])) = (((((fs)->f->code[(&e)->u.s.info]))&(~((~((~(Instruction)0)<<6))<<0))) | ((((Instruction)(OP_TAILCALL))<<0)&((~((~(Instruction)0)<<6))<<0))));
+        ((void)0);
       }
       first = fs->nactvar;
-      nret = LUA_MULTRET;  /* return all values */
+      nret = (-1); /* return all values */
     }
     else {
-      if (nret == 1) {  /* only one single value? */
+      if (nret == 1) { /* only one single value? */
         first = luaK_exp2anyreg(fs, &e);
       } else {
-        luaK_exp2nextreg(fs, &e);  /* values must go to the `stack' */
-        first = fs->nactvar;  /* return all `active' values */
-        lua_assert(nret == fs->freereg - first);
+        luaK_exp2nextreg(fs, &e); /* values must go to the `stack' */
+        first = fs->nactvar; /* return all `active' values */
+        ((void)0);
       }
     }
   }
@@ -1380,55 +1344,55 @@ static void retstat (LexState *ls) {
 
 
 static int statement (LexState *ls) {
-  int line = ls->linenumber;  /* may be needed for error messages */
+  int line = ls->linenumber; /* may be needed for error messages */
   switch (ls->t.token) {
-    case TK_IF: {  /* stat -> ifstat */
+    case TK_IF: { /* stat -> ifstat */
       ifstat(ls, line);
       return 0;
     }
-    case TK_WHILE: {  /* stat -> whilestat */
+    case TK_WHILE: { /* stat -> whilestat */
       whilestat(ls, line);
       return 0;
     }
-    case TK_DO: {  /* stat -> DO block END */
-      luaX_next(ls);  /* skip DO */
+    case TK_DO: { /* stat -> DO block END */
+      luaX_next(ls); /* skip DO */
       block(ls);
       check_match(ls, TK_END, TK_DO, line);
       return 0;
     }
-    case TK_FOR: {  /* stat -> forstat */
+    case TK_FOR: { /* stat -> forstat */
       forstat(ls, line);
       return 0;
     }
-    case TK_REPEAT: {  /* stat -> repeatstat */
+    case TK_REPEAT: { /* stat -> repeatstat */
       repeatstat(ls, line);
       return 0;
     }
     case TK_FUNCTION: {
-      funcstat(ls, line);  /* stat -> funcstat */
+      funcstat(ls, line); /* stat -> funcstat */
       return 0;
     }
-    case TK_LOCAL: {  /* stat -> localstat */
-      luaX_next(ls);  /* skip LOCAL */
-      if (testnext(ls, TK_FUNCTION)) {  /* local function? */
+    case TK_LOCAL: { /* stat -> localstat */
+      luaX_next(ls); /* skip LOCAL */
+      if (testnext(ls, TK_FUNCTION)) { /* local function? */
         localfunc(ls);
       } else {
         localstat(ls);
       }
       return 0;
     }
-    case TK_RETURN: {  /* stat -> retstat */
+    case TK_RETURN: { /* stat -> retstat */
       retstat(ls);
-      return 1;  /* must be last statement */
+      return 1; /* must be last statement */
     }
-    case TK_BREAK: {  /* stat -> breakstat */
-      luaX_next(ls);  /* skip BREAK */
+    case TK_BREAK: { /* stat -> breakstat */
+      luaX_next(ls); /* skip BREAK */
       breakstat(ls);
-      return 1;  /* must be last statement */
+      return 1; /* must be last statement */
     }
     default: {
       exprstat(ls);
-      return 0;  /* to avoid warnings */
+      return 0; /* to avoid warnings */
     }
   }
 }
@@ -1441,11 +1405,10 @@ static void chunk (LexState *ls) {
   while (!islast && !block_follow(ls->t.token)) {
     islast = statement(ls);
     testnext(ls, ';');
-    lua_assert(ls->fs->f->maxstacksize >= ls->fs->freereg &&
-               ls->fs->freereg >= ls->fs->nactvar);
-    ls->fs->freereg = ls->fs->nactvar;  /* free registers */
+    ((void)0);
+    ls->fs->freereg = ls->fs->nactvar; /* free registers */
   }
-  leavelevel(ls);
+  ((ls)->L->nCcalls--);
 }
 
 /* }====================================================================== */

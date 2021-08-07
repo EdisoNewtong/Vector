@@ -21,44 +21,44 @@
 
 
 const char *const luaT_typenames[] = {
-  "nil", 
-  "boolean", 
-  "userdata", 
+  "nil",
+  "boolean",
+  "userdata",
   "number",
-  "string", 
-  "table", 
-  "function", 
-  "userdata", 
+  "string",
+  "table",
+  "function",
+  "userdata",
   "thread",
-  "proto", 
+  "proto",
   "upval"
 };
 
 
 void luaT_init (lua_State *L) {
-  static const char *const luaT_eventname[] = {  /* ORDER TM */
-    "__index", 
+  static const char *const luaT_eventname[] = { /* ORDER TM */
+    "__index",
     "__newindex",
-    "__gc", 
-    "__mode", 
+    "__gc",
+    "__mode",
     "__eq",
-    "__add", 
-    "__sub", 
-    "__mul", 
-    "__div", 
+    "__add",
+    "__sub",
+    "__mul",
+    "__div",
     "__mod",
-    "__pow", 
-    "__unm", 
-    "__len", 
-    "__lt", 
+    "__pow",
+    "__unm",
+    "__len",
+    "__lt",
     "__le",
-    "__concat", 
+    "__concat",
     "__call"
   };
   int i;
   for (i=0; i<TM_N; i++) {
-    G(L)->tmname[i] = luaS_new(L, luaT_eventname[i]);
-    luaS_fix(G(L)->tmname[i]);  /* never collect these names */
+    (L->l_G)->tmname[i] = (luaS_newlstr(L, luaT_eventname[i], strlen(luaT_eventname[i])));
+    ((((L->l_G)->tmname[i])->tsv.marked) |= ((1<<(5)))); /* never collect these names */
   }
 }
 
@@ -69,12 +69,12 @@ void luaT_init (lua_State *L) {
 */
 const TValue *luaT_gettm (Table *events, TMS event, TString *ename) {
   const TValue *tm = luaH_getstr(events, ename);
-  lua_assert(event <= TM_EQ);
-  if (ttisnil(tm)) {  /* no tag method? */
-    events->flags |= cast_byte(1u<<event);  /* cache this fact */
-    return NULL;
+  ((void)0);
+  if ((((tm)->tt) == 0)) { /* no tag method? */
+    events->flags |= ((lu_byte)((1u<<event))); /* cache this fact */
+    return ((void *)0);
   }
-  else { 
+  else {
     return tm;
   }
 }
@@ -82,19 +82,20 @@ const TValue *luaT_gettm (Table *events, TMS event, TString *ename) {
 
 const TValue *luaT_gettmbyobj (lua_State *L, const TValue *o, TMS event) {
   Table *mt;
-  switch (ttype(o)) {
-    case LUA_TTABLE: {
-      mt = hvalue(o)->metatable;
+  switch (((o)->tt)) {
+    case 5: {
+      mt = (&(o)->value.gc->h)->metatable;
       break;
     }
-    case LUA_TUSERDATA: {
-      mt = uvalue(o)->metatable;
+    case 7: {
+      mt = (&(&(o)->value.gc->u)->uv)->metatable;
       break;
     }
     default: {
-      mt = G(L)->mt[ttype(o)];
+      mt = (L->l_G)->mt[((o)->tt)];
     }
   }
-  return (mt ? luaH_getstr(mt, G(L)->tmname[event]) : luaO_nilobject);
+  return (mt ? luaH_getstr(mt, (L->l_G)->tmname[event]) : (&luaO_nilobject_));
 }
+
 
