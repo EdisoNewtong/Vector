@@ -1,0 +1,296 @@
+==================================================
+| curr_func(L); |
+==================================================
+
+/* Closure *func = ((&(L->ci->func)->value.gc->cl));  */
+Closure *func = curr_func(L);
+
+
+#define curr_func(L)	(clvalue(L->ci->func))                                              // lstate.h:59
+                 #define clvalue(o)	check_exp(ttisfunction(o), &(o)->value.gc->cl)          // lobject.h:98
+                            #define check_exp(c,e)		(e)                                 // llimits.h:60
+                                      #define ttisfunction(o)	(ttype(o) == LUA_TFUNCTION) // lobject.h:83
+                                                         #define ttype(o)	((o)->tt)       // lobject.h:90
+
+curr_func(L); 
+&(     o     )->value.gc->cl
+&(L->ci->func)->value.gc->cl
+
+
+==================================================
+| sethvalue(L,obj,x) |
+==================================================
+
+/* { TValue *i_o = (&L->env); i_o->value.gc = ((GCObject *)((func->c.env))); i_o->tt = LUA_TTABLE; ((void)0); }; */
+sethvalue(L, &L->env, func->c.env);
+
+// lobject.h:148
+#define sethvalue(L,obj,x) \
+  { TValue *i_o = (obj); \
+    i_o->value.gc = cast(GCObject *, (x)); i_o->tt = LUA_TTABLE; \
+    checkliveness(G(L),i_o); }
+
+
+==================================================
+| hvalue(o) |
+==================================================
+
+/* return (&((&L->l_gt))->value.gc->h); */
+return hvalue(gt(L)); /* use global table as environment */ 
+
+#define hvalue(o)	check_exp(ttistable(o), &(o)->value.gc->h)  // lobject.h:99
+
+
+==================================================
+| setobj2s(L, obj1, obj2) |
+==================================================
+/*
+  { 
+	const TValue *o2=(o); 
+	TValue *o1 = (L->top); 
+	o1->value = o2->value; 
+	o1->tt = o2->tt; 
+	((void)0); 
+  };
+*/
+/* { const TValue *o2=(o); TValue *o1=(L->top); o1->value = o2->value; o1->tt=o2->tt; ((void)0); }; */
+setobj2s(L, L->top, o);
+
+#define setobj2s	setobj // lobject.h:174
+
+// lobject.h:161
+#define setobj(L,obj1,obj2) \
+  { const TValue *o2 = (obj2); TValue *o1=(obj1); \
+    o1->value = o2->value; o1->tt=o2->tt; \
+    checkliveness(G(L),o1); }
+
+
+==================================================
+| api_incr_top(L) |
+==================================================
+
+/* {{ (void)L; }; L->top++;}; */
+api_incr_top(L);
+
+#define api_incr_top(L)   {api_check(L, L->top < L->ci->top); L->top++;}  // lapi.c:45
+
+
+==================================================
+| luaD_checkstack(L,n) |
+==================================================
+/* luaD_checkstack(L, size); */
+if ((char *)L->stack_last - (char *)L->top <= (size)*(int)sizeof(TValue)) { 
+	luaD_growstack(L, size); 
+} 
+else { 
+	((void)0);;
+}
+
+
+// ldo.h:16
+#define luaD_checkstack(L,n)	\
+  if ((char *)L->stack_last - (char *)L->top <= (n)*(int)sizeof(TValue)) \
+    luaD_growstack(L, n); \
+  else condhardstacktests(luaD_reallocstack(L, L->stacksize - EXTRA_STACK - 1));
+
+
+
+==================================================
+| luaC_checkGC(L) |
+==================================================
+/* luaC_checkGC(L); */
+{
+  ((void)0); 
+  if ((L->l_G)->totalbytes >= (L->l_G)->GCthreshold) { 
+	  luaC_step(L); 
+  }
+}
+
+// lgc.h:80
+#define luaC_checkGC(L) { \
+  condhardstacktests(luaD_reallocstack(L, L->stacksize - EXTRA_STACK - 1)); \
+  if (G(L)->totalbytes >= G(L)->GCthreshold) \
+	luaC_step(L); }
+
+
+
+==================================================
+| setthvalue(L) |
+==================================================
+
+/* { TValue *i_o=(L->top); i_o->value.gc=((GCObject *)((L1))); i_o->tt=8; ((void)0); }; */
+setthvalue(L, L->top, L1);
+
+// lobject.h:138
+#define setthvalue(L,obj,x) \
+  { TValue *i_o=(obj); \
+    i_o->value.gc=cast(GCObject *, (x)); i_o->tt=LUA_TTHREAD; \
+    checkliveness(G(L),i_o); }
+
+
+==================================================
+| setnilvalue(L) |
+==================================================
+/* ((L->top++)->tt=0); */
+setnilvalue(L->top++);
+
+#define setnilvalue(obj) ((obj)->tt=LUA_TNIL) // lobject.h:117
+
+
+==================================================
+| luaC_barrier(L, func, L->top - 1) |
+==================================================
+/* luaC_barrier(L, func, L->top - 1); */
+{ 
+	if (((((L->top - 1)->tt) >= 4) && (((((L->top - 1)->value.gc))->gch.marked) & ((((1<<(0)) | (1<<(1))))))) && ((((((GCObject *)((func)))))->gch.marked) & ((1<<(2))))) { 
+		luaC_barrierf(L,(((GCObject *)((func)))),((L->top - 1)->value.gc)); 
+	} 
+};
+
+// lgc.h:86
+#define luaC_barrier(L,p,v) { if (valiswhite(v) && isblack(obj2gco(p)))  \
+	luaC_barrierf(L,obj2gco(p),gcvalue(v)); }
+
+#define valiswhite(x)	(iscollectable(x) && iswhite(gcvalue(x))) // lgc.h:75
+
+#define iscollectable(o)	(ttype(o) >= LUA_TSTRING)  // lobject.h:189
+
+#define gcvalue(o)	check_exp(iscollectable(o), (o)->value.gc) // lobject.h:91
+
+#define iswhite(x)      test2bits((x)->gch.marked, WHITE0BIT, WHITE1BIT) // lgc.h:65
+
+#define isblack(x)      testbit((x)->gch.marked, BLACKBIT)  // lgc.h:66
+
+#define obj2gco(v)	(cast(GCObject *, (v)))  // lstate.h:162
+
+#define testbits(x,m)	((x) & (m))  // lgc.h:29
+#define test2bits(x,b1,b2)	testbits(x, (bit2mask(b1, b2))) // lgc.h:37
+
+#define WHITE0BIT       0 // lgc.h:54
+#define WHITE1BIT       1 // lgc.h:55
+#define BLACKBIT        2 // lgc.h:56
+
+< =================================================================================================================== >
+/*
+   luaC_barrier(L,p,v)
+
+
+   if (                      valiswhite(v)                                                     &&        isblack( obj2gco(p) )  ) {
+   if ( (  iscollectable(v)       &&          iswhite(gcvalue(v)) )                            &&      ( isblack( obj2gco(p) )  ) {
+   if ( (  v->tt >= LUA_TSTRING   &&      ( v->value.gc->gch.marked & ((1<<0) | (1<<1)) ) )    &&      ( ( (GCObject*)p)->gch.marked & (1<<2) ) ) {
+		luaC_barrierf( L, ( (GCObject*)p ) , (v)->value.gc );
+   }
+*/
+
+< =================================================================================================================== >
+
+
+==================================================
+| equalobj(L,o1,o2) | 
+==================================================
+
+// lvm.h:21
+#define equalobj(L,o1,o2) \
+	(ttype(o1) == ttype(o2) && luaV_equalval(L, o1, o2))
+
+equalobj(L, o1, o2)
+(((o1)->tt) == ((o2)->tt) && luaV_equalval(L, o1, o2))
+
+
+
+==================================================
+| LUA_QS |
+==================================================
+
+#define LUA_QL(x)	"'" x "'"     // luaconf.h:201
+#define LUA_QS		LUA_QL("%s")  // luaconf.h:202
+
+
+==================================================
+| luaL_typename(L, narg) |
+==================================================
+
+#define luaL_typename(L,i)	lua_typename(L, lua_type(L,(i)))  // lauxlib.h:106
+
+
+==================================================
+| lua_pushliteral(L, s) |
+==================================================
+
+// lua.h:273
+#define lua_pushliteral(L, s)	\
+	lua_pushlstring(L, "" s, (sizeof(s)/sizeof(char))-1)
+
+
+==================================================
+| abs_index(L, obj) |
+==================================================
+/* convert a stack index to positive */
+#define abs_index(L, i)		((i) > 0 || (i) <= LUA_REGISTRYINDEX ? (i) : \
+					lua_gettop(L) + (i) + 1)
+
+
+==================================================
+| bufflen(L, idx) |
+==================================================
+
+#define bufflen(B)	((B)->p - (B)->buffer)  // lauxlib.c:420
+
+/*               bufflen(B);        */
+size_t l = ((B)->p - (B)->buffer);
+
+#define LUA_MINSTACK 20           // lua.h:87
+#define LIMIT	(LUA_MINSTACK/2)  // lauxlib.c:423
+
+
+
+==================================================
+| luaL_addchar(L, idx) |
+==================================================
+
+#define LUAL_BUFFERSIZE		BUFSIZ  // luaconf.h:488
+
+// lauxlib.h:133
+#define luaL_addchar(B,c) \
+  ((void)((B)->p < ((B)->buffer+LUAL_BUFFERSIZE) || luaL_prepbuffer(B)), \
+   (*(B)->p++ = (char)(c)))
+
+
+==================================================
+| bufffree(B) |
+==================================================
+
+#define bufffree(B)	((size_t)(LUAL_BUFFERSIZE - bufflen(B)))
+
+
+==================================================
+| LUA_REFNIL  LUA_NOREF |
+==================================================
+
+#define LUA_NOREF       (-2)   // lauxlib.h:156
+#define LUA_REFNIL      (-1)   // lauxlib.h:157
+
+
+==================================================
+| lua_tostring |
+==================================================
+
+#define lua_tostring(L,i)	lua_tolstring(L, (i), NULL) // lua.h:279
+
+/*                     lua_tostring(L, fnameindex)            */
+const char *filename = lua_tolstring(L, (fnameindex), NULL) + 1;
+
+
+
+==================================================
+| LUA_ERRERR  LUA_ERRFILE |
+==================================================
+      #define LUA_ERRERR      5               // lua.h:47
+      #define LUA_ERRFILE     (LUA_ERRERR+1)  // lauxlib.h:29
+
+
+==================================================
+| LUA_SIGNATURE  |
+==================================================
+#define	LUA_SIGNATURE	"\033Lua" // lua.h:27
+
