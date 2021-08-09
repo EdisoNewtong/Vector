@@ -4,7 +4,7 @@ all:eolconvert
 	
 
 eolconvert:eolconvert.cpp
-	g++   -Wall  -std=c++11  -o   eolconvert    eolconvert.cpp
+	g++   -Wall  -std=c++11  -O3 -o   eolconvert    eolconvert.cpp
 
 
 
