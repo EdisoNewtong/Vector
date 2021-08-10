@@ -26,6 +26,7 @@ private slots:
 
     void on_saveAsPngBtn_clicked();
 
+
 private:
     Ui::MainWindow *ui;
 };

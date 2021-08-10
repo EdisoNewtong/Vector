@@ -1,14 +1,17 @@
+#include <QDebug>
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "TreeModel.h"
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-
-    ui->tableView->setModel( new TreeModel() );
+    auto treemodel = new TreeModel(this);
+    ui->tableView->setModel( treemodel );
 }
 
 MainWindow::~MainWindow()
@@ -41,3 +44,4 @@ void MainWindow::on_saveAsPngBtn_clicked()
 {
 
 }
+

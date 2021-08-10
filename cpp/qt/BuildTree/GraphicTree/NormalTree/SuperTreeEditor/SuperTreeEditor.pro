@@ -4,6 +4,10 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++11
 
+macx {
+    QMAKE_CXXFLAGS += -Wno-inconsistent-missing-override
+}
+
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings
 # depend on your compiler). Please consult the documentation of the
@@ -30,6 +34,25 @@ HEADERS += \
 
 FORMS += \
     mainwindow.ui
+
+
+INCLUDEPATH += ../XmlParser \
+               ../rapidjson
+
+
+LIBS += -L../XmlParser -lXmlParser \
+        -L../rapidjson -lrapidjson
+
+win32:debug {
+    LIBS += -L../XmlParser/debug \
+            -L../rapidjson/debug
+}
+
+win32:release {
+    LIBS += -L../XmlParser/release \
+            -L../rapidjson/release
+}
+
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

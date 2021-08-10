@@ -9,11 +9,6 @@ TreeView::TreeView(QWidget* parent /* = nullptr*/)
 // virtual 
 TreeView::~TreeView()
 {
-    auto model = this->model();
-    if ( model != nullptr ) {
-        delete model;
-    }
-    this->setModel(nullptr);
 }
 
 

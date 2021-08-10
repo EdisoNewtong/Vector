@@ -23,6 +23,9 @@
       <height>411</height>
      </rect>
     </property>
+    <property name="selectionMode">
+     <enum>QAbstractItemView::SingleSelection</enum>
+    </property>
    </widget>
    <widget class="QGraphicsView" name="graphicsView">
     <property name="geometry">
@@ -96,7 +99,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Load From File</string>
+     <string>Load ...</string>
     </property>
    </widget>
    <widget class="QPushButton" name="saveTreeToFileBtn">
@@ -109,7 +112,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Save To File</string>
+     <string>Save ...</string>
     </property>
    </widget>
   </widget>

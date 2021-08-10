@@ -1,14 +1,18 @@
 #include "TreeNode.h"
 #include <QDebug>
 
-// static int G_CNT = 0;
+static bool G_ENABLE_REFCOUNT = true;
+static int G_CNT = 0;
 
-TreeNode::TreeNode(const QString& text, TreeNode* parent)
-	: m_text(text)
+TreeNode::TreeNode(const QString& text, const QString& val,TreeNode* parent)
+    : m_name(text)
+    , m_value(val)
 	, m_parent(parent)
 {
 	m_children.clear();
-    // qDebug() << "Create G_CNT = " << ++G_CNT;
+    if ( G_ENABLE_REFCOUNT ) {
+        qDebug() << "Create G_CNT = " << ++G_CNT;
+    }
 }
 
 
@@ -42,7 +46,9 @@ TreeNode::~TreeNode()
 		m_children.clear();
 	}
 
-    // qDebug() << "Delete G_CNT = " << --G_CNT;
+    if ( G_ENABLE_REFCOUNT ) {
+        qDebug() << "Delete G_CNT = " << --G_CNT;
+    }
 }
 
 
@@ -51,7 +57,7 @@ TreeNode::~TreeNode()
 //
 TreeNode* TreeNode::appendChild()
 {
-	TreeNode* newCreateNode = new TreeNode( QString(""), this);
+    TreeNode* newCreateNode = new TreeNode( QString(""), QString(""), this);
 	m_children.push_back(newCreateNode);
 	return newCreateNode;
 }
@@ -61,7 +67,7 @@ TreeNode* TreeNode::appendChild()
 //
 TreeNode* TreeNode::prependChild()
 {
-	TreeNode* newCreateNode = new TreeNode( QString(""), this);
+    TreeNode* newCreateNode = new TreeNode( QString(""), QString(""), this);
 	m_children.push_front(newCreateNode);
 	return newCreateNode;
 }
@@ -73,7 +79,7 @@ TreeNode* TreeNode::insertSiblingNodeBefore()
 		if ( !m_parent->m_children.isEmpty() ) {
 			int foundIdx = m_parent->m_children.indexOf( this );
 			if ( foundIdx != -1 ) {
-				TreeNode* newCreateNode = new TreeNode( QString(""), this->m_parent);
+                TreeNode* newCreateNode = new TreeNode( QString(""), QString(""), this->m_parent);
 				m_parent->m_children.insert(foundIdx, newCreateNode);
 				return newCreateNode;
 			}
@@ -89,7 +95,7 @@ TreeNode* TreeNode::insertSiblingNodeAfter()
 		if ( !m_parent->m_children.isEmpty() ) {
 			int foundIdx = m_parent->m_children.indexOf( this );
 			if ( foundIdx != -1 ) {
-				TreeNode* newCreateNode = new TreeNode( QString(""), this->m_parent);
+                TreeNode* newCreateNode = new TreeNode( QString(""), QString(""), this->m_parent);
 				int insertPos = foundIdx + 1;
 				if ( insertPos >= m_parent->m_children.size() ) {
 					m_parent->m_children.push_back( newCreateNode);
@@ -119,12 +125,27 @@ int       TreeNode::selfIndex()
 	return 0;
 }
 
-QString   TreeNode::getText()
+QString TreeNode::getName()
 {
-	return m_text;
+    return m_name;
+}
+
+void TreeNode::setName(const QString& name)
+{
+    m_name = name;
 }
 
 
+
+QString   TreeNode::getValue()
+{
+    return m_value;
+}
+
+void      TreeNode::setValue(const QString& val)
+{
+    m_value = val;
+}
 
 int TreeNode::childCount()
 {
@@ -141,9 +162,5 @@ TreeNode* TreeNode::getChild(int idx)
 }
 
 
-void      TreeNode::setText(const QString& txt)
-{
-	m_text = txt;
-}
 
 

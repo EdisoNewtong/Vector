@@ -10,7 +10,7 @@
 class TreeNode
 {
 public:
-	TreeNode(const QString& text, TreeNode* parent);
+    TreeNode(const QString& name, const QString& val, TreeNode* parent);
 	virtual ~TreeNode();
 	
 	// create node
@@ -24,15 +24,21 @@ public:
 	int       selfIndex();
 	TreeNode* getChild(int idx);
 
-	QString   getText();
-	void      setText(const QString& txt);
+    QString   getName();
+    void      setName(const QString& name);
+
+    QString   getValue();
+    void      setValue(const QString& val);
+
 	int       childCount();
 protected:
 	//
 	// Data Field
 	//
-	QString   m_text;
-	TreeNode* m_parent;
+    QString   m_name;
+    QString   m_value;
+
+    TreeNode* m_parent;
 	QList<TreeNode*> m_children;
 
 	// DisplayInfo m_displayOption;
