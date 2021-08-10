@@ -294,3 +294,103 @@ const char *filename = lua_tolstring(L, (fnameindex), NULL) + 1;
 ==================================================
 #define	LUA_SIGNATURE	"\033Lua" // lua.h:27
 
+
+==================================================
+| lua_getglobal(L,s) |
+==================================================
+#define lua_getglobal(L,s)	lua_getfield(L, LUA_GLOBALSINDEX, (s))  // lua.h:277
+
+e.g. 
+  /* lua_getglobal(L, "tostring"); */
+  lua_getfield(L, LUA_GLOBALSINDEX, "tostring");
+
+
+==================================================
+| lua_isfunction(L,n) |
+==================================================
+#define lua_isfunction(L,n)	(lua_type(L, (n)) == LUA_TFUNCTION) // lua.h:264
+
+
+==================================================
+| luaL_optint(L,n,d) |
+==================================================
+
+#define luaL_optint(L,n,d)	((int)luaL_optinteger(L, (n), (d)))  // lauxlib.h:102
+
+e.g.
+    luaL_optint(L, 1, 1)
+    ( (int)luaL_optinteger(L, 1, 1) )
+
+
+==================================================
+| luaL_checkint(L,n) |
+==================================================
+
+#define luaL_checkint(L,n)	((int)luaL_checkinteger(L, (n))) //  lauxlib.h:101
+e.g.
+    luaL_checkint(L, 1)
+    ( (int)luaL_checkinteger(L, 1) )
+
+
+==================================================
+| luaL_argcheck(L, cond,numarg,extramsg) |
+==================================================
+// lauxlib.h:97
+#define luaL_argcheck(L, cond,numarg,extramsg)	\
+		((void)((cond) || luaL_argerror(L, (numarg), (extramsg))))
+
+e.g.
+    /* luaL_argcheck(L, 2 <= base && base <= 36, 2, "base out of range"); */
+    ( (void)( (2 <= base && base <= 36) || luaL_argerror(L, 2, "base out of range") ) );
+
+
+==================================================
+| lua_upvalueindex(i) |
+==================================================
+#define lua_upvalueindex(i)	(LUA_GLOBALSINDEX-(i))
+
+e.g.
+  /*              lua_upvalueindex(1) */
+  lua_pushvalue(L, ( LUA_GLOBALSINDEX - (1))); /* return generator, */
+
+
+
+==================================================
+| luaL_optstring(L,n,d) |
+==================================================
+#define luaL_optstring(L,n,d)	(luaL_optlstring(L, (n), (d), NULL)) // lauxlib.h:100
+
+e.g.
+  /*                   luaL_optstring(L, 2, "=(load)");     */
+  const char *cname = (luaL_optlstring(L, 2, "=(load)", NULL));
+
+
+==================================================
+| lua_pushcfunction(L,f) |
+==================================================
+#define lua_pushcfunction(L,f)	lua_pushcclosure(L, (f), 0)  // lua.h:260
+
+e.g.
+  /* lua_pushcfunction(L, u); */
+  lua_pushcclosure(L, u, 0);
+
+
+==================================================
+| lua_setglobal(L,s) |
+==================================================
+#define lua_setglobal(L,s)	lua_setfield(L, LUA_GLOBALSINDEX, (s))  // lua.h:276
+
+e.g.
+  /* lua_setglobal(L, "_G"); */
+  lua_setfield(L, LUA_GLOBALSINDEX, ("_G"));
+
+
+==================================================
+| GET_OPCODE(i) |
+==================================================
+#define GET_OPCODE(i)	(cast(OpCode, ((i)>>POS_OP) & MASK1(SIZE_OP,0))) // lopcodes.h:80
+
+e.g.
+      /*    GET_OPCODE(*previous)                                                       */
+      if ( (((OpCode)(((*previous)>>0) & ((~((~(Instruction)0)<<6))<<0)))) == OP_LOADNIL ) {
+
