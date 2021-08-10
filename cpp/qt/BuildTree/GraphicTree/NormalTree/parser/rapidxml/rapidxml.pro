@@ -10,5 +10,5 @@ HEADERS += rapidxml.hpp \
            rapidxml_print.hpp \
            rapidxml_utils.hpp
 
-TARGET = XmlParser
+TARGET = rapidxml
 

@@ -36,21 +36,21 @@ FORMS += \
     mainwindow.ui
 
 
-INCLUDEPATH += ../XmlParser \
-               ../rapidjson
+INCLUDEPATH += ../parser/rapidxml \
+               ../parser/rapidjson
 
 
-LIBS += -L../XmlParser -lXmlParser \
-        -L../rapidjson -lrapidjson
+LIBS += -L../parser/rapidxml -lrapidxml \
+        -L../parser/rapidjson -lrapidjson
 
 win32:debug {
-    LIBS += -L../XmlParser/debug \
-            -L../rapidjson/debug
+    LIBS += -L../parser/rapidxml/debug \
+            -L../parser/rapidjson/debug
 }
 
 win32:release {
-    LIBS += -L../XmlParser/release \
-            -L../rapidjson/release
+    LIBS += -L../parser/rapidxml/release \
+            -L../parser/rapidjson/release
 }
 
 

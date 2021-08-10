@@ -2,14 +2,14 @@
 TEMPLATE = subdirs
 
 SUBDIRS = SuperTreeEditor \
-          XmlParser \
+          rapidxml \
           rapidjson
           
 
 CONFIG += orderd
 
 SuperTreeEditor.subdir  = SuperTreeEditor
-SuperTreeEditor.depends = XmlParser rapidjson
+SuperTreeEditor.depends = rapidxml rapidjson
 
-XMLParser.subdir = XMLParser
-rapidjson.subdir = rapidjson
+rapidxml.subdir = parser/rapidxml
+rapidjson.subdir = parser/rapidjson
