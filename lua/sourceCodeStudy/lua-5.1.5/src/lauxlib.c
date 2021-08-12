@@ -521,8 +521,8 @@ extern void luaL_addvalue (luaL_Buffer *B) {
   size_t vl;
   const char *s = lua_tolstring(L, -1, &vl);
   /*                          bufffree(B)                
-                      
-              #define LUAL_BUFFERSIZE  BUFSIZ  //  BUFSIZ 8192
+                                        8192
+              #define LUAL_BUFFERSIZE  BUFSIZ
   */
   if (vl <= ((size_t)(LUAL_BUFFERSIZE - ((B)->p - (B)->buffer)))) { /* fit into buffer? */
     memcpy(B->p, s, vl); /* put it there */
@@ -608,7 +608,11 @@ extern void luaL_unref (lua_State *L, int t, int ref) {
 typedef struct LoadF {
   int extraline;
   FILE *f;
-  /* #define LUAL_BUFFERSIZE  BUFSIZ  //  BUFSIZ 8192 */
+  /* 
+                                 8192
+      #define LUAL_BUFFERSIZE  BUFSIZ 
+
+  */
   char buff[LUAL_BUFFERSIZE];
 } LoadF;
 
@@ -637,8 +641,8 @@ static int errfile (lua_State *L, const char *what, int fnameindex) {
   lua_remove(L, fnameindex);
 
   /* 
-      #define LUA_ERRERR      5               // lua.h:47
-      #define LUA_ERRFILE     (LUA_ERRERR+1)  // lauxlib.h:29
+      #define LUA_ERRERR      5               / * lua.h:47 * /
+      #define LUA_ERRFILE     (LUA_ERRERR+1)  / * lauxlib.h:29 * /
 
   */
 
@@ -675,7 +679,7 @@ extern int luaL_loadfile (lua_State *L, const char *filename) {
     }
   }
 
-  /* #define	LUA_SIGNATURE	"\033Lua"    // lua.h:27           */
+  /* #define	LUA_SIGNATURE	"\033Lua"    / * lua.h:27 * /           */
   if (c == LUA_SIGNATURE[0] && filename) { /* binary file? */
     lf.f = freopen(filename, "rb", lf.f); /* reopen in binary mode */
     if (lf.f == NULL) {
@@ -683,7 +687,7 @@ extern int luaL_loadfile (lua_State *L, const char *filename) {
     }
 
     /*                        EOF  (-1)                     */
-    /* #define	                          LUA_SIGNATURE	"\033Lua"    // lua.h:27           */
+    /* #define	                          LUA_SIGNATURE	"\033Lua"    / * lua.h:27 * /           */
     /* skip eventual `#!...' */
     while ((c = getc(lf.f)) != (-1) && c != LUA_SIGNATURE[0]){ ; }
     lf.extraline = 0;

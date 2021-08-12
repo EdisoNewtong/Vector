@@ -88,8 +88,8 @@ void luaK_nil (FuncState *fs, int from, int n) {
 
 			#define SIZE_C		9
 
-			#define POS_C		(POS_A + SIZE_A)   // (6 + 8) = (14)
-			#define POS_B		(POS_C + SIZE_C)   // (14+9)  = 23
+			#define POS_C		(POS_A + SIZE_A)   ==> (6 + 8) = (14)
+			#define POS_B		(POS_C + SIZE_C)   ==> (14+9)  = 23
 
 			(int)(  ( (*previous) >> 23)   & (  (~((~(Instruction)0)<< 9 ))<<0  ) )
 
@@ -107,8 +107,8 @@ void luaK_nil (FuncState *fs, int from, int n) {
 
 			#define SIZE_C		9
 
-			#define POS_C		(POS_A + SIZE_A)   // (6 + 8) = (14)
-			#define POS_B		(POS_C + SIZE_C)   // (14+9)  = 23
+			#define POS_C		(POS_A + SIZE_A)   ==> (6 + 8) = (14)
+			#define POS_B		(POS_C + SIZE_C)   ==> (14+9)  = 23
 
 			(int)(  ( (*previous) >> 23)   & (  (~((~(Instruction)0)<< 9 ))<<0  ) )
 
@@ -199,9 +199,9 @@ static void fixjump (FuncState *fs, int pc, int dest) {
 	#define SIZE_OP		6
 
 	#define POS_OP		0
-	#define POS_A		(POS_OP + SIZE_OP) // 0 + 6 = 6
-	#define POS_C		(POS_A + SIZE_A)   // 6 + 8 = 14
-	#define POS_Bx		POS_C              // 14
+	#define POS_A		(POS_OP + SIZE_OP) ==> 0 + 6 = 6
+	#define POS_C		(POS_A + SIZE_A)   ==> 6 + 8 = 14
+	#define POS_Bx		POS_C              ==> 14
 
 	#define SETARG_sBx(i,b)	SETARG_Bx((i),cast(unsigned int, (b)+MAXARG_sBx))
 
@@ -230,11 +230,11 @@ int luaK_getlabel (FuncState *fs) {
 
 static int getjump (FuncState *fs, int pc) {
 /*
-	#define SIZE_Bx		(SIZE_C + SIZE_B) // 9 + 9 = 18
+	#define SIZE_Bx		(SIZE_C + SIZE_B) ==> 9 + 9 = 18
 
-	#define POS_Bx		POS_C              // 14
+	#define POS_Bx		POS_C              ==> 14
 
-    #define MAXARG_sBx        (MAXARG_Bx>>1)         //   ( ( (1<<18) -1 ) >> 1 )
+    #define MAXARG_sBx        (MAXARG_Bx>>1)         ==>   ( ( (1<<18) -1 ) >> 1 )
 
 	#define GETARG_Bx(i)	(cast(int, ((i)>>POS_Bx) & MASK1(SIZE_Bx,0)))
 
