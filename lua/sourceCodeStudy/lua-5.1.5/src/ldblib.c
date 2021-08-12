@@ -20,7 +20,8 @@
 
 
 static int db_getregistry (lua_State *L) {
-  lua_pushvalue(L, (-10000));
+  /*               LUA_REGISTRYINDEX (-10000) */
+  lua_pushvalue(L, LUA_REGISTRYINDEX);
   return 1;
 }
 
@@ -36,7 +37,11 @@ static int db_getmetatable (lua_State *L) {
 
 static int db_setmetatable (lua_State *L) {
   int t = lua_type(L, 2);
-  ((void)((t == 0 || t == 5) || luaL_argerror(L, (2), ("nil or table expected"))));
+  /*
+  luaL_argcheck(L, t == LUA_TNIL || t == LUA_TTABLE, 2,
+                    "nil or table expected");
+  */
+  ( (void)( (t == LUA_TNIL || t == LUA_TTABLE) || luaL_argerror(L, 2, "nil or table expected") ) );
   lua_settop(L, 2);
   lua_pushboolean(L, lua_setmetatable(L, 1));
   return 1;
@@ -51,7 +56,7 @@ static int db_getfenv (lua_State *L) {
 
 
 static int db_setfenv (lua_State *L) {
-  luaL_checktype(L, 2, 5);
+  luaL_checktype(L, 2, LUA_TTABLE);
   lua_settop(L, 2);
   if (lua_setfenv(L, 1) == 0) {
     luaL_error(L, "'" "setfenv" "'"
@@ -74,7 +79,8 @@ static void settabsi (lua_State *L, const char *i, int v) {
 
 
 static lua_State *getthread (lua_State *L, int *arg) {
-  if ((lua_type(L, (1)) == 8)) {
+  /* (lua_type(L, (1)) == 8)  */
+  if ( lua_isthread(L, 1) ) {
     *arg = 1;
     return lua_tothread(L, 1);
   }
@@ -101,16 +107,18 @@ static int db_getinfo (lua_State *L) {
   lua_Debug ar;
   int arg;
   lua_State *L1 = getthread(L, &arg);
-  const char *options = (luaL_optlstring(L, (arg+2), ("flnSu"), ((void *)0)));
+  /*                  =  luaL_optstring(L, arg+2, "flnSu"); */
+  const char *options = luaL_optlstring(L, (arg+2), "flnSu", NULL );
   if (lua_isnumber(L, arg+1)) {
     if (!lua_getstack(L1, (int)lua_tointeger(L, arg+1), &ar)) {
       lua_pushnil(L); /* level out of range */
       return 1;
     }
   }
-  else if ((lua_type(L, (arg+1)) == 6)) {
+  else if ( lua_isfunction(L, arg+1)  ) { /*      ( lua_type(L, (arg+1)) == 6 ) */
     lua_pushfstring(L, ">%s", options);
-    options = lua_tolstring(L, (-1), ((void *)0));
+    /*        lua_tostring(L, -1); */
+    options = lua_tolstring(L, -1, NULL);
     lua_pushvalue(L, arg+1);
     lua_xmove(L, L1, 1);
   }
@@ -153,10 +161,12 @@ static int db_getlocal (lua_State *L) {
   lua_State *L1 = getthread(L, &arg);
   lua_Debug ar;
   const char *name;
-  if (!lua_getstack(L1, ((int)luaL_checkinteger(L, (arg+1))), &ar)) { /* out of range? */
+  /*                          luaL_checkint(L, arg+1) */
+  if (!lua_getstack(L1, ( (int)luaL_checkinteger(L, arg+1) ), &ar)) { /* out of range? */
     return luaL_argerror(L, arg+1, "level out of range");
   }
-  name = lua_getlocal(L1, &ar, ((int)luaL_checkinteger(L, (arg+2))));
+  /*                                 luaL_checkint(L, arg+2)); */
+  name = lua_getlocal(L1, &ar, (int)luaL_checkinteger(L, arg+2 ) );
   if (name) {
     lua_xmove(L1, L, 1);
     lua_pushstring(L, name);
@@ -174,26 +184,29 @@ static int db_setlocal (lua_State *L) {
   int arg;
   lua_State *L1 = getthread(L, &arg);
   lua_Debug ar;
-  if (!lua_getstack(L1, ((int)luaL_checkinteger(L, (arg+1))), &ar)) { /* out of range? */
+  /*                          luaL_checkint(L, arg+1) */
+  if (!lua_getstack(L1, ((int)luaL_checkinteger(L, arg+1)), &ar)) { /* out of range? */
     return luaL_argerror(L, arg+1, "level out of range");
   }
   luaL_checkany(L, arg+3);
   lua_settop(L, arg+3);
   lua_xmove(L, L1, 1);
-  lua_pushstring(L, lua_setlocal(L1, &ar, ((int)luaL_checkinteger(L, (arg+2)))));
+  /*                                       luaL_checkint(L, arg+2) */
+  lua_pushstring(L, lua_setlocal(L1, &ar, ((int)luaL_checkinteger(L, arg+2))));
   return 1;
 }
 
 
 static int auxupvalue (lua_State *L, int get) {
   const char *name;
-  int n = ((int)luaL_checkinteger(L, (2)));
-  luaL_checktype(L, 1, 6);
+  /*            luaL_checkint(L, 2); */
+  int n = ((int)luaL_checkinteger(L, 2));
+  luaL_checktype(L, 1, LUA_TFUNCTION);
   if (lua_iscfunction(L, 1)) {
     return 0; /* cannot touch C upvalues from Lua */
   }
   name = get ? lua_getupvalue(L, 1, n) : lua_setupvalue(L, 1, n);
-  if (name == ((void *)0)) {
+  if (name == NULL) {
     return 0;
   }
   lua_pushstring(L, name);
@@ -220,10 +233,11 @@ static void hookf (lua_State *L, lua_Debug *ar) {
   static const char *const hooknames[] =
     {"call", "return", "line", "count", "tail return"};
   lua_pushlightuserdata(L, (void *)&KEY_HOOK);
-  lua_rawget(L, (-10000));
+  lua_rawget(L, LUA_REGISTRYINDEX ); /* LUA_REGISTRYINDEX (-10000) */
   lua_pushlightuserdata(L, L);
   lua_rawget(L, -2);
-  if ((lua_type(L, (-1)) == 6)) {
+  /*  (lua_type(L, (-1)) == 6)  */
+  if ( lua_isfunction(L, -1) ) {
     lua_pushstring(L, hooknames[(int)ar->event]);
     if (ar->currentline >= 0) {
       lua_pushinteger(L, ar->currentline);
@@ -231,7 +245,7 @@ static void hookf (lua_State *L, lua_Debug *ar) {
     else {
       lua_pushnil(L);
     }
-    ((void)0);
+    ((void)0); /* lua_assert(lua_getinfo(L, "lS", ar)); */
     lua_call(L, 2, 0);
   }
 }
@@ -240,16 +254,16 @@ static void hookf (lua_State *L, lua_Debug *ar) {
 static int makemask (const char *smask, int count) {
   int mask = 0;
   if (strchr(smask, 'c')) {
-    mask |= (1 << 0);
+    mask |= LUA_MASKCALL;  /* LUA_MASKCALL   (1 << 0) */
   }
   if (strchr(smask, 'r')) {
-    mask |= (1 << 1);
+    mask |= LUA_MASKRET;   /* LUA_MASKRET    (1 << 1) */
   }
   if (strchr(smask, 'l')) {
-    mask |= (1 << 2);
+    mask |= LUA_MASKLINE;  /* LUA_MASKLINE   (1 << 2) */
   }
   if (count > 0) {
-    mask |= (1 << 3);
+    mask |= LUA_MASKCOUNT; /* LUA_MASKCOUNT  (1 << 3) */
   }
   return mask;
 }
@@ -257,13 +271,13 @@ static int makemask (const char *smask, int count) {
 
 static char *unmakemask (int mask, char *smask) {
   int i = 0;
-  if (mask & (1 << 0)) {
+  if (mask & LUA_MASKCALL ) { /* LUA_MASKCALL (1 << 0) */
     smask[i++] = 'c';
   }
-  if (mask & (1 << 1)) {
+  if (mask & LUA_MASKRET )  { /* LUA_MASKRET  (1 << 1) */
     smask[i++] = 'r';
   }
-  if (mask & (1 << 2)) {
+  if (mask & LUA_MASKLINE ) { /* LUA_MASKLINE (1 << 2) */
     smask[i++] = 'l';
   }
   smask[i] = '\0';
@@ -273,13 +287,16 @@ static char *unmakemask (int mask, char *smask) {
 
 static void gethooktable (lua_State *L) {
   lua_pushlightuserdata(L, (void *)&KEY_HOOK);
-  lua_rawget(L, (-10000));
-  if (!(lua_type(L, (-1)) == 5)) {
+  lua_rawget(L, LUA_REGISTRYINDEX); /* LUA_REGISTRYINDEX (-10000) */
+  /*    (lua_type(L, (-1)) == 5) */
+  if ( !lua_istable(L, -1) ) {
+    /* lua_pop(L, 1); */
     lua_settop(L, -(1)-1);
+
     lua_createtable(L, 0, 1);
     lua_pushlightuserdata(L, (void *)&KEY_HOOK);
     lua_pushvalue(L, -2);
-    lua_rawset(L, (-10000));
+    lua_rawset(L, LUA_REGISTRYINDEX);  /* LUA_REGISTRYINDEX (-10000) */
   }
 }
 
@@ -288,21 +305,27 @@ static int db_sethook (lua_State *L) {
   int arg, mask, count;
   lua_Hook func;
   lua_State *L1 = getthread(L, &arg);
-  if ((lua_type(L, (arg+1)) <= 0)) {
+  /*  (lua_type(L, (arg+1)) <= 0)   */
+  if ( lua_isnoneornil(L, arg+1) ) {
     lua_settop(L, arg+1);
-    func = ((void *)0); mask = 0; count = 0; /* turn off hooks */
+    func = NULL; mask = 0; count = 0; /* turn off hooks */
   }
   else {
-    const char *smask = (luaL_checklstring(L, (arg+2), ((void *)0)));
-    luaL_checktype(L, arg+1, 6);
-    count = ((int)luaL_optinteger(L, (arg+3), (0)));
+    /*                   luaL_checkstring(L, arg+2); */
+    const char *smask = (luaL_checklstring(L, (arg+2), NULL));
+    luaL_checktype(L, arg+1, LUA_TFUNCTION);
+    /*       luaL_optint(L, arg+3, 0); */
+    count = ((int)luaL_optinteger(L, arg+3, 0));
     func = hookf; mask = makemask(smask, count);
   }
   gethooktable(L);
   lua_pushlightuserdata(L, L1);
   lua_pushvalue(L, arg+1);
   lua_rawset(L, -3); /* set new hook */
+
+  /* lua_pop(L, 1); */
   lua_settop(L, -(1)-1); /* remove hook table */
+
   lua_sethook(L1, func, mask, count); /* set hooks */
   return 0;
 }
@@ -314,8 +337,9 @@ static int db_gethook (lua_State *L) {
   char buff[5];
   int mask = lua_gethookmask(L1);
   lua_Hook hook = lua_gethook(L1);
-  if (hook != ((void *)0) && hook != hookf) { /* external hook? */
-    lua_pushlstring(L, "" "external hook", (sizeof("external hook")/sizeof(char))-1);
+  if (hook != NULL && hook != hookf) { /* external hook? */
+    /* lua_pushlstring(L, "" "external hook", (sizeof("external hook")/sizeof(char))-1); */
+    lua_pushliteral(L, "external hook");
   } else {
     gethooktable(L);
     lua_pushlightuserdata(L, L1);
@@ -339,13 +363,17 @@ static int db_debug (lua_State *L) {
     }
     if (luaL_loadbuffer(L, buffer, strlen(buffer), "=(debug command)") ||
         lua_pcall(L, 0, 0, 0)) {
-      fputs(lua_tolstring(L, (-1), ((void *)0)), stderr);
+      /*    lua_tostring(L, -1)              */
+      fputs(lua_tolstring(L, -1, NULL), stderr);
       fputs("\n", stderr);
     }
     lua_settop(L, 0); /* remove eventual returns */
   }
 }
 
+
+#define LEVELS1	12	/* size of the first part of the stack */
+#define LEVELS2	10	/* size of the second part of the stack */
 
 static int db_errorfb (lua_State *L) {
   int level;
@@ -355,36 +383,47 @@ static int db_errorfb (lua_State *L) {
   lua_Debug ar;
   if (lua_isnumber(L, arg+2)) {
     level = (int)lua_tointeger(L, arg+2);
+    /* lua_pop(L, 1); */
     lua_settop(L, -(1)-1);
   }
   else {
     level = (L == L1) ? 1 : 0; /* level 0 may be this own function */
   }
   if (lua_gettop(L) == arg) {
-    lua_pushlstring(L, "" "", (sizeof("")/sizeof(char))-1);
+    /* lua_pushlstring(L, "" "", (sizeof("")/sizeof(char))-1); */
+    lua_pushliteral(L, "");
   }
   else if (!lua_isstring(L, arg+1)) {
     return 1; /* message is not a string */
   }
   else {
-    lua_pushlstring(L, "" "\n", (sizeof("\n")/sizeof(char))-1);
+    /* lua_pushlstring(L, "" "\n", (sizeof("\n")/sizeof(char))-1); */
+    lua_pushliteral(L, "\n");
   }
-  lua_pushlstring(L, "" "stack traceback:", (sizeof("stack traceback:")/sizeof(char))-1);
+
+  /* lua_pushlstring(L, "" "stack traceback:", (sizeof("stack traceback:")/sizeof(char))-1); */
+  lua_pushliteral(L, "stack traceback:");
+
   while (lua_getstack(L1, level++, &ar)) {
-    if (level > 12 && firstpart) {
+    /*          LEVELS1 12           */
+    if (level > LEVELS1 && firstpart) {
       /* no more than `LEVELS2' more levels? */
-      if (!lua_getstack(L1, level+10, &ar)) {
+      /*                          LEVELS2 10 */
+      if (!lua_getstack(L1, level+LEVELS2, &ar)) {
         level--; /* keep going */
       } else {
-        lua_pushlstring(L, "" "\n\t...", (sizeof("\n\t...")/sizeof(char))-1); /* too many levels */
-        while (lua_getstack(L1, level+10, &ar)) { /* find last levels */
+        /* lua_pushlstring(L, "" "\n\t...", (sizeof("\n\t...")/sizeof(char))-1); */
+        lua_pushliteral(L, "\n\t..."); /* too many levels */
+        /*                            LEVELS2 10    */
+        while (lua_getstack(L1, level+LEVELS2, &ar)) { /* find last levels */
           level++;
         }
       }
       firstpart = 0;
       continue;
     }
-    lua_pushlstring(L, "" "\n\t", (sizeof("\n\t")/sizeof(char))-1);
+    /* lua_pushlstring(L, "" "\n\t", (sizeof("\n\t")/sizeof(char))-1); */
+    lua_pushliteral(L, "\n\t");
     lua_getinfo(L1, "Snl", &ar);
     lua_pushfstring(L, "%s:", ar.short_src);
     if (ar.currentline > 0) {
@@ -396,7 +435,8 @@ static int db_errorfb (lua_State *L) {
       if (*ar.what == 'm') { /* main? */
         lua_pushfstring(L, " in main chunk");
       } else if (*ar.what == 'C' || *ar.what == 't') {
-        lua_pushlstring(L, "" " ?", (sizeof(" ?")/sizeof(char))-1); /* C function or tail call */
+        /* lua_pushlstring(L, "" " ?", (sizeof(" ?")/sizeof(char))-1); */
+        lua_pushliteral(L, " ?"); /* C function or tail call */
       } else {
         lua_pushfstring(L, " in function <%s:%d>",
                            ar.short_src, ar.linedefined);
@@ -424,12 +464,13 @@ static const luaL_Reg dblib[] = {
   {"setmetatable", db_setmetatable},
   {"setupvalue", db_setupvalue},
   {"traceback", db_errorfb},
-  {((void *)0), ((void *)0)}
+  {NULL, NULL}
 };
 
 
 extern int luaopen_debug (lua_State *L) {
-  luaL_register(L, "debug", dblib);
+  /*               LUA_DBLIBNAME "debug"  */
+  luaL_register(L, LUA_DBLIBNAME, dblib);
   return 1;
 }
 
