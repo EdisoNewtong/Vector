@@ -4,7 +4,7 @@ TEMPLATE = subdirs
 SUBDIRS = XMLParser \
           XMLDisplay
 
-CONFIG += orderd
+CONFIG += ordered
 
 XMLDisplay.subdir = XMLDisplay
 XMLDisplay.depends = XMLParser

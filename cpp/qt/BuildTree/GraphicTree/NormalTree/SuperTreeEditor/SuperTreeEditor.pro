@@ -37,20 +37,24 @@ FORMS += \
 
 
 INCLUDEPATH += ../parser/rapidxml \
-               ../parser/rapidjson
+               ../parser/rapidjson \
+               ../parser/lua/src
 
 
 LIBS += -L../parser/rapidxml -lrapidxml \
-        -L../parser/rapidjson -lrapidjson
+        -L../parser/rapidjson -lrapidjson \
+        -L../parser/lua       -llua
 
 win32:debug {
     LIBS += -L../parser/rapidxml/debug \
-            -L../parser/rapidjson/debug
+            -L../parser/rapidjson/debug \
+            -L../parser/lua/debug
 }
 
 win32:release {
     LIBS += -L../parser/rapidxml/release \
-            -L../parser/rapidjson/release
+            -L../parser/rapidjson/release \
+            -L../parser/lua/release
 }
 
 
