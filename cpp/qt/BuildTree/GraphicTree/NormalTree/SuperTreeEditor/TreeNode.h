@@ -11,18 +11,19 @@ class TreeNode
 {
 public:
     TreeNode(const QString& name, const QString& val, TreeNode* parent);
-	virtual ~TreeNode();
-	
-	// create node
-	TreeNode* appendChild();
-	TreeNode* prependChild();
-	TreeNode* insertSiblingNodeBefore();
-	TreeNode* insertSiblingNodeAfter();
+    virtual ~TreeNode();
 
+    // create node
+    TreeNode* appendChild();
+    TreeNode* prependChild();
+    TreeNode* insertSiblingNodeBefore();
+    TreeNode* insertSiblingNodeAfter();
 
-	TreeNode* getParent();
-	int       selfIndex();
-	TreeNode* getChild(int idx);
+    TreeNode* insertNodeAtIndex(int idx);
+
+    TreeNode* getParent();
+    int       selfIndex();
+    TreeNode* getChild(int idx);
 
     QString   getName();
     void      setName(const QString& name);
@@ -30,18 +31,22 @@ public:
     QString   getValue();
     void      setValue(const QString& val);
 
-	int       childCount();
+    void      removeFromParent();
+
+    int       childCount();
+
+    void      releaseSelfAndChildren();
 protected:
-	//
-	// Data Field
-	//
+    //
+    // Data Field
+    //
     QString   m_name;
     QString   m_value;
 
     TreeNode* m_parent;
-	QList<TreeNode*> m_children;
+    QList<TreeNode*> m_children;
 
-	// DisplayInfo m_displayOption;
+    // DisplayInfo m_displayOption;
 };
 
 #endif

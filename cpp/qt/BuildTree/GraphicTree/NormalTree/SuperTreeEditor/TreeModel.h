@@ -18,45 +18,74 @@ namespace rapidxml {
 
 class TreeModel : public QAbstractItemModel
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
     TreeModel(QObject* parent = nullptr);
     virtual ~TreeModel();
 
     //
     // implementation of abstract base class QAbstractItemModel
-	//
-	virtual int 
+    // Read-Only , Model Data Access Function
+    virtual int 
     columnCount(const QModelIndex &parent = QModelIndex()) const Q_DECL_OVERRIDE;
 
-	virtual QVariant 
+    virtual QVariant 
     data(const QModelIndex &index, int role = Qt::DisplayRole) const Q_DECL_OVERRIDE;
 
-	virtual QModelIndex 
+    virtual QModelIndex 
     index(int row, int column, const QModelIndex &parent = QModelIndex()) const Q_DECL_OVERRIDE;
 
-	virtual QModelIndex 
-	parent(const QModelIndex &index) const override;
+    virtual QModelIndex 
+    parent(const QModelIndex &index) const override;
 
-	virtual int 
+    virtual int 
     rowCount(const QModelIndex &parent = QModelIndex()) const Q_DECL_OVERRIDE;
 
     Qt::ItemFlags flags(const QModelIndex & index) const Q_DECL_OVERRIDE;
 
+    //
+    // Another Category
+    //
     virtual bool
     setData(const QModelIndex & index, const QVariant & afterEditVal, int role) Q_DECL_OVERRIDE;
 
     virtual  QVariant
     headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const Q_DECL_OVERRIDE;
 
+    //
+    // Resizeable
+    //
+    virtual bool 
+    insertRows(int row, int count, const QModelIndex &parent = QModelIndex()) Q_DECL_OVERRIDE; 
+
+    virtual bool 
+    removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) Q_DECL_OVERRIDE;
+
+protected:
+    // void QAbstractItemModel::beginInsertRows(const QModelIndex &parent, int first, int last) Q_DECL_OVERRIDE;
+
+public:
 
     // Util Operator
     bool prepareSavedString(QString& outFileContent,QPersistentModelIndex& errorIdx);
+    bool isInvisibleRoot( TreeNode* node);
+
+    // Create New Node at some position or Delete a selected Node
+    bool prependChildNode(const QModelIndex& parent);
+    bool appendChildNode(const QModelIndex& parent);
+
+    bool insertSiblingNodeBefore(const QModelIndex& beforeNodeIdx);
+    bool insertSiblingNodeAfter(const QModelIndex& afterNodeIdx);
+    
+    bool deleteSelectedNode(const QModelIndex& selectedNodeIdx);
+
 protected:
 
+    void deleteRootNode();
+    void reCreateRootNode();
     void deleteXMLDoc();
 protected:
-	TreeNode*  m_invisibleRoot;
+    TreeNode*  m_invisibleRoot;
 
     rapidxml::xml_document<char>* m_pXMLDoc;
 

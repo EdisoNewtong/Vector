@@ -7,9 +7,9 @@ static int G_CNT = 0;
 TreeNode::TreeNode(const QString& text, const QString& val,TreeNode* parent)
     : m_name(text)
     , m_value(val)
-	, m_parent(parent)
+    , m_parent(parent)
 {
-	m_children.clear();
+    m_children.clear();
     if ( G_ENABLE_REFCOUNT ) {
         qDebug() << "Create G_CNT = " << ++G_CNT;
     }
@@ -20,31 +20,61 @@ TreeNode::TreeNode(const QString& text, const QString& val,TreeNode* parent)
 // virtual
 TreeNode::~TreeNode()
 {
-	if ( m_parent != nullptr ) {
-		if ( !m_parent->m_children.isEmpty() ) {
-			int foundIdx = m_parent->m_children.indexOf( this );
-			if ( foundIdx != -1 ) {
-				// delete self inside the children list
-				m_parent->m_children.removeAt(foundIdx);
+    releaseSelfAndChildren();
+}
 
-				// cut parent relationship
-				m_parent = nullptr;
-			}
-		}
-	} else {
-		//
-		// this node is the <Root> Node , delete children is enough
-		//
-		for ( auto it = m_children.begin(); it != m_children.end(); ++it ) {
-			auto node = *it;
-			if ( node !=nullptr ) {
-				node->m_parent = nullptr;
-				delete node;
-			}
-			*it = nullptr;
-		}
-		m_children.clear();
-	}
+void      TreeNode::releaseSelfAndChildren()
+{
+    if ( m_parent != nullptr ) {
+        int foundIdx = m_parent->m_children.indexOf( this );
+        if ( foundIdx != -1 ) {
+            m_parent->m_children.removeAt(foundIdx);
+        }
+    }
+
+    //
+    // Delete children
+    //
+    for ( auto it = m_children.begin(); it != m_children.end(); ++it ) {
+        auto node = *it;
+        if ( node != nullptr ) {
+            node->m_parent = nullptr;
+        }
+
+        delete node;
+        *it = nullptr;
+    }
+    m_children.clear();
+    // delete this;
+
+
+    /*
+    if ( m_parent != nullptr ) {
+        if ( !m_parent->m_children.isEmpty() ) {
+            int foundIdx = m_parent->m_children.indexOf( this );
+            if ( foundIdx != -1 ) {
+                // delete self inside the children list
+                m_parent->m_children.removeAt(foundIdx);
+
+                // cut parent relationship
+                m_parent = nullptr;
+            }
+        }
+    } else {
+        //
+        // this node is the <Root> Node , delete children is enough
+        //
+        for ( auto it = m_children.begin(); it != m_children.end(); ++it ) {
+            auto node = *it;
+            if ( node !=nullptr ) {
+                node->m_parent = nullptr;
+                delete node;
+            }
+            *it = nullptr;
+        }
+        m_children.clear();
+    }
+    */
 
     if ( G_ENABLE_REFCOUNT ) {
         qDebug() << "Delete G_CNT = " << --G_CNT;
@@ -58,8 +88,8 @@ TreeNode::~TreeNode()
 TreeNode* TreeNode::appendChild()
 {
     TreeNode* newCreateNode = new TreeNode( QString(""), QString(""), this);
-	m_children.push_back(newCreateNode);
-	return newCreateNode;
+    m_children.push_back(newCreateNode);
+    return newCreateNode;
 }
 
 //
@@ -68,61 +98,61 @@ TreeNode* TreeNode::appendChild()
 TreeNode* TreeNode::prependChild()
 {
     TreeNode* newCreateNode = new TreeNode( QString(""), QString(""), this);
-	m_children.push_front(newCreateNode);
-	return newCreateNode;
+    m_children.push_front(newCreateNode);
+    return newCreateNode;
 }
 
 
 TreeNode* TreeNode::insertSiblingNodeBefore()
 {
-	if ( m_parent != nullptr ) {
-		if ( !m_parent->m_children.isEmpty() ) {
-			int foundIdx = m_parent->m_children.indexOf( this );
-			if ( foundIdx != -1 ) {
+    if ( m_parent != nullptr ) {
+        if ( !m_parent->m_children.isEmpty() ) {
+            int foundIdx = m_parent->m_children.indexOf( this );
+            if ( foundIdx != -1 ) {
                 TreeNode* newCreateNode = new TreeNode( QString(""), QString(""), this->m_parent);
-				m_parent->m_children.insert(foundIdx, newCreateNode);
-				return newCreateNode;
-			}
-		}
-	}
+                m_parent->m_children.insert(foundIdx, newCreateNode);
+                return newCreateNode;
+            }
+        }
+    }
 
-	return nullptr;
+    return nullptr;
 }
 
 TreeNode* TreeNode::insertSiblingNodeAfter()
 {
-	if ( m_parent != nullptr ) {
-		if ( !m_parent->m_children.isEmpty() ) {
-			int foundIdx = m_parent->m_children.indexOf( this );
-			if ( foundIdx != -1 ) {
+    if ( m_parent != nullptr ) {
+        if ( !m_parent->m_children.isEmpty() ) {
+            int foundIdx = m_parent->m_children.indexOf( this );
+            if ( foundIdx != -1 ) {
                 TreeNode* newCreateNode = new TreeNode( QString(""), QString(""), this->m_parent);
-				int insertPos = foundIdx + 1;
-				if ( insertPos >= m_parent->m_children.size() ) {
-					m_parent->m_children.push_back( newCreateNode);
-				} else {
-					m_parent->m_children.insert(insertPos, newCreateNode);
-				}
-				return newCreateNode;
-			}
-		}
-	}
+                int insertPos = foundIdx + 1;
+                if ( insertPos >= m_parent->m_children.size() ) {
+                    m_parent->m_children.push_back( newCreateNode);
+                } else {
+                    m_parent->m_children.insert(insertPos, newCreateNode);
+                }
+                return newCreateNode;
+            }
+        }
+    }
 
-	return nullptr;
+    return nullptr;
 }
 
 TreeNode* TreeNode::getParent()
 {
-	return m_parent;
+    return m_parent;
 }
 
 
 int       TreeNode::selfIndex()
 {
-	if ( m_parent != nullptr ) {
-		return m_parent->m_children.indexOf( this );
-	}
+    if ( m_parent != nullptr ) {
+        return m_parent->m_children.indexOf( this );
+    }
 
-	return 0;
+    return 0;
 }
 
 QString TreeNode::getName()
@@ -147,20 +177,49 @@ void      TreeNode::setValue(const QString& val)
     m_value = val;
 }
 
+
+void      TreeNode::removeFromParent()
+{
+    if ( m_parent != nullptr ) {
+        int foundIdx = m_parent->m_children.indexOf( this );
+        if ( foundIdx != -1 ) {
+            // delete self inside the children list
+            m_parent->m_children.removeAt(foundIdx);
+
+            // cut parent relationship
+            m_parent = nullptr;
+        }
+
+        delete this;
+    }
+}
+
+
 int TreeNode::childCount()
 {
-	return m_children.size();
+    return m_children.size();
 }
 
 TreeNode* TreeNode::getChild(int idx)
 {
-	if ( idx >=0 && idx < m_children.size() ) {
-		return m_children.at(idx);
-	}
+    if ( idx >=0 && idx < m_children.size() ) {
+        return m_children.at(idx);
+    }
 
-	return nullptr;
+    return nullptr;
 }
 
 
 
+TreeNode* TreeNode::insertNodeAtIndex(int idx)
+{
+    if ( idx < 0 || idx > childCount() ) {
+        return nullptr;
+    }
+
+
+    TreeNode* newInsertNode = new TreeNode( QString(""), QString(""), this);
+    m_children.insert(idx, newInsertNode);
+    return newInsertNode;
+}
 
