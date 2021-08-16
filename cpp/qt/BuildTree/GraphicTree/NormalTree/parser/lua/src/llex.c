@@ -120,7 +120,8 @@ TString *luaX_newstring (LexState *ls, const char *str, size_t l) {
   TValue *o = luaH_setstr(L, ls->fs->h, ts);  /* entry for `str' */
   if (ttisnil(o)) {
     setbvalue(o, 1);  /* make sure `str' will not be collected */
-    luaC_checkGC(L);
+    /* luaC_checkGC(L); */
+    luaC_checkGC(L)
   }
   return ts;
 }

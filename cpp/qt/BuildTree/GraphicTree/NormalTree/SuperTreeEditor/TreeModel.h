@@ -6,6 +6,7 @@
 #include <QByteArray>
 // #include <QStringList>
 #include <QPersistentModelIndex>
+#include <QRegExp>
 
 
 #include "TreeNode.h"
@@ -75,7 +76,6 @@ public:
 
     // Util Operator
     bool prepareSavedString(QString& outFileContent,QPersistentModelIndex& errorIdx);
-    bool isInvisibleRoot( TreeNode* node);
 
     // Create New Node at some position or Delete a selected Node
     bool prependChildNode(const QModelIndex& parent);
@@ -85,6 +85,8 @@ public:
     bool insertSiblingNodeAfter(const QModelIndex& afterNodeIdx);
     
     bool deleteSelectedNode(const QModelIndex& selectedNodeIdx, int iDeleteMethod);
+    bool deleteSelectedNodesChildren(const QModelIndex& selectedNodeIdx,int iDeleteMethod);
+
     bool createParentWithChild(const QModelIndex& selectedNodeIdx, QModelIndex& newCreatedParentIdx);
 
     bool swapUp(const QModelIndex& selectedNodeIdx);
@@ -94,6 +96,7 @@ protected:
     void deleteRootNode();
     void reCreateRootNode();
     void deleteXMLDoc();
+    bool checkNameIsValid( const QModelIndex& index, int* bFlagisEmptyString) const;
 protected:
     TreeNode*  m_invisibleRoot;
 
@@ -105,6 +108,8 @@ protected:
     int                 m_pushExistedNodeFlag;
 
     TreeNode*           m_existedWillInsertNode;
+
+    QRegExp             m_nameReg;
 
 };
 

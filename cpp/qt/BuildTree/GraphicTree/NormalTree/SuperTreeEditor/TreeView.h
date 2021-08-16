@@ -22,13 +22,12 @@ private slots:
     void onInsertSiblingNodeAfterActTrigger();
 
     void onDeleteNodeTrigger();
+    void onDeleteNodesChildrenTrigger();
 
     void onMoveUpActTrigger();
     void onMoveDownActTrigger();
 
     void onCreateParentWithChildActTrigger();
-
-
 
 protected:
     //
@@ -42,6 +41,7 @@ protected:
     QAction*    m_pInsertSiblingNodeAfterSelectedNodeAct;
 
     QAction*    m_pDeleteNodeAct;
+    QAction*    m_pDeleteNodesChildrenAct;
 
     QAction*    m_pMoveUpAct;
     QAction*    m_pMoveDownAct;

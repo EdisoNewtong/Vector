@@ -18,6 +18,7 @@ TreeView::TreeView(QWidget* parent /* = nullptr*/)
     , m_pInsertSiblingNodeBeforeSelectedNodeAct( nullptr )
     , m_pInsertSiblingNodeAfterSelectedNodeAct( nullptr )
     , m_pDeleteNodeAct( nullptr )
+    , m_pDeleteNodesChildrenAct( nullptr )
     , m_pMoveUpAct( nullptr )
     , m_pMoveDownAct( nullptr )
     , m_pCreateParentWithChildAct( nullptr )
@@ -36,6 +37,7 @@ TreeView::TreeView(QWidget* parent /* = nullptr*/)
     m_pPopupMenu->addSeparator();
 
     m_pDeleteNodeAct                          = m_pPopupMenu->addAction( QStringLiteral("Delete Selected Node") );
+    m_pDeleteNodesChildrenAct                 = m_pPopupMenu->addAction( QStringLiteral("Delete Selected Node's children") );
 
     m_pPopupMenu->addSeparator();
 
@@ -55,6 +57,7 @@ TreeView::TreeView(QWidget* parent /* = nullptr*/)
     connect( m_pInsertSiblingNodeBeforeSelectedNodeAct, SIGNAL(triggered(bool)), this, SLOT( onInsertSiblingNodeBeforeActTrigger()) );
     connect( m_pInsertSiblingNodeAfterSelectedNodeAct,  SIGNAL(triggered(bool)), this, SLOT( onInsertSiblingNodeAfterActTrigger()) );
     connect( m_pDeleteNodeAct,  SIGNAL(triggered(bool)), this, SLOT( onDeleteNodeTrigger()) );
+    connect( m_pDeleteNodesChildrenAct,  SIGNAL(triggered(bool)), this, SLOT( onDeleteNodesChildrenTrigger()) );
     connect( m_pMoveUpAct,      SIGNAL(triggered(bool)),  this, SLOT( onMoveUpActTrigger()) );  
     connect( m_pMoveDownAct,    SIGNAL(triggered(bool)),  this, SLOT( onMoveDownActTrigger()) );  
     connect( m_pCreateParentWithChildAct,    SIGNAL(triggered(bool)),  this, SLOT( onCreateParentWithChildActTrigger()) );  
@@ -74,7 +77,6 @@ void TreeView::contextMenuEvent(QContextMenuEvent* event) // Q_DECL_OVERRIDE;
 {
     QTreeView::contextMenuEvent( event );
 
-    QModelIndex selectIdx;
     auto bSelectedFlag = hasOneSelectedItem(m_RightClickSelectedValidIdx);
     if ( !bSelectedFlag || !m_RightClickSelectedValidIdx.isValid() || m_RightClickSelectedValidIdx.column() != 0 ) {
         return;
@@ -88,20 +90,27 @@ void TreeView::contextMenuEvent(QContextMenuEvent* event) // Q_DECL_OVERRIDE;
     }
 
     qDebug() << "Updating QMenu Action ... ";
+    ////////////////////////////////////////////////////////////////
+    m_pCreateChildNodeAtBeginAct->setEnabled( true );
+    m_pCreateChildNodeAtEndAct->setEnabled( true );
+
     auto parentIdx = m_RightClickSelectedValidIdx.parent();
-    TreeNode *parentNode = static_cast<TreeNode*>( parentIdx.internalPointer() );
+    auto isRootNode = !parentIdx.isValid();
 
-    if ( parentNode!= nullptr ) {
-        auto model = this->model();
-        TreeModel* treeModel = nullptr;
-        if (   model != nullptr 
-               // &&  ( treeModel = dynamic_cast<TreeModel*>(model) ) != nullptr )
-               &&  ( treeModel = qobject_cast<TreeModel*>(model) ) != nullptr )
-        {
-            qDebug() << ( treeModel->isInvisibleRoot(parentNode) ? "YES : Invisible Node" : "NO : <Not> Invisible Node");
-        }
-    }
+    m_pInsertSiblingNodeBeforeSelectedNodeAct->setEnabled( !isRootNode );
+    m_pInsertSiblingNodeAfterSelectedNodeAct->setEnabled( !isRootNode );
 
+    m_pDeleteNodeAct->setEnabled( !isRootNode );
+
+    auto currentNode = static_cast<TreeNode*>( m_RightClickSelectedValidIdx.internalPointer() );
+    m_pDeleteNodesChildrenAct->setEnabled( currentNode!=nullptr &&  currentNode->hasChildren() );
+    
+    m_pMoveUpAct->setEnabled( currentNode!=nullptr   && ( currentNode->canSwapWithPreviousNode()  != nullptr) );
+    m_pMoveDownAct->setEnabled( currentNode!=nullptr && ( currentNode->canSwapWithFormerNode()    != nullptr) );
+
+    // m_pCreateParentWithChildAct->setEnabled( !isRootNode );
+    m_pCreateParentWithChildAct->setEnabled( true );
+    ///////////////////////////////////////////////////////
 
     // else : is Valid 
     m_pPopupMenu->popup( event->globalPos() );
@@ -209,6 +218,34 @@ void TreeView::onDeleteNodeTrigger()
         treeModel->deleteSelectedNode(m_RightClickSelectedValidIdx, bNeedReleaseMemoryFlag);
     }
 }
+
+// slot
+void TreeView::onDeleteNodesChildrenTrigger()
+{
+    if ( !m_RightClickSelectedValidIdx.isValid() ) {
+        return;
+    }
+
+    auto model = this->model();
+    TreeModel* treeModel = nullptr;
+    if (   model != nullptr 
+           // &&  ( treeModel = dynamic_cast<TreeModel*>(model) ) != nullptr )
+           &&  ( treeModel = qobject_cast<TreeModel*>(model) ) != nullptr )
+    {
+        // int bNeedReleaseMemoryFlag = 1;
+        // treeModel->deleteSelectedNode(m_RightClickSelectedValidIdx, bNeedReleaseMemoryFlag);
+        auto parentNode = static_cast<TreeNode*>( m_RightClickSelectedValidIdx.internalPointer() );
+        if ( parentNode!=nullptr && parentNode->hasChildren() ) {
+            int bNeedReleaseMemoryFlag = 1;
+            auto bret = treeModel->deleteSelectedNodesChildren( m_RightClickSelectedValidIdx, bNeedReleaseMemoryFlag);
+
+            if ( bret ) {
+                collapse(m_RightClickSelectedValidIdx);
+            }
+        }
+    }
+}
+
 
 // slot
 void TreeView::onMoveUpActTrigger()

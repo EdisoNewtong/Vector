@@ -8,7 +8,7 @@
 #include "rapidxml_print.hpp" // for xml generate file content
 
 
-static const QString G_NEW_NODE_NAME("UnnamedNode");
+static const QString G_NEW_NODE_NAME("New_Node");
 static const QString G_NEW_NODE_VALUE("");
 
 TreeModel::TreeModel(QObject* parent /*= nullptr*/)
@@ -18,6 +18,7 @@ TreeModel::TreeModel(QObject* parent /*= nullptr*/)
     , m_deleteMethod(0)
     , m_pushExistedNodeFlag(0)
     , m_existedWillInsertNode( nullptr )
+    , m_nameReg( QStringLiteral("[a-zA-Z_][a-zA-Z0-9_]*") )
 {
     reCreateRootNode();
 
@@ -65,23 +66,47 @@ QVariant TreeModel::data(const QModelIndex &index, int role /* = Qt::DisplayRole
         return QVariant();
     }
 
-    if ( role != Qt::DisplayRole && role != Qt::EditRole ) {
-        return QVariant();
-    }
-
+    QVariant val;
     TreeNode* item = static_cast<TreeNode*>( index.internalPointer() );
-    if ( item != nullptr ) {
+    if ( item != nullptr ) 
+    {
         int idxCol = index.column();
-        if ( idxCol == 0 ) {
-            return item->getName();
-        } else if ( idxCol == 1) {
-            return item->getValue();
-        } else {
-            return QVariant();
+        switch( role ) 
+        {
+            case Qt::DisplayRole:
+            case Qt::EditRole:
+                {
+                    if ( idxCol == 0 ) {
+                        val =  item->getName();
+                    } else if ( idxCol == 1) {
+                        val = item->getValue();
+                    } 
+                }
+                break;
+            case Qt::BackgroundRole:
+            case Qt::ForegroundRole:
+                {
+                    if ( idxCol == 0 ) {
+                        int isEmptyFlag = 0;
+                        auto bValid = checkNameIsValid(index, &isEmptyFlag);
+                        if ( !bValid ) {
+                            if ( isEmptyFlag == 1 ) {
+                                val = role == Qt::BackgroundRole ? QBrush(Qt::red) : QBrush();
+                            } else {
+                                val = role == Qt::BackgroundRole ? QBrush() : QBrush(Qt::red);
+                            }
+                        } else {
+                            val = QBrush();
+                        }
+                    }
+                }
+                break;
+            default:
+                break;
         }
     }
 
-    return QVariant();
+    return val;
 }
 
 // virtual 
@@ -145,7 +170,7 @@ int TreeModel::rowCount(const QModelIndex &parent /* = QModelIndex()*/ ) const /
 // virtual
 Qt::ItemFlags TreeModel::flags(const QModelIndex & index) const // Q_DECL_OVERRIDE;
 {
-    // Q_UNUSED(index);
+    // Qt::ItemFlags retFlags = QAbstractItemModel::flags(index) | Qt::ItemIsEditable;
     return QAbstractItemModel::flags(index) | Qt::ItemIsEditable;
 }
 
@@ -358,11 +383,13 @@ bool TreeModel::insertSiblingNodeAfter(const QModelIndex& afterNodeIdx)
 bool TreeModel::createParentWithChild(const QModelIndex& selectedNodeIdx, QModelIndex& newCreatedParentIdx)
 {
     auto parentIdx = selectedNodeIdx.parent();
+    TreeNode* selectedNodeParent = nullptr;
     if ( !parentIdx.isValid() ) {
-        return false;
+        selectedNodeParent = m_invisibleRoot;
+    } else {
+        selectedNodeParent = static_cast<TreeNode*>( parentIdx.internalPointer() );
     }
 
-    TreeNode* selectedNodeParent = static_cast<TreeNode*>( parentIdx.internalPointer() );
     TreeNode* selectedNode = static_cast<TreeNode*>( selectedNodeIdx.internalPointer() );
     int selfIdx = selectedNode->selfIndex();
 
@@ -396,10 +423,6 @@ bool TreeModel::createParentWithChild(const QModelIndex& selectedNodeIdx, QModel
 
 
 
-bool TreeModel::isInvisibleRoot(TreeNode* node)
-{
-    return node == m_invisibleRoot;
-}
 
 
 
@@ -420,40 +443,42 @@ bool TreeModel::insertRows(int row, int count, const QModelIndex &parent /* = QM
     //
     bool checkValid = true;
     TreeNode* targetParentItem = static_cast<TreeNode*>( parent.internalPointer() );
-    if ( targetParentItem != nullptr ) {
-        int childrenSz = targetParentItem->childCount();
-        if ( row > childrenSz || row < 0 ) {
-            checkValid = false;
-        } else {
-            TreeNode* newInsertNode = nullptr;
+    if ( targetParentItem == nullptr ) {
+        targetParentItem = m_invisibleRoot;
+    }
 
-            if ( m_pushExistedNodeFlag == 0 ) {
-                if ( row == 0 ) {
-                    // prepend at head
-                    newInsertNode = targetParentItem->prependChild();
-                } else if ( row == childrenSz ) {
-                    // append at tail
-                    newInsertNode = targetParentItem->appendChild();
-                } else {
-                    // In the middle N-th position
-                    newInsertNode = targetParentItem->insertNodeAtIndex(row);
-                }
+    int childrenSz = targetParentItem->childCount();
+    if ( row > childrenSz || row < 0 ) {
+        checkValid = false;
+    } else {
+        TreeNode* newInsertNode = nullptr;
 
-                if ( newInsertNode != nullptr ) {
-                    newInsertNode->setName( G_NEW_NODE_NAME );
-                } else {
-                    checkValid = false;
-                }
-            } else if ( m_pushExistedNodeFlag == 1 ) {
-                // push Existed node
-                if ( m_existedWillInsertNode ) {
-                    targetParentItem->pushExistedChild( m_existedWillInsertNode );
-                }
-            } else if ( m_pushExistedNodeFlag == 2 ) {
-                // qDebug() << " Up/Down" << 
-                if ( m_existedWillInsertNode ) {
-                    targetParentItem->insertExistedChild( m_existedWillInsertNode, row);
-                }
+        if ( m_pushExistedNodeFlag == 0 ) {
+            if ( row == 0 ) {
+                // prepend at head
+                newInsertNode = targetParentItem->prependChild();
+            } else if ( row == childrenSz ) {
+                // append at tail
+                newInsertNode = targetParentItem->appendChild();
+            } else {
+                // In the middle N-th position
+                newInsertNode = targetParentItem->insertNodeAtIndex(row);
+            }
+
+            if ( newInsertNode != nullptr ) {
+                newInsertNode->setName( G_NEW_NODE_NAME );
+            } else {
+                checkValid = false;
+            }
+        } else if ( m_pushExistedNodeFlag == 1 ) {
+            // push Existed node
+            if ( m_existedWillInsertNode ) {
+                targetParentItem->pushExistedChild( m_existedWillInsertNode );
+            }
+        } else if ( m_pushExistedNodeFlag == 2 ) {
+            // qDebug() << " Up/Down" << 
+            if ( m_existedWillInsertNode ) {
+                targetParentItem->insertExistedChild( m_existedWillInsertNode, row);
             }
         }
     }
@@ -470,9 +495,6 @@ bool TreeModel::deleteSelectedNode(const QModelIndex& selectedNodeIdx, int iDele
     }
 
     auto parentModelIdx = selectedNodeIdx.parent();
-    if ( !parentModelIdx.isValid() ) {
-        return false;
-    }
 
     auto targetItemNeedToBeDelete = static_cast<TreeNode*>( selectedNodeIdx.internalPointer() );
     if ( targetItemNeedToBeDelete == nullptr ) {
@@ -484,6 +506,30 @@ bool TreeModel::deleteSelectedNode(const QModelIndex& selectedNodeIdx, int iDele
     m_deleteMethod = iDeleteMethod;
     auto bret =  this->removeRows(selfIdx,1, parentModelIdx);
     m_deleteMethod = 0;
+
+    return bret;
+}
+
+
+bool TreeModel::deleteSelectedNodesChildren(const QModelIndex& selectedNodeIdx,int iDeleteMethod)
+{
+    if ( !selectedNodeIdx.isValid() ) {
+        return false;
+    }
+
+    auto bret = true;
+    auto parentNode = static_cast<TreeNode*>( selectedNodeIdx.internalPointer() );
+    for ( int i = parentNode->childCount()-1; i >=0; --i ) {
+        auto childidx = this->index(i,0, selectedNodeIdx);
+        if ( childidx.isValid() ) {
+            bret = deleteSelectedNode(childidx, iDeleteMethod);
+
+            if ( !bret ) {
+                break;
+            }
+        }
+        
+    }
 
     return bret;
 }
@@ -503,19 +549,19 @@ bool TreeModel::removeRows(int row, int count, const QModelIndex &parent /* = QM
     //
     bool checkValid = true;
     TreeNode* targetParentItem = static_cast<TreeNode*>( parent.internalPointer() );
-    if ( targetParentItem != nullptr ) {
-        TreeNode* willDeleteNode = targetParentItem->getChildAtIdx(row);
-        if ( willDeleteNode != nullptr ) {
-            if ( m_deleteMethod == 1 ) {
-                delete willDeleteNode;
-            } else if ( m_deleteMethod == 2 ) {
-                willDeleteNode->removeFromParent();
-            } else if ( m_deleteMethod == 3 ) {
-                qDebug() << "Swap Up/Down : Do removeFromParent( false )";
-                willDeleteNode->removeFromParent();
-            }
-        } else {
-            checkValid = false;
+    if ( targetParentItem == nullptr ) {
+        targetParentItem = m_invisibleRoot;
+    }
+
+    TreeNode* willDeleteNode = targetParentItem->getChildAtIdx(row);
+    if ( willDeleteNode != nullptr ) {
+        if ( m_deleteMethod == 1 ) {
+            delete willDeleteNode;
+        } else if ( m_deleteMethod == 2 ) {
+            willDeleteNode->removeFromParent();
+        } else if ( m_deleteMethod == 3 ) {
+            qDebug() << "Swap Up/Down : Do removeFromParent( false )";
+            willDeleteNode->removeFromParent();
         }
     } else {
         checkValid = false;
@@ -598,3 +644,15 @@ bool TreeModel::swapDown(const QModelIndex& selectedNodeIdx)
     return bret;
 }
 
+
+
+bool TreeModel::checkNameIsValid(const QModelIndex& index, int* bFlagisEmptyString) const
+{
+    QString strData = index.data().toString();
+
+    auto bret = m_nameReg.exactMatch(strData);
+    if ( bFlagisEmptyString != nullptr ) {
+        *bFlagisEmptyString = strData.trimmed().isEmpty() ? 1 : 0;
+    }
+    return bret;
+}

@@ -255,8 +255,8 @@ bool  TreeNode::hasChildren()
 TreeNode*  TreeNode::canSwapWithPreviousNode()
 {
     int selfIdx = selfIndex();
-    if( selfIdx != 0 ) {
-        return m_parent->m_children.at( selfIdx-1 );
+    if( selfIdx > 0 ) {
+        return m_parent->m_children.at( selfIdx - 1 );
     } else {
         return nullptr;
     }

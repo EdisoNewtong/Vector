@@ -1,6 +1,11 @@
 
 TEMPLATE = lib
 
+win32 {
+    # QMAKE_CFLAGS += -Wimplicit-fallthrough=
+    QMAKE_CFLAGS += -Wno-implicit-fallthrough
+}
+
 CONFIG += staticlib c++11
 
 HEADERS += src/lapi.h \
