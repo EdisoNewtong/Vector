@@ -15,6 +15,9 @@ TreeModel::TreeModel(QObject* parent /*= nullptr*/)
     : QAbstractItemModel(parent)
     , m_invisibleRoot( nullptr )
     , m_pXMLDoc( nullptr )
+    , m_deleteMethod(0)
+    , m_pushExistedNodeFlag(0)
+    , m_existedWillInsertNode( nullptr )
 {
     reCreateRootNode();
 
@@ -51,6 +54,7 @@ TreeModel::~TreeModel()
 // virtual 
 int TreeModel::columnCount(const QModelIndex &parent /* = QModelIndex()*/ ) const // Q_DECL_OVERRIDE;
 {
+    (void)parent;
     return 2;
 }
 
@@ -94,7 +98,7 @@ QModelIndex TreeModel::index(int row, int column, const QModelIndex &parent /* =
         parentItem = static_cast<TreeNode*>( parent.internalPointer() );
     }
 
-    TreeNode* child = parentItem->getChild(row);
+    TreeNode* child = parentItem->getChildAtIdx(row);
     if ( child != nullptr ) {
         return createIndex(row, column, child);
     } 
@@ -116,14 +120,14 @@ QModelIndex TreeModel::parent(const QModelIndex &index) const // Q_DECL_OVERRIDE
         return QModelIndex();
     }
 
-    return createIndex( parentItem->selfIndex() ,0, parentItem);
+    return createIndex( parentItem->selfIndex() , 0, parentItem);
 }
 
 // virtual 
 int TreeModel::rowCount(const QModelIndex &parent /* = QModelIndex()*/ ) const // Q_DECL_OVERRIDE;
 {
     TreeNode* parentItem = nullptr;
-    // not the 1st node , maybe node at the 2nd position , 3rd position or ...
+    // not the 1st column node , maybe node at the 2nd column position , 3rd position column or ...
     if ( parent.column() > 0 ) {
         return 0;
     }
@@ -138,12 +142,36 @@ int TreeModel::rowCount(const QModelIndex &parent /* = QModelIndex()*/ ) const /
     return parentItem != nullptr ? parentItem->childCount() : 0; 
 }
 
-
+// virtual
 Qt::ItemFlags TreeModel::flags(const QModelIndex & index) const // Q_DECL_OVERRIDE;
 {
     // Q_UNUSED(index);
     return QAbstractItemModel::flags(index) | Qt::ItemIsEditable;
 }
+
+
+
+// virtual 
+bool TreeModel::hasChildren(const QModelIndex &parent /* = QModelIndex() */) const // Q_DECL_OVERRIDE;
+{
+    TreeNode* parentItem  = nullptr;
+    if ( !parent.isValid() /* || parent.column() != 0 */ ) {
+        parentItem = m_invisibleRoot;
+    } else {
+        parentItem  = static_cast<TreeNode*>( parent.internalPointer() );
+        if ( parentItem == nullptr ) {
+            // qDebug() << "parentItem == nullptr, set as m_invisibleRoot";
+            parentItem = m_invisibleRoot;
+        }
+    }
+
+    if ( parentItem != nullptr ) {
+        return parentItem->hasChildren();
+    } else {
+        return false;
+    }
+}
+
 
 // virtual
 bool TreeModel::setData(const QModelIndex & index, const QVariant & afterEditVal, int role) // Q_DECL_OVERRIDE;
@@ -158,6 +186,10 @@ bool TreeModel::setData(const QModelIndex & index, const QVariant & afterEditVal
             } else if ( idxCol == 1 ) {
                 editNode->setValue( afterEditVal.toString() );
             }
+
+            // follow the QT offical document : 
+            //     The dataChanged() signal should be emitted if the data was successfully set.
+            emit dataChanged(index, index);
         }
     }
 
@@ -323,6 +355,47 @@ bool TreeModel::insertSiblingNodeAfter(const QModelIndex& afterNodeIdx)
 }
 
 
+bool TreeModel::createParentWithChild(const QModelIndex& selectedNodeIdx, QModelIndex& newCreatedParentIdx)
+{
+    auto parentIdx = selectedNodeIdx.parent();
+    if ( !parentIdx.isValid() ) {
+        return false;
+    }
+
+    TreeNode* selectedNodeParent = static_cast<TreeNode*>( parentIdx.internalPointer() );
+    TreeNode* selectedNode = static_cast<TreeNode*>( selectedNodeIdx.internalPointer() );
+    int selfIdx = selectedNode->selfIndex();
+
+    bool bRet = false;
+    int deleteMethod = 2;
+    bRet = this->deleteSelectedNode(selectedNodeIdx, deleteMethod);
+    if ( !bRet ) {
+        return false;
+    }
+    
+    bRet = this->insertRow(selfIdx, parentIdx);
+    if ( !bRet ) {
+        return false;
+    }
+
+    //
+    // get New created pointer in selfIdx
+    //
+    TreeNode* newInsertedNode = selectedNodeParent->getChildAtIdx(selfIdx);
+    QModelIndex newParentNodeIdx = createIndex(selfIdx, 0, newInsertedNode);
+    newCreatedParentIdx = newParentNodeIdx;
+
+    m_pushExistedNodeFlag = 1;
+    m_existedWillInsertNode = selectedNode;
+    bRet = this->insertRow(0, newParentNodeIdx);
+    m_existedWillInsertNode = nullptr;
+    m_pushExistedNodeFlag = 0;
+
+    return bRet;
+}
+
+
+
 bool TreeModel::isInvisibleRoot(TreeNode* node)
 {
     return node == m_invisibleRoot;
@@ -353,21 +426,34 @@ bool TreeModel::insertRows(int row, int count, const QModelIndex &parent /* = QM
             checkValid = false;
         } else {
             TreeNode* newInsertNode = nullptr;
-            if ( row == 0 ) {
-                // prepend at head
-                newInsertNode = targetParentItem->prependChild();
-            } else if ( row == childrenSz ) {
-                // append at tail
-                newInsertNode = targetParentItem->appendChild();
-            } else {
-                // In the middle N-th position
-                newInsertNode = targetParentItem->insertNodeAtIndex(row);
-            }
 
-            if ( newInsertNode != nullptr ) {
-                newInsertNode->setName( G_NEW_NODE_NAME );
-            } else {
-                checkValid = false;
+            if ( m_pushExistedNodeFlag == 0 ) {
+                if ( row == 0 ) {
+                    // prepend at head
+                    newInsertNode = targetParentItem->prependChild();
+                } else if ( row == childrenSz ) {
+                    // append at tail
+                    newInsertNode = targetParentItem->appendChild();
+                } else {
+                    // In the middle N-th position
+                    newInsertNode = targetParentItem->insertNodeAtIndex(row);
+                }
+
+                if ( newInsertNode != nullptr ) {
+                    newInsertNode->setName( G_NEW_NODE_NAME );
+                } else {
+                    checkValid = false;
+                }
+            } else if ( m_pushExistedNodeFlag == 1 ) {
+                // push Existed node
+                if ( m_existedWillInsertNode ) {
+                    targetParentItem->pushExistedChild( m_existedWillInsertNode );
+                }
+            } else if ( m_pushExistedNodeFlag == 2 ) {
+                // qDebug() << " Up/Down" << 
+                if ( m_existedWillInsertNode ) {
+                    targetParentItem->insertExistedChild( m_existedWillInsertNode, row);
+                }
             }
         }
     }
@@ -377,7 +463,7 @@ bool TreeModel::insertRows(int row, int count, const QModelIndex &parent /* = QM
 }
 
 
-bool TreeModel::deleteSelectedNode(const QModelIndex& selectedNodeIdx)
+bool TreeModel::deleteSelectedNode(const QModelIndex& selectedNodeIdx, int iDeleteMethod)
 {
     if ( !selectedNodeIdx.isValid() ) {
         return false;
@@ -394,7 +480,12 @@ bool TreeModel::deleteSelectedNode(const QModelIndex& selectedNodeIdx)
     }
 
     auto selfIdx = targetItemNeedToBeDelete->selfIndex();
-    return this->removeRows(selfIdx,1, parentModelIdx);
+
+    m_deleteMethod = iDeleteMethod;
+    auto bret =  this->removeRows(selfIdx,1, parentModelIdx);
+    m_deleteMethod = 0;
+
+    return bret;
 }
 
 
@@ -413,9 +504,16 @@ bool TreeModel::removeRows(int row, int count, const QModelIndex &parent /* = QM
     bool checkValid = true;
     TreeNode* targetParentItem = static_cast<TreeNode*>( parent.internalPointer() );
     if ( targetParentItem != nullptr ) {
-        TreeNode* willDeleteNode = targetParentItem->getChild(row);
+        TreeNode* willDeleteNode = targetParentItem->getChildAtIdx(row);
         if ( willDeleteNode != nullptr ) {
-            delete willDeleteNode;
+            if ( m_deleteMethod == 1 ) {
+                delete willDeleteNode;
+            } else if ( m_deleteMethod == 2 ) {
+                willDeleteNode->removeFromParent();
+            } else if ( m_deleteMethod == 3 ) {
+                qDebug() << "Swap Up/Down : Do removeFromParent( false )";
+                willDeleteNode->removeFromParent();
+            }
         } else {
             checkValid = false;
         }
@@ -425,5 +523,78 @@ bool TreeModel::removeRows(int row, int count, const QModelIndex &parent /* = QM
 
     QAbstractItemModel::endRemoveRows();
     return checkValid;
+}
+
+
+bool TreeModel::swapUp(const QModelIndex& selectedNodeIdx)
+{
+    /*
+     *
+     * Can't Use the sample method to deal with because it will result of the value column can't be edited
+     *
+        auto bret = selectedNode->swapWithPreviousNode();
+        ...
+        emit dataChanged( newPreviousIdx,  newFormerModelIdx , roleVec);
+    */
+
+    auto parentIdx = selectedNodeIdx.parent();
+    TreeNode* selectedNode = static_cast<TreeNode*>( selectedNodeIdx.internalPointer() );
+    TreeNode* previousNode = selectedNode->canSwapWithPreviousNode();
+    if ( previousNode == nullptr ) {
+        return true;
+    }
+
+    int iRowIdx = selectedNodeIdx.row();
+    auto previousRowIdx = selectedNodeIdx.sibling(iRowIdx-1, 0);
+
+    int deleteMethod = 3;
+    auto bret =  this->deleteSelectedNode(previousRowIdx , deleteMethod);
+    if ( !bret ) {
+        return false;
+    }
+
+    m_pushExistedNodeFlag = 2;
+    m_existedWillInsertNode = previousNode;
+    bret = this->insertRow(iRowIdx, parentIdx);
+    m_existedWillInsertNode = nullptr;
+    m_pushExistedNodeFlag = 0;
+    
+    return bret;
+}
+
+bool TreeModel::swapDown(const QModelIndex& selectedNodeIdx)
+{
+    /*
+     *
+     * Can't Use the sample method to deal with because it will result of the value column can't be edited
+     *
+        auto bret = selectedNode->swapWithPreviousNode();
+        ...
+        emit dataChanged( newPreviousIdx,  newFormerModelIdx , roleVec);
+    */
+
+    auto parentIdx = selectedNodeIdx.parent();
+    TreeNode* selectedNode = static_cast<TreeNode*>( selectedNodeIdx.internalPointer() );
+    TreeNode* formerNode   = selectedNode->canSwapWithFormerNode();
+    if ( formerNode == nullptr ) {
+        return true;
+    }
+
+    int iRowIdx = selectedNodeIdx.row();
+    auto formerRowIdx =  selectedNodeIdx.sibling(iRowIdx + 1, 0);
+
+    int deleteMethod = 3;
+    auto bret =  this->deleteSelectedNode(formerRowIdx , deleteMethod);
+    if ( !bret ) {
+        return false;
+    }
+
+    m_pushExistedNodeFlag = 2;
+    m_existedWillInsertNode = formerNode;
+    bret = this->insertRow(iRowIdx, parentIdx);
+    m_existedWillInsertNode = nullptr;
+    m_pushExistedNodeFlag = 0;
+
+    return bret;
 }
 

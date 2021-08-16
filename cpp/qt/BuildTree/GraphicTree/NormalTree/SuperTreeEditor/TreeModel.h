@@ -41,6 +41,7 @@ public:
     virtual int 
     rowCount(const QModelIndex &parent = QModelIndex()) const Q_DECL_OVERRIDE;
 
+    virtual 
     Qt::ItemFlags flags(const QModelIndex & index) const Q_DECL_OVERRIDE;
 
     //
@@ -51,6 +52,12 @@ public:
 
     virtual  QVariant
     headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const Q_DECL_OVERRIDE;
+
+    //
+    // In such cases, the hasChildren() function can be reimplemented to provide an inexpensive way for views to check for the presence of children
+    //
+    virtual bool 
+    hasChildren(const QModelIndex &parent = QModelIndex() ) const Q_DECL_OVERRIDE;
 
     //
     // Resizeable
@@ -77,8 +84,11 @@ public:
     bool insertSiblingNodeBefore(const QModelIndex& beforeNodeIdx);
     bool insertSiblingNodeAfter(const QModelIndex& afterNodeIdx);
     
-    bool deleteSelectedNode(const QModelIndex& selectedNodeIdx);
+    bool deleteSelectedNode(const QModelIndex& selectedNodeIdx, int iDeleteMethod);
+    bool createParentWithChild(const QModelIndex& selectedNodeIdx, QModelIndex& newCreatedParentIdx);
 
+    bool swapUp(const QModelIndex& selectedNodeIdx);
+    bool swapDown(const QModelIndex& selectedNodeIdx);
 protected:
 
     void deleteRootNode();
@@ -90,6 +100,11 @@ protected:
     rapidxml::xml_document<char>* m_pXMLDoc;
 
     QVector<QByteArray> m_XmlStringList;
+
+    int                 m_deleteMethod;
+    int                 m_pushExistedNodeFlag;
+
+    TreeNode*           m_existedWillInsertNode;
 
 };
 

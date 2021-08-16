@@ -103,6 +103,7 @@ TreeNode* TreeNode::prependChild()
 }
 
 
+/*
 TreeNode* TreeNode::insertSiblingNodeBefore()
 {
     if ( m_parent != nullptr ) {
@@ -139,11 +140,17 @@ TreeNode* TreeNode::insertSiblingNodeAfter()
 
     return nullptr;
 }
+*/
 
 TreeNode* TreeNode::getParent()
 {
     return m_parent;
 }
+
+// void TreeNode::setParent(TreeNode* parent)
+// {
+//     m_parent = parent;
+// }
 
 
 int       TreeNode::selfIndex()
@@ -186,11 +193,11 @@ void      TreeNode::removeFromParent()
             // delete self inside the children list
             m_parent->m_children.removeAt(foundIdx);
 
-            // cut parent relationship
-            m_parent = nullptr;
+            // broken ownership relationship
+            // if ( brokeRelationship ) {
+                m_parent = nullptr;
+            // }
         }
-
-        delete this;
     }
 }
 
@@ -200,7 +207,7 @@ int TreeNode::childCount()
     return m_children.size();
 }
 
-TreeNode* TreeNode::getChild(int idx)
+TreeNode* TreeNode::getChildAtIdx(int idx)
 {
     if ( idx >=0 && idx < m_children.size() ) {
         return m_children.at(idx);
@@ -217,9 +224,71 @@ TreeNode* TreeNode::insertNodeAtIndex(int idx)
         return nullptr;
     }
 
-
     TreeNode* newInsertNode = new TreeNode( QString(""), QString(""), this);
     m_children.insert(idx, newInsertNode);
     return newInsertNode;
 }
+
+
+
+
+TreeNode* TreeNode::pushExistedChild(TreeNode* child)
+{
+    child->m_parent = this;
+    m_children.push_back(child);
+    return child;
+}
+
+TreeNode* TreeNode::insertExistedChild(TreeNode* child, int idx)
+{
+    child->m_parent = this;
+    m_children.insert(idx, child);
+    return child;
+}
+
+bool  TreeNode::hasChildren()
+{
+    return !m_children.empty();
+}
+
+
+TreeNode*  TreeNode::canSwapWithPreviousNode()
+{
+    int selfIdx = selfIndex();
+    if( selfIdx != 0 ) {
+        return m_parent->m_children.at( selfIdx-1 );
+    } else {
+        return nullptr;
+    }
+}
+
+
+// void  TreeNode::swapWithPreviousNode()
+// {
+//     int selfIdx = selfIndex();
+//     m_parent->m_children.swapItemsAt( selfIdx, selfIdx - 1 );
+// }
+
+
+TreeNode*  TreeNode::canSwapWithFormerNode()
+{
+    int selfIdx = selfIndex();
+    int childrenCnt = m_parent->childCount();
+    if ( selfIdx != (childrenCnt - 1) ) {
+        return m_parent->m_children.at( selfIdx + 1);
+    } else {
+        return nullptr;
+    }
+}
+
+
+// void  TreeNode::swapWithFormerNode()
+// {
+//     int selfIdx = selfIndex();
+//     // Must have Former Node
+//     m_parent->m_children.swapItemsAt( selfIdx, selfIdx + 1 );
+// }
+
+
+
 

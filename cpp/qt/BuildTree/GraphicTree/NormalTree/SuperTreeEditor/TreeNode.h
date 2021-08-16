@@ -16,14 +16,17 @@ public:
     // create node
     TreeNode* appendChild();
     TreeNode* prependChild();
-    TreeNode* insertSiblingNodeBefore();
-    TreeNode* insertSiblingNodeAfter();
 
     TreeNode* insertNodeAtIndex(int idx);
+    TreeNode* pushExistedChild(TreeNode* child);
+    TreeNode* insertExistedChild(TreeNode* child, int idx);
 
     TreeNode* getParent();
+    // void setParent(TreeNode* parent);
+     
+
     int       selfIndex();
-    TreeNode* getChild(int idx);
+    TreeNode* getChildAtIdx(int idx);
 
     QString   getName();
     void      setName(const QString& name);
@@ -34,8 +37,15 @@ public:
     void      removeFromParent();
 
     int       childCount();
+    bool      hasChildren();
 
     void      releaseSelfAndChildren();
+
+    TreeNode* canSwapWithPreviousNode();
+    // void      swapWithPreviousNode();
+
+    TreeNode* canSwapWithFormerNode();
+    // void      swapWithFormerNode();
 protected:
     //
     // Data Field

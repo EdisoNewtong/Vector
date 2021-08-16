@@ -112,7 +112,7 @@ void TreeView::contextMenuEvent(QContextMenuEvent* event) // Q_DECL_OVERRIDE;
 // slot
 void TreeView::onPrependNodeActTrigger()
 {
-    qDebug() << "TODO : Prepend Child";
+    // qDebug() << "TODO : Prepend Child";
     
     if ( !m_RightClickSelectedValidIdx.isValid() ) {
         return;
@@ -134,7 +134,8 @@ void TreeView::onPrependNodeActTrigger()
 // slot
 void TreeView::onAppendNodeActTrigger()
 {
-    qDebug() << "TODO : Append Child";
+    // qDebug() << "TODO : Append Child";
+
     if ( !m_RightClickSelectedValidIdx.isValid() ) {
         return;
     }
@@ -155,7 +156,8 @@ void TreeView::onAppendNodeActTrigger()
 // slot
 void TreeView::onInsertSiblingNodeBeforeActTrigger()
 {
-    qDebug() << "TODO : Insert Sibling Child | Before ";
+    // qDebug() << "TODO : Insert Sibling Child | Before ";
+    
     if ( !m_RightClickSelectedValidIdx.isValid() ) {
         return;
     }
@@ -173,7 +175,8 @@ void TreeView::onInsertSiblingNodeBeforeActTrigger()
 // slot
 void TreeView::onInsertSiblingNodeAfterActTrigger()
 {
-    qDebug() << "TODO : Insert Sibling Child | After ";
+    // qDebug() << "TODO : Insert Sibling Child | After ";
+
     if ( !m_RightClickSelectedValidIdx.isValid() ) {
         return;
     }
@@ -191,7 +194,7 @@ void TreeView::onInsertSiblingNodeAfterActTrigger()
 // slot
 void TreeView::onDeleteNodeTrigger()
 {
-    qDebug() << "TODO : Delete Node ";
+    // qDebug() << "TODO : Delete Node ";
     if ( !m_RightClickSelectedValidIdx.isValid() ) {
         return;
     }
@@ -202,16 +205,27 @@ void TreeView::onDeleteNodeTrigger()
            // &&  ( treeModel = dynamic_cast<TreeModel*>(model) ) != nullptr )
            &&  ( treeModel = qobject_cast<TreeModel*>(model) ) != nullptr )
     {
-        treeModel->deleteSelectedNode(m_RightClickSelectedValidIdx);
+        int bNeedReleaseMemoryFlag = 1;
+        treeModel->deleteSelectedNode(m_RightClickSelectedValidIdx, bNeedReleaseMemoryFlag);
     }
 }
 
 // slot
 void TreeView::onMoveUpActTrigger()
 {
-    qDebug() << "TODO : Move Node Up";
+    // qDebug() << "TODO : Move Node Up";
     if ( !m_RightClickSelectedValidIdx.isValid() ) {
         return;
+    }
+
+    auto model = this->model();
+    TreeModel* treeModel = nullptr;
+    if (   model != nullptr 
+           // &&  ( treeModel = dynamic_cast<TreeModel*>(model) ) != nullptr )
+           &&  ( treeModel = qobject_cast<TreeModel*>(model) ) != nullptr )
+    {
+        auto bret = treeModel->swapUp( m_RightClickSelectedValidIdx );
+        qDebug() << "swapUp : " << (bret ? " SUCC" : " Failed");
     }
 }
 
@@ -222,15 +236,39 @@ void TreeView::onMoveDownActTrigger()
     if ( !m_RightClickSelectedValidIdx.isValid() ) {
         return;
     }
+
+    auto model = this->model();
+    TreeModel* treeModel = nullptr;
+    if (   model != nullptr 
+           // &&  ( treeModel = dynamic_cast<TreeModel*>(model) ) != nullptr )
+           &&  ( treeModel = qobject_cast<TreeModel*>(model) ) != nullptr )
+    {
+        auto bret = treeModel->swapDown( m_RightClickSelectedValidIdx );
+        qDebug() << "swapDown : " << (bret ? " SUCC" : " Failed");
+    }
 }
 
 // slot
 void TreeView::onCreateParentWithChildActTrigger()
 {
-    qDebug() << "TODO : Create Parent With Child";
+    // qDebug() << "TODO : Create Parent With Child";
     if ( !m_RightClickSelectedValidIdx.isValid() ) {
         return;
     }
+
+    auto model = this->model();
+    TreeModel* treeModel = nullptr;
+    if (   model != nullptr 
+           // &&  ( treeModel = dynamic_cast<TreeModel*>(model) ) != nullptr )
+           &&  ( treeModel = qobject_cast<TreeModel*>(model) ) != nullptr )
+    {
+        QModelIndex newParentIdx;
+        auto bret = treeModel->createParentWithChild(m_RightClickSelectedValidIdx, newParentIdx);
+        if ( bret && newParentIdx.isValid() ) {
+            expand(newParentIdx);
+        }
+    }
+
 }
 
 
@@ -241,7 +279,7 @@ bool TreeView::hasOneSelectedItem(QModelIndex& selectedIdx)
         return false;
     }
 
-    // Set Selected ModelIndex
+    // assign Selected ModelIndex to reference
     selectedIdx = model_idx_list.at(0);
     return true;
 }
