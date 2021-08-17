@@ -25,6 +25,7 @@ TreeModel::TreeModel(QObject* parent /*= nullptr*/)
     , m_pushExistedNodeFlag(0)
     , m_existedWillInsertNode( nullptr )
     , m_nameReg( QStringLiteral("[a-zA-Z_][a-zA-Z0-9_]*") )
+    , m_isSupportNumberOnly( false )
 {
     reCreateRootNode();
 
@@ -641,7 +642,13 @@ bool TreeModel::swapDown(const QModelIndex& selectedNodeIdx)
 bool TreeModel::checkNameIsValid(const QModelIndex& index, int* bFlagisEmptyString) const
 {
     QString strData = index.data().toString();
+    if ( m_isSupportNumberOnly ) {
+        bool isNumber = false;
+        strData.toDouble(&isNumber);
+        return isNumber;
+    } 
 
+    // !m_isSupportNumberOnly
     auto bret = m_nameReg.exactMatch(strData);
     if ( bFlagisEmptyString != nullptr ) {
 
@@ -663,20 +670,27 @@ void TreeModel::fillXMLHeader()
 
     rapidxml::xml_node<char>* dclNode = m_pXMLDoc->allocate_node(rapidxml::node_declaration);
 
-    QByteArray ver("version");
-    QByteArray verValue("1.0");
-    QByteArray encoding("encoding");
-    QByteArray encodingVal("UTF-8");
+    QByteArray ver("version");        // [0]
+    QByteArray verValue("1.0");       // [1]
+    QByteArray encoding("encoding");  // [2]
+    QByteArray encodingVal("UTF-8");  // [3]
 
     // For Attribute   value="..." Use
-    QByteArray attrValueKey("value");
+    QByteArray attrValueKey("value");   // [4]
+    QByteArray attrOptionKey("option"); // [5]
+    QByteArray attrOptionValue0( "0" ); // [6]
+    QByteArray attrOptionValue1( "1" ); // [7]
+    QByteArray fixedKey( "node" );      // [8]
 
     m_XmlStringList.push_back( ver );
     m_XmlStringList.push_back( verValue );
     m_XmlStringList.push_back( encoding );
     m_XmlStringList.push_back( encodingVal );
-    m_XmlStringList.push_back( encodingVal );
     m_XmlStringList.push_back( attrValueKey );
+    m_XmlStringList.push_back( attrOptionKey );
+    m_XmlStringList.push_back( attrOptionValue0 );
+    m_XmlStringList.push_back( attrOptionValue1 );
+    m_XmlStringList.push_back( fixedKey );
 
     rapidxml::xml_attribute<char>* attr1 = m_pXMLDoc->allocate_attribute( m_XmlStringList.at(0).constData(),
                                                                           m_XmlStringList.at(1).constData() );
@@ -705,25 +719,49 @@ bool TreeModel::fillXMLContentByNode(const QModelIndex& nodeMidx, rapidxml::xml_
         return false;
     }
 
+
+
+
     rapidxml::xml_node<char>* currentXmlNode = m_pXMLDoc->allocate_node(rapidxml::node_element);
+
+    // 1st Visible Root Only
+    if ( !nodeMidx.parent().isValid() ) {
+        // 6 => "0",   7 => "1"
+        int supportIdx = m_isSupportNumberOnly ? 7 : 6;
+        rapidxml::xml_attribute<char>* attrPairForOption = m_pXMLDoc->allocate_attribute( m_XmlStringList.at(5).constData(),
+                                                                            m_XmlStringList.at(supportIdx).constData() );
+
+        currentXmlNode->append_attribute( attrPairForOption );
+    }
 
     m_XmlStringList.push_back( pNode->getName().toUtf8() );
     nameIdx = m_XmlStringList.size() - 1;
     m_XmlStringList.push_back( pNode->getValue().toUtf8() );
     valIdx  = m_XmlStringList.size() - 1;
 
+    if ( !m_isSupportNumberOnly ) {
 
-    currentXmlNode->name( m_XmlStringList.at(nameIdx).constData() );
-    if ( !pNode->getValue().isEmpty() ) {
-        if ( pNode->hasChildren() ) { 
-            rapidxml::xml_attribute<char>* attrPair = m_pXMLDoc->allocate_attribute( m_XmlStringList.at(5).constData(),
-                                                                                m_XmlStringList.at(valIdx).constData() );
-            
-            currentXmlNode->append_attribute( attrPair );
-        } else {
-            currentXmlNode->value( m_XmlStringList.at(valIdx).constData() );
-        }
+        currentXmlNode->name( m_XmlStringList.at(nameIdx).constData() );
+
+        if ( !pNode->getValue().isEmpty() ) {
+            if ( pNode->hasChildren() ) { 
+                rapidxml::xml_attribute<char>* attrPairForValue = m_pXMLDoc->allocate_attribute( m_XmlStringList.at(4).constData(), // "value"
+                                                                                    m_XmlStringList.at(valIdx).constData() );
+                
+                currentXmlNode->append_attribute( attrPairForValue );
+            } else {
+                currentXmlNode->value( m_XmlStringList.at(valIdx).constData() );
+            }
+        } 
+    } else {
+        currentXmlNode->name( m_XmlStringList.at(8).constData() ); // "node"
+        rapidxml::xml_attribute<char>* attrPairForValue = m_pXMLDoc->allocate_attribute( m_XmlStringList.at(4).constData(), // "value"
+                                                                            m_XmlStringList.at(nameIdx).constData() );
+        currentXmlNode->append_attribute( attrPairForValue );
+        // ignore 2nd column's value
     }
+
+
 
     parentXmlNode->append_node( currentXmlNode );
 
@@ -732,7 +770,9 @@ bool TreeModel::fillXMLContentByNode(const QModelIndex& nodeMidx, rapidxml::xml_
         int sz = pNode->childCount();
         for ( int i = 0; i < sz; ++i ) {
             QModelIndex childMidx = index(i,0, nodeMidx);
+            //
             // recursively travesal child node
+            //
             if ( !fillXMLContentByNode( childMidx ,currentXmlNode, errorNodeMidx) ) {
                 isChildAddSucc = false;
                 break;
@@ -741,5 +781,11 @@ bool TreeModel::fillXMLContentByNode(const QModelIndex& nodeMidx, rapidxml::xml_
     } 
 
     return isChildAddSucc;
+}
+
+
+void TreeModel::setSupportNumberOnlyFlag(bool b)
+{
+    m_isSupportNumberOnly = b;
 }
 

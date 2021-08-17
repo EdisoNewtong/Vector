@@ -9,11 +9,12 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
+    , m_myTreeModel( nullptr )
 {
     ui->setupUi(this);
 
-    auto treemodel = new TreeModel(this);
-    ui->tableView->setModel( treemodel );
+    m_myTreeModel = new TreeModel(this);
+    ui->tableView->setModel( m_myTreeModel );
 }
 
 MainWindow::~MainWindow()
@@ -29,11 +30,17 @@ void MainWindow::on_loadTreeFromFileBtn_clicked()
 
 void MainWindow::on_saveTreeToFileBtn_clicked()
 {
-    // 
+    auto  isSupportNumberOnly = ui->checkBoxOption0->checkState() == Qt::Checked;
+    if ( m_myTreeModel != nullptr ) {
+        m_myTreeModel->setSupportNumberOnlyFlag( isSupportNumberOnly );
+    }
 
+    ui->checkBoxOption0->setEnabled(false);
+    // 
     auto treemodel = static_cast<TreeModel*>( ui->tableView->model() );
     if ( treemodel == nullptr ) {
         ui->statusBar->showMessage("No Tree Model , Can't perform <Save> operator", 3500);
+        ui->checkBoxOption0->setEnabled(true);
         return;
     }
 
@@ -44,12 +51,15 @@ void MainWindow::on_saveTreeToFileBtn_clicked()
         // auto selmodel = ui->treeView->selectionModel();
         ui->statusBar->showMessage("Some tree node's value is invalid, Please Check", 3500);
         ui->tableView->scrollTo( errorIdx );
+
+        ui->checkBoxOption0->setEnabled(true);
         return;
     }
 
     // static
     auto savedfile = QFileDialog::getSaveFileName(this,"Save Tree Info");
     if ( savedfile.trimmed().isEmpty() ) {
+        ui->checkBoxOption0->setEnabled(true);
         return;
     }
 
@@ -60,6 +70,7 @@ void MainWindow::on_saveTreeToFileBtn_clicked()
     } else {
         ui->statusBar->showMessage("Failed on saving file", 3500);
     }
+    ui->checkBoxOption0->setEnabled(true);
 }
 
 void MainWindow::on_clearTreeBtn_clicked()
@@ -75,5 +86,14 @@ void MainWindow::on_drawTreeBtn_clicked()
 void MainWindow::on_saveAsPngBtn_clicked()
 {
 
+}
+
+
+void MainWindow::on_checkBoxOption0_stateChanged(int arg1)
+{
+    auto isSupportNumberOnly = (arg1 == Qt::Checked);
+    if ( m_myTreeModel != nullptr ) {
+        m_myTreeModel->setSupportNumberOnlyFlag( isSupportNumberOnly );
+    }
 }
 

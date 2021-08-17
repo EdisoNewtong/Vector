@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 
+class TreeModel;
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -27,7 +29,11 @@ private slots:
     void on_saveAsPngBtn_clicked();
 
 
+    void on_checkBoxOption0_stateChanged(int arg1);
+
 private:
     Ui::MainWindow *ui;
+
+    TreeModel*    m_myTreeModel;
 };
 #endif // MAINWINDOW_H

@@ -131,6 +131,19 @@
      </rect>
     </property>
    </widget>
+   <widget class="QCheckBox" name="checkBoxOption0">
+    <property name="geometry">
+     <rect>
+      <x>310</x>
+      <y>510</y>
+      <width>121</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Key Only Number</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
  </widget>

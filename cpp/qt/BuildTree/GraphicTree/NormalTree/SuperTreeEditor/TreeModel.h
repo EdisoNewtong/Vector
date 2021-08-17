@@ -73,6 +73,9 @@ protected:
     // void QAbstractItemModel::beginInsertRows(const QModelIndex &parent, int first, int last) Q_DECL_OVERRIDE;
 
 public:
+    // set support number only
+    void setSupportNumberOnlyFlag(bool b);
+
     // for save info XML  file
     bool prepareSavedString(QString& outFileContent, QModelIndex& errorNodeMidx);
 
@@ -116,6 +119,8 @@ protected:
     TreeNode*           m_existedWillInsertNode;
 
     QRegExp             m_nameReg;
+
+    bool                m_isSupportNumberOnly;
 
 };
 
