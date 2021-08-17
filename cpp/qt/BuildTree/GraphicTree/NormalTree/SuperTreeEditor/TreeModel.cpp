@@ -1,3 +1,9 @@
+
+// C++ standard header
+#include <string>
+#include <iterator>
+
+// Qt header
 #include <QDebug>
 #include <QMenu>
 #include <QAction>
@@ -92,8 +98,12 @@ QVariant TreeModel::data(const QModelIndex &index, int role /* = Qt::DisplayRole
                         if ( !bValid ) {
                             if ( isEmptyFlag == 1 ) {
                                 val = role == Qt::BackgroundRole ? QBrush(Qt::red) : QBrush();
+                            } else if ( isEmptyFlag == 2 ) {
+                                // val = role == Qt::BackgroundRole ? QBrush(Qt::red) : QBrush();
+                                val = QBrush(Qt::red);
                             } else {
-                                val = role == Qt::BackgroundRole ? QBrush() : QBrush(Qt::red);
+                                val = role == Qt::BackgroundRole ? QBrush(Qt::red) : QBrush(Qt::white);
+                                // val = role == Qt::BackgroundRole ? QBrush() : QBrush(Qt::red);
                             }
                         } else {
                             val = QBrush();
@@ -271,48 +281,30 @@ void TreeModel::deleteXMLDoc()
 }
 
 
-bool TreeModel::prepareSavedString(QString& outFileContent,QPersistentModelIndex& errorIdx)
+bool TreeModel::prepareSavedString(QString& outFileContent, QModelIndex& errorNodeMidx)
 {
     m_XmlStringList.clear();
 
-    if ( m_pXMLDoc != nullptr ) {
+    auto bret = false;
+    if ( m_pXMLDoc != nullptr && m_invisibleRoot != nullptr ) {
         m_pXMLDoc->clear();
 
-        rapidxml::xml_node<char>* dclNode = m_pXMLDoc->allocate_node(rapidxml::node_declaration);
+        fillXMLHeader();
+        // travelsal from RootIdx
+        QModelIndex rootIdx = index(0,0);
+        bret = fillXMLContentByNode(rootIdx, m_pXMLDoc, errorNodeMidx);
+        if ( bret ) {
+            std::string fmtStr;
+            rapidxml::print( std::back_inserter(fmtStr) , *m_pXMLDoc, 0);
 
-        QByteArray ver("version");
-        QByteArray verValue("1.0");
-        QByteArray encoding("encoding");
-        QByteArray encodingVal("UTF-8");
-        m_XmlStringList.push_back( ver);
-        m_XmlStringList.push_back( verValue);
-        m_XmlStringList.push_back( encoding);
-        m_XmlStringList.push_back( encodingVal);
-        auto sz = m_XmlStringList.size();
-        int idxLast4Ary[] = { 
-            sz - 4,
-            sz - 3,
-            sz - 2,
-            sz - 1
-        };
-
-        rapidxml::xml_attribute<char>* attr1 = m_pXMLDoc->allocate_attribute( m_XmlStringList.at(idxLast4Ary[0]).constData(), 
-                                                                              m_XmlStringList.at(idxLast4Ary[1]).constData() );
-        rapidxml::xml_attribute<char>* attr2 = m_pXMLDoc->allocate_attribute( m_XmlStringList.at(idxLast4Ary[2]).constData(), 
-                                                                              m_XmlStringList.at(idxLast4Ary[3]).constData() );
-
-        dclNode->append_attribute(attr1);
-        dclNode->append_attribute(attr2);
-        m_pXMLDoc->append_node(dclNode);
+            // set finial data
+            outFileContent = QString::fromStdString(fmtStr);
+        }
     } else {
         return false;
     }
 
-    if ( m_invisibleRoot == nullptr ) {
-        return false;
-    }
-
-    return true;
+    return bret;
 }
 
 
@@ -652,7 +644,102 @@ bool TreeModel::checkNameIsValid(const QModelIndex& index, int* bFlagisEmptyStri
 
     auto bret = m_nameReg.exactMatch(strData);
     if ( bFlagisEmptyString != nullptr ) {
-        *bFlagisEmptyString = strData.trimmed().isEmpty() ? 1 : 0;
+
+        if ( strData.isEmpty() ) {
+            *bFlagisEmptyString = 1;
+        } else if ( strData.trimmed().isEmpty() ) {
+            *bFlagisEmptyString = 2;
+        } else {
+            *bFlagisEmptyString = 0;
+        }
+        
     }
     return bret;
 }
+
+
+void TreeModel::fillXMLHeader()
+{
+
+    rapidxml::xml_node<char>* dclNode = m_pXMLDoc->allocate_node(rapidxml::node_declaration);
+
+    QByteArray ver("version");
+    QByteArray verValue("1.0");
+    QByteArray encoding("encoding");
+    QByteArray encodingVal("UTF-8");
+
+    // For Attribute   value="..." Use
+    QByteArray attrValueKey("value");
+
+    m_XmlStringList.push_back( ver );
+    m_XmlStringList.push_back( verValue );
+    m_XmlStringList.push_back( encoding );
+    m_XmlStringList.push_back( encodingVal );
+    m_XmlStringList.push_back( encodingVal );
+    m_XmlStringList.push_back( attrValueKey );
+
+    rapidxml::xml_attribute<char>* attr1 = m_pXMLDoc->allocate_attribute( m_XmlStringList.at(0).constData(),
+                                                                          m_XmlStringList.at(1).constData() );
+    rapidxml::xml_attribute<char>* attr2 = m_pXMLDoc->allocate_attribute( m_XmlStringList.at(2).constData(), 
+                                                                          m_XmlStringList.at(3).constData() );
+
+    dclNode->append_attribute(attr1);
+    dclNode->append_attribute(attr2);
+
+    m_pXMLDoc->append_node(dclNode);
+
+}
+
+
+bool TreeModel::fillXMLContentByNode(const QModelIndex& nodeMidx, rapidxml::xml_node<char>* parentXmlNode, QModelIndex& errorNodeMidx)
+{
+    int nameIdx = 0;
+    int valIdx = 0;
+    auto pNode = static_cast<TreeNode*>( nodeMidx.internalPointer() );
+    if ( pNode == nullptr || parentXmlNode == nullptr ) {
+        return false;
+    }
+
+    if ( !checkNameIsValid( nodeMidx, nullptr ) ) {
+        errorNodeMidx = nodeMidx;
+        return false;
+    }
+
+    rapidxml::xml_node<char>* currentXmlNode = m_pXMLDoc->allocate_node(rapidxml::node_element);
+
+    m_XmlStringList.push_back( pNode->getName().toUtf8() );
+    nameIdx = m_XmlStringList.size() - 1;
+    m_XmlStringList.push_back( pNode->getValue().toUtf8() );
+    valIdx  = m_XmlStringList.size() - 1;
+
+
+    currentXmlNode->name( m_XmlStringList.at(nameIdx).constData() );
+    if ( !pNode->getValue().isEmpty() ) {
+        if ( pNode->hasChildren() ) { 
+            rapidxml::xml_attribute<char>* attrPair = m_pXMLDoc->allocate_attribute( m_XmlStringList.at(5).constData(),
+                                                                                m_XmlStringList.at(valIdx).constData() );
+            
+            currentXmlNode->append_attribute( attrPair );
+        } else {
+            currentXmlNode->value( m_XmlStringList.at(valIdx).constData() );
+        }
+    }
+
+    parentXmlNode->append_node( currentXmlNode );
+
+    auto isChildAddSucc = true;
+    if ( pNode->hasChildren() ) {
+        int sz = pNode->childCount();
+        for ( int i = 0; i < sz; ++i ) {
+            QModelIndex childMidx = index(i,0, nodeMidx);
+            // recursively travesal child node
+            if ( !fillXMLContentByNode( childMidx ,currentXmlNode, errorNodeMidx) ) {
+                isChildAddSucc = false;
+                break;
+            }
+        }
+    } 
+
+    return isChildAddSucc;
+}
+

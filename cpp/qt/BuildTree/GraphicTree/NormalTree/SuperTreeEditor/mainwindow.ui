@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>986</width>
-    <height>595</height>
+    <width>1486</width>
+    <height>649</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -46,7 +46,7 @@
    <widget class="QPushButton" name="clearTreeBtn">
     <property name="geometry">
      <rect>
-      <x>370</x>
+      <x>440</x>
       <y>510</y>
       <width>101</width>
       <height>41</height>
@@ -59,7 +59,7 @@
    <widget class="QPushButton" name="drawTreeBtn">
     <property name="geometry">
      <rect>
-      <x>500</x>
+      <x>570</x>
       <y>510</y>
       <width>171</width>
       <height>41</height>
@@ -72,7 +72,7 @@
    <widget class="QPushButton" name="saveAsPngBtn">
     <property name="geometry">
      <rect>
-      <x>700</x>
+      <x>770</x>
       <y>510</y>
       <width>141</width>
       <height>41</height>
@@ -121,14 +121,29 @@
      <string>Save ...</string>
     </property>
    </widget>
+   <widget class="SuperTextEdit" name="textEdit">
+    <property name="geometry">
+     <rect>
+      <x>980</x>
+      <y>30</y>
+      <width>491</width>
+      <height>461</height>
+     </rect>
+    </property>
+   </widget>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QStatusBar" name="statusBar"/>
  </widget>
  <customwidgets>
   <customwidget>
    <class>TreeView</class>
    <extends>QTableView</extends>
    <header>TreeView.h</header>
+  </customwidget>
+  <customwidget>
+   <class>SuperTextEdit</class>
+   <extends>QPlainTextEdit</extends>
+   <header>SuperTextEdit.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

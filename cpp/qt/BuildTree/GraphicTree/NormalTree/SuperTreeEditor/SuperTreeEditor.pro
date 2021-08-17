@@ -24,13 +24,15 @@ SOURCES += \
     mainwindow.cpp \
 	TreeNode.cpp \
 	TreeView.cpp \
-	TreeModel.cpp
+	TreeModel.cpp \
+    SuperTextEdit.cpp
 
 HEADERS += \
     mainwindow.h \
 	TreeNode.h \
 	TreeView.h \
-	TreeModel.h
+	TreeModel.h \
+    SuperTextEdit.h
 
 FORMS += \
     mainwindow.ui

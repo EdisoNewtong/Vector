@@ -4,8 +4,8 @@
 #include <QAbstractItemModel> 
 #include <QVector>
 #include <QByteArray>
+// #include <QPersistentModelIndex>
 // #include <QStringList>
-#include <QPersistentModelIndex>
 #include <QRegExp>
 
 
@@ -73,9 +73,8 @@ protected:
     // void QAbstractItemModel::beginInsertRows(const QModelIndex &parent, int first, int last) Q_DECL_OVERRIDE;
 
 public:
-
-    // Util Operator
-    bool prepareSavedString(QString& outFileContent,QPersistentModelIndex& errorIdx);
+    // for save info XML  file
+    bool prepareSavedString(QString& outFileContent, QModelIndex& errorNodeMidx);
 
     // Create New Node at some position or Delete a selected Node
     bool prependChildNode(const QModelIndex& parent);
@@ -96,7 +95,14 @@ protected:
     void deleteRootNode();
     void reCreateRootNode();
     void deleteXMLDoc();
+
     bool checkNameIsValid( const QModelIndex& index, int* bFlagisEmptyString) const;
+
+
+    // for fill xml node
+    void fillXMLHeader();
+    bool fillXMLContentByNode(const QModelIndex& nodeMidx, rapidxml::xml_node<char>* parentXmlNode, QModelIndex& errorNodeMidx);
+
 protected:
     TreeNode*  m_invisibleRoot;
 
