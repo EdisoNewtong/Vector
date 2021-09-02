@@ -78,6 +78,8 @@ public:
 
     // for save info XML  file
     bool prepareSavedString(QString& outFileContent, QModelIndex& errorNodeMidx);
+    // for load XML file into TreeView
+    bool loadFileIntoTreeView(const QString& filename, QString& errorMsg);
 
     // Create New Node at some position or Delete a selected Node
     bool prependChildNode(const QModelIndex& parent);
@@ -93,10 +95,16 @@ public:
 
     bool swapUp(const QModelIndex& selectedNodeIdx);
     bool swapDown(const QModelIndex& selectedNodeIdx);
+
+
+    signals:
+        void forceSetCheckBoxByLoadedFile(int isNumberMode);
+
 protected:
 
     void deleteRootNode();
-    void reCreateRootNode();
+    void reCreateRootNode(int needCreateRoot);
+    TreeNode* loadXMLContentIntoView(rapidxml::xml_node<char>* parentXmlNode, TreeNode* parentNode, QString errorMsg, int level);
     void deleteXMLDoc();
 
     bool checkNameIsValid( const QModelIndex& index, int* bFlagisEmptyString) const;
@@ -112,6 +120,7 @@ protected:
     rapidxml::xml_document<char>* m_pXMLDoc;
 
     QVector<QByteArray> m_XmlStringList;
+    QByteArray          m_loadedFileContent;
 
     int                 m_deleteMethod;
     int                 m_pushExistedNodeFlag;
@@ -121,6 +130,7 @@ protected:
     QRegExp             m_nameReg;
 
     bool                m_isSupportNumberOnly;
+    int                 m_modeFromXMLFile;
 
 };
 

@@ -28,8 +28,12 @@ private slots:
 
     void on_saveAsPngBtn_clicked();
 
-
     void on_checkBoxOption0_stateChanged(int arg1);
+
+    // Manually  Added by Edison
+    void on_forceSetCheckBoxState(int checkedState);
+
+
 
 private:
     Ui::MainWindow *ui;

@@ -11,18 +11,19 @@ class TreeNode
 {
 public:
     TreeNode(const QString& name, const QString& val, TreeNode* parent);
+    TreeNode();
     virtual ~TreeNode();
 
     // create node
-    TreeNode* appendChild();
-    TreeNode* prependChild();
+    TreeNode* appendNewChild();
+    TreeNode* prependNewChild();
 
     TreeNode* insertNodeAtIndex(int idx);
     TreeNode* pushExistedChild(TreeNode* child);
     TreeNode* insertExistedChild(TreeNode* child, int idx);
 
     TreeNode* getParent();
-    // void setParent(TreeNode* parent);
+    void setParent(TreeNode* parent);
      
 
     int       selfIndex();

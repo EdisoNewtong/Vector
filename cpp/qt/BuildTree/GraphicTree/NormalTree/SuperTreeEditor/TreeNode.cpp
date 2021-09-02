@@ -16,6 +16,18 @@ TreeNode::TreeNode(const QString& text, const QString& val,TreeNode* parent)
 }
 
 
+TreeNode::TreeNode()
+    : m_name("")
+    , m_value("")
+    , m_parent(nullptr)
+{
+    m_children.clear();
+    if ( G_ENABLE_REFCOUNT ) {
+        qDebug() << "Create G_CNT = " << ++G_CNT;
+    }
+}
+
+
 
 // virtual
 TreeNode::~TreeNode()
@@ -85,7 +97,7 @@ void      TreeNode::releaseSelfAndChildren()
 //
 // insert at tail
 //
-TreeNode* TreeNode::appendChild()
+TreeNode* TreeNode::appendNewChild()
 {
     TreeNode* newCreateNode = new TreeNode( QString(""), QString(""), this);
     m_children.push_back(newCreateNode);
@@ -95,7 +107,7 @@ TreeNode* TreeNode::appendChild()
 //
 // insert at head
 //
-TreeNode* TreeNode::prependChild()
+TreeNode* TreeNode::prependNewChild()
 {
     TreeNode* newCreateNode = new TreeNode( QString(""), QString(""), this);
     m_children.push_front(newCreateNode);
@@ -147,10 +159,10 @@ TreeNode* TreeNode::getParent()
     return m_parent;
 }
 
-// void TreeNode::setParent(TreeNode* parent)
-// {
-//     m_parent = parent;
-// }
+void TreeNode::setParent(TreeNode* parent)
+{
+    m_parent = parent;
+}
 
 
 int       TreeNode::selfIndex()

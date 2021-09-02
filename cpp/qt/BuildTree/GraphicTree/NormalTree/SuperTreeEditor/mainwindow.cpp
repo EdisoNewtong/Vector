@@ -1,5 +1,6 @@
 #include <QDebug>
 #include <QFileDialog>
+#include <QMessageBox>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -15,6 +16,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     m_myTreeModel = new TreeModel(this);
     ui->tableView->setModel( m_myTreeModel );
+
+    connect( m_myTreeModel, SIGNAL( forceSetCheckBoxByLoadedFile(int) ), this, SLOT( on_forceSetCheckBoxState(int) )  );
 }
 
 MainWindow::~MainWindow()
@@ -25,6 +28,24 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_loadTreeFromFileBtn_clicked()
 {
+    auto fileToLoaded = QFileDialog::getOpenFileName( this, QStringLiteral("Select a XML file to open "), QString(), QString("XML Files (*.xml)") );
+
+    auto treemodel = static_cast<TreeModel*>( ui->tableView->model() );
+    if ( treemodel == nullptr ) {
+        ui->statusBar->showMessage("No Tree Model , Can't perform <Save> operator", 3500);
+        return;
+    }
+
+
+    QString errorMsg;
+    auto bret = treemodel->loadFileIntoTreeView(fileToLoaded,  errorMsg );
+    if ( !bret ) {
+        ui->statusBar->showMessage(errorMsg, 3500);
+        QMessageBox::critical(this,QStringLiteral("Load File Error"), errorMsg);
+        return;
+    }
+
+    // else 
 
 }
 
@@ -36,7 +57,7 @@ void MainWindow::on_saveTreeToFileBtn_clicked()
     }
 
     ui->checkBoxOption0->setEnabled(false);
-    // 
+
     auto treemodel = static_cast<TreeModel*>( ui->tableView->model() );
     if ( treemodel == nullptr ) {
         ui->statusBar->showMessage("No Tree Model , Can't perform <Save> operator", 3500);
@@ -57,7 +78,7 @@ void MainWindow::on_saveTreeToFileBtn_clicked()
     }
 
     // static
-    auto savedfile = QFileDialog::getSaveFileName(this,"Save Tree Info");
+    auto savedfile = QFileDialog::getSaveFileName(this,"Save Tree Info", QString(), tr("XML Files (*.xml)") );
     if ( savedfile.trimmed().isEmpty() ) {
         ui->checkBoxOption0->setEnabled(true);
         return;
@@ -97,3 +118,9 @@ void MainWindow::on_checkBoxOption0_stateChanged(int arg1)
     }
 }
 
+
+
+void MainWindow::on_forceSetCheckBoxState(int checkedState)
+{
+    ui->checkBoxOption0->setCheckState( static_cast<Qt::CheckState>( checkedState ) );
+}

@@ -15,7 +15,24 @@
 
 
 static const QString G_NEW_NODE_NAME("New_Node");
+static const QString G_NEW_NODE_NAME_FORNUMBER("0");
 static const QString G_NEW_NODE_VALUE("");
+
+
+namespace XMLConstString
+{
+    const QByteArray VERSION("version");       // [0]  ver
+    const QByteArray VERSION_VALUE("1.0");     // [1]  verValue
+    const QByteArray ENCODING("encoding");     // [2]  encoding
+    const QByteArray ENCODING_VALUE("UTF-8");  // [3]  encodingVal
+
+    // For Attribute   value="..." Use
+    const QByteArray ATTR_VALUE_KEY("value");                    // [4]  attrValueKey
+    const QByteArray ATTR_MODE_KEY("mode");                      // [5]  attrOptionKey
+    const QByteArray ATTR_NORMAL_MODE( "Normal-Mode" );          // [6]  attrOptionValue0
+    const QByteArray ATTR_NUMBER_ONLY_MODE( "NumberOnly-Mode" ); // [7]  attrOptionValue1
+    const QByteArray FIXED_KEY( "node" );                        // [8]  fixedKey
+}
 
 TreeModel::TreeModel(QObject* parent /*= nullptr*/)
     : QAbstractItemModel(parent)
@@ -26,29 +43,13 @@ TreeModel::TreeModel(QObject* parent /*= nullptr*/)
     , m_existedWillInsertNode( nullptr )
     , m_nameReg( QStringLiteral("[a-zA-Z_][a-zA-Z0-9_]*") )
     , m_isSupportNumberOnly( false )
+    , m_modeFromXMLFile(0)
 {
-    reCreateRootNode();
-
-    /*
-    auto c1 = onlyRoot->appendChild();
-    c1->setName( QString("child-1") );
-    c1->setValue( QString("aaa")  );
-    auto c2 = onlyRoot->appendChild();
-    c2->setName( QString("child-2") );
-    c2->setValue( QString("bbb")  );
-
-    auto c11 = c1->appendChild();
-    c11->setName( QString("c-1-1") );
-    c11->setValue( QString("aaa-1")  );
-    auto c12 = c1->appendChild();
-    c12->setName( QString("c-1-2") );
-    c12->setValue( QString("aaa-2")  );
-    */
+    reCreateRootNode(1);
 
     m_pXMLDoc = new rapidxml::xml_document<char>();
 
     m_XmlStringList.clear();
-
 }
 
 
@@ -260,14 +261,38 @@ void TreeModel::deleteRootNode()
     }
 }
 
-void TreeModel::reCreateRootNode()
+void TreeModel::reCreateRootNode(int needCreateRoot)
 {
     deleteRootNode();
 
     m_invisibleRoot = new TreeNode( QString(), QString(), nullptr );
-    auto onlyRoot = m_invisibleRoot->appendChild();
-    onlyRoot->setName( QString("Root")  );
-    onlyRoot->setValue( QString("")  );
+
+    if ( needCreateRoot == 1 ) {
+        auto onlyRoot = m_invisibleRoot->appendNewChild();
+        onlyRoot->setName( QString("Root")  );
+        onlyRoot->setValue( QString("")  );
+
+        /*
+            ********************
+               Test Case
+            ********************
+           
+        auto c1 = onlyRoot->appendNewChild();
+        c1->setName( QString("child-1") );
+        c1->setValue( QString("aaa")  );
+        auto c2 = onlyRoot->appendNewChild();
+        c2->setName( QString("child-2") );
+        c2->setValue( QString("bbb")  );
+
+        auto c11 = c1->appendNewChild();
+        c11->setName( QString("c-1-1") );
+        c11->setValue( QString("aaa-1")  );
+        auto c12 = c1->appendNewChild();
+        c12->setName( QString("c-1-2") );
+        c12->setValue( QString("aaa-2")  );
+
+        */
+    }
 }
 
 
@@ -449,17 +474,17 @@ bool TreeModel::insertRows(int row, int count, const QModelIndex &parent /* = QM
         if ( m_pushExistedNodeFlag == 0 ) {
             if ( row == 0 ) {
                 // prepend at head
-                newInsertNode = targetParentItem->prependChild();
+                newInsertNode = targetParentItem->prependNewChild();
             } else if ( row == childrenSz ) {
                 // append at tail
-                newInsertNode = targetParentItem->appendChild();
+                newInsertNode = targetParentItem->appendNewChild();
             } else {
                 // In the middle N-th position
                 newInsertNode = targetParentItem->insertNodeAtIndex(row);
             }
 
             if ( newInsertNode != nullptr ) {
-                newInsertNode->setName( G_NEW_NODE_NAME );
+                newInsertNode->setName( !m_isSupportNumberOnly ? G_NEW_NODE_NAME : G_NEW_NODE_NAME_FORNUMBER );
             } else {
                 checkValid = false;
             }
@@ -648,7 +673,7 @@ bool TreeModel::checkNameIsValid(const QModelIndex& index, int* bFlagisEmptyStri
         return isNumber;
     } 
 
-    // !m_isSupportNumberOnly
+    // m_isSupportNumberOnly == false
     auto bret = m_nameReg.exactMatch(strData);
     if ( bFlagisEmptyString != nullptr ) {
 
@@ -670,32 +695,10 @@ void TreeModel::fillXMLHeader()
 
     rapidxml::xml_node<char>* dclNode = m_pXMLDoc->allocate_node(rapidxml::node_declaration);
 
-    QByteArray ver("version");        // [0]
-    QByteArray verValue("1.0");       // [1]
-    QByteArray encoding("encoding");  // [2]
-    QByteArray encodingVal("UTF-8");  // [3]
-
-    // For Attribute   value="..." Use
-    QByteArray attrValueKey("value");   // [4]
-    QByteArray attrOptionKey("option"); // [5]
-    QByteArray attrOptionValue0( "0" ); // [6]
-    QByteArray attrOptionValue1( "1" ); // [7]
-    QByteArray fixedKey( "node" );      // [8]
-
-    m_XmlStringList.push_back( ver );
-    m_XmlStringList.push_back( verValue );
-    m_XmlStringList.push_back( encoding );
-    m_XmlStringList.push_back( encodingVal );
-    m_XmlStringList.push_back( attrValueKey );
-    m_XmlStringList.push_back( attrOptionKey );
-    m_XmlStringList.push_back( attrOptionValue0 );
-    m_XmlStringList.push_back( attrOptionValue1 );
-    m_XmlStringList.push_back( fixedKey );
-
-    rapidxml::xml_attribute<char>* attr1 = m_pXMLDoc->allocate_attribute( m_XmlStringList.at(0).constData(),
-                                                                          m_XmlStringList.at(1).constData() );
-    rapidxml::xml_attribute<char>* attr2 = m_pXMLDoc->allocate_attribute( m_XmlStringList.at(2).constData(), 
-                                                                          m_XmlStringList.at(3).constData() );
+    rapidxml::xml_attribute<char>* attr1 = m_pXMLDoc->allocate_attribute( XMLConstString::VERSION.constData(),          // "version"
+                                                                          XMLConstString::VERSION_VALUE.constData() );  // "1.0"
+    rapidxml::xml_attribute<char>* attr2 = m_pXMLDoc->allocate_attribute( XMLConstString::ENCODING.constData(),         // "encoding"
+                                                                          XMLConstString::ENCODING_VALUE.constData() ); // "UTF-8"
 
     dclNode->append_attribute(attr1);
     dclNode->append_attribute(attr2);
@@ -726,17 +729,15 @@ bool TreeModel::fillXMLContentByNode(const QModelIndex& nodeMidx, rapidxml::xml_
 
     // 1st Visible Root Only
     if ( !nodeMidx.parent().isValid() ) {
-        // 6 => "0",   7 => "1"
-        int supportIdx = m_isSupportNumberOnly ? 7 : 6;
-        rapidxml::xml_attribute<char>* attrPairForOption = m_pXMLDoc->allocate_attribute( m_XmlStringList.at(5).constData(),
-                                                                            m_XmlStringList.at(supportIdx).constData() );
+        rapidxml::xml_attribute<char>* attrPairForOption = m_pXMLDoc->allocate_attribute( XMLConstString::ATTR_MODE_KEY.constData(),
+                                                                            m_isSupportNumberOnly ? XMLConstString::ATTR_NUMBER_ONLY_MODE.constData() : XMLConstString::ATTR_NORMAL_MODE.constData() );
 
         currentXmlNode->append_attribute( attrPairForOption );
     }
 
-    m_XmlStringList.push_back( pNode->getName().toUtf8() );
+    m_XmlStringList.push_back( pNode->getName().toUtf8().constData() );
     nameIdx = m_XmlStringList.size() - 1;
-    m_XmlStringList.push_back( pNode->getValue().toUtf8() );
+    m_XmlStringList.push_back( pNode->getValue().toUtf8().constData() );
     valIdx  = m_XmlStringList.size() - 1;
 
     if ( !m_isSupportNumberOnly ) {
@@ -745,7 +746,7 @@ bool TreeModel::fillXMLContentByNode(const QModelIndex& nodeMidx, rapidxml::xml_
 
         if ( !pNode->getValue().isEmpty() ) {
             if ( pNode->hasChildren() ) { 
-                rapidxml::xml_attribute<char>* attrPairForValue = m_pXMLDoc->allocate_attribute( m_XmlStringList.at(4).constData(), // "value"
+                rapidxml::xml_attribute<char>* attrPairForValue = m_pXMLDoc->allocate_attribute( XMLConstString::ATTR_VALUE_KEY.constData(), // "value"
                                                                                     m_XmlStringList.at(valIdx).constData() );
                 
                 currentXmlNode->append_attribute( attrPairForValue );
@@ -754,8 +755,8 @@ bool TreeModel::fillXMLContentByNode(const QModelIndex& nodeMidx, rapidxml::xml_
             }
         } 
     } else {
-        currentXmlNode->name( m_XmlStringList.at(8).constData() ); // "node"
-        rapidxml::xml_attribute<char>* attrPairForValue = m_pXMLDoc->allocate_attribute( m_XmlStringList.at(4).constData(), // "value"
+        currentXmlNode->name( XMLConstString::FIXED_KEY.constData() ); // "node"
+        rapidxml::xml_attribute<char>* attrPairForValue = m_pXMLDoc->allocate_attribute( XMLConstString::ATTR_VALUE_KEY.constData(), // "value"
                                                                             m_XmlStringList.at(nameIdx).constData() );
         currentXmlNode->append_attribute( attrPairForValue );
         // ignore 2nd column's value
@@ -787,5 +788,170 @@ bool TreeModel::fillXMLContentByNode(const QModelIndex& nodeMidx, rapidxml::xml_
 void TreeModel::setSupportNumberOnlyFlag(bool b)
 {
     m_isSupportNumberOnly = b;
+}
+
+
+
+bool TreeModel::loadFileIntoTreeView(const QString& filename, QString& errorMsg)
+{
+    m_modeFromXMLFile = 0;
+
+    if ( m_pXMLDoc!=nullptr ) {
+        m_pXMLDoc->clear();
+    } else {
+        errorMsg = "XML Doc haven't been init";
+        return false;
+    }
+
+    m_loadedFileContent.clear();
+
+    auto parseOK = false;
+    QFile loadedfile(filename);
+
+    // 1. Parse XML 
+    try {
+        auto openOK = loadedfile.open( QIODevice::ReadOnly );
+        if ( !openOK ) {
+            errorMsg = QString("Can't open this file : %1").arg(filename);
+            return false;
+        }
+
+        // else
+
+        m_loadedFileContent = loadedfile.readAll();
+        m_pXMLDoc->parse<rapidxml::parse_full>( m_loadedFileContent.data() );
+        parseOK = true;
+    } catch (const rapidxml::parse_error& error ) {
+        loadedfile.close();
+        errorMsg = QString("Parse XML file \"%1\" Error : %2 , %3").arg(filename).arg(error.what()).arg( error.where<char>() );
+    }
+
+    if ( !parseOK ) {
+        return false;    
+    }
+
+    //////////////////////////////////////////////////
+    //
+    // Parse XML OK
+    //
+    //////////////////////////////////////////////////
+    //
+    // 2. From XML into Tree View
+    //////////////////////////////////////////////////
+    //
+    // Core Core Core 
+    //
+    //////////////////////////////////////////////////
+    TreeNode* node2Load = nullptr;
+    beginResetModel();
+    {
+        reCreateRootNode(0);
+        node2Load = loadXMLContentIntoView(m_pXMLDoc, m_invisibleRoot, errorMsg, 0);
+    }
+    endResetModel();
+
+    return node2Load != nullptr;
+}
+
+TreeNode* TreeModel::loadXMLContentIntoView(rapidxml::xml_node<char>* parentXmlNode, TreeNode* parentNode, QString errorMsg, int level)
+{
+    int childIdx = 0;
+    for ( auto child = parentXmlNode->first_node(); child!=nullptr; child = child->next_sibling() ) {
+        if ( child->type() == rapidxml::node_element ) {
+            QString childName = child->name();
+            QString childValue = child->value();
+
+            qDebug() << "node.name = " << child->name() << ", qstring => name = " << childName;
+            qDebug() << "node.value = " << child->value() << ", qstring => value = " << childValue;
+
+
+            TreeNode* parsed_CreatedChildNode = new TreeNode();
+
+            int attrCount = 0;
+            if ( level == 0 && childIdx == 0 ) {
+                // Step1 : Parse Self Node's attribute list
+                for ( rapidxml::xml_attribute<char> *attr = child->first_attribute(); attr != nullptr; attr = attr->next_attribute() , ++attrCount ) {
+                    QString attrName = attr->name();
+                    QString attrValue = attr->value();
+
+                    if ( attrName == XMLConstString::ATTR_MODE_KEY ) {
+                        if ( attrValue == XMLConstString::ATTR_NORMAL_MODE ) {
+                            m_modeFromXMLFile = 1; // 1 for normal mode
+                        } else {
+                            m_modeFromXMLFile = 2; // 2 for number only mode
+                        }
+
+                        // To set check box
+                        emit forceSetCheckBoxByLoadedFile( m_modeFromXMLFile == 2 ? Qt::Checked : Qt::Unchecked );
+                    } else if ( attrName == XMLConstString::ATTR_VALUE_KEY ) {
+                        if ( m_modeFromXMLFile == 2 ) {
+
+                            bool isNumber = false;
+                            attrValue.toDouble(&isNumber);
+                            if ( isNumber ) {
+                                parsed_CreatedChildNode->setName( attrValue );
+                                parsed_CreatedChildNode->setValue("");
+                            } else {
+                                //
+                                // !!! ERROR !!!
+                                //     the xml value content can't be converted to a number
+                                errorMsg = QString("Can't convert %1 to a number").arg( attrValue );
+                                delete parsed_CreatedChildNode;
+                                parsed_CreatedChildNode = nullptr;
+                                return nullptr;
+                            }
+                        } else {
+                            // Normal mode    m_modeFromXMLFile == 1
+                            parsed_CreatedChildNode->setName( childName );
+                            parsed_CreatedChildNode->setValue( attrValue );
+                        }
+                    }
+                }
+            } else {
+                for ( rapidxml::xml_attribute<char> *attr = child->first_attribute(); attr != nullptr; attr = attr->next_attribute() , ++attrCount ) {
+                    QString attrName = attr->name();
+                    QString attrValue = attr->value();
+
+                    if ( attrName == XMLConstString::ATTR_VALUE_KEY ) {
+                        if ( m_modeFromXMLFile == 2 ) {
+                            bool isNumber = false;
+                            attrValue.toDouble(&isNumber);
+                            if ( isNumber ) {
+                                parsed_CreatedChildNode->setName( attrValue );
+                                parsed_CreatedChildNode->setValue("");
+                            } else {
+                                // the xml value content can't be converted to a number
+                                errorMsg = QString("Can't convert %1 to a number").arg( attrValue );
+                                delete parsed_CreatedChildNode;
+                                parsed_CreatedChildNode = nullptr;
+                                return nullptr;
+                            }
+                        } else {
+                            // normal mode
+                            parsed_CreatedChildNode->setName( childName );
+                            parsed_CreatedChildNode->setValue( attrValue );
+                        }
+                    }
+                }
+
+                if ( attrCount == 0 ) {
+                    parsed_CreatedChildNode->setName( childName );
+                    parsed_CreatedChildNode->setValue( childValue );
+                }
+            }
+
+            // 2. Step 2 : Parse Sub Node
+            auto subchildnode = loadXMLContentIntoView(child, parsed_CreatedChildNode, errorMsg, level+1);
+            if ( subchildnode == nullptr ) {
+                return subchildnode;
+            } 
+
+            parentNode->pushExistedChild( parsed_CreatedChildNode );
+
+            ++childIdx;
+        }
+    }
+    
+    return parentNode;
 }
 
