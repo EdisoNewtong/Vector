@@ -13,8 +13,8 @@
 #include "rapidxml.hpp" // for xml generte use
 #include "rapidxml_print.hpp" // for xml generate file content
 
-
-static const QString G_NEW_NODE_NAME("New_Node");
+static const QString G_NEW_ROOT_NODE_NAME("Root");
+static const QString G_NEW_NODE_NAME("Node");
 static const QString G_NEW_NODE_NAME_FORNUMBER("0");
 static const QString G_NEW_NODE_VALUE("");
 
@@ -24,7 +24,7 @@ namespace XMLConstString
     const QByteArray VERSION("version");       // [0]  ver
     const QByteArray VERSION_VALUE("1.0");     // [1]  verValue
     const QByteArray ENCODING("encoding");     // [2]  encoding
-    const QByteArray ENCODING_VALUE("UTF-8");  // [3]  encodingVal
+    const QByteArray ENCODING_VALUE("utf-8");  // [3]  encodingVal
 
     // For Attribute   value="..." Use
     const QByteArray ATTR_VALUE_KEY("value");                    // [4]  attrValueKey
@@ -63,7 +63,7 @@ TreeModel::~TreeModel()
 // virtual 
 int TreeModel::columnCount(const QModelIndex &parent /* = QModelIndex()*/ ) const // Q_DECL_OVERRIDE;
 {
-    (void)parent;
+    Q_UNUSED(parent)
     return 2;
 }
 
@@ -243,13 +243,19 @@ QVariant TreeModel::headerData(int section, Qt::Orientation orientation, int rol
     if ( orientation == Qt::Horizontal ) {
         if ( section == 0 ) {
             return QVariant( QString("Name") );
-        } else if ( section == 1) {
+        } else if ( section == 1 ) {
             return QVariant( QString("Value") );
         }
     }
 
     return QVariant();
 
+}
+
+
+bool TreeModel::hasRootNode()
+{
+    return m_invisibleRoot != nullptr && m_invisibleRoot->hasChildren();
 }
 
 
@@ -269,7 +275,7 @@ void TreeModel::reCreateRootNode(int needCreateRoot)
 
     if ( needCreateRoot == 1 ) {
         auto onlyRoot = m_invisibleRoot->appendNewChild();
-        onlyRoot->setName( QString("Root")  );
+        onlyRoot->setName( G_NEW_ROOT_NODE_NAME );
         onlyRoot->setValue( QString("")  );
 
         /*
@@ -850,10 +856,14 @@ bool TreeModel::loadFileIntoTreeView(const QString& filename, QString& errorMsg)
     }
     endResetModel();
 
-    return node2Load != nullptr;
+    auto isLoadSuccessful = node2Load != nullptr;
+    if ( isLoadSuccessful ) {
+        forceSetCheckBoxByLoadedFile( m_modeFromXMLFile == 2 ? Qt::Checked : Qt::Unchecked );
+    }
+    return isLoadSuccessful; 
 }
 
-TreeNode* TreeModel::loadXMLContentIntoView(rapidxml::xml_node<char>* parentXmlNode, TreeNode* parentNode, QString errorMsg, int level)
+TreeNode* TreeModel::loadXMLContentIntoView(rapidxml::xml_node<char>* parentXmlNode, TreeNode* parentNode, QString& errorMsg, int level)
 {
     int childIdx = 0;
     for ( auto child = parentXmlNode->first_node(); child!=nullptr; child = child->next_sibling() ) {
@@ -861,8 +871,8 @@ TreeNode* TreeModel::loadXMLContentIntoView(rapidxml::xml_node<char>* parentXmlN
             QString childName = child->name();
             QString childValue = child->value();
 
-            qDebug() << "node.name = " << child->name() << ", qstring => name = " << childName;
-            qDebug() << "node.value = " << child->value() << ", qstring => value = " << childValue;
+            // qDebug() << "node.name = " << child->name() << ", qstring => name = " << childName;
+            // qDebug() << "node.value = " << child->value() << ", qstring => value = " << childValue;
 
 
             TreeNode* parsed_CreatedChildNode = new TreeNode();
@@ -880,9 +890,6 @@ TreeNode* TreeModel::loadXMLContentIntoView(rapidxml::xml_node<char>* parentXmlN
                         } else {
                             m_modeFromXMLFile = 2; // 2 for number only mode
                         }
-
-                        // To set check box
-                        emit forceSetCheckBoxByLoadedFile( m_modeFromXMLFile == 2 ? Qt::Checked : Qt::Unchecked );
                     } else if ( attrName == XMLConstString::ATTR_VALUE_KEY ) {
                         if ( m_modeFromXMLFile == 2 ) {
 
@@ -895,7 +902,7 @@ TreeNode* TreeModel::loadXMLContentIntoView(rapidxml::xml_node<char>* parentXmlN
                                 //
                                 // !!! ERROR !!!
                                 //     the xml value content can't be converted to a number
-                                errorMsg = QString("Can't convert %1 to a number").arg( attrValue );
+                                errorMsg = QString("Can't convert \"%1\" to a number").arg( attrValue );
                                 delete parsed_CreatedChildNode;
                                 parsed_CreatedChildNode = nullptr;
                                 return nullptr;
@@ -921,7 +928,7 @@ TreeNode* TreeModel::loadXMLContentIntoView(rapidxml::xml_node<char>* parentXmlN
                                 parsed_CreatedChildNode->setValue("");
                             } else {
                                 // the xml value content can't be converted to a number
-                                errorMsg = QString("Can't convert %1 to a number").arg( attrValue );
+                                errorMsg = QString("Can't convert \"%1\" to a number").arg( attrValue );
                                 delete parsed_CreatedChildNode;
                                 parsed_CreatedChildNode = nullptr;
                                 return nullptr;
@@ -940,18 +947,39 @@ TreeNode* TreeModel::loadXMLContentIntoView(rapidxml::xml_node<char>* parentXmlN
                 }
             }
 
+            parentNode->pushExistedChild( parsed_CreatedChildNode );
+
             // 2. Step 2 : Parse Sub Node
             auto subchildnode = loadXMLContentIntoView(child, parsed_CreatedChildNode, errorMsg, level+1);
             if ( subchildnode == nullptr ) {
                 return subchildnode;
-            } 
+            } else {
+                // Do Nothing
+            }
 
-            parentNode->pushExistedChild( parsed_CreatedChildNode );
 
             ++childIdx;
         }
     }
     
     return parentNode;
+}
+
+bool TreeModel::createRootNode()
+{
+    bool bret = false;
+
+    beginResetModel();
+    {
+        if ( m_invisibleRoot != nullptr ) {
+            auto onlyRoot = m_invisibleRoot->appendNewChild();
+            onlyRoot->setName( G_NEW_ROOT_NODE_NAME );
+            onlyRoot->setValue( QString("")  );
+            bret = true;
+        }
+    }
+    endResetModel();
+
+    return bret;
 }
 

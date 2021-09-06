@@ -9,6 +9,8 @@
 #include <QModelIndex>
 #include <QContextMenuEvent>
 
+#include <QMessageBox>
+
 
 TreeView::TreeView(QWidget* parent /* = nullptr*/)
     : QTreeView(parent)
@@ -22,6 +24,8 @@ TreeView::TreeView(QWidget* parent /* = nullptr*/)
     , m_pMoveUpAct( nullptr )
     , m_pMoveDownAct( nullptr )
     , m_pCreateParentWithChildAct( nullptr )
+    , m_pPopupMenu2( nullptr )
+    , m_pCreateRootNodeAct( nullptr )
     , m_RightClickSelectedValidIdx()
 {
     //
@@ -61,6 +65,16 @@ TreeView::TreeView(QWidget* parent /* = nullptr*/)
     connect( m_pMoveUpAct,      SIGNAL(triggered(bool)),  this, SLOT( onMoveUpActTrigger()) );  
     connect( m_pMoveDownAct,    SIGNAL(triggered(bool)),  this, SLOT( onMoveDownActTrigger()) );  
     connect( m_pCreateParentWithChildAct,    SIGNAL(triggered(bool)),  this, SLOT( onCreateParentWithChildActTrigger()) );  
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Menu 2
+    //
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    m_pPopupMenu2 = new QMenu(this);
+    m_pCreateRootNodeAct = m_pPopupMenu2->addAction( QStringLiteral("Create Root Node") );
+    connect( m_pCreateRootNodeAct,    SIGNAL(triggered(bool)),  this, SLOT( onCreateRootNodeActTrigger()) );
 }
 
 
@@ -78,6 +92,20 @@ void TreeView::contextMenuEvent(QContextMenuEvent* event) // Q_DECL_OVERRIDE;
     QTreeView::contextMenuEvent( event );
 
     auto bSelectedFlag = hasOneSelectedItem(m_RightClickSelectedValidIdx);
+    if ( !bSelectedFlag ) {
+        auto model = this->model();
+        TreeModel* treeModel = nullptr;
+        if (   model != nullptr 
+               // &&  ( treeModel = dynamic_cast<TreeModel*>(model) ) != nullptr )
+               &&  ( treeModel = qobject_cast<TreeModel*>(model) ) != nullptr && !treeModel->hasRootNode() )
+        {
+            m_pPopupMenu2->popup( event->globalPos() );
+            m_pPopupMenu2->setFocus( Qt::PopupFocusReason );
+        }
+        return;
+    }
+
+
     if ( !bSelectedFlag || !m_RightClickSelectedValidIdx.isValid() || m_RightClickSelectedValidIdx.column() != 0 ) {
         return;
     }
@@ -319,5 +347,23 @@ bool TreeView::hasOneSelectedItem(QModelIndex& selectedIdx)
     // assign Selected ModelIndex to reference
     selectedIdx = model_idx_list.at(0);
     return true;
+}
+
+
+void TreeView::onCreateRootNodeActTrigger()
+{
+    // qDebug() << "Creating Root Node";
+    auto model = this->model();
+    TreeModel* treeModel = nullptr;
+    if (   model != nullptr
+           // &&  ( treeModel = dynamic_cast<TreeModel*>(model) ) != nullptr )
+           &&  ( treeModel = qobject_cast<TreeModel*>(model) ) != nullptr )
+    {
+        auto b = treeModel->createRootNode();
+        if ( !b ) {
+            // ui->statusBar->showMessage(errorMsg, 3500);
+            QMessageBox::critical(this,QStringLiteral("Error"), QStringLiteral("Sorry : Generate Root Node Failed"));
+        }
+    }
 }
 

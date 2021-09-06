@@ -14,7 +14,7 @@
    <string>Super Tree Editor</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="TreeView" name="tableView">
+   <widget class="TreeView" name="treeView">
     <property name="geometry">
      <rect>
       <x>30</x>

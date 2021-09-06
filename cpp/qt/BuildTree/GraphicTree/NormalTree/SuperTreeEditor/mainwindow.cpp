@@ -15,7 +15,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
 
     m_myTreeModel = new TreeModel(this);
-    ui->tableView->setModel( m_myTreeModel );
+    ui->treeView->setModel( m_myTreeModel );
 
     connect( m_myTreeModel, SIGNAL( forceSetCheckBoxByLoadedFile(int) ), this, SLOT( on_forceSetCheckBoxState(int) )  );
 }
@@ -30,7 +30,7 @@ void MainWindow::on_loadTreeFromFileBtn_clicked()
 {
     auto fileToLoaded = QFileDialog::getOpenFileName( this, QStringLiteral("Select a XML file to open "), QString(), QString("XML Files (*.xml)") );
 
-    auto treemodel = static_cast<TreeModel*>( ui->tableView->model() );
+    auto treemodel = static_cast<TreeModel*>( ui->treeView->model() );
     if ( treemodel == nullptr ) {
         ui->statusBar->showMessage("No Tree Model , Can't perform <Save> operator", 3500);
         return;
@@ -40,12 +40,14 @@ void MainWindow::on_loadTreeFromFileBtn_clicked()
     QString errorMsg;
     auto bret = treemodel->loadFileIntoTreeView(fileToLoaded,  errorMsg );
     if ( !bret ) {
+
         ui->statusBar->showMessage(errorMsg, 3500);
         QMessageBox::critical(this,QStringLiteral("Load File Error"), errorMsg);
         return;
     }
 
-    // else 
+    // else Load XML File Successful
+    ui->treeView->expandAll();
 
 }
 
@@ -58,7 +60,7 @@ void MainWindow::on_saveTreeToFileBtn_clicked()
 
     ui->checkBoxOption0->setEnabled(false);
 
-    auto treemodel = static_cast<TreeModel*>( ui->tableView->model() );
+    auto treemodel = static_cast<TreeModel*>( ui->treeView->model() );
     if ( treemodel == nullptr ) {
         ui->statusBar->showMessage("No Tree Model , Can't perform <Save> operator", 3500);
         ui->checkBoxOption0->setEnabled(true);
@@ -71,7 +73,7 @@ void MainWindow::on_saveTreeToFileBtn_clicked()
     if ( !ret ) {
         // auto selmodel = ui->treeView->selectionModel();
         ui->statusBar->showMessage("Some tree node's value is invalid, Please Check", 3500);
-        ui->tableView->scrollTo( errorIdx );
+        ui->treeView->scrollTo( errorIdx );
 
         ui->checkBoxOption0->setEnabled(true);
         return;

@@ -14,6 +14,27 @@
     #include <iterator>
 #endif
 
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Added by Edison , Declare Parts
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+namespace rapidxml
+{
+    /*const*/ extern int   print_use_space_count;
+    /*const*/ extern bool  print_use_space_instead;
+
+    // Added by Edison
+    void set_use_space_instead(bool b_flag, int space_cnt);
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
 namespace rapidxml
 {
 
@@ -22,6 +43,17 @@ namespace rapidxml
 
     const int print_no_indenting = 0x1;   //!< Printer flag instructing the printer to suppress indenting of XML. See print() function.
 
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    //
+    //
+    //
+    // Added by Edison
+    //
+    //
+    //
     /*
     e.g.
         ==================================================
@@ -35,7 +67,7 @@ namespace rapidxml
         cout << strbuf << endl;
 
         ==================================================
-        2. 
+        2.
 
         char bufferAry[40960] = { 0 };                      // You are responsible for making the buffer large enough!
         rapidxml::set_use_space_instead(true,2);
@@ -47,7 +79,7 @@ namespace rapidxml
     */
     // Added by Edison , you can use <Space> instead of Tab
     /*const*/ int   print_use_space_count = 4; // none default
-    /*bool*/  bool  print_use_space_instead = false;
+    /*const*/ bool  print_use_space_instead = false;
 
     // Added by Edison
     void set_use_space_instead(bool b_flag, int space_cnt)
@@ -57,6 +89,11 @@ namespace rapidxml
             print_use_space_count = (space_cnt > 0 ? space_cnt : 4);
         }
     }
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
 
 
     ///////////////////////////////////////////////////////////////////////
@@ -295,6 +332,7 @@ namespace rapidxml
         template<class OutIt, class Ch>
         inline OutIt print_attributes(OutIt out, const xml_node<Ch> *node, int flags)
         {
+            (void)flags;
             for (xml_attribute<Ch> *attribute = node->first_attribute(); attribute; attribute = attribute->next_attribute())
             {
                 if (attribute->name() && attribute->value())

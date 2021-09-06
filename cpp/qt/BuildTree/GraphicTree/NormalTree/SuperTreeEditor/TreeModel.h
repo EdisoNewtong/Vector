@@ -96,6 +96,8 @@ public:
     bool swapUp(const QModelIndex& selectedNodeIdx);
     bool swapDown(const QModelIndex& selectedNodeIdx);
 
+    bool hasRootNode();
+    bool createRootNode();
 
     signals:
         void forceSetCheckBoxByLoadedFile(int isNumberMode);
@@ -104,7 +106,7 @@ protected:
 
     void deleteRootNode();
     void reCreateRootNode(int needCreateRoot);
-    TreeNode* loadXMLContentIntoView(rapidxml::xml_node<char>* parentXmlNode, TreeNode* parentNode, QString errorMsg, int level);
+    TreeNode* loadXMLContentIntoView(rapidxml::xml_node<char>* parentXmlNode, TreeNode* parentNode, QString& errorMsg, int level);
     void deleteXMLDoc();
 
     bool checkNameIsValid( const QModelIndex& index, int* bFlagisEmptyString) const;

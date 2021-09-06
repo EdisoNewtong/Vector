@@ -29,6 +29,9 @@ private slots:
 
     void onCreateParentWithChildActTrigger();
 
+    // for menu  2
+    void onCreateRootNodeActTrigger();
+
 protected:
     //
     // Menu and Menu Items
@@ -47,6 +50,14 @@ protected:
     QAction*    m_pMoveDownAct;
 
     QAction*    m_pCreateParentWithChildAct;
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Menu 2
+    //
+    
+    QMenu*      m_pPopupMenu2;
+    QAction*    m_pCreateRootNodeAct;
     ////////////////////////////////////////////////////////////////////////////////////////////////////
 
     QModelIndex m_RightClickSelectedValidIdx;

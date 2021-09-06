@@ -897,8 +897,8 @@ namespace rapidxml
         
         //! Constructs empty pool with default allocator functions.
         memory_pool()
-            : m_alloc_func(0)
-            , m_free_func(0)
+            : m_alloc_func(nullptr)
+            , m_free_func(nullptr)
         {
             init();
         }
@@ -3331,7 +3331,7 @@ namespace rapidxml
                             {
                                 auto isAllWhiteSpace = true;
                                 Ch* chbegin = node1st->value();
-                                for ( int i = 0; i < node1st->value_size(); ++i ) {
+                                for ( int i = 0; i < static_cast<int>(node1st->value_size()); ++i ) {
                                     Ch* pCurrentCh = chbegin + i;
                                     if ( !whitespace_pred::test(*pCurrentCh) ) {
                                         isAllWhiteSpace = false;

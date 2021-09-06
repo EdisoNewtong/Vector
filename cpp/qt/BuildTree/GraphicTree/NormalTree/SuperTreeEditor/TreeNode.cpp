@@ -1,7 +1,7 @@
 #include "TreeNode.h"
 #include <QDebug>
 
-static bool G_ENABLE_REFCOUNT = true;
+static bool G_ENABLE_TRACE_MEMORY = true;
 static int G_CNT = 0;
 
 TreeNode::TreeNode(const QString& text, const QString& val,TreeNode* parent)
@@ -10,7 +10,7 @@ TreeNode::TreeNode(const QString& text, const QString& val,TreeNode* parent)
     , m_parent(parent)
 {
     m_children.clear();
-    if ( G_ENABLE_REFCOUNT ) {
+    if ( G_ENABLE_TRACE_MEMORY ) {
         qDebug() << "Create G_CNT = " << ++G_CNT;
     }
 }
@@ -22,7 +22,7 @@ TreeNode::TreeNode()
     , m_parent(nullptr)
 {
     m_children.clear();
-    if ( G_ENABLE_REFCOUNT ) {
+    if ( G_ENABLE_TRACE_MEMORY ) {
         qDebug() << "Create G_CNT = " << ++G_CNT;
     }
 }
@@ -32,6 +32,9 @@ TreeNode::TreeNode()
 // virtual
 TreeNode::~TreeNode()
 {
+    if ( G_ENABLE_TRACE_MEMORY ) {
+        qDebug() << "delete node.name = " << this->getName();
+    }
     releaseSelfAndChildren();
 }
 
@@ -88,7 +91,7 @@ void      TreeNode::releaseSelfAndChildren()
     }
     */
 
-    if ( G_ENABLE_REFCOUNT ) {
+    if ( G_ENABLE_TRACE_MEMORY ) {
         qDebug() << "Delete G_CNT = " << --G_CNT;
     }
 }
