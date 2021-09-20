@@ -155,9 +155,58 @@ void permutationDemo()
 	slotAry.clear();
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// Begin 
+//
+//
+// Question:     
+//     There are 4 numbers 1,2,3,4 and  4 slots 
+//     fill any one number into the slot until all slots are filled
+//     How many possibilities exists ?
+//
+static int testAry[] = { 1,2,3,4 };
+static int flags[]   = { 0,0,0,0 };
+static int retAry[]  = { 0,0,0,0 };
+
+void perm(int deep, int cnt)
+{
+	if ( deep > cnt ) {
+		cout << "case 1 : deep > cnt" << endl;
+		return;
+	}
+
+	if ( deep == cnt ) {
+		for ( int i = 0; i < cnt; ++i ) {
+			cout << retAry[i];
+			if ( i != cnt-1 ) {
+				cout << " - ";
+			}
+		}
+		cout << endl;
+		return;
+	}
+
+	for ( int i = 0; i < cnt; ++i ){
+		if ( flags[i] == 0 ) {
+			flags[i] = 1;
+			retAry[deep] = testAry[i];
+			perm( deep+1, cnt);
+			flags[i] = 0;
+		}
+	}
+}
+
+void permutation2()
+{
+	perm(0, sizeof(retAry) /  sizeof(retAry[0]) );
+}
+
+// End
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
 int main(int argc, char* argv[], char* env[])
 {
-	permutationDemo();
+	// permutationDemo();
+	permutation2();
 	return 0;
 }
