@@ -196,6 +196,34 @@ void perm(int deep, int cnt)
 	}
 }
 
+/*
+    There are 4 slots  , A B C D 
+    and  4 numbers in the poll { 1,2,3,4 }
+ 
+    Step-1 : A is filled with 2 ,then the rest 3 slots B C D  , can only filled with one of  { 1,   3, 4 } without 1
+    Step-2 : B is filled with 3 ,then the rest 2 slots C D    , can only filled with one of  { 1,      4 } without 2 and 3
+       ...
+ 
+ 
+    This example is different from 4 A,B,C,D slots, with 4 numbers {1,2,3,4} , some possibilities is shown below :
+
+	------------------
+	   A  B  C  D
+	   1  1  1  1
+	------------------
+	   A  B  C  D
+	   2  2  2  2
+
+	   ....
+
+	------------------
+	   A  B  C  D
+	   1  2  2  1
+	------------------
+
+
+
+*/
 void permutation2()
 {
 	perm(0, sizeof(retAry) /  sizeof(retAry[0]) );
