@@ -1,3 +1,22 @@
+#include <iostream>
+#include <string>
+#include <iomanip>
+#include <list>
+#include <fstream>
+using namespace std;
+
+namespace 
+{
+	// 1      : qSortSimpleVersionHead(...) 
+	// none 1 : qSortSimpleVersionTail(...)
+	static int  g_headerVersion = 1;
+
+	// true  , smaller --> bigger
+	// false , bigger  --> smaller
+	static bool g_isAscendOrder = true;
+}
+
+
 
 
 void swap2Numbers(int* ary, int idx1, int idx2, int sz)
@@ -11,7 +30,7 @@ void swap2Numbers(int* ary, int idx1, int idx2, int sz)
 	ary[idx2] = backupNum;
 }
 
-void qSortSimpleVersion(int* ary, int begIdx, int endIdx, int sz)
+void qSortSimpleVersionHead(int* ary, int begIdx, int endIdx, int sz, bool isAscendOrder)
 {
 	if ( endIdx <= begIdx ) {
 		return;
@@ -22,8 +41,13 @@ void qSortSimpleVersion(int* ary, int begIdx, int endIdx, int sz)
 	int j = endIdx;
 	while ( i < j ) 
 	{
-		for ( ; i < j && ary[i] <= povitNumber; ++i ) { ; }
-		for ( ; j > i && ary[j] >= povitNumber; --j ) { ; }
+		for ( ; i < j && (isAscendOrder ? ary[i] <= povitNumber
+				                        : ary[i] >= povitNumber); ++i )
+		{ ; }
+
+		for ( ; j > i && (isAscendOrder ? ary[j] >= povitNumber 
+				                        : ary[j] <= povitNumber); --j )
+		{ ; }
 
 		swap2Numbers(ary,i,j,sz);
 		++i;
@@ -38,32 +62,104 @@ void qSortSimpleVersion(int* ary, int begIdx, int endIdx, int sz)
 		sepIdx = i - 1;
 	}
 
-	if ( ary[sepIdx] >= povitNumber ) {
+	auto condition = isAscendOrder ? ary[sepIdx] >= povitNumber 
+		                           : ary[sepIdx] <= povitNumber;
+	if ( condition ) {
 		sepIdx = sepIdx - 1;
 	}
 
 	swap2Numbers(ary,begIdx,sepIdx,sz);
 
 	// sort left
-	qSortSimpleVersion(ary, begIdx, sepIdx - 1, sz);
+	qSortSimpleVersionHead(ary, begIdx, sepIdx - 1, sz, isAscendOrder);
 	// sort right
-	qSortSimpleVersion(ary, sepIdx + 1, endIdx, sz);
+	qSortSimpleVersionHead(ary, sepIdx + 1, endIdx, sz, isAscendOrder);
 }
 
-bool checkIsSorted(int* ary,int sz)
+void qSortSimpleVersionTail(int* ary, int begIdx, int endIdx, int sz, bool isAscendOrder)
+{
+	if ( endIdx <= begIdx ) {
+		return;
+	}
+
+	int povitNumber = ary[endIdx];
+	int i = begIdx;
+	int j = endIdx-1;
+	while ( i < j ) 
+	{
+		for ( ; i < j && (isAscendOrder ? ary[i] <= povitNumber
+				                        : ary[i] >= povitNumber); ++i )
+		{ ; }
+
+		for ( ; j > i && (isAscendOrder ? ary[j] >= povitNumber 
+				                        : ary[j] <= povitNumber); --j )
+		{ ; }
+
+		swap2Numbers(ary,i,j,sz);
+		++i;
+		--j;
+	}
+
+	int sepIdx = 0;
+	if ( i == j ) {
+		sepIdx = i;
+	} else {
+		// i > j
+		sepIdx = i - 1;
+	}
+
+	auto condition = isAscendOrder ? ary[sepIdx] <= povitNumber 
+		                           : ary[sepIdx] >= povitNumber;
+	if ( condition ) {
+		sepIdx = sepIdx + 1;
+	}
+
+	swap2Numbers(ary,endIdx,sepIdx,sz);
+
+	// sort left
+	qSortSimpleVersionTail(ary, begIdx, sepIdx - 1, sz, isAscendOrder);
+	// sort right
+	qSortSimpleVersionTail(ary, sepIdx + 1, endIdx, sz, isAscendOrder);
+}
+
+
+bool checkIsSorted(int* ary,int sz,bool isAscendOrder)
 {
 	auto isSort = true;
 	for ( auto i = 0; i < sz-1 ; ++i ) {
-		if ( ary[i] > ary[i+1] ) {
+		bool meetError = isAscendOrder 
+				         ?  ary[i] > ary[i+1]
+				         :  ary[i] < ary[i+1];
+
+		if ( meetError ) {
 			isSort = false;
 			break;
 		}
 	}
+
 	return isSort;
 }
 
-void testSort()
+void testSort(bool isAscOrder, bool useHeadVersion)
 {
+
+    g_isAscendOrder = isAscOrder;
+	g_headerVersion = useHeadVersion ? 1 : 2;
+
+	cout << "==================================================" << endl;
+	if ( g_isAscendOrder ) {
+		cout << "Use Ascending  Order " << endl;
+	} else {
+		cout << "Use Descending Order " << endl;
+	}
+
+	if ( g_headerVersion == 1 ) {
+		cout << "Use Pick Head Number " << endl;
+	} else {
+		cout << "Use Pick Tail Number " << endl;
+	}
+	cout << "==================================================" << endl;
+
 	const char* FILENAME = "1_5.txt";
 
 	ifstream fobj(FILENAME ,ios::in);
@@ -116,8 +212,12 @@ void testSort()
 		}
 		cout << " ]    "; // << endl;
 
-		qSortSimpleVersion(pary, 0, arysz-1, arysz);
-		auto bIsSorted = checkIsSorted( pary, arysz);
+		if ( g_headerVersion == 1 ) {
+			qSortSimpleVersionHead(pary, 0, arysz-1, arysz, g_isAscendOrder);
+		} else {
+			qSortSimpleVersionTail(pary, 0, arysz-1, arysz, g_isAscendOrder);
+		}
+		auto bIsSorted = checkIsSorted( pary, arysz , g_isAscendOrder);
 		if ( bIsSorted ) {
 			cout << "=> Sort SUCC" << endl;
 		} else {
@@ -139,4 +239,29 @@ void testSort()
 
 	fobj.close();
 }
+
+
+
+
+
+int main(int argc, char* argv[], char* env[])
+{
+	if ( argc != 3 ) {
+		cout << "Missing args" << endl;
+		return -1;
+	}
+
+	// "asc"  : ascending  order  => true   
+	// "desc" : descending order  => false
+	auto isAsc = (string(argv[1]) == "asc");
+
+	// "head"  : head version
+	// "tail"  : tail version
+	auto useHeadVersion = (string(argv[2]) == "head");
+
+	testSort(isAsc, useHeadVersion);
+
+	return 0;
+}
+
 
