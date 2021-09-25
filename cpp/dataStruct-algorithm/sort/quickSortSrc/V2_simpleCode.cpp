@@ -5,8 +5,13 @@
 #include <fstream>
 using namespace std;
 
+
 namespace 
 {
+	static bool g_checkBoundFlag = false;
+	static bool g_checkBoundLogFlag = false;
+	static bool g_checkOutOfBoundReturnFlag = false;
+
 	// 1      : qSortSimpleVersionHead(...) 
 	// none 1 : qSortSimpleVersionTail(...)
 	static int  g_headerVersion = 1;
@@ -16,11 +21,27 @@ namespace
 	static bool g_isAscendOrder = true;
 }
 
+bool checkIsInArrayRange(int idx, int sz, const char* varname)
+{
+	auto isInRange = (idx >=0 && idx < sz);
+	if ( !isInRange && g_checkBoundLogFlag ) {
+		cout << "[WARING] : " << varname << " is out of range [ 0, " << sz  << " ] , " << varname << " = " << idx << endl;
+	}
+	return isInRange;
+}
 
 
 
 void swap2Numbers(int* ary, int idx1, int idx2, int sz)
 {
+	if ( g_checkBoundFlag ) {
+		auto b1 = checkIsInArrayRange(idx1,sz, "idx-1");
+		auto b2 = checkIsInArrayRange(idx2,sz, "idx-2");
+		if ( g_checkOutOfBoundReturnFlag && (!b1 || !b2) ) {
+			return;
+		}
+	}
+	
 	if ( idx1 == idx2 ) {
 		return;
 	}
@@ -32,6 +53,14 @@ void swap2Numbers(int* ary, int idx1, int idx2, int sz)
 
 void qSortSimpleVersionHead(int* ary, int begIdx, int endIdx, int sz, bool isAscendOrder)
 {
+	if ( g_checkBoundFlag ) {
+		auto b1 = checkIsInArrayRange(begIdx,sz, "begIdx");
+		auto b2 = checkIsInArrayRange(endIdx,sz, "endIdx");
+		if ( g_checkOutOfBoundReturnFlag && (!b1 || !b2) ) {
+			return;
+		}
+	}
+
 	if ( endIdx <= begIdx ) {
 		return;
 	}
@@ -78,6 +107,15 @@ void qSortSimpleVersionHead(int* ary, int begIdx, int endIdx, int sz, bool isAsc
 
 void qSortSimpleVersionTail(int* ary, int begIdx, int endIdx, int sz, bool isAscendOrder)
 {
+
+	if ( g_checkBoundFlag ) {
+		auto b1 = checkIsInArrayRange(begIdx,sz, "begIdx");
+		auto b2 = checkIsInArrayRange(endIdx,sz, "endIdx");
+		if ( g_checkOutOfBoundReturnFlag && (!b1 || !b2) ) {
+			return;
+		}
+	}
+
 	if ( endIdx <= begIdx ) {
 		return;
 	}
@@ -148,15 +186,15 @@ void testSort(bool isAscOrder, bool useHeadVersion)
 
 	cout << "==================================================" << endl;
 	if ( g_isAscendOrder ) {
-		cout << "Use Ascending  Order " << endl;
+		cout << "Sorting by the <Ascending>  Order " << endl;
 	} else {
-		cout << "Use Descending Order " << endl;
+		cout << "Sorting by the <Descending> Order " << endl;
 	}
 
 	if ( g_headerVersion == 1 ) {
-		cout << "Use Pick Head Number " << endl;
+		cout << "Use Pick <Head> Number <== as the povit Number " << endl;
 	} else {
-		cout << "Use Pick Tail Number " << endl;
+		cout << "Use Pick <Tail> Number <== as the povit Number " << endl;
 	}
 	cout << "==================================================" << endl;
 
@@ -241,13 +279,25 @@ void testSort(bool isAscOrder, bool useHeadVersion)
 }
 
 
+void printUsage()
+{
+	cout << "Usage : " << endl
+		 << "==================================================" << endl
+		 << " $ ./v2 asc  head" << endl
+		 << "or ./v2 asc  tail" << endl
+		 << "or ./v2 desc head" << endl
+		 << "or ./v2 desc tail" << endl
+		 << "==================================================" << endl
+		 << endl;
+}
 
 
 
 int main(int argc, char* argv[], char* env[])
 {
 	if ( argc != 3 ) {
-		cout << "Missing args" << endl;
+		cout << "[ERROR] : Missing args!!!" << endl;
+		printUsage();
 		return -1;
 	}
 
