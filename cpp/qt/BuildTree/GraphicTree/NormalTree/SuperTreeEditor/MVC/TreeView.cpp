@@ -356,7 +356,6 @@ void TreeView::onCreateRootNodeActTrigger()
     auto model = this->model();
     TreeModel* treeModel = nullptr;
     if (   model != nullptr
-           // &&  ( treeModel = dynamic_cast<TreeModel*>(model) ) != nullptr )
            &&  ( treeModel = qobject_cast<TreeModel*>(model) ) != nullptr )
     {
         auto b = treeModel->createRootNode();

@@ -4,6 +4,9 @@
 #include <QMainWindow>
 
 class TreeModel;
+class QGraphicsScene;
+
+class myRectWithTextItem;
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -39,5 +42,8 @@ private:
     Ui::MainWindow *ui;
 
     TreeModel*    m_myTreeModel;
+    QGraphicsScene*  m_pScene;
+
+    myRectWithTextItem* m_pRectText1;
 };
 #endif // MAINWINDOW_H

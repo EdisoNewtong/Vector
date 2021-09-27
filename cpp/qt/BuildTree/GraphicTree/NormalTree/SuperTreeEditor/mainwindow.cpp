@@ -1,21 +1,30 @@
 #include <QDebug>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QGraphicsScene>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "TreeModel.h"
+
+#include "MVC/TreeModel.h"
+#include "renderObject/myRectWithTextItem.h"
 
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
     , m_myTreeModel( nullptr )
+    , m_pScene( nullptr )
+    , m_pRectText1( nullptr )
 {
     ui->setupUi(this);
 
     m_myTreeModel = new TreeModel(this);
     ui->treeView->setModel( m_myTreeModel );
+
+    m_pScene = new QGraphicsScene( ui->graphicsView );
+    m_pScene->setSceneRect( QRectF(0,0,1000,1000) );
+    ui->graphicsView->setScene( m_pScene );
 
     connect( m_myTreeModel, SIGNAL( forceSetCheckBoxByLoadedFile(int) ), this, SLOT( on_forceSetCheckBoxState(int) )  );
 }
@@ -103,12 +112,29 @@ void MainWindow::on_clearTreeBtn_clicked()
 
 void MainWindow::on_drawTreeBtn_clicked()
 {
-
+    m_pRectText1 = new myRectWithTextItem();
+    m_pScene->addItem( m_pRectText1 );
 }
 
 void MainWindow::on_saveAsPngBtn_clicked()
 {
+    static int func_testFlag = 1;
+    if ( m_pRectText1 == nullptr ) {
+        return;
+    }
 
+    if ( func_testFlag == 1 ) {
+        // Move the position of an  Rect-With-Text Graphics Object
+        m_pRectText1->setPos( 100,300 );
+    } else if ( func_testFlag == 2 )  {
+        auto textObj = m_pRectText1->getTextItem();
+        if ( textObj != nullptr ) {
+            auto textRect = textObj->boundingRect();
+            qDebug() << "textRect = " << textRect;
+        }
+    }
+
+    ++func_testFlag;
 }
 
 

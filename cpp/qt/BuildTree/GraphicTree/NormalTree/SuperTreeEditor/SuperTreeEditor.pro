@@ -22,23 +22,30 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
-	TreeNode.cpp \
-	TreeView.cpp \
-	TreeModel.cpp \
-    SuperTextEdit.cpp
+    MVC/TreeNode.cpp \
+    MVC/TreeView.cpp \
+    MVC/TreeModel.cpp \
+    SuperTextEdit.cpp\
+    renderObject/myRect.cpp \
+    renderObject/myRectWithTextItem.cpp
 
 HEADERS += \
     mainwindow.h \
-	TreeNode.h \
-	TreeView.h \
-	TreeModel.h \
-    SuperTextEdit.h
+    MVC/TreeNode.h \
+    MVC/TreeView.h \
+    MVC/TreeModel.h \
+    SuperTextEdit.h \
+    renderObject/myRect.h \
+    renderObject/myRectWithTextItem.h
+
 
 FORMS += \
     mainwindow.ui
 
 
-INCLUDEPATH += ../parser/rapidxml \
+INCLUDEPATH += MVC \
+               ../parser/rapidxml \
+               ../../parser/rapidxml \
                ../parser/rapidjson \
                ../parser/lua/src
 
