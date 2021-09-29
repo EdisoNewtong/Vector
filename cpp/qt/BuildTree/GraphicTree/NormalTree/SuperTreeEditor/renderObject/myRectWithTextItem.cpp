@@ -171,3 +171,14 @@ void myRectWithTextItem::moveTextToCenter()
         m_pTextItem->setPos( centerPt.x() - textRect.width() / 2.0 , centerPt.y() - textRect.height() / 2.0 );
     }
 }
+
+
+QSizeF myRectWithTextItem::getRectSize()
+{
+    if ( m_pRectItem != nullptr ) {
+        return m_pRectItem->rect().size();
+    } else { 
+        return QSizeF();
+    }
+}
+

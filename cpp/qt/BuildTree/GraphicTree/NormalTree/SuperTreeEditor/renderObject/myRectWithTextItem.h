@@ -2,6 +2,7 @@
 #define MY_RECT_WITH_TEXT_ITEM
 
 #include <QGraphicsObject>
+#include <QSizeF>
 
 class QGraphicsRectItem;
 class QGraphicsTextItem;
@@ -43,6 +44,8 @@ public:
 
     int getLayer();
     int getSelfIdx();
+
+    QSizeF getRectSize();
 protected:
     QGraphicsRectItem*  m_pRectItem;
     QGraphicsTextItem*  m_pTextItem;

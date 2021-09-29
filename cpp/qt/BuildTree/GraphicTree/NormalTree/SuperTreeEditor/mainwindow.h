@@ -46,8 +46,10 @@ private:
     QGraphicsScene*  m_pScene;
 
     myRectWithTextItem* m_pRectText1;
+    double              m_maxYPos;
 
-    double generateRenderObject(TreeNode* parentNode, int level, double previousX);
+    double generateRenderObject(TreeNode* parentNode,myRectWithTextItem* parentRenderObject, int level, double previousX);
+
 
 };
 

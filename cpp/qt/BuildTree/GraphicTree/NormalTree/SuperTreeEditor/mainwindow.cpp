@@ -2,6 +2,8 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QGraphicsScene>
+#include <QVector>
+#include <QGraphicsLineItem>
 
 #include <QFontMetricsF> // Test Only
 
@@ -19,6 +21,7 @@ MainWindow::MainWindow(QWidget *parent)
     , m_myTreeModel( nullptr )
     , m_pScene( nullptr )
     , m_pRectText1( nullptr )
+    , m_maxYPos(0.0)
 {
     ui->setupUi(this);
 
@@ -26,7 +29,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->treeView->setModel( m_myTreeModel );
 
     m_pScene = new QGraphicsScene( ui->graphicsView );
-    m_pScene->setSceneRect( QRectF(0,0,2000,2000) );
+    m_pScene->setSceneRect( QRectF(0,0,600,400) );
     ui->graphicsView->setScene( m_pScene );
 
     connect( m_myTreeModel, SIGNAL( forceSetCheckBoxByLoadedFile(int) ), this, SLOT( on_forceSetCheckBoxState(int) )  );
@@ -118,6 +121,9 @@ void MainWindow::on_clearTreeBtn_clicked()
 void MainWindow::on_drawTreeBtn_clicked()
 {
     if ( m_myTreeModel != nullptr && m_pScene != nullptr ) {
+        // clear previous drawn objects first
+        m_pScene->clear();
+
         auto pInvisibleRootNode = m_myTreeModel->getInvisibleRootNode();
         if ( pInvisibleRootNode == nullptr ) {
             return;
@@ -127,8 +133,14 @@ void MainWindow::on_drawTreeBtn_clicked()
         auto iLevel = 0; 
         // double previousX = 0.0;
         myRectWithTextItem* parentRenderObject = nullptr; 
-        (void)parentRenderObject;
-        generateRenderObject( pInvisibleRootNode, iLevel, RenderCfg::sc_leftMargin);
+        m_maxYPos = 0.0;
+        // (void)parentRenderObject;
+        auto rootItemWidth = generateRenderObject( pInvisibleRootNode,parentRenderObject,  iLevel, RenderCfg::sc_leftMargin);
+        auto totalWidth = RenderCfg::sc_leftMargin + rootItemWidth + RenderCfg::sc_rightMargin;
+        auto totalHeight = m_maxYPos + RenderCfg::sc_rectHeight + RenderCfg::sc_bottomMargin;
+        if ( rootItemWidth > 0 ) {
+            m_pScene->setSceneRect( QRectF(0,0,totalWidth,totalHeight) );
+        }
     }
 
     // arg1 : m_myTreeModel
@@ -237,7 +249,7 @@ void MainWindow::on_testOnlyButton_clicked()
 
 
 
-double MainWindow::generateRenderObject(TreeNode* parentNode, int level, double previousX)
+double MainWindow::generateRenderObject(TreeNode* parentNode,myRectWithTextItem* parentRenderObject, int level, double previousX)
 {
     using namespace RenderCfg;
     // (void)parentRenderObject;
@@ -262,6 +274,9 @@ double MainWindow::generateRenderObject(TreeNode* parentNode, int level, double 
 
     auto bHasChild = parentNode->hasChildren();
     if ( !bHasChild ) {
+        if ( parentRenderObject != nullptr ) {
+            parentRenderObject->setRectInfo( QRectF(0,0, sc_rectWidth, sc_rectHeight) );
+        }
         return (level == 0 ? 0.0 : sc_rectWidth);
     }
 
@@ -274,7 +289,11 @@ double MainWindow::generateRenderObject(TreeNode* parentNode, int level, double 
     double widthSum = 0.0;
 
     auto yPos = sc_topMargin + level * (sc_itemVGap + sc_rectHeight);
+    if ( yPos > m_maxYPos ) {
+        m_maxYPos = yPos;
+    }
     
+    QVector<myRectWithTextItem*> childList;
     for ( int childIdx = 0; childIdx < childCnt;  ++childIdx ) 
     {
         auto childNode = parentNode->getChildAtIdx( childIdx );
@@ -287,8 +306,8 @@ double MainWindow::generateRenderObject(TreeNode* parentNode, int level, double 
         //
         // Recursively Build Sub-Tree
         //
-        auto genSubTreeWidth = generateRenderObject( childNode, level + 1, dx);
-        newRenderRectWithTextObject->setRectInfo( QRectF(0,0, genSubTreeWidth, sc_rectHeight) );
+        auto genSubTreeWidth = generateRenderObject( childNode, newRenderRectWithTextObject,level + 1, dx);
+        // newRenderRectWithTextObject->setRectInfo( QRectF(0,0, genSubTreeWidth, sc_rectHeight) );
 
         widthSum += genSubTreeWidth;
         dx += genSubTreeWidth;
@@ -304,6 +323,30 @@ double MainWindow::generateRenderObject(TreeNode* parentNode, int level, double 
         newRenderRectWithTextObject->moveTextToCenter();
 
         m_pScene->addItem( newRenderRectWithTextObject );
+
+        childList.push_back( newRenderRectWithTextObject );
+    }
+
+    const auto flag = true;
+    //
+    // Draw a line connected to child
+    //
+    if ( flag && parentRenderObject != nullptr ) {
+        parentRenderObject->setRectInfo( QRectF(0,0, widthSum, sc_rectHeight) );
+        auto parentPos = parentRenderObject->pos();
+        QPointF parentBottomCenter( parentPos.x() + widthSum/2.0f, parentPos.y() + sc_rectHeight );
+        for ( auto it = childList.begin(); it != childList.end(); ++it )
+        {
+            auto child = *it;
+            if ( child != nullptr ) {
+                auto childpos = child->pos();
+                auto sz = child->getRectSize();
+                childpos += QPointF(sz.width() / 2.0f , 0.0 );
+
+                auto connectedLine = new QGraphicsLineItem( parentBottomCenter.x(), parentBottomCenter.y(), childpos.x(), childpos.y() );
+                m_pScene->addItem( connectedLine );
+            }
+        }
     }
 
     return widthSum;
