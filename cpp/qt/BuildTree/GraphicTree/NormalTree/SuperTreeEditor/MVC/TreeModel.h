@@ -69,6 +69,7 @@ public:
     virtual bool 
     removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) Q_DECL_OVERRIDE;
 
+    TreeNode* getInvisibleRootNode();
 protected:
     // void QAbstractItemModel::beginInsertRows(const QModelIndex &parent, int first, int last) Q_DECL_OVERRIDE;
 

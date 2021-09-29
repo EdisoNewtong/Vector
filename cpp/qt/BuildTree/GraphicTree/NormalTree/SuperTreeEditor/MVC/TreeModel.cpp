@@ -983,3 +983,8 @@ bool TreeModel::createRootNode()
     return bret;
 }
 
+
+TreeNode* TreeModel::getInvisibleRootNode()
+{
+    return m_invisibleRoot;
+}

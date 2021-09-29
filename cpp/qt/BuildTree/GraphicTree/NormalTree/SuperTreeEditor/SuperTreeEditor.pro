@@ -25,9 +25,9 @@ SOURCES += \
     MVC/TreeNode.cpp \
     MVC/TreeView.cpp \
     MVC/TreeModel.cpp \
-    SuperTextEdit.cpp\
-    renderObject/myRect.cpp \
-    renderObject/myRectWithTextItem.cpp
+    SuperTextEdit.cpp \
+    renderObject/myRectWithTextItem.cpp \
+    renderObject/renderCfg.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -35,8 +35,8 @@ HEADERS += \
     MVC/TreeView.h \
     MVC/TreeModel.h \
     SuperTextEdit.h \
-    renderObject/myRect.h \
-    renderObject/myRectWithTextItem.h
+    renderObject/myRectWithTextItem.h \
+    renderObject/renderCfg.h
 
 
 FORMS += \

@@ -7,6 +7,7 @@ class TreeModel;
 class QGraphicsScene;
 
 class myRectWithTextItem;
+class TreeNode;
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -36,7 +37,7 @@ private slots:
     // Manually  Added by Edison
     void on_forceSetCheckBoxState(int checkedState);
 
-
+    void on_testOnlyButton_clicked();
 
 private:
     Ui::MainWindow *ui;
@@ -45,5 +46,9 @@ private:
     QGraphicsScene*  m_pScene;
 
     myRectWithTextItem* m_pRectText1;
+
+    double generateRenderObject(TreeNode* parentNode, int level, double previousX);
+
 };
+
 #endif // MAINWINDOW_H

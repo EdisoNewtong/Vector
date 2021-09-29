@@ -144,6 +144,29 @@
      <string>Key Only Number</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="testOnlyButton">
+    <property name="geometry">
+     <rect>
+      <x>940</x>
+      <y>510</y>
+      <width>131</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>testOnly</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="argsEdit">
+    <property name="geometry">
+     <rect>
+      <x>1080</x>
+      <y>510</y>
+      <width>141</width>
+      <height>41</height>
+     </rect>
+    </property>
+   </widget>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
  </widget>
