@@ -129,6 +129,9 @@ void MainWindow::on_drawTreeBtn_clicked()
             return;
         }
 
+        // Core Code , for Render line Antialiasing
+        ui->graphicsView->setRenderHint( QPainter::Antialiasing , true);
+
         // level0 : Invisible Layer => layer.z = 0;
         auto iLevel = 0; 
         // double previousX = 0.0;
