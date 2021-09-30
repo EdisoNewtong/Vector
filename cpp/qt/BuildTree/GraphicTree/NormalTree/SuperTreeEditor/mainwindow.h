@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QtGlobal>
 
 class TreeModel;
 class QGraphicsScene;
@@ -46,9 +47,9 @@ private:
     QGraphicsScene*  m_pScene;
 
     myRectWithTextItem* m_pRectText1;
-    double              m_maxYPos;
+    qreal              m_maxYPos;
 
-    double generateRenderObject(TreeNode* parentNode,myRectWithTextItem* parentRenderObject, int level, double previousX);
+    qreal generateRenderObject(TreeNode* parentNode,myRectWithTextItem* parentRenderObject, int level, qreal previousX);
 
 
 };

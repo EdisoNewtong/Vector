@@ -1,23 +1,24 @@
 #ifndef RENDER_CFG_H
 #define RENDER_CFG_H
 
+#include <QtGlobal>
 
 namespace RenderCfg
 {
     //
     // default immutable varibles
     //
-    extern double sc_rectWidth;
-    extern double sc_rectHeight;
+    extern qreal sc_rectWidth;
+    extern qreal sc_rectHeight;
 
-    extern double sc_itemHGap;
-    extern double sc_itemVGap;
+    extern qreal sc_itemHGap;
+    extern qreal sc_itemVGap;
 
-    extern double sc_leftMargin;
-    extern double sc_topMargin;
+    extern qreal sc_leftMargin;
+    extern qreal sc_topMargin;
 
-    extern double sc_rightMargin;
-    extern double sc_bottomMargin;
+    extern qreal sc_rightMargin;
+    extern qreal sc_bottomMargin;
 }
 
 

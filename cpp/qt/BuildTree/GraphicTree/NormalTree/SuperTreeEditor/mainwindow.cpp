@@ -4,6 +4,7 @@
 #include <QGraphicsScene>
 #include <QVector>
 #include <QGraphicsLineItem>
+#include <QPixmap>
 
 #include <QFontMetricsF> // Test Only
 
@@ -30,6 +31,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     m_pScene = new QGraphicsScene( ui->graphicsView );
     m_pScene->setSceneRect( QRectF(0,0,600,400) );
+    m_pScene->setBackgroundBrush( Qt::white);
+    // m_pScene->setForegroundBrush( Qt::blue );
     ui->graphicsView->setScene( m_pScene );
 
     connect( m_myTreeModel, SIGNAL( forceSetCheckBoxByLoadedFile(int) ), this, SLOT( on_forceSetCheckBoxState(int) )  );
@@ -134,7 +137,7 @@ void MainWindow::on_drawTreeBtn_clicked()
 
         // level0 : Invisible Layer => layer.z = 0;
         auto iLevel = 0; 
-        // double previousX = 0.0;
+        // qreal previousX = 0.0;
         myRectWithTextItem* parentRenderObject = nullptr; 
         m_maxYPos = 0.0;
         // (void)parentRenderObject;
@@ -156,25 +159,56 @@ void MainWindow::on_drawTreeBtn_clicked()
 
 void MainWindow::on_saveAsPngBtn_clicked()
 {
-    /*
-    static int func_testFlag = 1;
-    if ( m_pRectText1 == nullptr ) {
+    if ( m_pScene == nullptr ) {
+        QString errorMsg("Graphics Scene hasn't been initialized");
+        ui->statusBar->showMessage(errorMsg, 3500);
+        QMessageBox::critical(this, QStringLiteral("Graphic Scene Error"), errorMsg);
         return;
     }
 
-    if ( func_testFlag == 1 ) {
-        // Move the position of an  Rect-With-Text Graphics Object
-        m_pRectText1->setPos( 100,300 );
-    } else if ( func_testFlag == 2 )  {
-        auto textObj = m_pRectText1->getTextItem();
-        if ( textObj != nullptr ) {
-            auto textRect = textObj->boundingRect();
-            qDebug() << "textRect = " << textRect;
-        }
+
+    qDebug() << "bgBrush = " << m_pScene->backgroundBrush();
+    qDebug() << "fgBrush = " << m_pScene->foregroundBrush();
+
+    // static
+    auto savedfile = QFileDialog::getSaveFileName(this,"Save Tree As png", QString(), tr("Png Files (*.png)") );
+    if ( savedfile.trimmed().isEmpty() ) {
+        ui->statusBar->showMessage("Cancel Saving File", 3500);
+        return;
     }
 
-    ++func_testFlag;
-    */
+    //
+    // Core Core Core :
+    //
+    //      Must set the pixmap's size first , otherwise , the save-file operation will be failed by the following Error List
+    //
+    // QPainter::begin: Paint device returned engine == 0, type: 2
+    // QPainter::setBackground: Painter not active
+    // QPainter::setRenderHint: Painter must be active to set rendering hints
+    // QPainter::save: Painter not active
+
+
+    // QPixmap pixmap;
+    auto rectSz = m_pScene->sceneRect().size().toSize();
+    QPixmap pixmap( rectSz );
+
+    // m_pScene->setBackgroundBrush( Qt::white);  // Set the  white brush first , otherwise the saved png will be filled with black brush as default
+    QPainter painter;
+    painter.begin(&pixmap);
+    painter.setBackground(Qt::white);
+    painter.setRenderHint(QPainter::Antialiasing);
+    m_pScene->render(&painter);
+    painter.end();
+
+    auto succ = pixmap.save(savedfile,"PNG");
+    if ( !succ ) {
+        QString errorMsg("Save Png Failed");
+        ui->statusBar->showMessage(errorMsg, 3500);
+        QMessageBox::critical(this, QStringLiteral("Saving Error"), errorMsg);
+    } else {
+        QMessageBox::information(this, QStringLiteral("Saving Status"), QStringLiteral("Png File Saved") );
+        ui->statusBar->showMessage("Saving File Done", 3500);
+    }
 }
 
 
@@ -252,23 +286,23 @@ void MainWindow::on_testOnlyButton_clicked()
 
 
 
-double MainWindow::generateRenderObject(TreeNode* parentNode,myRectWithTextItem* parentRenderObject, int level, double previousX)
+qreal MainWindow::generateRenderObject(TreeNode* parentNode,myRectWithTextItem* parentRenderObject, int level, qreal previousX)
 {
     using namespace RenderCfg;
     // (void)parentRenderObject;
 
     /*
-        extern double sc_rectWidth;
-        extern double sc_rectHeight;
+        extern qreal sc_rectWidth;
+        extern qreal sc_rectHeight;
 
-        extern double sc_itemHGap;
-        extern double sc_itemVGap;
+        extern qreal sc_itemHGap;
+        extern qreal sc_itemVGap;
 
-        extern double sc_leftMargin;
-        extern double sc_topMargin;
+        extern qreal sc_leftMargin;
+        extern qreal sc_topMargin;
 
-        extern double sc_rightMargin;
-        extern double sc_bottomMargin;
+        extern qreal sc_rightMargin;
+        extern qreal sc_bottomMargin;
     */
 
     if ( parentNode == nullptr ) {
@@ -288,8 +322,8 @@ double MainWindow::generateRenderObject(TreeNode* parentNode,myRectWithTextItem*
     // Has At Least 1 Child
     //
     int childCnt = parentNode->childCount();
-    double dx = previousX;
-    double widthSum = 0.0;
+    qreal dx = previousX;
+    qreal widthSum = 0.0;
 
     auto yPos = sc_topMargin + level * (sc_itemVGap + sc_rectHeight);
     if ( yPos > m_maxYPos ) {
@@ -337,14 +371,14 @@ double MainWindow::generateRenderObject(TreeNode* parentNode,myRectWithTextItem*
     if ( flag && parentRenderObject != nullptr ) {
         parentRenderObject->setRectInfo( QRectF(0,0, widthSum, sc_rectHeight) );
         auto parentPos = parentRenderObject->pos();
-        QPointF parentBottomCenter( parentPos.x() + widthSum/2.0f, parentPos.y() + sc_rectHeight );
+        QPointF parentBottomCenter( parentPos.x() + widthSum/2.0, parentPos.y() + sc_rectHeight );
         for ( auto it = childList.begin(); it != childList.end(); ++it )
         {
             auto child = *it;
             if ( child != nullptr ) {
                 auto childpos = child->pos();
                 auto sz = child->getRectSize();
-                childpos += QPointF(sz.width() / 2.0f , 0.0 );
+                childpos += QPointF(sz.width() / 2.0 , 0.0 );
 
                 auto connectedLine = new QGraphicsLineItem( parentBottomCenter.x(), parentBottomCenter.y(), childpos.x(), childpos.y() );
                 m_pScene->addItem( connectedLine );
