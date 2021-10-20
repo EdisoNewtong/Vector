@@ -1,0 +1,47 @@
+/*
+     unsigned 
+       signed
+         char
+        short
+          int
+         long
+    long long
+         float
+         double
+    long double
+*/
+
+
+//
+// unary operation
+//
++  or -  
+~
+
+
+//
+// binary operation
+//
++     -     *    /     %   
++=    -=   *=    /=    %=
+
+&      |     ^
+&=     |=    ^=
+
+<<     >>
+<<=    >>=
+
+=     //  varible-name = expr;
+
+
+
+//
+// binary operation
+//
+a-zA-Z0-9   _
+
+( )  
+
+;
+
+<Space>   <Tab>   \r \n
