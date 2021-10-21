@@ -3,6 +3,8 @@
 
 #include "tokenParserBase.h"
 
+#include "parserInfo.h"
+
 class SingleLineCommentParser : public TokenParserBase
 {
 public:
@@ -10,7 +12,7 @@ public:
 	virtual ~SingleLineCommentParser();
 
 	virtual void init();
-	virtual E_PaserType  appendContent(char ch);
+	virtual E_PaserType  appendContent(char ch, ParserInfo* pInfo);
 };
 
 

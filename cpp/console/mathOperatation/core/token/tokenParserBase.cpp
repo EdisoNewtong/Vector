@@ -68,19 +68,61 @@ void TokenParserBase::init()
 
 }
 
-// virtual 
-E_PaserType  TokenParserBase::appendContent(char ch)
+
+pair< std::unordered_map<char, E_ChType>::iterator, bool> TokenParserBase::commonCheck(char ch, ParserInfo* pInfo)
 {
 	auto pr = isValidChar(ch);
 	if ( !pr.second ) {
 		ParserExpection	e(E_ExceptionCode::E_UNKNOWN_CHAR);
 
 		string info;
-		info += ch;
+		if ( ch >= 0 ) {
+			// >= 32
+			if ( ch < 32 ) {
+				if ( ch == '\t' ) {
+					info += "'\\t'";
+				} else if ( ch == '\r' ) {
+					info += "'\\r'";
+				} else if ( ch == '\n' ) {
+					info += "'\\n'";
+				} else {
+					info += " ? , code = ";  
+					info += std::to_string( static_cast<int>(ch) );
+				}
+			} else {
+				if ( ch == 32 ) {
+					info += "' '";
+				} else {
+					info += "'";
+					info += ch;
+					info += "'";
+				}
+			}
+		} else {
+			// < 0
+			info += " ? , code = ";  
+			info += std::to_string( static_cast<int>(ch) );
+		}
+
+		info += "  | index = ";
+		info += std::to_string(pInfo->nCharIdx);
+		info += " @Line ";
+		info += std::to_string(pInfo->nLine);
+		info += ":";
+		info += std::to_string(pInfo->nCol);
+
 		e.setDetail(info);
 
 		throw e;
 	}
+
+	return pr; 
+}
+
+// virtual 
+E_PaserType  TokenParserBase::appendContent(char ch, ParserInfo* pInfo)
+{
+	auto pr = commonCheck(ch,pInfo);
 
 	m_alreadyTravelsaledString += ch;
 	E_ChType type =	(pr.first)->second;
@@ -105,7 +147,6 @@ pair< std::unordered_map<char, E_ChType>::iterator, bool> TokenParserBase::isVal
     auto b = it != m_CharSet.end();
 	return std::make_pair(it,b);
 }
-
 
 void TokenParserBase::clearTravelsaled()
 {

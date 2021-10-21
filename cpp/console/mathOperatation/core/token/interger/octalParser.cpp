@@ -31,8 +31,9 @@ void OctalParser::init()
 
 
 // virtual 
-E_PaserType  OctalParser::appendContent(char ch)
+E_PaserType  OctalParser::appendContent(char ch, ParserInfo* pInfo)
 {
 	(void)ch;
+	(void)pInfo;
 	return E_UNDETERMIND;	
 }

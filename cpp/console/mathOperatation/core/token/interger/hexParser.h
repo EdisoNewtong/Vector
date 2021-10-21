@@ -4,6 +4,8 @@
 #include <unordered_map>
 #include "tokenParserBase.h"
 
+#include "parserInfo.h"
+
 class HexParser : public TokenParserBase
 {
 public:
@@ -11,7 +13,7 @@ public:
 	virtual ~HexParser();
 
 	virtual void init();
-	virtual E_PaserType appendContent(char ch);
+	virtual E_PaserType appendContent(char ch, ParserInfo* pInfo);
 protected:
 };
 

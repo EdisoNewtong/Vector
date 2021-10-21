@@ -24,9 +24,13 @@ void BlankParser::init()
 
 
 // virtual 
-E_PaserType  BlankParser::appendContent(char ch)
+E_PaserType  BlankParser::appendContent(char ch, ParserInfo* pInfo)
 {
-	(void)ch;
-	return E_UNDETERMIND;	
+	auto pr = isValidChar(ch);
+	if ( !pr.second ) {
+		return E_UNDETERMIND;	
+	}
+
+	return E_P_BLANK;
 }
 

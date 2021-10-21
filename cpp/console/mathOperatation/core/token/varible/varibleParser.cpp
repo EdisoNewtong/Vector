@@ -41,9 +41,10 @@ void VaribleParser::init()
 
 
 // virtual 
-E_PaserType  VaribleParser::appendContent(char ch)
+E_PaserType  VaribleParser::appendContent(char ch, ParserInfo* pInfo)
 {
 	(void)ch;
+	(void)pInfo;
 	return E_UNDETERMIND;	
 }
 

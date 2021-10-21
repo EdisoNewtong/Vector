@@ -23,9 +23,10 @@ void SingleLineCommentParser::init()
 }
 
 // virtual 
-E_PaserType SingleLineCommentParser::appendContent(char ch)
+E_PaserType SingleLineCommentParser::appendContent(char ch, ParserInfo* pInfo)
 {
 	(void)ch;
+	(void)pInfo;
 	return E_UNDETERMIND;	
 }
 

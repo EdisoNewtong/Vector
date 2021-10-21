@@ -44,8 +44,11 @@ void HexParser::init()
 
 
 // virtual 
-E_PaserType HexParser::appendContent(char ch)
+E_PaserType HexParser::appendContent(char ch, ParserInfo* pInfo)
 {
 	(void)ch;
+	(void)pInfo;
+
 	return E_UNDETERMIND;	
 }
+

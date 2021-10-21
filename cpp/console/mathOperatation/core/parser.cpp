@@ -24,6 +24,7 @@ Parser::Parser()
     // Parser
 	, m_currentParser(nullptr)
 	, m_currentPaserType( E_UNDETERMIND )
+	, m_pInfo()
 {
 	m_parserMap.clear();
 
@@ -102,24 +103,58 @@ a-z  A-Z  0-9  _
 */
 
 
+void Parser::processLineInfo(char ch, size_t idx)
+{
+
+	// set index
+	m_pInfo.nCharIdx = idx;
+
+	if ( m_pInfo.hasPreviousChar ) {
+		if ( m_pInfo.previousChar == '\r' ) {
+			if ( ch != '\n' ) {
+				++m_pInfo.nLine;
+				m_pInfo.nCol = 1;
+			} else {
+				++m_pInfo.nCol;
+			}
+		} else if ( m_pInfo.previousChar == '\n' ) {
+			++m_pInfo.nLine;
+			m_pInfo.nCol = 1;
+		} else {
+			++m_pInfo.nCol;
+		}
+	} else {
+		++m_pInfo.nCol;
+	}
+
+}
 
 
 
 int Parser::doParse()
 {
-	
 	size_t idx;
 	for ( idx = 0; idx < m_size; ++idx )
 	{
 		char ch = m_buf[idx];
-		auto guessType = m_currentParser->appendContent(ch);
-		if ( guessType != E_UNDETERMIND ) {
-			m_currentParser =  m_parserMap[guessType];
+		// common process
+		processLineInfo(ch,idx);
+
+		if ( m_currentParser != nullptr ) {
+			auto guessType = m_currentParser->appendContent(ch, &m_pInfo);
+			if ( guessType != m_currentPaserType ) {
+				if ( guessType == E_UNDETERMIND ) {
+					m_parserMap[E_P_DEFAULT]->commonCheck(ch, &m_pInfo);
+				} 
+
+				m_currentParser =  m_parserMap[guessType];
+				m_currentPaserType = guessType;
+			}
 		}
-		
+
+		m_pInfo.previousChar = ch;
+		m_pInfo.hasPreviousChar = true; 
 	}
-
-
 
 	return 1;
 }

@@ -4,6 +4,8 @@
 
 #include "tokenParserBase.h"
 
+#include "parserInfo.h"
+
 class BlankParser : public TokenParserBase
 {
 public:
@@ -11,7 +13,7 @@ public:
 	virtual ~BlankParser();
 
 	virtual void init();
-	virtual E_PaserType  appendContent(char ch);
+	virtual E_PaserType  appendContent(char ch, ParserInfo* pInfo);
 };
 
 #endif

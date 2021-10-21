@@ -3,7 +3,7 @@
 INC_PATH := -Icore -Icore/token -Icore/token/interger -Icore/token/floatnumber -Icore/token/varible -Icore/token/comment -Icore/token/blank
 
 
-main:build/parser.o build/parserFlag.o build/parserException.o build/decimalParser.o build/octalParser.o build/hexParser.o build/floatParser.o build/varibleParser.o build/main.o  build/tokenParserBase.o build/blankParser.o build/singleLineCommentParser.o build/multiLineCommentParser.o
+main:build/parser.o build/parserInfo.o build/parserException.o build/decimalParser.o build/octalParser.o build/hexParser.o build/floatParser.o build/varibleParser.o build/main.o  build/tokenParserBase.o build/blankParser.o build/singleLineCommentParser.o build/multiLineCommentParser.o
 	g++ -Wall -std=c++11 -o main build/*.o
 
 
@@ -14,8 +14,8 @@ build/main.o:main.cpp core/commonEnum.h core/parser.h core/parserException.h
 build/parser.o:core/parser.cpp core/parser.h core/commonEnum.h core/token/tokenParserBase.h core/token/interger/decimalParser.h core/token/interger/octalParser.h core/token/interger/hexParser.h core/token/floatnumber/floatParser.h core/token/varible/varibleParser.h
 	g++ -Wall -std=c++11 $(INC_PATH)   -c -o build/parser.o core/parser.cpp
 
-build/parserFlag.o:core/parserFlag.cpp
-	g++ -Wall -std=c++11 $(INC_PATH)   -c -o build/parserFlag.o core/parserFlag.cpp 
+build/parserInfo.o:core/parserInfo.cpp core/parserInfo.h
+	g++ -Wall -std=c++11 $(INC_PATH)   -c -o build/parserInfo.o core/parserInfo.cpp 
 
 build/parserException.o:core/parserException.cpp core/parserException.h core/commonEnum.h
 	g++ -Wall -std=c++11 $(INC_PATH)   -c -o build/parserException.o  core/parserException.cpp
@@ -28,19 +28,19 @@ build/parserException.o:core/parserException.cpp core/parserException.h core/com
 #
 # Base Part
 #
-build/tokenParserBase.o:core/token/tokenParserBase.cpp core/token/tokenParserBase.h core/commonEnum.h core/parserException.h
+build/tokenParserBase.o:core/token/tokenParserBase.cpp core/token/tokenParserBase.h core/commonEnum.h core/parserException.h core/parserInfo.h
 	g++ -Wall -std=c++11 $(INC_PATH)  -c -o build/tokenParserBase.o  core/token/tokenParserBase.cpp
 
 #
 # Number Part
 #
-build/decimalParser.o:core/token/interger/decimalParser.cpp core/token/interger/decimalParser.h core/token/tokenParserBase.h core/parserException.h
+build/decimalParser.o:core/token/interger/decimalParser.cpp core/token/interger/decimalParser.h core/token/tokenParserBase.h core/parserException.h core/parserInfo.h
 	g++ -Wall -std=c++11 $(INC_PATH)  -c -o build/decimalParser.o  core/token/interger/decimalParser.cpp
 
-build/octalParser.o:core/token/interger/octalParser.cpp core/token/interger/octalParser.h core/token/tokenParserBase.h core/parserException.h
+build/octalParser.o:core/token/interger/octalParser.cpp core/token/interger/octalParser.h core/token/tokenParserBase.h core/parserException.h core/parserInfo.h
 	g++ -Wall -std=c++11 $(INC_PATH)   -c -o build/octalParser.o  core/token/interger/octalParser.cpp
 
-build/hexParser.o:core/token/interger/hexParser.cpp core/token/interger/hexParser.h  core/token/tokenParserBase.h core/parserException.h
+build/hexParser.o:core/token/interger/hexParser.cpp core/token/interger/hexParser.h  core/token/tokenParserBase.h core/parserException.h core/parserInfo.h
 	g++ -Wall -std=c++11 $(INC_PATH)   -c -o build/hexParser.o  core/token/interger/hexParser.cpp
 
 
@@ -51,13 +51,13 @@ build/hexParser.o:core/token/interger/hexParser.cpp core/token/interger/hexParse
 #
 # Float Part     
 #
-build/floatParser.o:core/token/floatnumber/floatParser.cpp core/token/floatnumber/floatParser.h core/token/tokenParserBase.h core/parserException.h
+build/floatParser.o:core/token/floatnumber/floatParser.cpp core/token/floatnumber/floatParser.h core/token/tokenParserBase.h core/parserException.h core/parserInfo.h
 	g++ -Wall -std=c++11 $(INC_PATH)  -c -o build/floatParser.o  core/token/floatnumber/floatParser.cpp
 
 #
 # Varible Part
 #
-build/varibleParser.o:core/token/varible/varibleParser.cpp  core/token/varible/varibleParser.h  core/token/tokenParserBase.h core/parserException.h
+build/varibleParser.o:core/token/varible/varibleParser.cpp  core/token/varible/varibleParser.h  core/token/tokenParserBase.h core/parserException.h core/parserInfo.h
 	g++ -Wall -std=c++11 $(INC_PATH)   -c -o build/varibleParser.o  core/token/varible/varibleParser.cpp
 
 
@@ -67,10 +67,10 @@ build/varibleParser.o:core/token/varible/varibleParser.cpp  core/token/varible/v
 #
 # Comment Part     //     or       /*    ...  */
 #
-build/singleLineCommentParser.o:core/token/comment/singleLineCommentParser.cpp core/token/comment/singleLineCommentParser.h core/token/tokenParserBase.h core/parserException.h
+build/singleLineCommentParser.o:core/token/comment/singleLineCommentParser.cpp core/token/comment/singleLineCommentParser.h core/token/tokenParserBase.h core/parserException.h core/parserInfo.h
 	g++ -Wall -std=c++11 $(INC_PATH)  -c -o build/singleLineCommentParser.o  core/token/comment/singleLineCommentParser.cpp
 
-build/multiLineCommentParser.o:core/token/comment/multiLineCommentParser.cpp core/token/comment/multiLineCommentParser.h core/token/tokenParserBase.h core/parserException.h
+build/multiLineCommentParser.o:core/token/comment/multiLineCommentParser.cpp core/token/comment/multiLineCommentParser.h core/token/tokenParserBase.h core/parserException.h core/parserInfo.h
 	g++ -Wall -std=c++11 $(INC_PATH)  -c -o build/multiLineCommentParser.o  core/token/comment/multiLineCommentParser.cpp
 
 
@@ -78,7 +78,7 @@ build/multiLineCommentParser.o:core/token/comment/multiLineCommentParser.cpp cor
 #
 # Blank Part
 #
-build/blankParser.o:core/token/blank/blankParser.cpp core/token/blank/blankParser.h core/token/tokenParserBase.h core/parserException.h
+build/blankParser.o:core/token/blank/blankParser.cpp core/token/blank/blankParser.h core/token/tokenParserBase.h core/parserException.h core/parserInfo.h
 	g++ -Wall -std=c++11 $(INC_PATH)  -c -o build/blankParser.o  core/token/blank/blankParser.cpp
 
 

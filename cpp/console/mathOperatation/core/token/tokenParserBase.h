@@ -6,6 +6,8 @@
 #include <string>
 #include "commonEnum.h"
 
+#include "parserInfo.h"
+
 //
 // Base Class
 //
@@ -17,10 +19,12 @@ public:
 
 
 	virtual void init();
-	virtual E_PaserType appendContent(char ch);
+	virtual E_PaserType appendContent(char ch, ParserInfo* pInfo);
 
 	std::pair< std::unordered_map<char, E_ChType>::iterator, bool> isValidChar(char ch);
 	void clearTravelsaled();
+
+	std::pair< std::unordered_map<char, E_ChType>::iterator, bool> commonCheck(char ch, ParserInfo* pInfo);
 protected:
 	std::unordered_map<char, E_ChType> m_CharSet;
 

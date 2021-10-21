@@ -25,5 +25,6 @@ lua/sourceCodeStudy/xcodeLuaStudy
 *.pro.user
 
 !cpp/console/mathOperatation/build/**
+cpp/console/mathOperatation/build/*.o
 
 

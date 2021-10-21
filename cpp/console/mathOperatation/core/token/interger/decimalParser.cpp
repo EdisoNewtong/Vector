@@ -30,8 +30,9 @@ void DecimalParser::init()
 
 
 // virtual 
-E_PaserType  DecimalParser::appendContent(char ch)
+E_PaserType  DecimalParser::appendContent(char ch, ParserInfo* pInfo)
 {
 	(void)ch;
+	(void)pInfo;
 	return E_UNDETERMIND;	
 }
