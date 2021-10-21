@@ -10,12 +10,14 @@ class ParserExpection : public std::exception
 {
 public:
 	ParserExpection(E_ExceptionCode errorCode);
+	ParserExpection(const  ParserExpection& r);
 	virtual const char* what() const throw();
 
 	void setDetail(const std::string& detail);
 protected:
 	E_ExceptionCode m_code;
 	std::string m_exceptionDetail;
+	mutable std::string m_formatDetail;
 
     std::unordered_map<E_ExceptionCode, std::string> m_shortInfoMap;
 
