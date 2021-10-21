@@ -24,4 +24,6 @@ lua/sourceCodeStudy/xcodeLuaStudy
 **/build/*
 *.pro.user
 
+!cpp/console/mathOperatation/build/**
+
 
