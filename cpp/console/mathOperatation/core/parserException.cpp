@@ -9,7 +9,7 @@ ParserExpection::ParserExpection(E_ExceptionCode errorCode)
 	, m_formatDetail("")
 {
 	m_shortInfoMap.clear();
-	m_shortInfoMap.insert( make_pair(E_UNKNOWN_CHAR, string("Unknown Character") ) );
+	m_shortInfoMap.insert( make_pair(static_cast<int>(E_UNKNOWN_CHAR), string("Unknown Character") ) );
 }
 
 ParserExpection::ParserExpection(const  ParserExpection& r)

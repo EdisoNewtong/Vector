@@ -19,7 +19,8 @@ protected:
 	std::string m_exceptionDetail;
 	mutable std::string m_formatDetail;
 
-    std::unordered_map<E_ExceptionCode, std::string> m_shortInfoMap;
+    // std::unordered_map<E_ExceptionCode, std::string> m_shortInfoMap;
+    std::unordered_map<int, std::string> m_shortInfoMap;
 
 };
 

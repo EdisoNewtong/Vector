@@ -22,6 +22,7 @@ Parser::Parser()
 	: m_buf(nullptr)
 	, m_size(0)
     // Parser
+    , m_defaultParser(nullptr)
 	, m_currentParser(nullptr)
 	, m_currentPaserType( E_UNDETERMIND )
 	, m_pInfo()
@@ -29,20 +30,20 @@ Parser::Parser()
 	m_parserMap.clear();
 
     //
-	m_parserMap.insert( make_pair(E_P_DEFAULT, new TokenParserBase() ) );
+	m_parserMap.insert( make_pair(static_cast<int>(E_P_DEFAULT), new TokenParserBase() ) );
 	// 
-	m_parserMap.insert( make_pair(E_P_DECIMAL, new DecimalParser() ) );
-	m_parserMap.insert( make_pair(E_P_OCTAL,   new OctalParser() ) );
-	m_parserMap.insert( make_pair(E_P_HEX,     new HexParser() ) );
+	m_parserMap.insert( make_pair(static_cast<int>(E_P_DECIMAL), new DecimalParser() ) );
+	m_parserMap.insert( make_pair(static_cast<int>(E_P_OCTAL),   new OctalParser() ) );
+	m_parserMap.insert( make_pair(static_cast<int>(E_P_HEX),     new HexParser() ) );
 	//
-	m_parserMap.insert( make_pair(E_P_FLOAT,  new FloatParser() ) );
+	m_parserMap.insert( make_pair(static_cast<int>(E_P_FLOAT),  new FloatParser() ) );
 	//
-	m_parserMap.insert( make_pair(E_P_VARIBLE, new VaribleParser() ) );
+	m_parserMap.insert( make_pair(static_cast<int>(E_P_VARIBLE), new VaribleParser() ) );
 	//
- 	m_parserMap.insert( make_pair(E_P_SINGLE_LINE_COMMENT, new SingleLineCommentParser() ) );
- 	m_parserMap.insert( make_pair(E_P_MULTI_LINE_COMMENT,  new MultiLineCommentParser()  ) );
+ 	m_parserMap.insert( make_pair(static_cast<int>(E_P_SINGLE_LINE_COMMENT), new SingleLineCommentParser() ) );
+ 	m_parserMap.insert( make_pair(static_cast<int>(E_P_MULTI_LINE_COMMENT),  new MultiLineCommentParser()  ) );
     //
- 	m_parserMap.insert( make_pair(E_P_BLANK,  new BlankParser() ) );
+ 	m_parserMap.insert( make_pair(static_cast<int>(E_P_BLANK),  new BlankParser() ) );
 
 	//
 	// init
@@ -55,8 +56,8 @@ Parser::Parser()
 		}
 	}
 
-	// set current parser
-	m_currentParser = m_parserMap[E_P_DEFAULT];
+    m_defaultParser = m_parserMap[E_P_DEFAULT]; // set default parser
+	m_currentParser = m_defaultParser;          // set current parser
 }
 
 // virtual 
@@ -144,7 +145,7 @@ int Parser::doParse()
 			auto guessType = m_currentParser->appendContent(ch, &m_pInfo);
 			if ( guessType != m_currentPaserType ) {
 				if ( guessType == E_UNDETERMIND ) {
-					m_parserMap[E_P_DEFAULT]->commonCheck(ch, &m_pInfo);
+                    m_defaultParser->commonCheck(ch, &m_pInfo);
 				} 
 
 				m_currentParser =  m_parserMap[guessType];

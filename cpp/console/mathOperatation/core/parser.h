@@ -21,10 +21,12 @@ protected:
 	  const char* m_buf;
       size_t m_size;
 
-	  std::unordered_map<E_PaserType, TokenParserBase*> m_parserMap;
+	  // std::unordered_map<E_PaserType, TokenParserBase*> m_parserMap;
+	  std::unordered_map<int, TokenParserBase*> m_parserMap;
 
-	  // current
-	  TokenParserBase* m_currentParser;
+      TokenParserBase* m_defaultParser;    // default
+	  TokenParserBase* m_currentParser;    // current
+
 	  E_PaserType      m_currentPaserType;
 
 	  ParserInfo       m_pInfo;
