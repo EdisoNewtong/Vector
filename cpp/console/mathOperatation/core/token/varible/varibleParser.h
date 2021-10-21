@@ -2,16 +2,17 @@
 #define VARIBLE_PARSER_H
 
 #include <unordered_map>
-#include "commonEnum.h"
+#include "tokenParserBase.h"
 
-class VaribleParser
+class VaribleParser : public TokenParserBase
 {
 public:
 	VaribleParser();
 	virtual ~VaribleParser();
 
+	virtual void init();
+	virtual E_PaserType  appendContent(char ch);
 protected:
-	  std::unordered_map<char, E_ChType> m_AllAvalibleCharacters;
 };
 
 #endif

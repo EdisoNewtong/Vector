@@ -4,9 +4,25 @@ using namespace std;
 
 FloatParser::FloatParser()
 {
-	// -1.23e-2f
-	m_AllAvalibleCharacters.clear();
 
+}
+
+
+
+//
+// virtual 
+//
+FloatParser::~FloatParser()
+{
+}
+
+
+
+
+// virtual 
+void FloatParser::init()
+{
+	// -1.23e-2f
 	m_AllAvalibleCharacters.insert( make_pair('+', E_ChType::E_SIGN_POSITIVE) );
 	m_AllAvalibleCharacters.insert( make_pair('-', E_ChType::E_SIGN_NEGATIVE) );
 	for( char ch = '0'; ch <='9'; ++ch ) {
@@ -19,13 +35,14 @@ FloatParser::FloatParser()
 
 	m_AllAvalibleCharacters.insert( make_pair('f', E_ChType::E_SUFFIX) );
 	m_AllAvalibleCharacters.insert( make_pair('F', E_ChType::E_SUFFIX) );
+
 }
 
 
-
-//
 // virtual 
-//
-FloatParser::~FloatParser()
+E_PaserType  FloatParser::appendContent(char ch)
 {
+	(void)ch;
+	return E_UNDETERMIND;	
 }
+

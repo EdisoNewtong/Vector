@@ -4,8 +4,19 @@ using namespace std;
 
 HexParser::HexParser()
 {
-	m_AllAvalibleCharacters.clear();
+}
 
+//
+// virtual 
+//
+HexParser::~HexParser()
+{
+}
+
+
+// virtual 
+void HexParser::init()
+{
 	m_AllAvalibleCharacters.insert( make_pair('+', E_ChType::E_SIGN_POSITIVE) );
 	m_AllAvalibleCharacters.insert( make_pair('-', E_ChType::E_SIGN_NEGATIVE) );
 
@@ -31,12 +42,10 @@ HexParser::HexParser()
 	m_AllAvalibleCharacters.insert( make_pair('L', E_ChType::E_SUFFIX) );
 }
 
-//
+
 // virtual 
-//
-HexParser::~HexParser()
+E_PaserType HexParser::appendContent(char ch)
 {
+	(void)ch;
+	return E_UNDETERMIND;	
 }
-
-
-

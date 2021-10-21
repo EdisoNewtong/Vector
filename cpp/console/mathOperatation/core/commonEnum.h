@@ -46,6 +46,39 @@ enum E_ChType
   E_PREFIX,   //    0 or 0x or 0X
   E_SUFFIX,   //    u U ul Ul uL UL
 
+  E_COMMENT_CHAR_1, //     '/'
+  E_COMMENT_CHAR_2, //     '*'
+
+};
+
+
+
+enum E_PaserType
+{
+
+  E_UNDETERMIND = 0,
+
+  E_P_DEFAULT,
+  //
+  E_P_DECIMAL,
+  E_P_OCTAL,
+  E_P_HEX,
+  //
+  E_P_FLOAT,
+  //
+  E_P_VARIBLE,
+  //
+  E_P_SINGLE_LINE_COMMENT,
+  E_P_MULTI_LINE_COMMENT,
+  //
+  E_P_BLANK
+};
+
+
+enum E_ExceptionCode
+{
+	E_UNKNOWN_CHAR = 0,
+
 };
 
 

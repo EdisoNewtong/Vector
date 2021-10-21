@@ -2,15 +2,17 @@
 #define HEX_PARSER_H
 
 #include <unordered_map>
-#include "commonEnum.h"
+#include "tokenParserBase.h"
 
-class HexParser
+class HexParser : public TokenParserBase
 {
 public:
 	HexParser();
 	virtual ~HexParser();
+
+	virtual void init();
+	virtual E_PaserType appendContent(char ch);
 protected:
-	  std::unordered_map<char, E_ChType> m_AllAvalibleCharacters;
 };
 
 #endif

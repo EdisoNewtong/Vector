@@ -4,8 +4,22 @@ using namespace std;
 
 VaribleParser::VaribleParser()
 {
-	m_AllAvalibleCharacters.clear();
+}
 
+//
+// virtual 
+//
+VaribleParser::~VaribleParser()
+{
+}
+
+
+
+
+
+// virtual 
+void VaribleParser::init()
+{
 	for( char ch = 'a'; ch <='z'; ++ch ) {
 		m_AllAvalibleCharacters.insert( make_pair(ch, E_ChType::E_LETTER) );
 	}
@@ -17,13 +31,19 @@ VaribleParser::VaribleParser()
 	for( char ch = '0'; ch <='9'; ++ch ) {
 		m_AllAvalibleCharacters.insert( make_pair(ch, E_ChType::E_NUMBER) );
 	}
+
+	//
+	// Add   "_"
+	//
 	m_AllAvalibleCharacters.insert( make_pair('_', E_ChType::E_UNDERLINE) );
+
 }
 
-//
+
 // virtual 
-//
-VaribleParser::~VaribleParser()
+E_PaserType  VaribleParser::appendContent(char ch)
 {
+	(void)ch;
+	return E_UNDETERMIND;	
 }
 

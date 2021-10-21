@@ -2,15 +2,17 @@
 #define FLOAT_PARSER_H
 
 #include <unordered_map>
-#include "commonEnum.h"
+#include "tokenParserBase.h"
 
-class FloatParser
+class FloatParser : public TokenParserBase
 {
 public:
 	FloatParser();
 	virtual ~FloatParser();
+
+	virtual void init();
+	virtual E_PaserType  appendContent(char ch);
 protected:
-	  std::unordered_map<char, E_ChType> m_AllAvalibleCharacters;
 };
 
 #endif

@@ -2,16 +2,17 @@
 #define DECIMAL_PARSER_H
 
 #include <unordered_map>
-#include "commonEnum.h"
+#include "tokenParserBase.h"
 
-class DecimalParser
+class DecimalParser : public TokenParserBase
 {
 public:
 	DecimalParser();
 	virtual ~DecimalParser();
-protected:
 
-	  std::unordered_map<char, E_ChType> m_AllAvalibleCharacters;
+	virtual void init();
+	virtual E_PaserType  appendContent(char ch);
+protected:
 };
 
 #endif

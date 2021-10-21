@@ -1,23 +1,28 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-#include <ios>
 #include <unordered_map>
-
 #include "commonEnum.h"
+#include "tokenParserBase.h"
+
 
 class Parser
 {
 public:
-      Parser(const char* buf, std::streamsize sz);
+      Parser();
       virtual ~Parser();
 
+	  void setContent(const char* buf, size_t sz);
 	  int doParse();
 protected:
 	  const char* m_buf;
-      std::streamsize m_size;
+      size_t m_size;
 
-	  std::unordered_map<char, E_ChType> m_AllAvalibleCharacters;
+	  std::unordered_map<E_PaserType, TokenParserBase*> m_parserMap;
+
+	  // current
+	  TokenParserBase* m_currentParser;
+	  E_PaserType      m_currentPaserType;
 };
 
 

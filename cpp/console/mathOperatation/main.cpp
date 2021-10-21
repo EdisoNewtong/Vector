@@ -6,11 +6,12 @@
 #include <exception>
 
 #include "parser.h"
+#include "parserException.h"
 
 using namespace std;
 
 
-auto bPrintFileLengthFlag = false;
+static auto bPrintFileLengthFlag = true;
 
 
 int main(int argc, char* argv[], char* env[])
@@ -34,7 +35,7 @@ int main(int argc, char* argv[], char* env[])
 	// get file-length
 	//
 	file.seekg(0, ios::end); // file-pointer move to the end of file
-	std::streamsize filelen = file.tellg();
+	size_t filelen = static_cast<size_t>( file.tellg() );
 	file.seekg(0, ios::beg); // file-pointer move to the begin of file
 	if ( bPrintFileLengthFlag ) {
 		cout << "filelen = " << filelen << endl;
@@ -47,13 +48,17 @@ int main(int argc, char* argv[], char* env[])
 	}
 
 
+	Parser p;
 	char* filebuf = nullptr;
 	try {
 		// read all
 		filebuf = new char[filelen];
-		file.get(filebuf, filelen);
+		file.read(filebuf, filelen);
 
-	    Parser p(filebuf, filelen);
+		p.setContent(filebuf, filelen );
+		//
+		// Core Core Core / Operation
+		//
 		auto iret = p.doParse();
 
 		if ( iret ) {
@@ -62,6 +67,8 @@ int main(int argc, char* argv[], char* env[])
 	} catch( const  std::bad_array_new_length& e_alloc ) {
 		(void)e_alloc;
 		cout << "Can't Alloc Memory for file content" << endl;
+	} catch ( const ParserExpection& e ) {
+		cout << "[ERROR] : Parse Failed : " << e.what() << endl;
 	} catch ( const std::exception& e ) {
 		cout << "Meet exception : " << e.what() << endl;
 	} catch ( ... ) {
@@ -71,10 +78,11 @@ int main(int argc, char* argv[], char* env[])
 	//
 	// Release Memory
 	//
+	file.close();
+
 	delete [] filebuf;
     filebuf = nullptr;
 
-	file.close();
 
 	return 0;
 }
