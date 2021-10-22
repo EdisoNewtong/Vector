@@ -106,9 +106,11 @@ a-z  A-Z  0-9  _
 
 void Parser::processLineInfo(char ch, size_t idx)
 {
-
-	// set index
+    //
+	// set index and flag
+    //
 	m_pInfo.nCharIdx = idx;
+    m_pInfo.isLastChar = (idx == m_size-1);
 
 	if ( m_pInfo.hasPreviousChar ) {
 		if ( m_pInfo.previousChar == '\r' ) {
@@ -141,17 +143,17 @@ int Parser::doParse()
 		// common process
 		processLineInfo(ch,idx);
 
-		if ( m_currentParser != nullptr ) {
+		// if ( m_currentParser != nullptr ) {
 			auto guessType = m_currentParser->appendContent(ch, &m_pInfo);
 			if ( guessType != m_currentPaserType ) {
 				if ( guessType == E_UNDETERMIND ) {
 					m_defaultParser->commonCheck(ch, &m_pInfo);
-				} 
+				}
 
-				m_currentParser =  m_parserMap[ static_cast<int>(guessType) ];
+				m_currentParser = m_parserMap[ static_cast<int>(guessType) ];
 				m_currentPaserType = guessType;
 			}
-		}
+		// }
 
 		m_pInfo.previousChar = ch;
 		m_pInfo.hasPreviousChar = true; 

@@ -44,7 +44,7 @@ int main(int argc, char* argv[], char* env[])
 	}
 
 	if ( filelen == 0 ) {
-		cout << "[DONE] : File has 0 byte(s) " << endl;
+		cout << "[DONE] : Nothing to Do , File has 0 byte " << endl;
 		file.close();
 		return 0;
 	}

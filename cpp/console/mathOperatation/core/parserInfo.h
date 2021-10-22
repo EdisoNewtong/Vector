@@ -7,12 +7,14 @@ struct ParserInfo
 {
 	ParserInfo();
 
-	bool hasPreviousChar;
-	char previousChar;
 	int  nLine;
 	int  nCol;
 
 	size_t nCharIdx;
+
+	bool hasPreviousChar;
+	bool isLastChar;
+	char previousChar;
 };
 
 #endif
