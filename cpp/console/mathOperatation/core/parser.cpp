@@ -56,8 +56,8 @@ Parser::Parser()
 		}
 	}
 
-    m_defaultParser = m_parserMap[E_P_DEFAULT]; // set default parser
-	m_currentParser = m_defaultParser;          // set current parser
+    m_defaultParser = m_parserMap[static_cast<int>(E_P_DEFAULT)]; // set default parser
+	m_currentParser = m_defaultParser;                            // set current parser
 }
 
 // virtual 
@@ -145,10 +145,10 @@ int Parser::doParse()
 			auto guessType = m_currentParser->appendContent(ch, &m_pInfo);
 			if ( guessType != m_currentPaserType ) {
 				if ( guessType == E_UNDETERMIND ) {
-                    m_defaultParser->commonCheck(ch, &m_pInfo);
+					m_defaultParser->commonCheck(ch, &m_pInfo);
 				} 
 
-				m_currentParser =  m_parserMap[guessType];
+				m_currentParser =  m_parserMap[ static_cast<int>(guessType) ];
 				m_currentPaserType = guessType;
 			}
 		}

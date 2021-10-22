@@ -31,6 +31,7 @@ protected:
 	std::unordered_map<char, E_ChType> m_AllAvalibleCharacters;
 
 	std::string m_alreadyTravelsaledString;
+	std::string m_token;
 };
 
 #endif

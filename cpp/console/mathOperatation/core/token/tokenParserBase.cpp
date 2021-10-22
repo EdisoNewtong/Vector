@@ -5,6 +5,7 @@ using namespace std;
 
 TokenParserBase::TokenParserBase()
 	: m_alreadyTravelsaledString("")
+	, m_token("")
 {
 	m_AllAvalibleCharacters.clear();
 
@@ -132,9 +133,22 @@ E_PaserType  TokenParserBase::appendContent(char ch, ParserInfo* pInfo)
 		|| type == E_NEW_LINE_N
 	) {
 		return E_P_BLANK;
-	} else {
-
-	}
+	} else if ( type == E_DIVIDE || type == E_MULTIPLY ) {
+		if ( pInfo->hasPreviousChar ) {
+			if ( type == E_DIVIDE ) {
+				// current = '/'
+				if ( pInfo->previousChar == '/' ) {
+					return E_P_SINGLE_LINE_COMMENT;
+				}
+			} else {
+				// current = '*'
+				//  START    "/*"  
+				if ( pInfo->previousChar == '/' ) {
+					return E_P_MULTI_LINE_COMMENT;
+				}
+			}
+		}
+	} 
 	
 	return E_UNDETERMIND;	
 }

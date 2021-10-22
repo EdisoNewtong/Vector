@@ -38,7 +38,9 @@ int main(int argc, char* argv[], char* env[])
 	size_t filelen = static_cast<size_t>( file.tellg() );
 	file.seekg(0, ios::beg); // file-pointer move to the begin of file
 	if ( bPrintFileLengthFlag ) {
-		cout << "filelen = " << filelen << endl;
+		cout << "==================================================" << endl;
+		cout << "file.length = " << filelen << " byte(s)" << endl;
+		cout << "==================================================" << endl;
 	}
 
 	if ( filelen == 0 ) {
