@@ -3,7 +3,7 @@
 INC_PATH := -Icore -Icore/token -Icore/token/interger -Icore/token/floatnumber -Icore/token/varible -Icore/token/operator -Icore/token/comment -Icore/token/blank
 
 
-main:build/parser.o build/parserInfo.o build/parserException.o build/charInfo.o build/decimalParser.o build/octalParser.o build/hexParser.o build/floatParser.o build/varibleParser.o build/main.o  build/tokenParserBase.o build/blankParser.o build/singleLineCommentParser.o build/multiLineCommentParser.o build/operatorParser.o
+main:build/parser.o build/parserInfo.o build/parserException.o build/charInfo.o build/tokenInfo.o  build/decimalParser.o build/octalParser.o build/hexParser.o build/floatParser.o build/varibleParser.o build/main.o  build/tokenParserBase.o build/blankParser.o build/singleLineCommentParser.o build/multiLineCommentParser.o build/operatorParser.o
 	g++ -Wall -std=c++11 -o main build/*.o
 
 
@@ -33,6 +33,9 @@ build/parserException.o:core/parserException.cpp core/parserException.h core/com
 #
 build/tokenParserBase.o:core/token/tokenParserBase.cpp core/token/tokenParserBase.h core/commonEnum.h core/parserException.h core/parserInfo.h
 	g++ -Wall -std=c++11 $(INC_PATH)  -c -o build/tokenParserBase.o  core/token/tokenParserBase.cpp
+
+build/tokenInfo.o:core/token/tokenInfo.cpp core/token/tokenInfo.h core/commonEnum.h
+	g++ -Wall -std=c++11 $(INC_PATH)  -c -o build/tokenInfo.o  core/token/tokenInfo.cpp
 
 #
 # Number Part

@@ -5,6 +5,7 @@ using namespace std;
 
 MultiLineCommentParser::MultiLineCommentParser(E_PaserType tp)
 	: TokenParserBase(tp)
+	, m_warningCnt(0)
 {
 }
 
@@ -23,8 +24,31 @@ void MultiLineCommentParser::init()
 // virtual 
 E_PaserType  MultiLineCommentParser::appendContent(char ch, ParserInfo* pInfo)
 {
-	(void)ch;
-	(void)pInfo;
+    if ( pInfo->isLastChar ) {
+	    m_token += ch;
+		// Check is End Flag
+	} else {
+		if ( ch == '*' ) {
+			m_token += ch;
+			if ( pInfo->previousChar == '/' ) {
+				/*  
+				   in side  / *
+				*/
+				++m_warningCnt;
+			} 
+		} else if ( ch == '/' ) {
+			if ( pInfo->previousChar == '*' ) {
+				//   */
+				//   Set End Flag
+				m_token += ch;
+			} else {
+				m_token += ch;
+			}
+		} else {
+			m_token += ch;
+		}
+	}
+
 	return E_P_UNDETERMIND;	
 }
 

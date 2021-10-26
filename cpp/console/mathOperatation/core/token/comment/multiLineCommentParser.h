@@ -13,6 +13,8 @@ public:
 
 	virtual void init();
 	virtual E_PaserType  appendContent(char ch, ParserInfo* pInfo);
+protected:
+	int m_warningCnt;
 };
 
 

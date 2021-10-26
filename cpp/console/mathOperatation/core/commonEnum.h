@@ -63,8 +63,8 @@ enum E_Char_Category
 	   <<   >>
 	*/
 	E_CAT_OPERATOR,       
-	E_CAT_PARENTHESES,
-	E_CAT_ASSIGNMENT,
+	E_CAT_PARENTHESES,  // ( )
+	E_CAT_ASSIGNMENT,   // = 
 
 	// <Space> <Tab>  \r  \n
 	E_CAT_SEPERATOR,
@@ -96,6 +96,42 @@ enum E_PaserType
   E_P_BLANK,
 
 };
+
+
+enum E_TokenType
+{
+	E_TOKEN_DECIMAL_NUMBER,
+	E_TOKEN_OCTAL_NUMBER,
+	E_TOKEN_HEX_NUMBER,
+
+	E_TOKEN_FLOAT_NUMBER,
+
+	E_TOKEN_VARIBLE,
+
+	E_TOKEN_OPERATOR,
+	/*
+	   Sub Operator Type
+    */
+	E_TOKEN_OP_ADD,              // +
+	E_TOKEN_OP_MINUS,            // -
+	E_TOKEN_OP_MULTIPLY,         // *
+	E_TOKEN_OP_DIVIDE,           // /
+	E_TOKEN_OP_MOD,              // %
+	E_TOKEN_OP_BIT_AND,          // &
+	E_TOKEN_OP_BIT_OR,           // |
+	E_TOKEN_OP_BIT_XOR,          // ^
+	E_TOKEN_OP_BIT_NOT,          // ~
+	E_TOKEN_OP_BIT_LEFT_SHIFT,   // <<
+	E_TOKEN_OP_BIT_RIGHT_SHIFT,  // >>
+
+	E_TOKEN_SINGLE_COMMENT,    //    //
+	E_TOKEN_MULTI_COMMENT,     //    /*   */
+
+	E_TOKEN_BLANK,  // <Space> <Tab> \r \n
+
+	E_TOKEN_SKIP,  // skip type
+};
+
 
 
 enum E_ExceptionCode
