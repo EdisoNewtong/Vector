@@ -9,7 +9,7 @@
 class FloatParser : public TokenParserBase
 {
 public:
-	FloatParser();
+	FloatParser(E_PaserType tp);
 	virtual ~FloatParser();
 
 	virtual void init();

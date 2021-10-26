@@ -9,7 +9,7 @@
 class HexParser : public TokenParserBase
 {
 public:
-	HexParser();
+	HexParser(E_PaserType tp);
 	virtual ~HexParser();
 
 	virtual void init();

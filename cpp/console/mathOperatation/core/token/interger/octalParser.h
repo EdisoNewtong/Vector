@@ -8,7 +8,7 @@
 class OctalParser : public TokenParserBase
 {
 public:
-	OctalParser();
+	OctalParser(E_PaserType tp);
 	virtual ~OctalParser();
 
 	virtual void init();

@@ -9,7 +9,7 @@
 class DecimalParser : public TokenParserBase
 {
 public:
-	DecimalParser();
+	DecimalParser(E_PaserType tp);
 	virtual ~DecimalParser();
 
 	virtual void init();

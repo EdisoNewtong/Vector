@@ -72,9 +72,9 @@ int main(int argc, char* argv[], char* env[])
 	} catch ( const ParserExpection& e ) {
 		cout << "[ERROR] Parse Failed : " << e.what() << endl;
 	} catch ( const std::exception& e ) {
-		cout << "Meet exception : " << e.what() << endl;
+		cout << "[ERROR] Meet an exception : " << e.what() << endl;
 	} catch ( ... ) {
-		cout << "Meet unexpected expection, ... " << endl;
+		cout << "[ERROR] Meet unexpected expection, ... " << endl;
 	}
 
 	//

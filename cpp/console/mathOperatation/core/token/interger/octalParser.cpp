@@ -2,7 +2,8 @@
 
 using namespace std;
 
-OctalParser::OctalParser()
+OctalParser::OctalParser(E_PaserType tp)
+	: TokenParserBase(tp)
 {
 }
 
@@ -16,16 +17,16 @@ OctalParser::~OctalParser()
 // virtual 
 void OctalParser::init()
 {
-	m_AllAvalibleCharacters.insert( make_pair('+', E_ChType::E_SIGN_POSITIVE) );
-	m_AllAvalibleCharacters.insert( make_pair('-', E_ChType::E_SIGN_NEGATIVE) );
+	m_AllAvalibleCharacters.insert( make_pair('+', CharInfo(E_ChType::E_SIGN_POSITIVE, E_CAT_OPERATOR) ) );
+	m_AllAvalibleCharacters.insert( make_pair('-', CharInfo(E_ChType::E_SIGN_NEGATIVE, E_CAT_OPERATOR) ) );
 	for( char ch = '0'; ch <='7'; ++ch ) {
-		m_AllAvalibleCharacters.insert( make_pair(ch, E_ChType::E_NUMBER) );
+		m_AllAvalibleCharacters.insert( make_pair(ch, CharInfo(E_ChType::E_NUMBER, E_CAT_NUMBER) ) );
 	}
 
-	m_AllAvalibleCharacters.insert( make_pair('u', E_ChType::E_SUFFIX) );
-	m_AllAvalibleCharacters.insert( make_pair('U', E_ChType::E_SUFFIX) );
-	m_AllAvalibleCharacters.insert( make_pair('l', E_ChType::E_SUFFIX) );
-	m_AllAvalibleCharacters.insert( make_pair('L', E_ChType::E_SUFFIX) );
+	m_AllAvalibleCharacters.insert( make_pair('u', CharInfo(E_ChType::E_SUFFIX, E_CAT_ALPHA) ) );
+	m_AllAvalibleCharacters.insert( make_pair('U', CharInfo(E_ChType::E_SUFFIX, E_CAT_ALPHA) ) );
+	m_AllAvalibleCharacters.insert( make_pair('l', CharInfo(E_ChType::E_SUFFIX, E_CAT_ALPHA) ) );
+	m_AllAvalibleCharacters.insert( make_pair('L', CharInfo(E_ChType::E_SUFFIX, E_CAT_ALPHA) ) );
 
 }
 
@@ -35,5 +36,5 @@ E_PaserType  OctalParser::appendContent(char ch, ParserInfo* pInfo)
 {
 	(void)ch;
 	(void)pInfo;
-	return E_UNDETERMIND;	
+	return E_P_UNDETERMIND;	
 }

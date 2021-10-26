@@ -8,7 +8,7 @@
 class SingleLineCommentParser : public TokenParserBase
 {
 public:
-	SingleLineCommentParser();
+	SingleLineCommentParser(E_PaserType tp);
 	virtual ~SingleLineCommentParser();
 
 	virtual void init();

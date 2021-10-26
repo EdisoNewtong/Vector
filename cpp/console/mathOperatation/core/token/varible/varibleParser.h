@@ -9,7 +9,7 @@
 class VaribleParser : public TokenParserBase
 {
 public:
-	VaribleParser();
+	VaribleParser(E_PaserType tp);
 	virtual ~VaribleParser();
 
 	virtual void init();

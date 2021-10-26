@@ -8,7 +8,7 @@
 class MultiLineCommentParser : public TokenParserBase
 {
 public:
-	MultiLineCommentParser();
+	MultiLineCommentParser(E_PaserType tp);
 	virtual ~MultiLineCommentParser();
 
 	virtual void init();

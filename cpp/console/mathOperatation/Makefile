@@ -1,9 +1,9 @@
 #!/bin/bash
 
-INC_PATH := -Icore -Icore/token -Icore/token/interger -Icore/token/floatnumber -Icore/token/varible -Icore/token/comment -Icore/token/blank
+INC_PATH := -Icore -Icore/token -Icore/token/interger -Icore/token/floatnumber -Icore/token/varible -Icore/token/operator -Icore/token/comment -Icore/token/blank
 
 
-main:build/parser.o build/parserInfo.o build/parserException.o build/decimalParser.o build/octalParser.o build/hexParser.o build/floatParser.o build/varibleParser.o build/main.o  build/tokenParserBase.o build/blankParser.o build/singleLineCommentParser.o build/multiLineCommentParser.o
+main:build/parser.o build/parserInfo.o build/parserException.o build/charInfo.o build/decimalParser.o build/octalParser.o build/hexParser.o build/floatParser.o build/varibleParser.o build/main.o  build/tokenParserBase.o build/blankParser.o build/singleLineCommentParser.o build/multiLineCommentParser.o build/operatorParser.o
 	g++ -Wall -std=c++11 -o main build/*.o
 
 
@@ -16,6 +16,9 @@ build/parser.o:core/parser.cpp core/parser.h core/commonEnum.h core/token/tokenP
 
 build/parserInfo.o:core/parserInfo.cpp core/parserInfo.h
 	g++ -Wall -std=c++11 $(INC_PATH)   -c -o build/parserInfo.o core/parserInfo.cpp 
+
+build/charInfo.o:core/charInfo.cpp core/charInfo.h core/commonEnum.h
+	g++ -Wall -std=c++11 $(INC_PATH)   -c -o build/charInfo.o core/charInfo.cpp 
 
 build/parserException.o:core/parserException.cpp core/parserException.h core/commonEnum.h
 	g++ -Wall -std=c++11 $(INC_PATH)   -c -o build/parserException.o  core/parserException.cpp
@@ -61,6 +64,11 @@ build/varibleParser.o:core/token/varible/varibleParser.cpp  core/token/varible/v
 	g++ -Wall -std=c++11 $(INC_PATH)   -c -o build/varibleParser.o  core/token/varible/varibleParser.cpp
 
 
+#
+# Operator Part
+#
+build/operatorParser.o:core/token/operator/operatorParser.cpp   core/token/operator/operatorParser.h  core/token/tokenParserBase.h core/parserException.h core/parserInfo.h
+	g++ -Wall -std=c++11 $(INC_PATH)   -c -o build/operatorParser.o  core/token/operator/operatorParser.cpp
 
 
 

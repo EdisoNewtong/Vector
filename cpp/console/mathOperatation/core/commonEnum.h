@@ -52,11 +52,31 @@ enum E_ChType
 };
 
 
+enum E_Char_Category
+{
+	E_CAT_ALPHA,          // a-zA-Z
+	E_CAT_NUMBER,         // 0-9
+	E_CAT_UNDER_LINE,     // _
+    /* 
+	   +  -  *  /  %
+	   &  |  ^  ~ 
+	   <<   >>
+	*/
+	E_CAT_OPERATOR,       
+	E_CAT_PARENTHESES,
+	E_CAT_ASSIGNMENT,
+
+	// <Space> <Tab>  \r  \n
+	E_CAT_SEPERATOR,
+
+	E_CAT_OTHERS,
+};
+
+
 
 enum E_PaserType
 {
-
-  E_UNDETERMIND = 0,
+  E_P_UNDETERMIND = 0,
 
   E_P_DEFAULT,
   //
@@ -68,10 +88,13 @@ enum E_PaserType
   //
   E_P_VARIBLE,
   //
+  E_P_OPERATOR,
+  //
   E_P_SINGLE_LINE_COMMENT,
   E_P_MULTI_LINE_COMMENT,
   //
-  E_P_BLANK
+  E_P_BLANK,
+
 };
 
 

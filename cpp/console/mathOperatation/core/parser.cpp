@@ -10,6 +10,8 @@
 
 #include "varibleParser.h"
 
+#include "operatorParser.h"
+
 #include "singleLineCommentParser.h"
 #include "multiLineCommentParser.h"
 
@@ -24,26 +26,29 @@ Parser::Parser()
     // Parser
     , m_defaultParser(nullptr)
 	, m_currentParser(nullptr)
-	, m_currentPaserType( E_UNDETERMIND )
+	, m_currentPaserType( E_P_UNDETERMIND )
 	, m_pInfo()
 {
 	m_parserMap.clear();
 
     //
-	m_parserMap.insert( make_pair(static_cast<int>(E_P_DEFAULT), new TokenParserBase() ) );
+	m_parserMap.insert( make_pair(static_cast<int>(E_P_DEFAULT), new TokenParserBase(E_P_DEFAULT) ) );
 	// 
-	m_parserMap.insert( make_pair(static_cast<int>(E_P_DECIMAL), new DecimalParser() ) );
-	m_parserMap.insert( make_pair(static_cast<int>(E_P_OCTAL),   new OctalParser() ) );
-	m_parserMap.insert( make_pair(static_cast<int>(E_P_HEX),     new HexParser() ) );
+	m_parserMap.insert( make_pair(static_cast<int>(E_P_DECIMAL), new DecimalParser(E_P_DECIMAL) ) );
+	m_parserMap.insert( make_pair(static_cast<int>(E_P_OCTAL),   new OctalParser(E_P_OCTAL) ) );
+	m_parserMap.insert( make_pair(static_cast<int>(E_P_HEX),     new HexParser(E_P_HEX) ) );
 	//
-	m_parserMap.insert( make_pair(static_cast<int>(E_P_FLOAT),  new FloatParser() ) );
+	m_parserMap.insert( make_pair(static_cast<int>(E_P_FLOAT),  new FloatParser(E_P_FLOAT) ) );
 	//
-	m_parserMap.insert( make_pair(static_cast<int>(E_P_VARIBLE), new VaribleParser() ) );
+	m_parserMap.insert( make_pair(static_cast<int>(E_P_VARIBLE), new VaribleParser(E_P_VARIBLE) ) );
 	//
- 	m_parserMap.insert( make_pair(static_cast<int>(E_P_SINGLE_LINE_COMMENT), new SingleLineCommentParser() ) );
- 	m_parserMap.insert( make_pair(static_cast<int>(E_P_MULTI_LINE_COMMENT),  new MultiLineCommentParser()  ) );
+ 	m_parserMap.insert( make_pair(static_cast<int>(E_P_OPERATOR),  new OperatorParser(E_P_OPERATOR) ) );
+	//
+ 	m_parserMap.insert( make_pair(static_cast<int>(E_P_SINGLE_LINE_COMMENT), new SingleLineCommentParser(E_P_SINGLE_LINE_COMMENT) ) );
+ 	m_parserMap.insert( make_pair(static_cast<int>(E_P_MULTI_LINE_COMMENT),  new MultiLineCommentParser(E_P_MULTI_LINE_COMMENT)  ) );
     //
- 	m_parserMap.insert( make_pair(static_cast<int>(E_P_BLANK),  new BlankParser() ) );
+ 	m_parserMap.insert( make_pair(static_cast<int>(E_P_BLANK),  new BlankParser(E_P_BLANK) ) );
+	
 
 	//
 	// init
@@ -146,7 +151,7 @@ int Parser::doParse()
 		// if ( m_currentParser != nullptr ) {
 			auto guessType = m_currentParser->appendContent(ch, &m_pInfo);
 			if ( guessType != m_currentPaserType ) {
-				if ( guessType == E_UNDETERMIND ) {
+				if ( guessType == E_P_UNDETERMIND ) {
 					m_defaultParser->commonCheck(ch, &m_pInfo);
 				}
 

@@ -1,8 +1,10 @@
 #include "blankParser.h"
 
+
 using namespace std;
 
-BlankParser::BlankParser()
+BlankParser::BlankParser(E_PaserType tp)
+	: TokenParserBase(tp)
 {
 
 }
@@ -16,10 +18,10 @@ BlankParser::~BlankParser()
 // virtual 
 void BlankParser::init()
 {
-	m_AllAvalibleCharacters.insert(  make_pair(' ',  E_SPACE) );
-	m_AllAvalibleCharacters.insert(  make_pair('\t', E_TAB) );
-	m_AllAvalibleCharacters.insert(  make_pair('\r', E_NEW_LINE_R) );
-	m_AllAvalibleCharacters.insert(  make_pair('\n', E_NEW_LINE_N) );
+	m_AllAvalibleCharacters.insert(  make_pair(' ',  CharInfo(E_ChType::E_SPACE, E_CAT_SEPERATOR) ) );
+	m_AllAvalibleCharacters.insert(  make_pair('\t', CharInfo(E_ChType::E_TAB, E_CAT_SEPERATOR)) );
+	m_AllAvalibleCharacters.insert(  make_pair('\r', CharInfo(E_ChType::E_NEW_LINE_R, E_CAT_SEPERATOR) ) );
+	m_AllAvalibleCharacters.insert(  make_pair('\n', CharInfo(E_ChType::E_NEW_LINE_N, E_CAT_SEPERATOR) ) );
 }
 
 
@@ -28,7 +30,7 @@ E_PaserType  BlankParser::appendContent(char ch, ParserInfo* pInfo)
 {
 	auto pr = isValidChar(ch);
 	if ( !pr.second ) {
-		return E_UNDETERMIND;	
+		return E_P_UNDETERMIND;	
 	}
 
 	return E_P_BLANK;

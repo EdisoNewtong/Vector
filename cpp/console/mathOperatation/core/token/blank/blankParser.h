@@ -5,11 +5,12 @@
 #include "tokenParserBase.h"
 
 #include "parserInfo.h"
+#include "charInfo.h"
 
 class BlankParser : public TokenParserBase
 {
 public:
-	BlankParser();
+	BlankParser(E_PaserType tp);
 	virtual ~BlankParser();
 
 	virtual void init();
