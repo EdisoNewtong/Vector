@@ -36,3 +36,10 @@ E_PaserType  BlankParser::appendContent(char ch, ParserInfo* pInfo)
 	return E_P_BLANK;
 }
 
+// virtual 
+TokenInfo* BlankParser::generateToken()
+{
+	auto retInfo = new TokenInfo(E_TOKEN_BLANK, E_TOKEN_BLANK);
+	retInfo->setDetail(m_token);
+	return retInfo;
+}

@@ -38,3 +38,12 @@ E_PaserType  OctalParser::appendContent(char ch, ParserInfo* pInfo)
 	(void)pInfo;
 	return E_P_UNDETERMIND;	
 }
+
+
+// virtual 
+TokenInfo* OctalParser::generateToken()
+{
+	auto retInfo = new TokenInfo(E_TOKEN_OCTAL_NUMBER, E_TOKEN_OCTAL_NUMBER);
+	retInfo->setDetail(m_token);
+	return retInfo;
+}

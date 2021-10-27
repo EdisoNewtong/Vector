@@ -52,3 +52,12 @@ E_PaserType  MultiLineCommentParser::appendContent(char ch, ParserInfo* pInfo)
 	return E_P_UNDETERMIND;	
 }
 
+// virtual 
+TokenInfo* MultiLineCommentParser::generateToken()
+{
+	auto retInfo = new TokenInfo(E_TOKEN_MULTI_COMMENT, E_TOKEN_MULTI_COMMENT);
+	retInfo->setDetail(m_token);
+	return retInfo;
+}
+
+

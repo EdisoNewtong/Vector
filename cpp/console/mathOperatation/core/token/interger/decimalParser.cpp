@@ -37,3 +37,13 @@ E_PaserType  DecimalParser::appendContent(char ch, ParserInfo* pInfo)
 	(void)pInfo;
 	return E_P_UNDETERMIND;	
 }
+
+
+// virtual 
+TokenInfo* DecimalParser::generateToken()
+{
+	auto retInfo = new TokenInfo(E_TOKEN_DECIMAL_NUMBER, E_TOKEN_DECIMAL_NUMBER);
+	retInfo->setDetail(m_token);
+	return retInfo;
+}
+

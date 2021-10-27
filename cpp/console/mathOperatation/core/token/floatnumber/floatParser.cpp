@@ -48,3 +48,10 @@ E_PaserType  FloatParser::appendContent(char ch, ParserInfo* pInfo)
 	return E_P_UNDETERMIND;	
 }
 
+// virtual 
+TokenInfo* FloatParser::generateToken()
+{
+	auto retInfo = new TokenInfo(E_TOKEN_FLOAT_NUMBER, E_TOKEN_FLOAT_NUMBER);
+	retInfo->setDetail(m_token);
+	return retInfo;
+}

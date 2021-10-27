@@ -4,6 +4,7 @@
 TokenInfo::TokenInfo(E_TokenType tp, E_TokenType subtype)
 	: m_type(tp)
 	, m_subType(subtype)
+	, m_strSequence("")
 {
 
 }
@@ -26,4 +27,14 @@ E_TokenType TokenInfo::getSubType()
 	return m_subType;
 }
 
+
+std::string TokenInfo::getDetail()
+{
+	return m_strSequence;
+}
+
+void TokenInfo::setDetail(const std::string& token)
+{
+	m_strSequence = token;
+}
 

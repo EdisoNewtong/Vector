@@ -100,6 +100,8 @@ enum E_PaserType
 
 enum E_TokenType
 {
+	E_TOKEN_UNKNOWN,
+
 	E_TOKEN_DECIMAL_NUMBER,
 	E_TOKEN_OCTAL_NUMBER,
 	E_TOKEN_HEX_NUMBER,
@@ -112,6 +114,7 @@ enum E_TokenType
 	/*
 	   Sub Operator Type
     */
+	//////////////////////////////////////////////////
 	E_TOKEN_OP_ADD,              // +
 	E_TOKEN_OP_MINUS,            // -
 	E_TOKEN_OP_MULTIPLY,         // *
@@ -123,13 +126,15 @@ enum E_TokenType
 	E_TOKEN_OP_BIT_NOT,          // ~
 	E_TOKEN_OP_BIT_LEFT_SHIFT,   // <<
 	E_TOKEN_OP_BIT_RIGHT_SHIFT,  // >>
+	E_TOKEN_OP_ASSIGNMENT,  // >>
+	//////////////////////////////////////////////////
 
 	E_TOKEN_SINGLE_COMMENT,    //    //
 	E_TOKEN_MULTI_COMMENT,     //    /*   */
 
 	E_TOKEN_BLANK,  // <Space> <Tab> \r \n
 
-	E_TOKEN_SKIP,  // skip type
+	E_TOKEN_IGNORE,  // Skip ignore
 };
 
 

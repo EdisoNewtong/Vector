@@ -53,3 +53,11 @@ E_PaserType HexParser::appendContent(char ch, ParserInfo* pInfo)
 	return E_P_UNDETERMIND;	
 }
 
+
+// virtual 
+TokenInfo* HexParser::generateToken()
+{
+	auto retInfo = new TokenInfo(E_TOKEN_HEX_NUMBER, E_TOKEN_HEX_NUMBER);
+	retInfo->setDetail(m_token);
+	return retInfo;
+}

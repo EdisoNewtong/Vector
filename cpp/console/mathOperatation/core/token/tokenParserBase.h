@@ -8,6 +8,7 @@
 
 #include "parserInfo.h"
 #include "charInfo.h"
+#include "tokenInfo.h"
 
 
 //
@@ -22,6 +23,7 @@ public:
 
 	virtual void init();
 	virtual E_PaserType appendContent(char ch, ParserInfo* pInfo);
+	virtual TokenInfo* generateToken();
 
 	std::pair< std::unordered_map<char, CharInfo>::iterator, bool> isValidChar(char ch);
 	std::pair< std::unordered_map<char, CharInfo>::iterator, bool> commonCheck(char ch, ParserInfo* pInfo);

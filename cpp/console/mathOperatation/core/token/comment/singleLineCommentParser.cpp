@@ -58,3 +58,12 @@ E_PaserType SingleLineCommentParser::appendContent(char ch, ParserInfo* pInfo)
 	return E_P_SINGLE_LINE_COMMENT;	
 }
 
+
+// virtual 
+TokenInfo* SingleLineCommentParser::generateToken()
+{
+	auto retInfo = new TokenInfo(E_TOKEN_SINGLE_COMMENT, E_TOKEN_SINGLE_COMMENT);
+	retInfo->setDetail(m_token);
+	return retInfo;
+}
+

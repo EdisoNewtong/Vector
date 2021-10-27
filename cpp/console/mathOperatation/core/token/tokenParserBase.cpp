@@ -152,6 +152,12 @@ E_PaserType  TokenParserBase::appendContent(char ch, ParserInfo* pInfo)
 	return E_P_UNDETERMIND;	
 }
 
+// virtual
+TokenInfo* TokenParserBase::generateToken()
+{
+	return new TokenInfo(E_TOKEN_UNKNOWN, E_TOKEN_IGNORE);
+}
+
 
 
 pair< std::unordered_map<char, CharInfo>::iterator, bool> TokenParserBase::isValidChar(char ch)
@@ -174,3 +180,5 @@ E_PaserType TokenParserBase::getType()
 {
 	return m_type;
 }
+
+

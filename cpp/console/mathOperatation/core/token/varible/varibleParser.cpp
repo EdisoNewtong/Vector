@@ -47,3 +47,10 @@ E_PaserType  VaribleParser::appendContent(char ch, ParserInfo* pInfo)
 	return E_P_UNDETERMIND;	
 }
 
+// virtual 
+TokenInfo* VaribleParser::generateToken()
+{
+	auto retInfo = new TokenInfo(E_TOKEN_VARIBLE, E_TOKEN_VARIBLE);
+	retInfo->setDetail(m_token);
+	return retInfo;
+}

@@ -14,6 +14,9 @@ public:
 
 	virtual void init();
 	virtual E_PaserType appendContent(char ch, ParserInfo* pInfo);
+	virtual TokenInfo* generateToken();
+protected:
+	std::unordered_map<char, E_TokenType> m_opMap;
 };
 
 #endif
