@@ -41,11 +41,11 @@ void FloatParser::init()
 
 
 // virtual 
-E_PaserType  FloatParser::appendContent(char ch, ParserInfo* pInfo)
+E_PaserType  FloatParser::appendContent(char ch, ParsedCharInfo* pInfo)
 {
 	(void)ch;
 	(void)pInfo;
-	return E_P_UNDETERMIND;	
+	return E_P_DEFAULT;	
 }
 
 // virtual 

@@ -26,9 +26,11 @@ Parser::Parser()
     // Parser
     , m_defaultParser(nullptr)
 	, m_currentParser(nullptr)
-	, m_currentPaserType( E_P_UNDETERMIND )
+	, m_currentPaserType( E_P_DEFAULT )
 	, m_pInfo()
 {
+	m_tokenList.clear();
+
 	m_parserMap.clear();
 
     //
@@ -61,13 +63,14 @@ Parser::Parser()
 		}
 	}
 
-    m_defaultParser = m_parserMap[static_cast<int>(E_P_DEFAULT)]; // set default parser
+    m_defaultParser = m_parserMap[ static_cast<int>(E_P_DEFAULT) ]; // set default parser
 	m_currentParser = m_defaultParser;                            // set current parser
 }
 
 // virtual 
 Parser::~Parser()
 {
+	// clear parser map
 	for( auto it = m_parserMap.begin(); it != m_parserMap.end(); ++it )
 	{
 		auto parser = it->second;
@@ -77,7 +80,13 @@ Parser::~Parser()
 		}
 	}
 	m_parserMap.clear();
-	
+
+	// clear token list
+	for ( auto& pToken : m_tokenList ) {
+		delete pToken;
+		pToken = nullptr;
+	}
+	m_tokenList.clear();
 }
 
 
@@ -120,6 +129,10 @@ void Parser::processLineInfo(char ch, size_t idx)
 	if ( m_pInfo.hasPreviousChar ) {
 		if ( m_pInfo.previousChar == '\r' ) {
 			if ( ch != '\n' ) {
+				/*
+				      \r
+				  a
+				 */
 				++m_pInfo.nLine;
 				m_pInfo.nCol = 1;
 			} else {
@@ -148,23 +161,53 @@ int Parser::doParse()
 		// common process
 		processLineInfo(ch,idx);
 
-		// if ( m_currentParser != nullptr ) {
-			auto guessType = m_currentParser->appendContent(ch, &m_pInfo);
-			if ( guessType != m_currentPaserType ) {
-				if ( guessType == E_P_UNDETERMIND ) {
-					m_defaultParser->commonCheck(ch, &m_pInfo);
-				}
+		if ( idx == 0 ) {
+			m_defaultParser->markBeginTag(&m_pInfo);
+		}
 
-				m_currentParser = m_parserMap[ static_cast<int>(guessType) ];
-				m_currentPaserType = guessType;
+		auto guessType = m_currentParser->appendContent(ch, &m_pInfo);
+		if ( guessType != m_currentPaserType ) {
+			if ( guessType == E_P_DEFAULT ) {
+				// check the char is inside the whole charSet , otherwise will throw an exception
+				m_defaultParser->commonCheck(ch, &m_pInfo);
 			}
-		// }
+
+			// save previous token
+			auto previousParser = m_currentParser;
+			// Do < Switch > Parser
+			m_currentParser = m_parserMap[ static_cast<int>(guessType) ];
+
+			// switch Parser
+			if ( m_currentPaserType == E_P_DEFAULT ) {
+				m_currentParser->transferToken( m_defaultParser );
+			} else {
+				auto pGenerateToken = previousParser->generateToken();
+				if ( m_tokenList.empty() ) {
+					m_tokenList.push_back( pGenerateToken );
+				} else {
+					// TODO
+					// Check previous is valid or not
+					checkPreviousTokenIsValid();
+				}
+			}
+
+			m_currentPaserType = guessType;
+		}
 
 		m_pInfo.previousChar = ch;
 		m_pInfo.hasPreviousChar = true; 
 	}
 
+
+	//
+	// Endless Logic Check
+	//
+
 	return 1;
 }
 
 
+bool Parser::checkPreviousTokenIsValid()
+{
+	return true;
+}

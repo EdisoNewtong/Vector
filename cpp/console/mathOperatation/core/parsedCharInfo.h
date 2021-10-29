@@ -1,11 +1,11 @@
-#ifndef PARSER_FLAG_H
-#define PARSER_FLAG_H
+#ifndef PARSED_CHAR_INFO_H
+#define PARSED_CHAR_INFO_H
 
 #include <cstdlib>
 
-struct ParserInfo
+struct ParsedCharInfo
 {
-	ParserInfo();
+	ParsedCharInfo();
 
 	int  nLine;
 	int  nCol;

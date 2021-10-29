@@ -22,7 +22,7 @@ void MultiLineCommentParser::init()
 }
 
 // virtual 
-E_PaserType  MultiLineCommentParser::appendContent(char ch, ParserInfo* pInfo)
+E_PaserType  MultiLineCommentParser::appendContent(char ch, ParsedCharInfo* pInfo)
 {
     if ( pInfo->isLastChar ) {
 	    m_token += ch;
@@ -49,7 +49,7 @@ E_PaserType  MultiLineCommentParser::appendContent(char ch, ParserInfo* pInfo)
 		}
 	}
 
-	return E_P_UNDETERMIND;	
+	return E_P_DEFAULT;	
 }
 
 // virtual 

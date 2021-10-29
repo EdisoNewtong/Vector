@@ -34,11 +34,11 @@ void OperatorParser::init()
 }
 
 // virtual 
-E_PaserType OperatorParser::appendContent(char ch, ParserInfo* pInfo)
+E_PaserType OperatorParser::appendContent(char ch, ParsedCharInfo* pInfo)
 {
 	(void)ch;
 	(void)pInfo;
-	return E_P_UNDETERMIND;	
+	return E_P_DEFAULT;	
 }
 
 // virtual 

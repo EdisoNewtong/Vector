@@ -7,6 +7,7 @@ TokenParserBase::TokenParserBase(E_PaserType tp)
 	: m_alreadyTravelsaledString("")
 	, m_token("")
 	, m_type(tp)
+	, m_isValidEnd( false )
 {
 	m_AllAvalibleCharacters.clear();
 
@@ -70,7 +71,7 @@ void TokenParserBase::init()
 }
 
 
-pair< std::unordered_map<char, CharInfo>::iterator, bool> TokenParserBase::commonCheck(char ch, ParserInfo* pInfo)
+pair< std::unordered_map<char, CharInfo>::iterator, bool> TokenParserBase::commonCheck(char ch, ParsedCharInfo* pInfo)
 {
 	auto pr = isValidChar(ch);
 	if ( !pr.second ) {
@@ -121,7 +122,7 @@ pair< std::unordered_map<char, CharInfo>::iterator, bool> TokenParserBase::commo
 }
 
 // virtual 
-E_PaserType  TokenParserBase::appendContent(char ch, ParserInfo* pInfo)
+E_PaserType  TokenParserBase::appendContent(char ch, ParsedCharInfo* pInfo)
 {
 	auto pr = commonCheck(ch,pInfo);
 
@@ -149,7 +150,7 @@ E_PaserType  TokenParserBase::appendContent(char ch, ParserInfo* pInfo)
 		return E_P_OPERATOR;
 	}
 	
-	return E_P_UNDETERMIND;	
+	return E_P_DEFAULT;	
 }
 
 // virtual
@@ -171,8 +172,11 @@ pair< std::unordered_map<char, CharInfo>::iterator, bool> TokenParserBase::isVal
 
 void TokenParserBase::transferToken(TokenParserBase* pBase)
 {
-	this->m_token = pBase->m_alreadyTravelsaledString;
+	this->m_alreadyTravelsaledString = pBase->m_alreadyTravelsaledString;
 	m_alreadyTravelsaledString.clear();
+
+	// Set Begin Flag
+	this->m_beginInfo = pBase->m_beginInfo;
 }
 
 
@@ -182,3 +186,13 @@ E_PaserType TokenParserBase::getType()
 }
 
 
+std::string TokenParserBase::getToken()
+{
+	return m_token;
+}
+
+
+void TokenParserBase::markBeginTag(ParsedCharInfo* pInfo)
+{
+	m_beginInfo = *pInfo;
+}

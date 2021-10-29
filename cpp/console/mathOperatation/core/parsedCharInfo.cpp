@@ -1,6 +1,6 @@
-#include "parserInfo.h"
+#include "parsedCharInfo.h"
 
-ParserInfo::ParserInfo()
+ParsedCharInfo::ParsedCharInfo()
 	: nLine(1)
 	, nCol(0)
 	, nCharIdx(0)

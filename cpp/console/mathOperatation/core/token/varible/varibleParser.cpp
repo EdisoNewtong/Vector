@@ -40,11 +40,14 @@ void VaribleParser::init()
 
 
 // virtual 
-E_PaserType  VaribleParser::appendContent(char ch, ParserInfo* pInfo)
+E_PaserType  VaribleParser::appendContent(char ch, ParsedCharInfo* pInfo)
 {
-	(void)ch;
-	(void)pInfo;
-	return E_P_UNDETERMIND;	
+	auto pr = isValidChar(ch);
+	if ( !pr.second ) {
+		return E_P_DEFAULT;
+	}
+
+	return m_type;
 }
 
 // virtual 

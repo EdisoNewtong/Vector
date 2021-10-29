@@ -24,11 +24,11 @@ void SingleLineCommentParser::init()
 }
 
 // virtual 
-E_PaserType SingleLineCommentParser::appendContent(char ch, ParserInfo* pInfo)
+E_PaserType SingleLineCommentParser::appendContent(char ch, ParsedCharInfo* pInfo)
 {
     if ( pInfo->isLastChar ) {
 	    m_token += ch;
-		return E_P_UNDETERMIND;
+		return E_P_DEFAULT;
 	} else {
 	    // auto sz = m_token.size();
 		// size_t lastPos = sz - 1;
@@ -37,7 +37,7 @@ E_PaserType SingleLineCommentParser::appendContent(char ch, ParserInfo* pInfo)
 
 		if ( pInfo->previousChar == '\n' ) {
 			// Set End-Flag
-			return E_P_UNDETERMIND;	
+			return E_P_DEFAULT;	
 		} else if ( pInfo->previousChar == '\r' ) {
 			if ( ch == '\n' ) {
 				// last string is  "\r\n"
@@ -48,7 +48,7 @@ E_PaserType SingleLineCommentParser::appendContent(char ch, ParserInfo* pInfo)
 				      aaaa\r
 					  b
 				*/
-				return E_P_UNDETERMIND;	
+				return E_P_DEFAULT;	
 			}
 		} else {
 			m_token += ch;

@@ -3,7 +3,7 @@
 
 #include <unordered_map>
 #include "tokenParserBase.h"
-#include "parserInfo.h"
+#include "parsedCharInfo.h"
 
 class OctalParser : public TokenParserBase
 {
@@ -12,7 +12,7 @@ public:
 	virtual ~OctalParser();
 
 	virtual void init();
-	virtual E_PaserType  appendContent(char ch, ParserInfo* pInfo);
+	virtual E_PaserType  appendContent(char ch, ParsedCharInfo* pInfo);
 	virtual TokenInfo* generateToken();
 protected:
 };

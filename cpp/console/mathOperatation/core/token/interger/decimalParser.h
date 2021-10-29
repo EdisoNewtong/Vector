@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include "tokenParserBase.h"
 
-#include "parserInfo.h"
+#include "parsedCharInfo.h"
 
 class DecimalParser : public TokenParserBase
 {
@@ -13,7 +13,7 @@ public:
 	virtual ~DecimalParser();
 
 	virtual void init();
-	virtual E_PaserType  appendContent(char ch, ParserInfo* pInfo);
+	virtual E_PaserType  appendContent(char ch, ParsedCharInfo* pInfo);
 	virtual TokenInfo* generateToken();
 protected:
 };

@@ -76,8 +76,6 @@ enum E_Char_Category
 
 enum E_PaserType
 {
-  E_P_UNDETERMIND = 0,
-
   E_P_DEFAULT,
   //
   E_P_DECIMAL,

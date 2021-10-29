@@ -45,12 +45,12 @@ void HexParser::init()
 
 
 // virtual 
-E_PaserType HexParser::appendContent(char ch, ParserInfo* pInfo)
+E_PaserType HexParser::appendContent(char ch, ParsedCharInfo* pInfo)
 {
 	(void)ch;
 	(void)pInfo;
 
-	return E_P_UNDETERMIND;	
+	return E_P_DEFAULT;	
 }
 
 
