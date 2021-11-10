@@ -16,46 +16,45 @@ HexParser::~HexParser()
 
 
 // virtual 
-void HexParser::init()
+void HexParser::init() // override
 {
-	m_AllAvalibleCharacters.insert( make_pair('+', CharInfo(E_ChType::E_SIGN_POSITIVE, E_CAT_OPERATOR) ) );
-	m_AllAvalibleCharacters.insert( make_pair('-', CharInfo(E_ChType::E_SIGN_NEGATIVE, E_CAT_OPERATOR) ) );
+	m_AllAvalibleCharacters.insert( make_pair('+', CharUtil::getCharBaseInfo('+') ) );
+	m_AllAvalibleCharacters.insert( make_pair('-', CharUtil::getCharBaseInfo('-') ) );
 
 	// 0x     or     0X
-	m_AllAvalibleCharacters.insert( make_pair('x', CharInfo(E_ChType::E_PREFIX, E_CAT_ALPHA) ) );
-	m_AllAvalibleCharacters.insert( make_pair('X', CharInfo(E_ChType::E_PREFIX, E_CAT_ALPHA) ) );
+	m_AllAvalibleCharacters.insert( make_pair('x', CharUtil::getCharBaseInfo('x') ) );
+	m_AllAvalibleCharacters.insert( make_pair('X', CharUtil::getCharBaseInfo('X')  ) );
 
 	for( char ch = '0'; ch <='9'; ++ch ) {
-		m_AllAvalibleCharacters.insert( make_pair(ch, CharInfo(E_ChType::E_NUMBER, E_CAT_NUMBER) ) );
+		m_AllAvalibleCharacters.insert( make_pair(ch, CharUtil::getCharBaseInfo(ch) ) );
 	}
 
 	for( char ch = 'a'; ch <='f'; ++ch ) {
-		m_AllAvalibleCharacters.insert( make_pair(ch, CharInfo(E_ChType::E_NUMBER, E_CAT_ALPHA) ) );
+		m_AllAvalibleCharacters.insert( make_pair(ch, CharUtil::getCharBaseInfo(ch) ) );
 	}
 
 	for( char ch = 'A'; ch <='F'; ++ch ) {
-		m_AllAvalibleCharacters.insert( make_pair(ch, CharInfo(E_ChType::E_NUMBER, E_CAT_ALPHA) ) );
+		m_AllAvalibleCharacters.insert( make_pair(ch, CharUtil::getCharBaseInfo(ch) ) );
 	}
 
-	m_AllAvalibleCharacters.insert( make_pair('u', CharInfo(E_ChType::E_SUFFIX, E_CAT_ALPHA) ) );
-	m_AllAvalibleCharacters.insert( make_pair('U', CharInfo(E_ChType::E_SUFFIX, E_CAT_ALPHA) ) );
-	m_AllAvalibleCharacters.insert( make_pair('l', CharInfo(E_ChType::E_SUFFIX, E_CAT_ALPHA) ) );
-	m_AllAvalibleCharacters.insert( make_pair('L', CharInfo(E_ChType::E_SUFFIX, E_CAT_ALPHA) ) );
+	m_AllAvalibleCharacters.insert( make_pair('u', CharUtil::getCharBaseInfo('u') ) );
+	m_AllAvalibleCharacters.insert( make_pair('U', CharUtil::getCharBaseInfo('U') ) );
+	m_AllAvalibleCharacters.insert( make_pair('l', CharUtil::getCharBaseInfo('l') ) );
+	m_AllAvalibleCharacters.insert( make_pair('L', CharUtil::getCharBaseInfo('L') ) );
 }
 
 
 // virtual 
-E_PaserType HexParser::appendContent(char ch, ParsedCharInfo* pInfo)
+E_PaserType HexParser::appendContent(ParsedCharInfo* pInfo, list<TokenInfo*>* pTokenList) // override
 {
-	(void)ch;
 	(void)pInfo;
-
+	(void)pTokenList;
 	return E_P_DEFAULT;	
 }
 
 
 // virtual 
-TokenInfo* HexParser::generateToken()
+TokenInfo* HexParser::generateToken() // override
 {
 	auto retInfo = new TokenInfo(E_TOKEN_HEX_NUMBER, E_TOKEN_HEX_NUMBER);
 	retInfo->setDetail(m_token);

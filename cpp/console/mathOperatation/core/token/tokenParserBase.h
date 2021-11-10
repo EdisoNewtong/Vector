@@ -4,11 +4,12 @@
 
 #include <unordered_map>
 #include <string>
+#include <list>
 #include "commonEnum.h"
 
 #include "parsedCharInfo.h"
-#include "charInfo.h"
 #include "tokenInfo.h"
+#include "charUtil.h"
 
 
 //
@@ -22,21 +23,18 @@ public:
 
 
 	virtual void init();
-	virtual E_PaserType appendContent(char ch, ParsedCharInfo* pInfo);
+	virtual E_PaserType appendContent(ParsedCharInfo* pInfo, std::list<TokenInfo*>* pTokenList);
 	virtual TokenInfo* generateToken();
 
-	std::pair< std::unordered_map<char, CharInfo>::iterator, bool> isValidChar(char ch);
-	std::pair< std::unordered_map<char, CharInfo>::iterator, bool> commonCheck(char ch, ParsedCharInfo* pInfo);
+	CharBaseInfo* isInsideCharSet(char ch);
+	CharBaseInfo* commonCheck(char ch, ParsedCharInfo* pInfo);
 
 	void transferToken(TokenParserBase* pBase);
 	E_PaserType getType();
 	std::string getToken();
 	void markBeginTag(ParsedCharInfo* pInfo);
-	// void markEndTag(CharInfo* pInfo);
 protected:
-	std::unordered_map<char, CharInfo> m_CharSet;
-
-	std::unordered_map<char, CharInfo> m_AllAvalibleCharacters;
+	std::unordered_map<char, CharBaseInfo*> m_AllAvalibleCharacters;
 
 	std::string m_alreadyTravelsaledString;
 	std::string m_token;

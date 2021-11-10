@@ -1,13 +1,14 @@
 #include "parsedCharInfo.h"
 
 ParsedCharInfo::ParsedCharInfo()
-	: nLine(1)
-	, nCol(0)
-	, nCharIdx(0)
+	: pos()
 	, hasPreviousChar(false)
     , isLastChar(false)
 	, previousChar(0)
 	, baseInfo(nullptr)
 { 
+	pos.nLine = 1;
+	pos.nCol = 0;
+	pos.nCharIdx = 0;
 }
 

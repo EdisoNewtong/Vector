@@ -16,30 +16,32 @@ BlankParser::~BlankParser()
 }
 
 // virtual 
-void BlankParser::init()
+void BlankParser::init() // override
 {
-	m_AllAvalibleCharacters.insert(  make_pair(' ',  CharInfo(E_ChType::E_SPACE, E_CAT_SEPERATOR) ) );
-	m_AllAvalibleCharacters.insert(  make_pair('\t', CharInfo(E_ChType::E_TAB, E_CAT_SEPERATOR)) );
-	m_AllAvalibleCharacters.insert(  make_pair('\r', CharInfo(E_ChType::E_NEW_LINE_R, E_CAT_SEPERATOR) ) );
-	m_AllAvalibleCharacters.insert(  make_pair('\n', CharInfo(E_ChType::E_NEW_LINE_N, E_CAT_SEPERATOR) ) );
+	//
+	m_AllAvalibleCharacters.insert(  make_pair(' ',  CharUtil::getCharBaseInfo(' ')  ) );
+	m_AllAvalibleCharacters.insert(  make_pair('\t', CharUtil::getCharBaseInfo('\t') ) );
+	m_AllAvalibleCharacters.insert(  make_pair('\r', CharUtil::getCharBaseInfo('\r') ) );
+	m_AllAvalibleCharacters.insert(  make_pair('\n', CharUtil::getCharBaseInfo('\n') ) );
 }
 
 
 // virtual 
-E_PaserType  BlankParser::appendContent(char ch, ParsedCharInfo* pInfo)
+E_PaserType  BlankParser::appendContent(ParsedCharInfo* pInfo, list<TokenInfo*>* pTokenList) // override
 {
-	auto pr = isValidChar(ch);
-	if ( !pr.second ) {
+	char ch = pInfo->baseInfo->getCh();
+	auto pBaseInfo = isInsideCharSet(ch);
+	if ( pBaseInfo == nullptr ) {
 		return E_P_DEFAULT;	
 	} else {
 		m_token += ch;
 	}
 
-	return E_P_BLANK;
+	return m_type;
 }
 
 // virtual 
-TokenInfo* BlankParser::generateToken()
+TokenInfo* BlankParser::generateToken() // override
 {
 	auto retInfo = new TokenInfo(E_TOKEN_BLANK, E_TOKEN_BLANK);
 	retInfo->setDetail(m_token);

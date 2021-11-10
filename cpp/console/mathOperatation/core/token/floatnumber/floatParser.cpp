@@ -21,35 +21,35 @@ FloatParser::~FloatParser()
 
 
 // virtual 
-void FloatParser::init()
+void FloatParser::init() // override
 {
 	// -1.23e-2f
-	m_AllAvalibleCharacters.insert( make_pair('+', CharInfo(E_ChType::E_SIGN_POSITIVE, E_CAT_OPERATOR) ) );
-	m_AllAvalibleCharacters.insert( make_pair('-', CharInfo(E_ChType::E_SIGN_NEGATIVE, E_CAT_OPERATOR) ) );
+	m_AllAvalibleCharacters.insert( make_pair('+', CharUtil::getCharBaseInfo('+') ) );
+	m_AllAvalibleCharacters.insert( make_pair('-', CharUtil::getCharBaseInfo('-') ) );
 	for( char ch = '0'; ch <='9'; ++ch ) {
-		m_AllAvalibleCharacters.insert( make_pair(ch, CharInfo(E_ChType::E_NUMBER, E_CAT_NUMBER) ) );
+		m_AllAvalibleCharacters.insert( make_pair(ch, CharUtil::getCharBaseInfo(ch) ) );
 	}
-	m_AllAvalibleCharacters.insert( make_pair('.', CharInfo(E_ChType::E_DOT, E_CAT_OTHERS) ) );
+	m_AllAvalibleCharacters.insert( make_pair('.', CharUtil::getCharBaseInfo('.') ) );
 
-	m_AllAvalibleCharacters.insert( make_pair('e', CharInfo(E_ChType::E_DOT, E_CAT_ALPHA) ) );
-	m_AllAvalibleCharacters.insert( make_pair('E', CharInfo(E_ChType::E_DOT, E_CAT_ALPHA) ) );
+	m_AllAvalibleCharacters.insert( make_pair('e', CharUtil::getCharBaseInfo('e') ) );
+	m_AllAvalibleCharacters.insert( make_pair('E', CharUtil::getCharBaseInfo('E') ) );
 
-	m_AllAvalibleCharacters.insert( make_pair('f', CharInfo(E_ChType::E_SUFFIX, E_CAT_ALPHA) ) );
-	m_AllAvalibleCharacters.insert( make_pair('F', CharInfo(E_ChType::E_SUFFIX, E_CAT_ALPHA) ) );
+	m_AllAvalibleCharacters.insert( make_pair('f', CharUtil::getCharBaseInfo('f') ) );
+	m_AllAvalibleCharacters.insert( make_pair('F', CharUtil::getCharBaseInfo('F') ) );
 
 }
 
 
 // virtual 
-E_PaserType  FloatParser::appendContent(char ch, ParsedCharInfo* pInfo)
+E_PaserType  FloatParser::appendContent(ParsedCharInfo* pInfo, list<TokenInfo*>* pTokenList) // override
 {
-	(void)ch;
 	(void)pInfo;
+	(void)pTokenList;
 	return E_P_DEFAULT;	
 }
 
 // virtual 
-TokenInfo* FloatParser::generateToken()
+TokenInfo* FloatParser::generateToken()  // override
 {
 	auto retInfo = new TokenInfo(E_TOKEN_FLOAT_NUMBER, E_TOKEN_FLOAT_NUMBER);
 	retInfo->setDetail(m_token);

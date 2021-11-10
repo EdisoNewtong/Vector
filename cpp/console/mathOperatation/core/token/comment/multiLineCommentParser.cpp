@@ -15,15 +15,16 @@ MultiLineCommentParser::~MultiLineCommentParser()
 }
 
 // virtual 
-void MultiLineCommentParser::init()
+void MultiLineCommentParser::init() // override
 {
-	m_AllAvalibleCharacters.insert( make_pair('/', CharInfo(E_ChType::E_COMMENT_CHAR_1, E_CAT_OTHERS) ) );
-	m_AllAvalibleCharacters.insert( make_pair('*', CharInfo(E_ChType::E_COMMENT_CHAR_2, E_CAT_OTHERS) ) );
+	m_AllAvalibleCharacters.insert( make_pair('/', CharUtil::getCharBaseInfo('/') ) );
+	m_AllAvalibleCharacters.insert( make_pair('*', CharUtil::getCharBaseInfo('*') ) );
 }
 
 // virtual 
-E_PaserType  MultiLineCommentParser::appendContent(char ch, ParsedCharInfo* pInfo)
+E_PaserType  MultiLineCommentParser::appendContent(ParsedCharInfo* pInfo, list<TokenInfo*>* pTokenList) // override
 {
+	char ch = pInfo->baseInfo->getCh();
     if ( pInfo->isLastChar ) {
 	    m_token += ch;
 		// Check is End Flag
@@ -53,7 +54,7 @@ E_PaserType  MultiLineCommentParser::appendContent(char ch, ParsedCharInfo* pInf
 }
 
 // virtual 
-TokenInfo* MultiLineCommentParser::generateToken()
+TokenInfo* MultiLineCommentParser::generateToken() // override
 {
 	auto retInfo = new TokenInfo(E_TOKEN_MULTI_COMMENT, E_TOKEN_MULTI_COMMENT);
 	retInfo->setDetail(m_token);

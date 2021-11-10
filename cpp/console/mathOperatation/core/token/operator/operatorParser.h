@@ -12,9 +12,9 @@ public:
 	OperatorParser(E_PaserType tp);
 	virtual ~OperatorParser();
 
-	virtual void init();
-	virtual E_PaserType appendContent(char ch, ParsedCharInfo* pInfo);
-	virtual TokenInfo* generateToken();
+	virtual void init() override;
+	virtual E_PaserType appendContent(ParsedCharInfo* pInfo, std::list<TokenInfo*>* pTokenList) override;
+	virtual TokenInfo* generateToken() override;
 protected:
 	std::unordered_map<char, E_TokenType> m_opMap;
 };

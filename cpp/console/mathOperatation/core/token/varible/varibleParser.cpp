@@ -19,39 +19,42 @@ VaribleParser::~VaribleParser()
 
 
 // virtual 
-void VaribleParser::init()
+void VaribleParser::init() // override
 {
 	for( char ch = 'a'; ch <='z'; ++ch ) {
-		m_AllAvalibleCharacters.insert( make_pair(ch, CharInfo(E_ChType::E_LETTER, E_CAT_ALPHA) ) );
+		m_AllAvalibleCharacters.insert( make_pair(ch, CharUtil::getCharBaseInfo(ch) ) );
 	}
 
 	for( char ch = 'A'; ch <='Z'; ++ch ) {
-		m_AllAvalibleCharacters.insert( make_pair(ch, CharInfo(E_ChType::E_LETTER, E_CAT_ALPHA) ) );
+		m_AllAvalibleCharacters.insert( make_pair(ch, CharUtil::getCharBaseInfo(ch) ) );
 	}
 
 	for( char ch = '0'; ch <='9'; ++ch ) {
-		m_AllAvalibleCharacters.insert( make_pair(ch, CharInfo(E_ChType::E_NUMBER, E_CAT_NUMBER) ) );
+		m_AllAvalibleCharacters.insert( make_pair(ch, CharUtil::getCharBaseInfo(ch) ) );
 	}
 
 	// Add   '_'
-	m_AllAvalibleCharacters.insert( make_pair('_', CharInfo(E_ChType::E_UNDERLINE, E_CAT_UNDER_LINE) ) );
+	m_AllAvalibleCharacters.insert( make_pair('_', CharUtil::getCharBaseInfo('_') ) );
 
 }
 
 
 // virtual 
-E_PaserType  VaribleParser::appendContent(char ch, ParsedCharInfo* pInfo)
+E_PaserType  VaribleParser::appendContent(ParsedCharInfo* pInfo, list<TokenInfo*>* pTokenList) // override
 {
-	auto pr = isValidChar(ch);
-	if ( !pr.second ) {
+	char ch = pInfo->baseInfo->getCh();
+	auto pBaseInfo = isInsideCharSet(ch);
+	if ( pBaseInfo == nullptr ) {
 		return E_P_DEFAULT;
 	}
+
+	(void)pTokenList;
 
 	return m_type;
 }
 
 // virtual 
-TokenInfo* VaribleParser::generateToken()
+TokenInfo* VaribleParser::generateToken() // override
 {
 	auto retInfo = new TokenInfo(E_TOKEN_VARIBLE, E_TOKEN_VARIBLE);
 	retInfo->setDetail(m_token);

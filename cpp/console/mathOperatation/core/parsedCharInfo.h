@@ -4,14 +4,19 @@
 #include <cstdlib>
 #include "charUtil.h"
 
-struct ParsedCharInfo
+struct PosInfo
 {
-	ParsedCharInfo();
-
 	int  nLine;
 	int  nCol;
 
 	size_t nCharIdx;
+};
+
+struct ParsedCharInfo
+{
+	ParsedCharInfo();
+
+	PosInfo pos;
 
 	bool hasPreviousChar;
 	bool isLastChar;

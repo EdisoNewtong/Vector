@@ -11,50 +11,6 @@ TokenParserBase::TokenParserBase(E_PaserType tp)
 {
 	m_AllAvalibleCharacters.clear();
 
-
-	//
-	// Char Set
-	//
-	m_CharSet.clear();
-	for ( char ch = 'a'; ch <= 'z'; ++ch ) {
-		m_CharSet.insert(  make_pair(ch, CharInfo(E_LETTER, E_CAT_ALPHA) ) );
-	}
-
-	for ( char ch = 'A'; ch <= 'Z'; ++ch ) {
-		m_CharSet.insert(  make_pair(ch, CharInfo(E_LETTER, E_CAT_ALPHA) ) );
-	}
-
-	for ( char ch = '0'; ch <= '9'; ++ch ) {
-		m_CharSet.insert(  make_pair(ch, CharInfo(E_NUMBER, E_CAT_NUMBER) ) );
-	}
-	m_CharSet.insert(  make_pair('.', CharInfo(E_DOT, E_CAT_OTHERS) ) );
-	m_CharSet.insert(  make_pair('_', CharInfo(E_UNDERLINE, E_CAT_UNDER_LINE) ) );
-
-	m_CharSet.insert(  make_pair('+', CharInfo(E_ADD, E_CAT_OPERATOR) ) );
-	m_CharSet.insert(  make_pair('-', CharInfo(E_MINUS, E_CAT_OPERATOR) ) );
-	m_CharSet.insert(  make_pair('*', CharInfo(E_MULTIPLY, E_CAT_OPERATOR) ) );
-	m_CharSet.insert(  make_pair('/', CharInfo(E_DIVIDE, E_CAT_OPERATOR) ) );
-	m_CharSet.insert(  make_pair('%', CharInfo(E_MOD, E_CAT_OPERATOR) ) );
-
-	m_CharSet.insert(  make_pair('&', CharInfo(E_BIT_AND, E_CAT_OPERATOR) ) );
-	m_CharSet.insert(  make_pair('|', CharInfo(E_BIT_OR, E_CAT_OPERATOR) ) );
-	m_CharSet.insert(  make_pair('^', CharInfo(E_BIT_XOR, E_CAT_OPERATOR) ) );
-	m_CharSet.insert(  make_pair('~', CharInfo(E_BIT_NOT, E_CAT_OPERATOR) ) );
-
-	m_CharSet.insert(  make_pair('<', CharInfo(E_LESS_THAN, E_CAT_OPERATOR) ) );
-	m_CharSet.insert(  make_pair('>', CharInfo(E_GREATER_THAN, E_CAT_OPERATOR) ) );
-
-	m_CharSet.insert(  make_pair('(', CharInfo(E_OPEN_PARENTHESES,  E_CAT_PARENTHESES) ) );
-	m_CharSet.insert(  make_pair(')', CharInfo(E_CLOSE_PARENTHESES, E_CAT_PARENTHESES) ) );
-
-	m_CharSet.insert(  make_pair(';', CharInfo(E_SEMICOLON, E_CAT_OTHERS) ) );
-	m_CharSet.insert(  make_pair('=', CharInfo(E_ASSIGN, E_CAT_ASSIGNMENT ) ) );
-
-	m_CharSet.insert(  make_pair(' ',  CharInfo(E_SPACE, E_CAT_SEPERATOR) ) );
-	m_CharSet.insert(  make_pair('\t', CharInfo(E_TAB, E_CAT_SEPERATOR) ) );
-	m_CharSet.insert(  make_pair('\r', CharInfo(E_NEW_LINE_R, E_CAT_SEPERATOR ) ) );
-	m_CharSet.insert(  make_pair('\n', CharInfo(E_NEW_LINE_N, E_CAT_SEPERATOR) ) );
-
 }
 
 
@@ -71,15 +27,15 @@ void TokenParserBase::init()
 }
 
 
-pair< std::unordered_map<char, CharInfo>::iterator, bool> TokenParserBase::commonCheck(char ch, ParsedCharInfo* pInfo)
+CharBaseInfo* TokenParserBase::commonCheck(char ch, ParsedCharInfo* pInfo)
 {
-	auto pr = isValidChar(ch);
-	if ( !pr.second ) {
+	auto pCharInfo = isInsideCharSet(ch);
+	if ( pCharInfo == nullptr  ) {
 		ParserExpection	e(E_ExceptionCode::E_UNKNOWN_CHAR);
 
 		string info;
 		if ( ch >= 0 ) {
-			// >= 32
+			// < 32
 			if ( ch < 32 ) {
 				if ( ch == '\t' ) {
 					info += "'\\t'";
@@ -89,7 +45,7 @@ pair< std::unordered_map<char, CharInfo>::iterator, bool> TokenParserBase::commo
 					info += "'\\n'";
 				} else {
 					info += " ? , code = ";  
-					info += std::to_string( static_cast<int>(ch) );
+					info += std::to_string( static_cast<int>(ch & 0xFFU) );
 				}
 			} else {
 				if ( ch == 32 ) {
@@ -103,54 +59,52 @@ pair< std::unordered_map<char, CharInfo>::iterator, bool> TokenParserBase::commo
 		} else {
 			// < 0
 			info += " ? , code = ";  
-			info += std::to_string( static_cast<int>(ch) );
+			info += std::to_string( static_cast<int>(ch & 0xFFU) );
 		}
 
 		info += "  | index = ";
-		info += std::to_string(pInfo->nCharIdx);
+		info += std::to_string(pInfo->pos.nCharIdx);
 		info += " @Line ";
-		info += std::to_string(pInfo->nLine);
+		info += std::to_string(pInfo->pos.nLine);
 		info += ":";
-		info += std::to_string(pInfo->nCol);
+		info += std::to_string(pInfo->pos.nCol);
 
 		e.setDetail(info);
 
 		throw e;
 	}
 
-	return pr; 
+	return pCharInfo;
 }
 
 // virtual 
-E_PaserType  TokenParserBase::appendContent(char ch, ParsedCharInfo* pInfo)
+E_PaserType  TokenParserBase::appendContent(ParsedCharInfo* pInfo, list<TokenInfo*>* pTokenList) // override;
 {
-	auto pr = commonCheck(ch,pInfo);
+	auto isTokenListEmpty = pTokenList->empty();
+	if ( isTokenListEmpty ) {
+		if ( pInfo->baseInfo != nullptr ) {
+			char ch = pInfo->baseInfo->getCh();
 
-	m_alreadyTravelsaledString += ch;
-	CharInfo chDetail = (pr.first)->second;
-	E_Char_Category cat = chDetail.cat;
-	if ( cat == E_CAT_SEPERATOR ) {
-		return E_P_BLANK;
-	} else if ( cat == E_CAT_OPERATOR ) {
-		if ( pInfo->hasPreviousChar ) {
-			if ( ch == '/' ) {
-				// current = '/'
-				if ( pInfo->previousChar == '/' ) {
-					return E_P_SINGLE_LINE_COMMENT;
-				} 
-			} else {
-				// current = '*'
-				//  START    "/*"
-				if ( pInfo->previousChar == '/' ) {
-					return E_P_MULTI_LINE_COMMENT;
-				} 
+			m_alreadyTravelsaledString += ch;
+
+			if ( pInfo->baseInfo->isOpType() ) {
+				if ( ch == '/' ) {
+					return E_P_OPERATOR;
+				}
+			} else if ( pInfo->baseInfo->isBlank() ) {
+				return E_P_BLANK;
+			} else if ( pInfo->baseInfo->isVaribleHeadChar() ) {
+				return E_P_VARIBLE;
+			} else if ( pInfo->baseInfo->isNumber() ) {
+				// guess it as an decimal number
+				return E_P_DECIMAL; // guess it as an decimal number
 			}
-		}
+		} else {
 
-		return E_P_OPERATOR;
+		}
 	}
-	
-	return E_P_DEFAULT;	
+
+	return m_type;	
 }
 
 // virtual
@@ -161,11 +115,14 @@ TokenInfo* TokenParserBase::generateToken()
 
 
 
-pair< std::unordered_map<char, CharInfo>::iterator, bool> TokenParserBase::isValidChar(char ch)
+CharBaseInfo* TokenParserBase::isInsideCharSet(char ch)
 {
-	auto it = m_CharSet.find(ch);
-    auto b = it != m_CharSet.end();
-	return std::make_pair(it,b);
+	auto it = m_AllAvalibleCharacters.find(ch);
+	if ( it != m_AllAvalibleCharacters.end() ) {
+		return it->second;
+	} else {
+		return nullptr;
+	}
 }
 
 
@@ -173,7 +130,7 @@ pair< std::unordered_map<char, CharInfo>::iterator, bool> TokenParserBase::isVal
 void TokenParserBase::transferToken(TokenParserBase* pBase)
 {
 	this->m_alreadyTravelsaledString = pBase->m_alreadyTravelsaledString;
-	m_alreadyTravelsaledString.clear();
+	pBase->m_alreadyTravelsaledString.clear();
 
 	// Set Begin Flag
 	this->m_beginInfo = pBase->m_beginInfo;

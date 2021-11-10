@@ -3,7 +3,7 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-OperatorBaseInfo::OperatorBaseInfo(char ch,unsigned int meta)
+OperatorBaseInfo::OperatorBaseInfo(char ch, unsigned int meta)
 	: m_ch(ch)
 	, m_metaInfo(meta)
 {
@@ -25,12 +25,14 @@ unsigned int OperatorBaseInfo::getPriority()
 
 bool OperatorBaseInfo::isBinaryOp()
 {
-	return ( ( (m_metaInfo >> 6) & 0x1U) == 0x1U);
+	//  xx123456
+	return ( ( (m_metaInfo >> 6) & 0x3U) == 0x2U);
 }
 
 bool OperatorBaseInfo::isLeft2Right()
 {
-	return ( ( (m_metaInfo >> 7) & 0x1U) == 0x1U);
+	//  xx12345678
+	return ( ( (m_metaInfo >> 8) & 0x3U) == 0x1U);
 }
 
 //
@@ -95,8 +97,15 @@ bool CharBaseInfo::isUnderLine()
 
 bool CharBaseInfo::isVaribleCharSet()
 {
-	return this->isAlpha() || this->isNumber() || this->isUnderLine();
+	return isAlpha() || isNumber() || isUnderLine();
 }
+
+
+bool CharBaseInfo::isVaribleHeadChar()
+{
+	return isAlpha() || isUnderLine();
+}
+
 
 bool CharBaseInfo::isDot()
 {
@@ -148,6 +157,11 @@ OperatorBaseInfo* CharBaseInfo::getOpInfo()
 // static
 unordered_map<char,CharBaseInfo*> CharUtil::s_allCharSetMap;
 
+// static 
+CharBaseInfo* CharUtil::s_positiveCharInfo = nullptr;
+
+// static 
+CharBaseInfo* CharUtil::s_negativeCharInfo = nullptr;
 
 // static 
 void CharUtil::init()
@@ -240,6 +254,10 @@ void CharUtil::init()
 	// Blank Part
 	the_ch = ' ';
 	s_allCharSetMap.insert( make_pair(the_ch, new CharBaseInfo(the_ch, nullptr) ) );
+
+	// TODO
+	CharUtil::s_positiveCharInfo = new CharBaseInfo('+', nullptr);
+	CharUtil::s_positiveCharInfo = new CharBaseInfo('-', nullptr);
 }
 
 // static 
@@ -254,6 +272,16 @@ void CharUtil::finalize()
 	}
 
 	s_allCharSetMap.clear();
+
+	if ( CharUtil::s_positiveCharInfo != nullptr ) {
+		delete  CharUtil::s_positiveCharInfo;
+		CharUtil::s_positiveCharInfo = nullptr;
+	}
+
+	if ( CharUtil::s_negativeCharInfo != nullptr ) {
+		delete  CharUtil::s_negativeCharInfo;
+		CharUtil::s_negativeCharInfo = nullptr;
+	}
 }
 	
 CharBaseInfo* CharUtil::getCharBaseInfo(char ch)
@@ -265,6 +293,20 @@ CharBaseInfo* CharUtil::getCharBaseInfo(char ch)
 		return nullptr;
 	}
 }
+
+
+// static 
+CharBaseInfo* CharUtil::getPositiveCharInfo() // +
+{
+	return s_positiveCharInfo;
+}
+
+// static 
+CharBaseInfo* CharUtil::getNegativeCharInfo() // -
+{
+	return s_negativeCharInfo;
+}
+
 
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////

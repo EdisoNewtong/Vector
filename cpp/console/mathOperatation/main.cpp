@@ -7,6 +7,7 @@
 
 #include "parser.h"
 #include "parserException.h"
+#include "charUtil.h"
 
 using namespace std;
 
@@ -49,6 +50,7 @@ int main(int argc, char* argv[], char* env[])
 		return 0;
 	}
 
+	CharUtil::init();
 
 	Parser p;
 	char* filebuf = nullptr;
@@ -84,6 +86,8 @@ int main(int argc, char* argv[], char* env[])
 
 	delete [] filebuf;
     filebuf = nullptr;
+
+	CharUtil::finalize();
 
 
 	return 0;

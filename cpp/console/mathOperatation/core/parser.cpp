@@ -123,29 +123,33 @@ void Parser::processLineInfo(char ch, size_t idx)
     //
 	// set index and flag
     //
-	m_pInfo.nCharIdx = idx;
+	m_pInfo.pos.nCharIdx = idx;
     m_pInfo.isLastChar = (idx == m_size-1);
+
+	//  Set Ch BaseInfo
+	m_pInfo.baseInfo = CharUtil::getCharBaseInfo(ch);
 
 	if ( m_pInfo.hasPreviousChar ) {
 		if ( m_pInfo.previousChar == '\r' ) {
-			if ( ch != '\n' ) {
-				/*
-				      \r
-				  a
-				 */
-				++m_pInfo.nLine;
-				m_pInfo.nCol = 1;
+			if ( ch == '\n' ) {
+				//  \r \n
+				++m_pInfo.pos.nCol;
 			} else {
-				++m_pInfo.nCol;
+				/*
+				  string s = "Hello World";  \r
+				  ++a;
+				*/
+				++m_pInfo.pos.nLine;
+				m_pInfo.pos.nCol = 1;
 			}
 		} else if ( m_pInfo.previousChar == '\n' ) {
-			++m_pInfo.nLine;
-			m_pInfo.nCol = 1;
+			++m_pInfo.pos.nLine;
+			m_pInfo.pos.nCol = 1;
 		} else {
-			++m_pInfo.nCol;
+			++m_pInfo.pos.nCol;
 		}
 	} else {
-		++m_pInfo.nCol;
+		++m_pInfo.pos.nCol;
 	}
 
 }
@@ -165,7 +169,7 @@ int Parser::doParse()
 			m_defaultParser->markBeginTag(&m_pInfo);
 		}
 
-		auto guessType = m_currentParser->appendContent(ch, &m_pInfo);
+		auto guessType = m_currentParser->appendContent(&m_pInfo, &m_tokenList);
 		if ( guessType != m_currentPaserType ) {
 			if ( guessType == E_P_DEFAULT ) {
 				// check the char is inside the whole charSet , otherwise will throw an exception
@@ -194,13 +198,15 @@ int Parser::doParse()
 			m_currentPaserType = guessType;
 		}
 
+
+		// treat this char as previous char
 		m_pInfo.previousChar = ch;
 		m_pInfo.hasPreviousChar = true; 
 	}
 
 
 	//
-	// Endless Logic Check
+	// TODO : Endless Logic Check
 	//
 
 	return 1;

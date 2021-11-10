@@ -18,23 +18,19 @@ SingleLineCommentParser::~SingleLineCommentParser()
 }
 
 // virtual 
-void SingleLineCommentParser::init()
+void SingleLineCommentParser::init() // override
 {
-	m_AllAvalibleCharacters.insert( make_pair('/', CharInfo(E_ChType::E_COMMENT_CHAR_1, E_CAT_OTHERS) ) );
+	m_AllAvalibleCharacters.insert( make_pair('/', CharUtil::getCharBaseInfo('/') ) );
 }
 
 // virtual 
-E_PaserType SingleLineCommentParser::appendContent(char ch, ParsedCharInfo* pInfo)
+E_PaserType SingleLineCommentParser::appendContent(ParsedCharInfo* pInfo, list<TokenInfo*>* pTokenList) // override
 {
+	char ch = pInfo->baseInfo->getCh();
     if ( pInfo->isLastChar ) {
 	    m_token += ch;
 		return E_P_DEFAULT;
 	} else {
-	    // auto sz = m_token.size();
-		// size_t lastPos = sz - 1;
-		// size_t lastButOnePos = sz - 2;
-		// char   chLastButOne = m_token[lastButOnePos];
-
 		if ( pInfo->previousChar == '\n' ) {
 			// Set End-Flag
 			return E_P_DEFAULT;	
@@ -55,12 +51,12 @@ E_PaserType SingleLineCommentParser::appendContent(char ch, ParsedCharInfo* pInf
 		}
 	}
 
-	return E_P_SINGLE_LINE_COMMENT;	
+	return m_type;	
 }
 
 
 // virtual 
-TokenInfo* SingleLineCommentParser::generateToken()
+TokenInfo* SingleLineCommentParser::generateToken() // override
 {
 	auto retInfo = new TokenInfo(E_TOKEN_SINGLE_COMMENT, E_TOKEN_SINGLE_COMMENT);
 	retInfo->setDetail(m_token);
