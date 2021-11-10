@@ -7,6 +7,7 @@ ParsedCharInfo::ParsedCharInfo()
 	, hasPreviousChar(false)
     , isLastChar(false)
 	, previousChar(0)
+	, baseInfo(nullptr)
 { 
 }
 

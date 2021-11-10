@@ -2,6 +2,7 @@
 #define PARSED_CHAR_INFO_H
 
 #include <cstdlib>
+#include "charUtil.h"
 
 struct ParsedCharInfo
 {
@@ -15,6 +16,8 @@ struct ParsedCharInfo
 	bool hasPreviousChar;
 	bool isLastChar;
 	char previousChar;
+
+	CharBaseInfo* baseInfo;
 };
 
 #endif

@@ -1,21 +1,14 @@
-/*
+a-z A-Z   _   
 
-     unsigned 
-       signed
+0-9       .
 
-	     bool
-         char
-        short
-          int
-         long
-    long long
++    -    *    /    %    &    |    ^    ~    <<    >>    (    )    = 
+
+;
+
+<Space>   <Tab>   <\r>    <\n>
 
 
-         float
-         double
-    long double
-
-*/
 
 
 //

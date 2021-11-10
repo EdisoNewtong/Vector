@@ -3,7 +3,7 @@
 INC_PATH := -Icore -Icore/token -Icore/token/interger -Icore/token/floatnumber -Icore/token/varible -Icore/token/operator -Icore/token/comment -Icore/token/blank
 
 
-main:build/parser.o build/parsedCharInfo.o build/parserException.o build/charInfo.o build/tokenInfo.o  build/decimalParser.o build/octalParser.o build/hexParser.o build/floatParser.o build/varibleParser.o build/main.o  build/tokenParserBase.o build/blankParser.o build/singleLineCommentParser.o build/multiLineCommentParser.o build/operatorParser.o
+main:build/parser.o build/parsedCharInfo.o build/parserException.o  build/keywordList.o build/charUtil.o build/charInfo.o build/tokenInfo.o  build/decimalParser.o build/octalParser.o build/hexParser.o build/floatParser.o build/varibleParser.o build/main.o  build/tokenParserBase.o build/blankParser.o build/singleLineCommentParser.o build/multiLineCommentParser.o build/operatorParser.o
 	g++ -Wall -std=c++11 -o main build/*.o
 
 
@@ -14,7 +14,7 @@ build/main.o:main.cpp core/commonEnum.h core/parser.h core/parserException.h
 build/parser.o:core/parser.cpp core/parser.h core/commonEnum.h core/token/tokenParserBase.h core/token/interger/decimalParser.h core/token/interger/octalParser.h core/token/interger/hexParser.h core/token/floatnumber/floatParser.h core/token/varible/varibleParser.h
 	g++ -Wall -std=c++11 $(INC_PATH)   -c -o build/parser.o core/parser.cpp
 
-build/parsedCharInfo.o:core/parsedCharInfo.cpp core/parsedCharInfo.h
+build/parsedCharInfo.o:core/parsedCharInfo.cpp core/parsedCharInfo.h core/charUtil.h
 	g++ -Wall -std=c++11 $(INC_PATH)   -c -o build/parsedCharInfo.o core/parsedCharInfo.cpp 
 
 build/charInfo.o:core/charInfo.cpp core/charInfo.h core/commonEnum.h
@@ -23,10 +23,11 @@ build/charInfo.o:core/charInfo.cpp core/charInfo.h core/commonEnum.h
 build/parserException.o:core/parserException.cpp core/parserException.h core/commonEnum.h
 	g++ -Wall -std=c++11 $(INC_PATH)   -c -o build/parserException.o  core/parserException.cpp
 
+build/keywordList.o:core/keywordList.cpp  core/keywordList.h
+	g++ -Wall -std=c++11 $(INC_PATH)   -c -o build/keywordList.o  core/keywordList.cpp
 
-
-
-
+build/charUtil.o:core/charUtil.cpp  core/charUtil.h
+	g++ -Wall -std=c++11 $(INC_PATH)   -c -o build/charUtil.o  core/charUtil.cpp
 
 #
 # Base Part
