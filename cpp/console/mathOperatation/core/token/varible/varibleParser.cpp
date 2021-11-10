@@ -43,7 +43,7 @@ void VaribleParser::init() // override
 E_PaserType  VaribleParser::appendContent(ParsedCharInfo* pInfo, list<TokenInfo*>* pTokenList) // override
 {
 	char ch = pInfo->baseInfo->getCh();
-	auto pBaseInfo = isInsideCharSet(ch);
+	auto pBaseInfo = getInsideCharSetBaseInfo(ch);
 	if ( pBaseInfo == nullptr ) {
 		return E_P_DEFAULT;
 	}

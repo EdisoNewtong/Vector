@@ -26,7 +26,7 @@ public:
 	virtual E_PaserType appendContent(ParsedCharInfo* pInfo, std::list<TokenInfo*>* pTokenList);
 	virtual TokenInfo* generateToken();
 
-	CharBaseInfo* isInsideCharSet(char ch);
+	CharBaseInfo* getInsideCharSetBaseInfo(char ch);
 	CharBaseInfo* commonCheck(char ch, ParsedCharInfo* pInfo);
 
 	void transferToken(TokenParserBase* pBase);

@@ -2,6 +2,7 @@
 #define CHAR_UTIL_H
 
 #include <unordered_map>
+#include "commonEnum.h"
 
 class OperatorBaseInfo
 {
@@ -26,7 +27,7 @@ public:
 	virtual ~CharBaseInfo();
 
 	char getCh();
-	unsigned int getCategory();
+	E_CharType getCategory();
 
 	bool isAlpha();
 	bool isNumber();
@@ -45,7 +46,7 @@ public:
 	OperatorBaseInfo* getOpInfo();
 protected:
 	char m_ch;
-	unsigned int  m_category;
+	E_CharType  m_category;
 	OperatorBaseInfo* m_pOpInfo;
 };
 
@@ -55,6 +56,7 @@ class CharUtil
 public:
 	static void init();
 	static void finalize();
+	static std::unordered_map<char,CharBaseInfo*>* getAllCharSet();
 	static CharBaseInfo* getCharBaseInfo(char ch);
 
 	static CharBaseInfo* getPositiveCharInfo(); // +    e.g.    +123

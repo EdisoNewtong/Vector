@@ -1,6 +1,15 @@
 #ifndef COMMON_ENUM_H
 #define COMMON_ENUM_H
 
+enum E_CharType
+{
+	E_CHTYPE_ALPHA,    // a-z A-Z
+	E_CHTYPE_NUMBER,   // 0-9
+	E_CHTYPE_OPERATOR, // +  -  *  /  %  &  |  ^  ~   <   >   (  )  =
+	E_CHTYPE_BLANK,    // <Space>   <Tab>   <\r>    <\n>
+	E_CHTYPE_OTHER,    // _    .   ;
+};
+
 
 
 enum E_PaserType

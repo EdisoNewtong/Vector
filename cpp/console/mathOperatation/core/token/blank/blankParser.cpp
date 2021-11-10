@@ -29,8 +29,15 @@ void BlankParser::init() // override
 // virtual 
 E_PaserType  BlankParser::appendContent(ParsedCharInfo* pInfo, list<TokenInfo*>* pTokenList) // override
 {
+	if ( pInfo->baseInfo == nullptr ) {
+		return E_P_DEFAULT;	
+	}
+
+	//
+	// pInfo->baseInfo != nullptr
+	//
 	char ch = pInfo->baseInfo->getCh();
-	auto pBaseInfo = isInsideCharSet(ch);
+	auto pBaseInfo = getInsideCharSetBaseInfo(ch);
 	if ( pBaseInfo == nullptr ) {
 		return E_P_DEFAULT;	
 	} else {

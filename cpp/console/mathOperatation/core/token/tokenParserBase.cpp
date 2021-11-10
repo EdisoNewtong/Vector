@@ -11,6 +11,12 @@ TokenParserBase::TokenParserBase(E_PaserType tp)
 {
 	m_AllAvalibleCharacters.clear();
 
+	// copy
+	auto pMap = CharUtil::getAllCharSet();
+	for ( auto it = pMap->begin();  it != pMap->end();  ++it )
+	{
+		m_AllAvalibleCharacters.insert( make_pair(it->first, it->second) ); 
+	}
 }
 
 
@@ -29,7 +35,7 @@ void TokenParserBase::init()
 
 CharBaseInfo* TokenParserBase::commonCheck(char ch, ParsedCharInfo* pInfo)
 {
-	auto pCharInfo = isInsideCharSet(ch);
+	auto pCharInfo = getInsideCharSetBaseInfo(ch);
 	if ( pCharInfo == nullptr  ) {
 		ParserExpection	e(E_ExceptionCode::E_UNKNOWN_CHAR);
 
@@ -115,7 +121,7 @@ TokenInfo* TokenParserBase::generateToken()
 
 
 
-CharBaseInfo* TokenParserBase::isInsideCharSet(char ch)
+CharBaseInfo* TokenParserBase::getInsideCharSetBaseInfo(char ch)
 {
 	auto it = m_AllAvalibleCharacters.find(ch);
 	if ( it != m_AllAvalibleCharacters.end() ) {

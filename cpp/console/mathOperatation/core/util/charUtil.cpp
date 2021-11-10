@@ -53,11 +53,21 @@ bool OperatorBaseInfo::isLeft2Right()
 //
 CharBaseInfo::CharBaseInfo(char ch,OperatorBaseInfo* pOpInfo)
 	: m_ch(ch)
-	, m_category(0)
+	, m_category(E_CHTYPE_OTHER)
 	, m_pOpInfo(pOpInfo)
 {
-	// TODO : set category by ch
-	// m_category
+	
+	if ( isAlpha() ) {
+		m_category = E_CHTYPE_ALPHA;
+	} else if ( isNumber() ) {
+		m_category = E_CHTYPE_NUMBER;
+	} else if ( isOpType() ) {
+		m_category = E_CHTYPE_OPERATOR;
+	} else if ( isBlank() ) {
+		m_category = E_CHTYPE_BLANK;
+	} else {
+		m_category = E_CHTYPE_OTHER;
+	}
 }
 
 
@@ -75,7 +85,7 @@ char CharBaseInfo::getCh()
 	return m_ch;
 }
 
-unsigned int CharBaseInfo::getCategory()
+E_CharType CharBaseInfo::getCategory()
 {
 	return m_category;
 }
@@ -251,9 +261,21 @@ void CharUtil::init()
 	the_ch = ';';
 	s_allCharSetMap.insert( make_pair(the_ch, new CharBaseInfo(the_ch, nullptr) ) );
 
+	//
 	// Blank Part
+	//
 	the_ch = ' ';
 	s_allCharSetMap.insert( make_pair(the_ch, new CharBaseInfo(the_ch, nullptr) ) );
+
+	the_ch = '\t';
+	s_allCharSetMap.insert( make_pair(the_ch, new CharBaseInfo(the_ch, nullptr) ) );
+
+	the_ch = '\r';
+	s_allCharSetMap.insert( make_pair(the_ch, new CharBaseInfo(the_ch, nullptr) ) );
+
+	the_ch = '\n';
+	s_allCharSetMap.insert( make_pair(the_ch, new CharBaseInfo(the_ch, nullptr) ) );
+
 
 	// TODO
 	CharUtil::s_positiveCharInfo = new CharBaseInfo('+', nullptr);
@@ -283,6 +305,13 @@ void CharUtil::finalize()
 		CharUtil::s_negativeCharInfo = nullptr;
 	}
 }
+
+// static 
+std::unordered_map<char,CharBaseInfo*>* CharUtil::getAllCharSet()
+{
+	return &s_allCharSetMap;
+}
+
 	
 CharBaseInfo* CharUtil::getCharBaseInfo(char ch)
 {
