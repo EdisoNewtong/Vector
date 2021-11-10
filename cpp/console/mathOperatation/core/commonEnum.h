@@ -72,5 +72,29 @@ enum E_ExceptionCode
 
 };
 
+enum E_DataType
+{
+    //////////////////////////////////////////////////
+	E_TP_U_CHAR,
+	E_TP_S_CHAR,
+
+	E_TP_U_SHORT,
+	E_TP_S_SHORT,
+
+	E_TP_U_INT,
+	E_TP_S_INT,
+
+	E_TP_U_LONG,
+	E_TP_S_LONG,
+
+	E_TP_U_LONG_LONG,
+	E_TP_S_LONG_LONG,
+    //////////////////////////////////////////////////
+
+	E_TP_FLOAT,
+	E_TP_DOUBLE,
+	E_TP_LONG_DOUBLE,
+};
+
 
 #endif

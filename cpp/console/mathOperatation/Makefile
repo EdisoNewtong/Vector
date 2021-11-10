@@ -1,33 +1,37 @@
 #!/bin/bash
 
-INC_PATH := -Icore -Icore/token -Icore/token/interger -Icore/token/floatnumber -Icore/token/varible -Icore/token/operator -Icore/token/comment -Icore/token/blank
+INC_PATH := -Icore -Icore/token -Icore/util -Icore/token/interger -Icore/token/floatnumber -Icore/token/varible -Icore/token/operator -Icore/token/comment -Icore/token/blank
 
 COMPILE_OPT :=  -Wall  -std=c++11  
 
 
-main:build/parser.o build/parsedCharInfo.o build/parserException.o  build/keywordList.o build/charUtil.o build/tokenInfo.o  build/decimalParser.o build/octalParser.o build/hexParser.o build/floatParser.o build/varibleParser.o build/main.o  build/tokenParserBase.o build/blankParser.o build/singleLineCommentParser.o build/multiLineCommentParser.o build/operatorParser.o
+main:build/parser.o build/parsedCharInfo.o build/parserException.o  build/keywordList.o build/typeUtil.o build/charUtil.o build/tokenInfo.o  build/decimalParser.o build/octalParser.o build/hexParser.o build/floatParser.o build/varibleParser.o build/main.o  build/tokenParserBase.o build/blankParser.o build/singleLineCommentParser.o build/multiLineCommentParser.o build/operatorParser.o
 	g++   $(COMPILE_OPT) -o main build/*.o
 
 
 
-build/main.o:main.cpp core/commonEnum.h core/parser.h core/parserException.h core/charUtil.h
+build/main.o:main.cpp core/commonEnum.h core/parser.h core/parserException.h core/util/charUtil.h core/util/typeUtil.h
 	g++   $(COMPILE_OPT)   $(INC_PATH)   -c -o build/main.o main.cpp
 
 build/parser.o:core/parser.cpp core/parser.h core/commonEnum.h core/token/tokenParserBase.h core/token/interger/decimalParser.h core/token/interger/octalParser.h core/token/interger/hexParser.h core/token/floatnumber/floatParser.h core/token/varible/varibleParser.h
 	g++   $(COMPILE_OPT)   $(INC_PATH)   -c -o build/parser.o core/parser.cpp
 
-build/parsedCharInfo.o:core/parsedCharInfo.cpp core/parsedCharInfo.h core/charUtil.h
+build/parsedCharInfo.o:core/parsedCharInfo.cpp core/parsedCharInfo.h core/util/charUtil.h
 	g++   $(COMPILE_OPT)   $(INC_PATH)   -c -o build/parsedCharInfo.o core/parsedCharInfo.cpp 
 
 
 build/parserException.o:core/parserException.cpp core/parserException.h core/commonEnum.h
 	g++   $(COMPILE_OPT)   $(INC_PATH)   -c -o build/parserException.o  core/parserException.cpp
 
-build/keywordList.o:core/keywordList.cpp  core/keywordList.h
-	g++   $(COMPILE_OPT)   $(INC_PATH)   -c -o build/keywordList.o  core/keywordList.cpp
+build/keywordList.o:core/util/keywordList.cpp  core/util/keywordList.h
+	g++   $(COMPILE_OPT)   $(INC_PATH)   -c -o build/keywordList.o  core/util/keywordList.cpp
 
-build/charUtil.o:core/charUtil.cpp  core/charUtil.h
-	g++   $(COMPILE_OPT)   $(INC_PATH)   -c -o build/charUtil.o  core/charUtil.cpp
+build/charUtil.o:core/util/charUtil.cpp  core/util/charUtil.h
+	g++   $(COMPILE_OPT)   $(INC_PATH)   -c -o build/charUtil.o  core/util/charUtil.cpp
+
+build/typeUtil.o:core/util/typeUtil.cpp  core/util/typeUtil.h
+	g++   $(COMPILE_OPT)   $(INC_PATH)   -c -o build/typeUtil.o  core/util/typeUtil.cpp
+
 
 #
 # Base Part
