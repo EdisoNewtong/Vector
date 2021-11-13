@@ -7,4 +7,4 @@ demo:demo.cpp
 
 .PHONY:clean
 clean:
-	-rm  -Rf *.o demo
+	-rm  -Rf *.o *.obj *.exe *.dSYM demo 

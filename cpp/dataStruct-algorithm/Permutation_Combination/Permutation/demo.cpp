@@ -12,10 +12,7 @@ struct Slot
 void enumerateSlot(const vector<Slot*>& slotAry, int deep, vector< vector<int> >& used, vector<string>& grp, vector<vector<string>>& pp) 
 {
 	int slotSz = static_cast<int>( slotAry.size() );
-	if ( deep > slotSz ) {
-		return;
-	}
-
+	// recursive end condition
 	if ( deep == slotSz ) {
 		pp.push_back( grp );
 		return;
@@ -24,9 +21,14 @@ void enumerateSlot(const vector<Slot*>& slotAry, int deep, vector< vector<int> >
 	for ( size_t i = 0; i < slotAry.at(deep)->pool.size(); ++i ) {
 		string content = slotAry.at(deep)->pool.at(i);
 		if ( used[deep][i] == 0 ) {
+			// Core Core Core 
+			//     <Set> used flag ### Before ### recursive function
 			used[deep][i] = 1;
 			grp[deep] = content;
+
 			enumerateSlot(slotAry, deep + 1, used, grp, pp);
+
+			//     <Unset>  used flag ### After ### recursive function
 			used[deep][i] = 0;
 		}
 	}
@@ -65,6 +67,7 @@ int getNumberBitInDecimal(unsigned long long cnt)
 
 void enumerateSlotAry(const vector<Slot*>& slotAry)
 {
+	// init used flag 
 	vector< vector<int> >  usedStatus;
 	for ( const auto pSlot : slotAry ) {
 		vector<int> flags;
@@ -76,9 +79,11 @@ void enumerateSlotAry(const vector<Slot*>& slotAry)
 		usedStatus.push_back( flags );
 	}
 
+	//  One of the possibility 
 	vector<string>         possibilityGrp;
 	possibilityGrp.resize( slotAry.size() );
 
+	// a collection set of  possibility
 	vector<vector<string>> possibilityPool;
 
 	//
@@ -140,9 +145,8 @@ void permutationDemo()
 	slotAry.push_back(s2);
 	slotAry.push_back(s3);
 
-	//
-	// Core Core Core
-	//
+	
+	// Key function
 	enumerateSlotAry(slotAry);
 
 	// release
@@ -155,86 +159,10 @@ void permutationDemo()
 	slotAry.clear();
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-// Begin 
-//
-//
-// Question:     
-//     There are 4 numbers 1,2,3,4 and  4 slots 
-//     fill any one number into the slot until all slots are filled
-//     How many possibilities exists ?
-//
-static int testAry[] = { 1,2,3,4 };
-static int flags[]   = { 0,0,0,0 };
-static int retAry[]  = { 0,0,0,0 };
 
-void perm(int deep, int cnt)
-{
-	if ( deep > cnt ) {
-		cout << "case 1 : deep > cnt" << endl;
-		return;
-	}
-
-	if ( deep == cnt ) {
-		for ( int i = 0; i < cnt; ++i ) {
-			cout << retAry[i];
-			if ( i != cnt-1 ) {
-				cout << " - ";
-			}
-		}
-		cout << endl;
-		return;
-	}
-
-	for ( int i = 0; i < cnt; ++i ){
-		if ( flags[i] == 0 ) {
-			flags[i] = 1;
-			retAry[deep] = testAry[i];
-			perm( deep+1, cnt);
-			flags[i] = 0;
-		}
-	}
-}
-
-/*
-    There are 4 slots  , A B C D 
-    and  4 numbers in the poll { 1,2,3,4 }
- 
-    Step-1 : A is filled with 2 ,then the rest 3 slots B C D  , can only filled with one of  { 1,   3, 4 } without 1
-    Step-2 : B is filled with 3 ,then the rest 2 slots C D    , can only filled with one of  { 1,      4 } without 2 and 3
-       ...
- 
- 
-    This example is different from 4 A,B,C,D slots, with 4 numbers {1,2,3,4} , some possibilities is shown below :
-
-	------------------
-	   A  B  C  D
-	   1  1  1  1
-	------------------
-	   A  B  C  D
-	   2  2  2  2
-
-	   ....
-
-	------------------
-	   A  B  C  D
-	   1  2  2  1
-	------------------
-
-
-
-*/
-void permutation2()
-{
-	perm(0, sizeof(retAry) /  sizeof(retAry[0]) );
-}
-
-// End
-////////////////////////////////////////////////////////////////////////////////////////////////////
 
 int main(int argc, char* argv[], char* env[])
 {
-	// permutationDemo();
-	permutation2();
+	permutationDemo();
 	return 0;
 }

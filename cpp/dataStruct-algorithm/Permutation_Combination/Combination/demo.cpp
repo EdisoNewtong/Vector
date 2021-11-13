@@ -4,124 +4,103 @@
 #include <string>
 using namespace std;
 
-struct Slot
-{
-	vector<string> pool;
-};
 
-void enumerateSlot(const vector<Slot*>& slotAry, int deep, vector< vector<int> >& used, vector<string>& grp, vector<vector<string>>& pp) 
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// Begin 
+//
+//
+// Question:     
+//     There are 4 numbers 1,2,3,4 and  4 slots 
+//     fill any one number into the slot until all slots are filled
+//     How many possibilities exists ?
+//
+
+static int g_nPossibilityCnt = 0;
+
+static int pickupPool[] = { 1,2,3,4 };
+static int flagsAry[]   = { 0,0,0,0 };
+static int retAry[]     = { 0,0,0,0 };
+
+void comination(int deep, int cnt)
 {
-	int slotSz = static_cast<int>( slotAry.size() );
-	if ( deep > slotSz ) {
+	//
+	// ==== Core Core Core ====
+	// Recursive termate condition
+	//
+	if ( deep == cnt ) {
+		// print result array
+		cout << (g_nPossibilityCnt+1) << ". ";
+		for ( int i = 0; i < cnt; ++i ) {
+			cout << retAry[i];
+			if ( i != cnt-1 ) {
+				cout << " - ";
+			}
+		}
+		cout << endl;
+
+		++g_nPossibilityCnt;
 		return;
 	}
 
-	if ( deep == slotSz ) {
-		pp.push_back( grp );
-		return;
-	}
+	for ( int i = 0; i < cnt; ++i ){
+		if ( flagsAry[i] == 0 ) {
+			// set flag
+			flagsAry[i] = 1;
 
-	for ( size_t i = 0; i < slotAry.at(deep)->pool.size(); ++i ) {
-		string content = slotAry.at(deep)->pool.at(i);
-		if ( used[deep][i] == 0 ) {
-			used[deep][i] = 1;
-			grp[deep] = content;
-			enumerateSlot(slotAry, deep + 1, used, grp, pp);
-			used[deep][i] = 0;
+			// pick up one
+			retAry[deep] = pickupPool[i];
+
+			comination( deep+1, cnt);
+			// clear flag
+			flagsAry[i] = 0;
 		}
 	}
+
+
 }
 
-/* 
- * get the bit for a decimal number
- * e.g.
- *     0         => 1
- *     5         => 1
- *     12        => 2
- *     315       => 3
- *     1435      => 4
- *     21435     => 5
- *
- *         ....
- *         ....
- *         ....
- *
- *     123456789 => 9
+/*
+    There are 4 slots  , A B C D 
+    and  4 numbers in the poll { 1,2,3,4 }
+ 
+    Step-1 : A is filled with 2 ,then the rest 3 slots B C D  , can only filled with one of  { 1,   3, 4 } without 1
+    Step-2 : B is filled with 3 ,then the rest 2 slots C D    , can only filled with one of  { 1,      4 } without 2 and 3
+       ...
+ 
+ 
+    This example is different from 4 A,B,C,D slots, with 4 numbers {1,2,3,4} , some possibilities is shown below :
+
+	------------------
+	   A  B  C  D
+	   1  1  1  1
+	------------------
+	   A  B  C  D
+	   2  2  2  2
+
+	   ....
+
+	------------------
+	   A  B  C  D
+	   1  2  2  1
+	------------------
+
+
+
 */
-int getNumberBitInDecimal(unsigned long long cnt) 
+void runCombinationDemo()
 {
-	int ret = 0;
-	if ( cnt == 0 ) {
-		ret = 1;
-		return ret;
-	}
-	
-	while ( cnt > 0 ) {
-		++ret;
-		cnt /= 10;
-	}
-	return ret;
-}
+	comination(0, sizeof(retAry) /  sizeof(retAry[0]) );
 
-void enumerateSlotAry(const vector<Slot*>& slotAry)
-{
-	(void)slotAry;
-}
-
-void combinationDemo()
-{
-	// init
-	vector<Slot*> slotAry;
-
-	auto s0 = new Slot;
-	s0->pool.push_back("A");
-	s0->pool.push_back("B");
-	s0->pool.push_back("C");
-
-	auto s1 = new Slot;
-	s1->pool.push_back("D");
-	s1->pool.push_back("E");
-	s1->pool.push_back("F");
-	s1->pool.push_back("G");
-
-	auto s2 = new Slot;
-	s2->pool.push_back("H");
-	s2->pool.push_back("I");
-	s2->pool.push_back("J");
-	s2->pool.push_back("K");
-	s2->pool.push_back("L");
-
-	auto s3 = new Slot;
-	s3->pool.push_back("M");
-	s3->pool.push_back("N");
-	s3->pool.push_back("O");
-	s3->pool.push_back("P");
-	s3->pool.push_back("Q");
-	s3->pool.push_back("R");
-
-	slotAry.push_back(s0);
-	slotAry.push_back(s1);
-	slotAry.push_back(s2);
-	slotAry.push_back(s3);
-
-	//
-	// Core Core Core
-	//
-	enumerateSlotAry(slotAry);
-
-	// release
-	for ( auto pSlot : slotAry)
-	{
-		if ( pSlot != nullptr ) {
-			delete pSlot;
-		}
-	}
-	slotAry.clear();
+	cout << "==================================================" << endl
+		 << "\tThere are " << g_nPossibilityCnt << " possiblities in all. " << endl
+		 << "==================================================" << endl;
 }
 
 
 int main(int argc, char* argv[], char* env[])
 {
-	combinationDemo();
+	runCombinationDemo();
 	return 0;
 }
+
