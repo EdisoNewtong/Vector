@@ -58,7 +58,7 @@ protected:
     inline unsigned int getPresentStyle();
     inline unsigned int getCharPresentStyle();
 
-    void convertFailedHints();
+    void convertFailedHints( const QString& s = QString() );
     void updateCharBits();
     void updateShortBits();
     void updateIntBits();
@@ -66,6 +66,14 @@ protected:
     void updateLongLongBits();
     void innerBitsUpdate(int nBits);
     void setAllBitsDash();
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    // To Fix a bug when converting signed short/int/long/long long while the binary highest bit is '1'
+    bool isHightestBit_1(const QString& targetStr, size_t nBits, int baseOpt);
+    QByteArray string2ByteArray_WithAlignmentByte(const QString& inStr, size_t nBits, int baseOpt);
+    void octbaseProcessUgly(QByteArray& retAry, const QString& inStr, size_t nBits);
+    bool octbaseProcessNice(QByteArray& retAry, const QString& inStr, size_t nBits, QString& errorMsg);
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
 
     QString flagAuxInfo();
     ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -173,8 +181,11 @@ protected:
 
     //                      | ? 1 + 2 | 3 + 1 |
     unsigned int            m_pickedInfo;
+    const int               m_errorMsgShowTime; // in milli-seconds
 
-    QMap<int,QString>       m_unprintedTable;
+    QMap<int,QString>                m_unprintedTable;
+
+    QMap<QString, QString>           m_octNumberStringMap;
 };
 
 

@@ -15,6 +15,7 @@
 #include <QRegExp>
 #include <QApplication>
 #include <QClipboard>
+#include <QTextStream> //  for type   QDataStream
 // #include <QByteArray>
 
 #include <QDebug>
@@ -137,6 +138,7 @@ myhardcodewindow::myhardcodewindow(QWidget* parent /* = nullptr */  )
     , m_strColor3("#0000FF")
     , m_strDetailOutput("")
     , m_pickedInfo(0U)
+    , m_errorMsgShowTime(3000)
 {
     setWindowTitle( tr("Decimal-Hex-Binary Convert"));
     resize(800,600);
@@ -183,6 +185,22 @@ myhardcodewindow::myhardcodewindow(QWidget* parent /* = nullptr */  )
     m_unprintedTable.insert(31, "<US> (unit separator)");
     m_unprintedTable.insert(32, "<SPC> (Space)");
     m_unprintedTable.insert(127, "<DEL> (delete)");
+
+
+
+    //
+    // Oct Number =>   Binary String
+    //
+    m_octNumberStringMap.insert("0", "000");
+    m_octNumberStringMap.insert("1", "001");
+    m_octNumberStringMap.insert("2", "010");
+    m_octNumberStringMap.insert("3", "011");
+    m_octNumberStringMap.insert("4", "100");
+    m_octNumberStringMap.insert("5", "101");
+    m_octNumberStringMap.insert("6", "110");
+    m_octNumberStringMap.insert("7", "111");
+
+
 }
 
 // virtual
@@ -355,7 +373,7 @@ void myhardcodewindow::initUI()
         m_pBinAry[i] = new QLabel( QString("<font color='%1'>%2</font>").arg( (i/4%2) == 0 ? m_strColor3 :  m_strColor1).arg("-") );
 
         QFont idxNewFnt( m_pBinIndexAry[i]->font() );
-        idxNewFnt.setPointSizeF( idxNewFnt.pointSizeF() * 0.7f );
+        idxNewFnt.setPointSizeF( idxNewFnt.pointSizeF() * 0.7 );
         m_pBinIndexAry[i]->setFont( idxNewFnt );
     }
     
@@ -471,7 +489,7 @@ void myhardcodewindow::initUI()
     setCentralWidget(m_pCenterWidget);
 
     m_pStatusBar = new QStatusBar(this);
-    // m_pStatusBar->showMessage( tr("Hello DHB Ver 2.0"), 0 );
+    // m_pStatusBar->showMessage( tr("Hello DHB Ver 2.0"), m_errorMsgShowTime );
     // m_pStatusBar->resize( ... );
     setStatusBar( m_pStatusBar);
 
@@ -595,7 +613,7 @@ void myhardcodewindow::onCharRepresentationClick(int btnId, bool checkFlag)
 
 void myhardcodewindow::onOctalSwitchBtnClicked(bool check)
 {
-    Q_UNUSED(check);
+    Q_UNUSED(check)
     m_original2ColorMode = !m_original2ColorMode;
     updateOctBinaryColor();
 }
@@ -604,7 +622,7 @@ void myhardcodewindow::onOctalSwitchBtnClicked(bool check)
 void myhardcodewindow::updateOctBinaryColor()
 {
     auto dt = getDataType();
-    int bits = static_cast<int>(m_intBits);
+    size_t bits = static_cast<size_t>(m_intBits);
     switch( dt )
     {
     case 0:
@@ -626,7 +644,7 @@ void myhardcodewindow::updateOctBinaryColor()
         break;
     }
 
-    innerBitsUpdate(bits);
+    innerBitsUpdate( static_cast<int>(bits) );
 }
 
 QString myhardcodewindow::flagAuxInfo()
@@ -845,7 +863,7 @@ void myhardcodewindow::updateDataTypeInfo()
     m_pMinNumberText->setText(strMin);
     m_pMaxNumberText->setText(strMax);
     if ( !dataTypeStatuText.isEmpty() ) {
-        m_pStatusBar->showMessage( dataTypeStatuText, 0 );
+        m_pStatusBar->showMessage( dataTypeStatuText, m_errorMsgShowTime );
     }
 }
 
@@ -941,9 +959,9 @@ void myhardcodewindow::doBinaryConvert()
     case 1: // short
         {
             // m_shortBits
-            if ( bohd>=0 && bohd < arysz ) {
+            if (  bohd < arysz ) {
                 if( !radixAry[bohd]->exactMatch(inputText) ) {
-                    m_pStatusBar->showMessage( QString("Invalid  Input!!! Format must be %1").arg(regexDetailAry[bohd]), 0 );
+                    m_pStatusBar->showMessage( QString("Invalid  Input!!! Format must be %1").arg(regexDetailAry[bohd]), m_errorMsgShowTime );
                     m_pDecialCharDetailBox->setStyleSheet("QLineEdit { color : red }");
                     m_pDecialCharDetailBox->setText( QString("Invalid  Input!!! Format must be %1").arg(regexDetailAry[bohd]));
                     setAllBitsDash();
@@ -951,7 +969,7 @@ void myhardcodewindow::doBinaryConvert()
                     updateShortBits();
                 }
             } else {
-                m_pStatusBar->showMessage( tr("Invalid Binary/Oct/Hex/Decimal representation"), 0 );
+                m_pStatusBar->showMessage( tr("Invalid Binary/Oct/Hex/Decimal representation"), m_errorMsgShowTime );
 
                 m_pDecialCharDetailBox->setStyleSheet("QLineEdit { color : red }");
                 m_pDecialCharDetailBox->setText( tr("Invalid Binary/Oct/Hex/Decimal representation") );
@@ -962,9 +980,9 @@ void myhardcodewindow::doBinaryConvert()
         break;
     case 2: // int
         {
-            if ( bohd>=0 && bohd < arysz ) {
+            if (  bohd < arysz ) {
                 if( !radixAry[bohd]->exactMatch(inputText) ) {
-                    m_pStatusBar->showMessage( QString("Invalid  Input!!! Format must be %1").arg(regexDetailAry[bohd]), 0 );
+                    m_pStatusBar->showMessage( QString("Invalid  Input!!! Format must be %1").arg(regexDetailAry[bohd]), m_errorMsgShowTime );
                     m_pDecialCharDetailBox->setStyleSheet("QLineEdit { color : red }");
                     m_pDecialCharDetailBox->setText( QString("Invalid  Input!!! Format must be %1").arg(regexDetailAry[bohd]));
 
@@ -973,7 +991,7 @@ void myhardcodewindow::doBinaryConvert()
                     updateIntBits();
                 }
             } else {
-                m_pStatusBar->showMessage( tr("Invalid Binary/Oct/Hex/Decimal representation"), 0 );
+                m_pStatusBar->showMessage( tr("Invalid Binary/Oct/Hex/Decimal representation"), m_errorMsgShowTime );
 
                 m_pDecialCharDetailBox->setStyleSheet("QLineEdit { color : red }");
                 m_pDecialCharDetailBox->setText( tr("Invalid Binary/Oct/Hex/Decimal representation") );
@@ -984,9 +1002,9 @@ void myhardcodewindow::doBinaryConvert()
         break;
     case 3: // long
         {
-            if ( bohd>=0 && bohd < arysz ) {
+            if (  bohd < arysz ) {
                 if( !radixAry[bohd]->exactMatch(inputText) ) {
-                    m_pStatusBar->showMessage( QString("Invalid  Input!!! Format must be %1").arg(regexDetailAry[bohd]), 0 );
+                    m_pStatusBar->showMessage( QString("Invalid  Input!!! Format must be %1").arg(regexDetailAry[bohd]), m_errorMsgShowTime );
                     m_pDecialCharDetailBox->setStyleSheet("QLineEdit { color : red }");
                     m_pDecialCharDetailBox->setText( QString("Invalid  Input!!! Format must be %1").arg(regexDetailAry[bohd]));
 
@@ -995,7 +1013,7 @@ void myhardcodewindow::doBinaryConvert()
                     updateLongBits();
                 }
             } else {
-                m_pStatusBar->showMessage( tr("Invalid Binary/Oct/Hex/Decimal representation"), 0 );
+                m_pStatusBar->showMessage( tr("Invalid Binary/Oct/Hex/Decimal representation"), m_errorMsgShowTime );
 
                 m_pDecialCharDetailBox->setStyleSheet("QLineEdit { color : red }");
                 m_pDecialCharDetailBox->setText( tr("Invalid Binary/Oct/Hex/Decimal representation") );
@@ -1006,9 +1024,9 @@ void myhardcodewindow::doBinaryConvert()
         break;
     case 4: // long long
         {
-            if ( bohd>=0 && bohd < arysz ) {
+            if ( bohd < arysz ) {
                 if( !radixAry[bohd]->exactMatch(inputText) ) {
-                    m_pStatusBar->showMessage( QString("Invalid  Input!!! Format must be %1").arg(regexDetailAry[bohd]), 0 );
+                    m_pStatusBar->showMessage( QString("Invalid  Input!!! Format must be %1").arg(regexDetailAry[bohd]), m_errorMsgShowTime );
                     m_pDecialCharDetailBox->setStyleSheet("QLineEdit { color : red }");
                     m_pDecialCharDetailBox->setText( QString("Invalid  Input!!! Format must be %1").arg(regexDetailAry[bohd]));
 
@@ -1017,7 +1035,7 @@ void myhardcodewindow::doBinaryConvert()
                     updateLongLongBits();
                 }
             } else {
-                m_pStatusBar->showMessage( tr("Invalid Binary/Oct/Hex/Decimal representation"), 0 );
+                m_pStatusBar->showMessage( tr("Invalid Binary/Oct/Hex/Decimal representation"), m_errorMsgShowTime );
 
                 m_pDecialCharDetailBox->setStyleSheet("QLineEdit { color : red }");
                 m_pDecialCharDetailBox->setText( tr("Invalid Binary/Oct/Hex/Decimal representation") );
@@ -1086,7 +1104,7 @@ void myhardcodewindow::updateCharBits()
 
     if ( !succ ) {
         if ( letAscii == 0 ) {
-            m_pStatusBar->showMessage( QString("Invalid  Input!!! Single Letter Only"), 0 );
+            m_pStatusBar->showMessage( QString("Invalid  Input!!! Single Letter Only"), m_errorMsgShowTime );
             m_pDecialCharDetailBox->setStyleSheet("QLineEdit { color : red }");
             m_pDecialCharDetailBox->setText( QString("Invalid  Input!!! Single Letter Only") );
             setAllBitsDash();
@@ -1105,8 +1123,8 @@ void myhardcodewindow::updateCharBits()
     m_byteDecimal.setNum(code,10);
 
     // Truncate Unused Bits
-    if ( m_byteBin.size() > m_charBits ) {
-        m_byteBin = m_byteBin.right(m_charBits);
+    if ( m_byteBin.size() > static_cast<int>(m_charBits) ) {
+        m_byteBin = m_byteBin.right( static_cast<int>(m_charBits) );
     }
 
     int octMaxBits = (m_charBits/3 + 1);
@@ -1120,9 +1138,9 @@ void myhardcodewindow::updateCharBits()
     }
 
     if ( isFullBitChecked ) {
-        m_byteBin = m_byteBin.rightJustified(m_charBits,  '0' , truncateFlag);
-        m_byteOct = m_byteOct.rightJustified(m_charBits/3 + 1, '0', truncateFlag);
-        m_byteHex = m_byteHex.rightJustified(m_charBits/4, '0', truncateFlag);
+        m_byteBin = m_byteBin.rightJustified( static_cast<int>(m_charBits),  '0' , truncateFlag);
+        m_byteOct = m_byteOct.rightJustified( static_cast<int>(m_charBits/3 + 1), '0', truncateFlag);
+        m_byteHex = m_byteHex.rightJustified( static_cast<int>(m_charBits/4), '0', truncateFlag);
     }
     m_byteHex = m_byteHex.toUpper();
     if ( m_byteOct.size() == 3 ) {
@@ -1142,7 +1160,7 @@ void myhardcodewindow::updateCharBits()
         }
     }
 
-    innerBitsUpdate(m_charBits);
+    innerBitsUpdate( static_cast<int>(m_charBits) );
 }
 
 
@@ -1150,7 +1168,7 @@ void myhardcodewindow::updateShortBits()
 {
     auto isFullBitChecked = (m_pShowFullBitsChkBox->checkState() == Qt::Checked);
 
-    QString inputText = m_pInputBox->text();
+    QString inputText = m_pInputBox->text().trimmed();
     auto us = getUnsignedSigned();
     auto bohd = getPresentStyle();
     auto convertRet = false;
@@ -1167,33 +1185,42 @@ void myhardcodewindow::updateShortBits()
         m_byteHex.setNum(us_num, 16);
         m_byteDecimal.setNum(us_num,10);
         if ( isFullBitChecked ) {
-            m_byteBin = m_byteBin.rightJustified(m_shortBits,  '0');
-            m_byteOct = m_byteOct.rightJustified(m_shortBits/3 + 1, '0');
-            m_byteHex = m_byteHex.rightJustified(m_shortBits/4, '0');
+            m_byteBin = m_byteBin.rightJustified(static_cast<int>(m_shortBits),  '0');
+            m_byteOct = m_byteOct.rightJustified(static_cast<int>(m_shortBits/3 + 1), '0');
+            m_byteHex = m_byteHex.rightJustified(static_cast<int>(m_shortBits/4), '0');
         }
         m_byteHex = m_byteHex.toUpper();
 
-        innerBitsUpdate(m_shortBits);
+        innerBitsUpdate( static_cast<int>(m_shortBits) );
     } else {
         //   signed short
-        signed short ss_num = inputText.toShort(&convertRet, m_baseMap[bohd]);
-        if ( !convertRet ) {
-            convertFailedHints();
-            return;
-        } 
+        signed short ss_num = 0;
+        auto hightestBit_1Flag = isHightestBit_1(inputText, m_shortBits, m_baseMap[bohd] );
+        if ( hightestBit_1Flag ) {
+            QByteArray ary = string2ByteArray_WithAlignmentByte( inputText, m_shortBits, m_baseMap[bohd] );
+            QDataStream in(&ary,QIODevice::ReadOnly);
+            in >> ss_num;
+        } else {
+            ss_num = inputText.toShort(&convertRet, m_baseMap[bohd]);
+            if ( !convertRet ) {
+                convertFailedHints();
+                return;
+            } 
+        }
+
         // else
         m_byteBin.setNum(ss_num, 2);
         m_byteOct.setNum(ss_num, 8);
         m_byteHex.setNum(ss_num, 16);
         m_byteDecimal.setNum(ss_num,10);
         if ( isFullBitChecked ) {
-            m_byteBin = m_byteBin.rightJustified(m_shortBits,  '0');
-            m_byteOct = m_byteOct.rightJustified(m_shortBits/3 + 1, '0');
-            m_byteHex = m_byteHex.rightJustified(m_shortBits/4, '0');
+            m_byteBin = m_byteBin.rightJustified( static_cast<int>(m_shortBits),  '0');
+            m_byteOct = m_byteOct.rightJustified( static_cast<int>(m_shortBits/3 + 1), '0');
+            m_byteHex = m_byteHex.rightJustified( static_cast<int>(m_shortBits/4), '0');
         }
         m_byteHex = m_byteHex.toUpper();
 
-        innerBitsUpdate(m_shortBits);
+        innerBitsUpdate( static_cast<int>(m_shortBits) );
     }
 }
 
@@ -1201,7 +1228,7 @@ void myhardcodewindow::updateIntBits()
 {
     auto isFullBitChecked = (m_pShowFullBitsChkBox->checkState() == Qt::Checked);
 
-    QString inputText = m_pInputBox->text();
+    QString inputText = m_pInputBox->text().trimmed();
     auto us = getUnsignedSigned();
     auto bohd = getPresentStyle();
     auto convertRet = false;
@@ -1219,33 +1246,42 @@ void myhardcodewindow::updateIntBits()
         m_byteHex.setNum(ui_num, 16);
         m_byteDecimal.setNum(ui_num,10);
         if ( isFullBitChecked ) {
-            m_byteBin = m_byteBin.rightJustified(m_intBits,  '0');
-            m_byteOct = m_byteOct.rightJustified(m_intBits/3 + 1, '0');
-            m_byteHex = m_byteHex.rightJustified(m_intBits/4, '0');
+            m_byteBin = m_byteBin.rightJustified( static_cast<int>(m_intBits),  '0');
+            m_byteOct = m_byteOct.rightJustified( static_cast<int>(m_intBits/3 + 1), '0');
+            m_byteHex = m_byteHex.rightJustified( static_cast<int>(m_intBits/4), '0');
         }
         m_byteHex = m_byteHex.toUpper();
 
-        innerBitsUpdate(m_intBits);
+        innerBitsUpdate( static_cast<int>(m_intBits) );
     } else {
         //   signed int
-        signed int si_num = inputText.toInt(&convertRet, m_baseMap[bohd]);
-        if ( !convertRet ) {
-            convertFailedHints();
-            return;
-        } 
+        signed int si_num = 0;
+
+        auto hightestBit_1Flag = isHightestBit_1(inputText, m_intBits, m_baseMap[bohd] );
+        if ( hightestBit_1Flag ) {
+            QByteArray ary = string2ByteArray_WithAlignmentByte( inputText, m_intBits, m_baseMap[bohd] );
+            QDataStream in(&ary,QIODevice::ReadOnly);
+            in >> si_num;
+        } else {
+            si_num = inputText.toInt(&convertRet, m_baseMap[bohd]);
+            if ( !convertRet ) {
+                convertFailedHints();
+                return;
+            } 
+        }
         // else
         m_byteBin.setNum(si_num, 2);
         m_byteOct.setNum(si_num, 8);
         m_byteHex.setNum(si_num, 16);
         m_byteDecimal.setNum(si_num,10);
         if ( isFullBitChecked ) {
-            m_byteBin = m_byteBin.rightJustified(m_intBits,  '0');
-            m_byteOct = m_byteOct.rightJustified(m_intBits/3 + 1, '0');
-            m_byteHex = m_byteHex.rightJustified(m_intBits/4, '0');
+            m_byteBin = m_byteBin.rightJustified( static_cast<int>(m_intBits),  '0');
+            m_byteOct = m_byteOct.rightJustified( static_cast<int>(m_intBits/3 + 1), '0');
+            m_byteHex = m_byteHex.rightJustified( static_cast<int>(m_intBits/4), '0');
         }
         m_byteHex = m_byteHex.toUpper();
 
-        innerBitsUpdate(m_intBits);
+        innerBitsUpdate( static_cast<int>(m_intBits) );
     }
 }
 
@@ -1262,7 +1298,7 @@ void myhardcodewindow::updateLongLongBits()
 {
     auto isFullBitChecked = (m_pShowFullBitsChkBox->checkState() == Qt::Checked);
 
-    QString inputText = m_pInputBox->text();
+    QString inputText = m_pInputBox->text().trimmed();
     auto us = getUnsignedSigned();
     auto bohd = getPresentStyle();
     auto convertRet = false;
@@ -1280,20 +1316,28 @@ void myhardcodewindow::updateLongLongBits()
         m_byteHex.setNum(ull_num, 16);
         m_byteDecimal.setNum(ull_num,10);
         if ( isFullBitChecked ) {
-            m_byteBin = m_byteBin.rightJustified(m_longlongBits,  '0');
-            m_byteOct = m_byteOct.rightJustified(m_longlongBits/3 + 1, '0');
-            m_byteHex = m_byteHex.rightJustified(m_longlongBits/4, '0');
+            m_byteBin = m_byteBin.rightJustified( static_cast<int>(m_longlongBits),  '0');
+            m_byteOct = m_byteOct.rightJustified( static_cast<int>(m_longlongBits/3 + 1), '0');
+            m_byteHex = m_byteHex.rightJustified( static_cast<int>(m_longlongBits/4), '0');
         } 
         m_byteHex = m_byteHex.toUpper();
 
-        innerBitsUpdate(m_longlongBits);
+        innerBitsUpdate( static_cast<int>(m_longlongBits) );
     } else {
         //   signed long long
-        signed long long sll_num = inputText.toLongLong(&convertRet, m_baseMap[bohd]);
+        signed long long sll_num = 0;
         // qlonglong qll_num = static_cast<qlonglong>(sll_num);
-        if ( !convertRet ) {
-            convertFailedHints();
-            return;
+        auto hightestBit_1Flag = isHightestBit_1(inputText, m_longlongBits, m_baseMap[bohd] );
+        if ( hightestBit_1Flag ) {
+            QByteArray ary = string2ByteArray_WithAlignmentByte( inputText, m_longlongBits, m_baseMap[bohd] );
+            QDataStream in(&ary,QIODevice::ReadOnly);
+            in >> sll_num;
+        } else {
+            sll_num = inputText.toLongLong(&convertRet, m_baseMap[bohd]);
+            if ( !convertRet ) {
+                convertFailedHints();
+                return;
+            }
         }
         // else
         m_byteBin.setNum(sll_num, 2);
@@ -1301,13 +1345,13 @@ void myhardcodewindow::updateLongLongBits()
         m_byteHex.setNum(sll_num, 16);
         m_byteDecimal.setNum(sll_num,10);
         if ( isFullBitChecked ) {
-            m_byteBin = m_byteBin.rightJustified(m_longlongBits,  '0');
-            m_byteOct = m_byteOct.rightJustified(m_longlongBits/3 + 1, '0');
-            m_byteHex = m_byteHex.rightJustified(m_longlongBits/4, '0');
+            m_byteBin = m_byteBin.rightJustified( static_cast<int>(m_longlongBits),  '0');
+            m_byteOct = m_byteOct.rightJustified( static_cast<int>(m_longlongBits/3 + 1), '0');
+            m_byteHex = m_byteHex.rightJustified( static_cast<int>(m_longlongBits/4), '0');
         }
         m_byteHex = m_byteHex.toUpper();
 
-        innerBitsUpdate(m_longlongBits);
+        innerBitsUpdate( static_cast<int>(m_longlongBits) );
     }
 }
 
@@ -1425,12 +1469,12 @@ void myhardcodewindow::innerBitsUpdate(int nBits)
 }
 
 
-void myhardcodewindow::convertFailedHints()
+void myhardcodewindow::convertFailedHints( const QString& s /* = QString() */ )
 {
-    m_pStatusBar->showMessage( tr("Input is out of range"), 0 );
+    m_pStatusBar->showMessage( (s.isEmpty() ? tr("Input is out of range") : s), m_errorMsgShowTime );
 
     m_pDecialCharDetailBox->setStyleSheet("QLineEdit { color : red }");
-    m_pDecialCharDetailBox->setText( tr("Input is out of range") );
+    m_pDecialCharDetailBox->setText( (s.isEmpty() ? tr("Input is out of range") : s) );
 
     setAllBitsDash();
 }
@@ -1628,14 +1672,306 @@ void myhardcodewindow::setAllBitsDash()
 
 void myhardcodewindow::onCopyBtnClicked(bool check)
 {
-    Q_UNUSED(check);
+    Q_UNUSED(check)
 
 	auto copyBoard = qApp->clipboard();
     if ( copyBoard!=nullptr && !m_strDetailOutput.isEmpty() ) {
         copyBoard->setText(m_strDetailOutput);
-        m_pStatusBar->showMessage( tr("Successfully copied to clipboard"), 0 );
+        m_pStatusBar->showMessage( tr("Successfully copied to clipboard"), m_errorMsgShowTime );
     }
 
 }
 
+bool myhardcodewindow::isHightestBit_1(const QString& targetStr, size_t nBits, int baseOpt)
+{
+    if ( baseOpt == 10 ) {
+        return false;
+    }
+
+    /*
+       16 bits        (1) + (3*5)
+       32 bits        (2) + (3*10)
+       64 bits        (1) + (3*21)
+
+       Oct     Bin
+       0       000
+       1       001
+       2       010
+       3       011
+
+       4       100
+       5       101
+       6       110
+       7       111
+
+    */
+    int nHighestBit = static_cast<int>(nBits);
+    int strSize = targetStr.size();
+    auto bret = false;
+    if ( baseOpt == 2 ) {
+        nHighestBit /= 1;
+
+        if ( strSize != nHighestBit ) {
+            bret = false;
+        } else {
+            QChar highestCh = targetStr.at(0);
+            bret = (highestCh == QChar('1'));
+        }
+    } else if ( baseOpt == 8 ) {
+        int nCnt  = nBits / 3;
+        int nRest = nBits % 3;
+        if ( nRest == 0 ) {
+            nHighestBit = nCnt;
+        } else {
+            nHighestBit = nCnt + 1;
+        }
+
+        if ( strSize != nHighestBit ) {
+            bret = false;
+        } else {
+            // === Special Logic ===
+            QChar highestCh = targetStr.at(0);
+            if ( nRest == 1 ) {
+                /*
+                bret =     ( highestCh == QChar('1') )
+                        || ( highestCh == QChar('3') )
+                        || ( highestCh == QChar('5') )
+                        || ( highestCh == QChar('7') );
+                */
+                bret =     ( highestCh == QChar('1') );
+            } else {
+                // nRest == 2
+                /*
+                bret =     ( highestCh == QChar('2') )
+                        || ( highestCh == QChar('3') )
+                        || ( highestCh == QChar('6') )
+                        || ( highestCh == QChar('7') );
+                */
+                bret =     ( highestCh == QChar('2') )
+                        || ( highestCh == QChar('3') );
+            }
+        }
+    } else if ( baseOpt == 16 ) {
+        nHighestBit /= 4;
+
+        if ( strSize != nHighestBit ) {
+            bret = false;
+        } else {
+            QChar highestCh = targetStr.at(0);
+            bret =    ( highestCh >= QChar('8') && highestCh <= QChar('9') )
+                   || ( highestCh >= QChar('a') && highestCh <= QChar('f') )
+                   || ( highestCh >= QChar('A') && highestCh <= QChar('F') );
+        }
+    } 
+
+
+    return bret;
+}
+
+
+QByteArray myhardcodewindow::string2ByteArray_WithAlignmentByte(const QString& inStr, size_t nBits, int baseOpt)
+{
+    Q_UNUSED(nBits)
+
+    QByteArray retAry;
+    int strLen = inStr.size();
+    int strIdx = strLen;
+
+    int makeBytes = 0;
+    if ( baseOpt == 2 ) {
+        makeBytes = 8;
+    } else if ( baseOpt == 8 ) {
+        makeBytes = 3;
+    } else if ( baseOpt == 16 ) {
+        makeBytes = 2;
+    }
+
+    if ( makeBytes != 0 ) {
+        if ( baseOpt == 8 ) {
+            //
+            // Core Core Core : Switch Nice Function for Converting from Oct-String to ( QByteArry of interger Memory )
+            //
+            auto useNiceFlag = true;
+            if ( useNiceFlag ) {
+                QString errMsg;
+                auto b = octbaseProcessNice(retAry, inStr , nBits, errMsg);
+                if ( !b ) {
+                    convertFailedHints( errMsg );
+                } 
+            } else {
+                octbaseProcessUgly(retAry, inStr , nBits);
+            }
+
+
+        } else {
+            //
+            // baseOpt == 2 ||  baseOpt == 16
+            //      nBits % makeBytes == 0
+            while ( strIdx > 0 ) 
+            {
+                strIdx -= makeBytes;
+                if ( strIdx < 0 ) {
+                    break;
+                }
+
+                QString splitedstr = inStr.mid(strIdx, makeBytes);
+                bool b = false;
+                int code = splitedstr.toInt(&b, baseOpt);
+                if ( b ) {
+                    char ch = static_cast<char>( code );
+                    retAry.prepend(ch);
+                }
+            }
+        }
+    }
+    
+    return retAry;
+}
+
+void myhardcodewindow::octbaseProcessUgly(QByteArray& retAry, const QString& inStr, size_t nBits)
+{
+    Q_UNUSED(nBits)
+
+    const int makeBytes = 3;
+    const int baseOpt = 8;
+    const int byte_nBits = 8;
+    unsigned int byte = 0;
+
+    int leftShiftBits = 0;
+    int nGetBits = 0;
+
+
+    for ( int i = inStr.size() - 1; i>=0; --i ) 
+    {
+        bool b = false;
+        QString ch = inStr.mid(i, 1);
+        unsigned int partCode = ch.toUInt(&b, baseOpt);
+        unsigned int restKeep = 0;
+
+        if ( b ) {
+            auto specialFlag = false;
+            int nNeededBits = byte_nBits - nGetBits;
+            if ( nNeededBits >= makeBytes ) {
+                byte |= (partCode << leftShiftBits);
+                nGetBits += makeBytes;
+
+                leftShiftBits += makeBytes;
+            } else {
+                specialFlag = true;
+                ////////////////////////////////////////
+                //  nNeededBits <  makeBytes ,     2 or 1 or 0   
+                ////////////////////////////////////////
+                //
+                //  Core Core Core 
+                //         : Need to split
+                //
+                ////////////////////////////////////////
+
+                unsigned int splitPartCode = 0;
+                int currentLeftShift = 0;
+                if ( nNeededBits == 2 ) {
+                    splitPartCode = (partCode & 0x3U);
+                    restKeep = (partCode >> 2);
+
+                    nGetBits = 8;
+                    leftShiftBits = 1;
+                    currentLeftShift = 6;
+                } else if ( nNeededBits == 1 ) {
+                    splitPartCode = (partCode & 0x1U);
+
+                    restKeep = (partCode >> 1);
+                    nGetBits = 8;
+                    leftShiftBits = 2;
+                    currentLeftShift = 7;
+                } 
+
+                byte |= (splitPartCode << currentLeftShift);
+            }
+
+            if ( nGetBits == byte_nBits || i == 0 ) {
+                char ch = static_cast<char>( byte );
+                retAry.prepend(ch);
+
+                if ( !specialFlag ) {
+                    nGetBits = 0;
+                    leftShiftBits = 0;
+                    byte = 0;
+                } else {
+                    // special logic
+                    byte = restKeep;
+                    nGetBits = leftShiftBits;
+                }
+            }
+        }
+    }
+}
+
+
+bool myhardcodewindow::octbaseProcessNice(QByteArray& retAry, const QString& inStr, size_t nBits, QString& errorMsg)
+{
+    auto bret = true;
+
+    QString tmpStrBin;
+    int strlen = inStr.size();
+    for ( int idx = strlen-1; idx>=0; --idx ) {
+        QString sch = inStr.at(idx);
+        auto it = m_octNumberStringMap.find( sch );
+        if ( it != m_octNumberStringMap.end() ) {
+            tmpStrBin.prepend( it.value() );
+        } else {
+            errorMsg = QString("Can't find oct-code of '%1'").arg( sch );
+            bret = false;
+            break;
+        }
+    }
+
+    //
+    // Cut / left-fill '0'
+    //
+    if ( bret ) {
+
+        int genStrSize = tmpStrBin.size();
+        int i_nBits = static_cast<int>( nBits );
+
+        if ( genStrSize != i_nBits ) {
+            if ( genStrSize > i_nBits  ) {
+                // cut-off (genStrSize - i_nBits) at the front side
+                tmpStrBin = tmpStrBin.mid( genStrSize - i_nBits );
+            } else {
+                // genStrSize < i_nBits , fill   (i_nBits - genStrSize)  '0'
+                // append '0' at head
+                QString head( i_nBits - genStrSize, QChar('0') );
+                tmpStrBin.prepend( head );
+            }
+        }
+
+        const int nBits = 8;
+        int newsize = tmpStrBin.size();
+        int nParts = newsize / nBits;
+        if ( (newsize % i_nBits) != 0 ) {
+            errorMsg = QString("[ERROR] : Oct Convert Failed , %1 %% %2 != 0").arg( newsize ).arg( i_nBits );
+            bret = false;
+        } else {
+
+            const int nBits = 8;
+            for( int i = 0; i < nParts; ++i ) 
+            {
+                bool isOk = false;
+                QString part = tmpStrBin.mid( nBits * i, nBits);
+                int code = part.toInt(&isOk, 2);
+                if ( isOk ) {
+                    char ch = static_cast<char>( code );
+                    retAry.push_back( ch );
+                } else {
+                    errorMsg = QString("[ERROR] : Oct Convert Failed , %1 is not a binary int").arg( part );
+                    bret = false;
+                    break;
+                }
+            }
+            
+        }
+    }
+
+    return bret;
+}
 
