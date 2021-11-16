@@ -26,6 +26,7 @@ protected:
 };
 
 
+
 class TypeUtil
 {
 public:
@@ -35,5 +36,6 @@ public:
 protected:
 	static std::unordered_map<E_DataType, TypeBaseInfo*> s_typeFamily;
 };
+
 
 #endif 

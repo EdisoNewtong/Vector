@@ -21,37 +21,35 @@ void MultiLineCommentParser::init() // override
 	m_AllAvalibleCharacters.insert( make_pair('*', CharUtil::getCharBaseInfo('*') ) );
 }
 
+
 // virtual 
 E_PaserType  MultiLineCommentParser::appendContent(ParsedCharInfo* pInfo, list<TokenInfo*>* pTokenList) // override
 {
-	char ch = pInfo->baseInfo->getCh();
-    if ( pInfo->isLastChar ) {
-	    m_token += ch;
-		// Check is End Flag
-	} else {
-		if ( ch == '*' ) {
-			m_token += ch;
-			if ( pInfo->previousChar == '/' ) {
-				/*  
-				   in side  / *
-				*/
-				++m_warningCnt;
-			} 
-		} else if ( ch == '/' ) {
-			if ( pInfo->previousChar == '*' ) {
-				//   */
-				//   Set End Flag
-				m_token += ch;
-			} else {
-				m_token += ch;
-			}
-		} else {
-			m_token += ch;
+	char curCh = pInfo->currentChar;
+	m_alreadyTravelsaledString += curCh; // add current first
+
+	int sz = static_cast<int>( m_alreadyTravelsaledString.size() );
+	if ( sz >= 4 ) {
+		auto last2str = m_alreadyTravelsaledString.substr( sz-2 );
+		if ( last2str == "/*" ) {
+			//  /* 
+			//  
+			//     /* line-1          warning 1
+			//     /* line-2          warning 2
+			//     line-3
+			//     line-4
+			//  */
+	 		++m_warningCnt;
+		} else if ( last2str == "*/" ) {
+	 		// m_switchFlag = 2;
+	 		return E_P_DEFAULT;	
 		}
 	}
 
-	return E_P_DEFAULT;	
+	return m_type;	
 }
+
+
 
 // virtual 
 TokenInfo* MultiLineCommentParser::generateToken() // override
@@ -61,4 +59,15 @@ TokenInfo* MultiLineCommentParser::generateToken() // override
 	return retInfo;
 }
 
+// virtual
+bool MultiLineCommentParser::isEnd() // override
+{
+	int sz = static_cast<int>( m_alreadyTravelsaledString.size() );
+	if ( sz < 4 ) {
+		return false;
+	} 
 
+	// else >=4
+	string last2str = m_alreadyTravelsaledString.substr( sz - 2);
+	return last2str == "*/";
+}

@@ -26,28 +26,21 @@ void SingleLineCommentParser::init() // override
 // virtual 
 E_PaserType SingleLineCommentParser::appendContent(ParsedCharInfo* pInfo, list<TokenInfo*>* pTokenList) // override
 {
-	char ch = pInfo->baseInfo->getCh();
-    if ( pInfo->isLastChar ) {
-	    m_token += ch;
-		return E_P_DEFAULT;
+	auto curCh = pInfo->currentChar;
+	auto lastCh = m_alreadyTravelsaledString.back();
+	
+	if ( curCh == '\n' ) {
+		
+		m_alreadyTravelsaledString += curCh;
+		// m_switchFlag = 2;
+		return E_P_DEFAULT;	
 	} else {
-		if ( pInfo->previousChar == '\n' ) {
-			// Set End-Flag
+		// curCh != '\n'
+		if ( lastCh == '\r' ) {
+			// m_switchFlag = 1; // previous '\r' is end , passby default
 			return E_P_DEFAULT;	
-		} else if ( pInfo->previousChar == '\r' ) {
-			if ( ch == '\n' ) {
-				// last string is  "\r\n"
-				m_token += ch;
-			} else {
-				// Set End-Flag , such as   
-				/*
-				      aaaa\r
-					  b
-				*/
-				return E_P_DEFAULT;	
-			}
 		} else {
-			m_token += ch;
+			m_alreadyTravelsaledString += curCh;
 		}
 	}
 
@@ -61,5 +54,12 @@ TokenInfo* SingleLineCommentParser::generateToken() // override
 	auto retInfo = new TokenInfo(E_TOKEN_SINGLE_COMMENT, E_TOKEN_SINGLE_COMMENT);
 	retInfo->setDetail(m_token);
 	return retInfo;
+}
+
+
+// virtual 
+bool SingleLineCommentParser::isEnd() // override;
+{
+	return true;	
 }
 

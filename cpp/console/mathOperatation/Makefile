@@ -1,19 +1,19 @@
 #!/bin/bash
 
-INC_PATH := -Icore -Icore/token -Icore/util -Icore/token/interger -Icore/token/floatnumber -Icore/token/varible -Icore/token/operator -Icore/token/comment -Icore/token/blank
+INC_PATH := -Icore -Icore/token -Icore/util -Icore/token/interger -Icore/token/floatnumber -Icore/token/varible -Icore/token/operator -Icore/token/comment -Icore/token/blank -Icore/token/expevaluation
 
 COMPILE_OPT :=  -Wall  -std=c++11  
 
 
-main:build/parser.o build/parsedCharInfo.o build/parserException.o  build/keywordList.o build/typeUtil.o build/charUtil.o build/tokenInfo.o  build/decimalParser.o build/octalParser.o build/hexParser.o build/floatParser.o build/varibleParser.o build/main.o  build/tokenParserBase.o build/blankParser.o build/singleLineCommentParser.o build/multiLineCommentParser.o build/operatorParser.o
+main:build/parser.o build/parsedCharInfo.o build/parserException.o  build/keywordList.o build/typeUtil.o build/charUtil.o build/tokenInfo.o  build/decimalParser.o build/octalParser.o build/hexParser.o build/floatParser.o build/varibleParser.o  build/tokenParserBase.o build/blankParser.o build/singleLineCommentParser.o build/multiLineCommentParser.o build/operatorParser.o  build/expevaluation.o build/tokenParserMgr.o  build/main.o
 	g++   $(COMPILE_OPT) -o main build/*.o
 
 
 
-build/main.o:main.cpp core/commonEnum.h core/parser.h core/parserException.h core/util/charUtil.h core/util/typeUtil.h
+build/main.o:main.cpp core/commonEnum.h core/parser.h core/parserException.h core/util/charUtil.h core/util/typeUtil.h core/token/tokenParserMgr.h
 	g++   $(COMPILE_OPT)   $(INC_PATH)   -c -o build/main.o main.cpp
 
-build/parser.o:core/parser.cpp core/parser.h core/commonEnum.h core/token/tokenParserBase.h core/token/interger/decimalParser.h core/token/interger/octalParser.h core/token/interger/hexParser.h core/token/floatnumber/floatParser.h core/token/varible/varibleParser.h
+build/parser.o:core/parser.cpp core/parser.h core/commonEnum.h core/token/tokenParserBase.h  core/token/tokenParserMgr.h
 	g++   $(COMPILE_OPT)   $(INC_PATH)   -c -o build/parser.o core/parser.cpp
 
 build/parsedCharInfo.o:core/parsedCharInfo.cpp core/parsedCharInfo.h core/util/charUtil.h
@@ -98,7 +98,14 @@ build/blankParser.o:core/token/blank/blankParser.cpp core/token/blank/blankParse
 	g++   $(COMPILE_OPT)   $(INC_PATH)  -c -o build/blankParser.o  core/token/blank/blankParser.cpp
 
 
+build/expevaluation.o:core/token/expevaluation/expevaluation.cpp  core/token/expevaluation/expevaluation.h   core/token/tokenParserBase.h core/parserException.h core/parsedCharInfo.h
+	g++   $(COMPILE_OPT)   $(INC_PATH)  -c -o build/expevaluation.o  core/token/expevaluation/expevaluation.cpp
 
+#
+# Parser-Mgr Part
+#
+build/tokenParserMgr.o:core/token/tokenParserMgr.cpp  core/token/tokenParserMgr.h core/token/tokenParserBase.h core/commonEnum.h core/token/blank/blankParser.h  core/token/comment/singleLineCommentParser.h  core/token/comment/multiLineCommentParser.h   core/token/interger/decimalParser.h  core/token/interger/octalParser.h core/token/interger/hexParser.h  core/token/floatnumber/floatParser.h  core/token/operator/operatorParser.h   core/token/varible/varibleParser.h core/token/expevaluation/expevaluation.h
+	g++   $(COMPILE_OPT)   $(INC_PATH)  -c -o build/tokenParserMgr.o  core/token/tokenParserMgr.cpp
 
 
 

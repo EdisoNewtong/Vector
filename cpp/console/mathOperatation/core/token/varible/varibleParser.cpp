@@ -42,13 +42,23 @@ void VaribleParser::init() // override
 // virtual 
 E_PaserType  VaribleParser::appendContent(ParsedCharInfo* pInfo, list<TokenInfo*>* pTokenList) // override
 {
-	char ch = pInfo->baseInfo->getCh();
-	auto pBaseInfo = getInsideCharSetBaseInfo(ch);
-	if ( pBaseInfo == nullptr ) {
+	(void)pTokenList;
+
+	auto curCh = pInfo->currentChar;
+
+	if ( pInfo->baseInfo != nullptr ) {
+		if ( pInfo->baseInfo->isVaribleCharSet() ) {
+			m_alreadyTravelsaledString += curCh;
+		} else {
+			// set End flag
+			m_switchFlag = E_TRANSFER_DEFAULT_PARSER_AND_DO_REPARSE;
+			return E_P_DEFAULT;
+		}
+	} else {
+		// set End flag
+		m_switchFlag = E_TRANSFER_DEFAULT_PARSER_AND_DO_REPARSE;
 		return E_P_DEFAULT;
 	}
-
-	(void)pTokenList;
 
 	return m_type;
 }
@@ -59,4 +69,15 @@ TokenInfo* VaribleParser::generateToken() // override
 	auto retInfo = new TokenInfo(E_TOKEN_VARIBLE, E_TOKEN_VARIBLE);
 	retInfo->setDetail(m_token);
 	return retInfo;
+}
+
+
+// virtual
+bool VaribleParser::isEnd()
+{
+	if ( m_alreadyTravelsaledString.empty() ) {
+		return false;
+	}
+
+	return true;
 }

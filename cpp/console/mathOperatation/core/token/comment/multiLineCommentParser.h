@@ -14,6 +14,8 @@ public:
 	virtual void init() override;
 	virtual E_PaserType appendContent(ParsedCharInfo* pInfo, std::list<TokenInfo*>* pTokenList) override;
 	virtual TokenInfo* generateToken() override;
+
+	virtual bool isEnd() override;
 protected:
 	int m_warningCnt;
 };

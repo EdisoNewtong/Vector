@@ -1,0 +1,109 @@
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+< Default-Parser> :
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+                              Read a character
+	1. < Default-Parser >   -------------------->  Switch to a concrete Parser
+	   And transfer the character metioned before
+
+	   ##########################################################################################
+
+	   e.g.
+	       case-1. 
+				i_num = i_num + 1;
+
+				read  "i"
+
+				<Default-Paser>   ==>  <Varbile-Parser>
+
+			case-2.  % 3;
+			   
+			    read "%"
+			
+				<Default-Paser>   ==>  <Operator-Parser>
+
+	   ##########################################################################################
+			
+
+
+	2. a concrete Parser < XXX > judge the terminate condition , the statement is end or Not
+	   
+	   if   ( it matches the end condtion ) {
+		   2. <Operator-Parser>   is End // "%" means  <mod> op
+
+		   Push the concrete <Parser Token> into TokenList
+	        ------> Switch to Default-Parser
+
+	   } else  { 
+		   save the character into buffer-Array , And Keep the current 
+
+           1. <Varbile-Parser>    is Not End , push( "i" ) into buffer-Array
+	   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+<A Concrete Parser> :
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+	   e.g.  
+	       case-1. <Operator-Parser>
+
+		       Buffer-Array = "/"
+			   Read "*"
+
+			   "/*"  =>     <Multi-Line Comment>  =>    <Comment-Buffer>
+
+
+		   case-2.  <Blank-Parser>  
+		                <\t><\t>a     
+		                        ^
+
+		   case-3.  <Operator-Parser>  
+
+		               /* aaaa    */   is End
+		                           ^
+
+
+                                    Read a character < X >
+	1. a concrete Parser < XXX >  -------------------------->
+
+	   
+	   if ( X is inside the  Parser's avalible-char-set Range and Syntax-Valid ) {
+		   1. push X into the Buffer-Array
+		   2. check the New Content Buffer-Array is End or Not
+               
+		      // case-3  is end   because    */ is end
+
+
+
+		      if ( isEnd ) {
+				   Push the concrete <Parser Token> into TokenList
+				   ------> Switch to Default-Parser
+			  } else {
+				  if (  "New Content Buffer-Array" matches Other type of Parser format ) {
+					  ------> transfer Switch to Other-Parser
+				  } else {
+				      doNothing // Still Keep the current Parser 
+				  }
+			  }
+	   } else {
+		   // X is not inside  Parser's avalible-char-set
+		   // transer the char into  ------> Switch to Default-Parser
+		   Roll Back to <init> state
+	   }
+	

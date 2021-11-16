@@ -1,21 +1,8 @@
+#include <iostream>
+
 #include "parser.h"
 
-#include "tokenParserBase.h"
-
-#include "decimalParser.h"
-#include "octalParser.h"
-#include "hexParser.h"
-
-#include "floatParser.h"
-
-#include "varibleParser.h"
-
-#include "operatorParser.h"
-
-#include "singleLineCommentParser.h"
-#include "multiLineCommentParser.h"
-
-#include "blankParser.h"
+#include "tokenParserMgr.h"
 
 
 using namespace std;
@@ -23,64 +10,27 @@ using namespace std;
 Parser::Parser()
 	: m_buf(nullptr)
 	, m_size(0)
+	, m_debugOption(0)
+	, m_flag(0)
     // Parser
-    , m_defaultParser(nullptr)
-	, m_currentParser(nullptr)
 	, m_currentPaserType( E_P_DEFAULT )
 	, m_pInfo()
+	, m_optKeyWordprefix_1()
+	, m_optKeyWord_1()
+	, m_optKeyWordprefix_2()
+	, m_optKeyWord_2()
 {
 	m_tokenList.clear();
 
-	m_parserMap.clear();
+    m_defaultParser = TokenParserMgr::getParserByType(E_P_DEFAULT); // set default parser
+	m_currentParser = m_defaultParser;                              // set current parser
 
-    //
-	m_parserMap.insert( make_pair(static_cast<int>(E_P_DEFAULT), new TokenParserBase(E_P_DEFAULT) ) );
-	// 
-	m_parserMap.insert( make_pair(static_cast<int>(E_P_DECIMAL), new DecimalParser(E_P_DECIMAL) ) );
-	m_parserMap.insert( make_pair(static_cast<int>(E_P_OCTAL),   new OctalParser(E_P_OCTAL) ) );
-	m_parserMap.insert( make_pair(static_cast<int>(E_P_HEX),     new HexParser(E_P_HEX) ) );
-	//
-	m_parserMap.insert( make_pair(static_cast<int>(E_P_FLOAT),  new FloatParser(E_P_FLOAT) ) );
-	//
-	m_parserMap.insert( make_pair(static_cast<int>(E_P_VARIBLE), new VaribleParser(E_P_VARIBLE) ) );
-	//
- 	m_parserMap.insert( make_pair(static_cast<int>(E_P_OPERATOR),  new OperatorParser(E_P_OPERATOR) ) );
-	//
- 	m_parserMap.insert( make_pair(static_cast<int>(E_P_SINGLE_LINE_COMMENT), new SingleLineCommentParser(E_P_SINGLE_LINE_COMMENT) ) );
- 	m_parserMap.insert( make_pair(static_cast<int>(E_P_MULTI_LINE_COMMENT),  new MultiLineCommentParser(E_P_MULTI_LINE_COMMENT)  ) );
-    //
- 	m_parserMap.insert( make_pair(static_cast<int>(E_P_BLANK),  new BlankParser(E_P_BLANK) ) );
-	
-
-	//
-	// init
-	//
-	for( auto it = m_parserMap.begin(); it != m_parserMap.end(); ++it )
-	{
-		auto parser = it->second;
-		if ( parser != nullptr ) {
-			parser->init();
-		}
-	}
-
-    m_defaultParser = m_parserMap[ static_cast<int>(E_P_DEFAULT) ]; // set default parser
-	m_currentParser = m_defaultParser;                            // set current parser
+	prepareOptionKeyWord();
 }
 
 // virtual 
 Parser::~Parser()
 {
-	// clear parser map
-	for( auto it = m_parserMap.begin(); it != m_parserMap.end(); ++it )
-	{
-		auto parser = it->second;
-		if ( parser != nullptr ) {
-			delete parser;
-			it->second = nullptr;
-		}
-	}
-	m_parserMap.clear();
-
 	// clear token list
 	for ( auto& pToken : m_tokenList ) {
 		delete pToken;
@@ -88,6 +38,44 @@ Parser::~Parser()
 	}
 	m_tokenList.clear();
 }
+
+
+void Parser::prepareOptionKeyWord()
+{
+	  m_optKeyWordprefix_1 = "--option=";
+	  m_optKeyWord_1 = "--option=<number>";
+	  m_optKeyWordprefix_2 = "--flags=";
+	  m_optKeyWord_2 = "--flags=<number>";
+}
+
+
+
+bool Parser::analyzeOptionArgs(const std::list<string>& argList, string& errorMsg)
+{
+	auto bret = true;
+
+	for ( const auto& sOption : argList ) 
+	{
+		auto pos1 = sOption.find(m_optKeyWordprefix_1);
+		auto pos2 = sOption.find(m_optKeyWordprefix_2);
+
+		if ( pos1 != string::npos ) {
+			// set debug option
+			string optValue = sOption.substr( pos1 + m_optKeyWordprefix_1.size() );
+			m_debugOption = atoi( optValue.c_str() );
+		} else if ( pos2 != string::npos ) {
+			string flagValue = sOption.substr( pos2 + m_optKeyWordprefix_2.size() );
+			m_flag = atoi( flagValue.c_str() );
+		} else {
+			bret = false;
+			errorMsg = sOption;
+			break;
+		}
+	}
+
+	return bret;
+}
+
 
 
 void Parser::setContent(const char* buf, size_t sz)
@@ -121,10 +109,11 @@ a-z  A-Z  0-9  _
 void Parser::processLineInfo(char ch, size_t idx)
 {
     //
-	// set index and flag
+	// set base info , ch , index and flag
     //
-	m_pInfo.pos.nCharIdx = idx;
+	m_pInfo.position.nCharIdx = idx;
     m_pInfo.isLastChar = (idx == m_size-1);
+	m_pInfo.currentChar = ch;
 
 	//  Set Ch BaseInfo
 	m_pInfo.baseInfo = CharUtil::getCharBaseInfo(ch);
@@ -133,23 +122,23 @@ void Parser::processLineInfo(char ch, size_t idx)
 		if ( m_pInfo.previousChar == '\r' ) {
 			if ( ch == '\n' ) {
 				//  \r \n
-				++m_pInfo.pos.nCol;
+				++m_pInfo.position.nCol;
 			} else {
 				/*
 				  string s = "Hello World";  \r
 				  ++a;
 				*/
-				++m_pInfo.pos.nLine;
-				m_pInfo.pos.nCol = 1;
+				++m_pInfo.position.nLine;
+				m_pInfo.position.nCol = 1;
 			}
 		} else if ( m_pInfo.previousChar == '\n' ) {
-			++m_pInfo.pos.nLine;
-			m_pInfo.pos.nCol = 1;
+			++m_pInfo.position.nLine;
+			m_pInfo.position.nCol = 1;
 		} else {
-			++m_pInfo.pos.nCol;
+			++m_pInfo.position.nCol;
 		}
 	} else {
-		++m_pInfo.pos.nCol;
+		++m_pInfo.position.nCol;
 	}
 
 }
@@ -166,37 +155,28 @@ int Parser::doParse()
 		processLineInfo(ch,idx);
 
 		if ( idx == 0 ) {
-			m_defaultParser->markBeginTag(&m_pInfo);
+			// current must be default
+			m_currentParser->markBeginTag(&m_pInfo);
 		}
 
-		auto guessType = m_currentParser->appendContent(&m_pInfo, &m_tokenList);
-		if ( guessType != m_currentPaserType ) {
-			if ( guessType == E_P_DEFAULT ) {
-				// check the char is inside the whole charSet , otherwise will throw an exception
-				m_defaultParser->commonCheck(ch, &m_pInfo);
+		/*
+		auto nextParserType = m_currentParser->appendContent(&m_pInfo, &m_tokenList);
+		if ( nextParserType != m_currentPaserType ) {
+			if ( m_debugOption == 1 ) {
+				cout << "[Changed] : " << getstrParserType(m_currentPaserType) << " -> " << getstrParserType(nextParserType) << " , " <<  m_pInfo.position.getLineInfo() << endl;
 			}
 
-			// save previous token
-			auto previousParser = m_currentParser;
-			// Do < Switch > Parser
-			m_currentParser = m_parserMap[ static_cast<int>(guessType) ];
-
-			// switch Parser
-			if ( m_currentPaserType == E_P_DEFAULT ) {
-				m_currentParser->transferToken( m_defaultParser );
+			auto oldParserType = m_currentPaserType;
+			if ( oldParserType == E_P_DEFAULT ) {
+				// from   Current(E_P_DEFAULT)    -->     Other-Parser
 			} else {
-				auto pGenerateToken = previousParser->generateToken();
-				if ( m_tokenList.empty() ) {
-					m_tokenList.push_back( pGenerateToken );
-				} else {
-					// TODO
-					// Check previous is valid or not
-					checkPreviousTokenIsValid();
-				}
+				// from   Other-Parser   -->     ???
 			}
 
-			m_currentPaserType = guessType;
+
+			m_currentPaserType = nextParserType;
 		}
+		*/
 
 
 		// treat this char as previous char
@@ -217,3 +197,68 @@ bool Parser::checkPreviousTokenIsValid()
 {
 	return true;
 }
+
+
+// static 
+string Parser::getstrParserType(E_PaserType tp)
+{
+	string retStr;
+
+	switch( tp ) 
+	{
+	case E_P_DEFAULT:
+		retStr = "E_P_DEFAULT";
+		break;
+	case E_P_DECIMAL:
+		retStr = "E_P_DECIMAL";
+		break;
+	case E_P_OCTAL:
+		retStr = "E_P_OCTAL";
+		break;
+	case E_P_HEX:
+		retStr = "E_P_HEX";
+		break;
+	case E_P_FLOAT:
+		retStr = "E_P_FLOAT";
+		break;
+	case E_P_VARIBLE:
+		retStr = "E_P_VARIBLE";
+		break;
+	case E_P_OPERATOR:
+		retStr = "E_P_OPERATOR";
+		break;
+	case E_P_SINGLE_LINE_COMMENT:
+		retStr = "E_P_SINGLE_LINE_COMMENT";
+		break;
+	case E_P_MULTI_LINE_COMMENT:
+		retStr = "E_P_MULTI_LINE_COMMENT";
+		break;
+	case E_P_BLANK:
+		retStr = "E_P_BLANK";
+		break;
+	default:
+		retStr = "E_P_UNKNOWN ???";
+		break;
+	}
+
+	return retStr;
+}
+
+
+string Parser::getUserManual()
+{
+	string strUserManul;
+	strUserManul += "==================================================\n";
+	strUserManul += "Usage : \n";
+	strUserManul += "\t<programName> ";
+	strUserManul += m_optKeyWord_1;
+	strUserManul += "  ";
+	strUserManul += m_optKeyWord_2;
+
+	strUserManul += "   ";
+	strUserManul += "<src-FileName>\n";
+	strUserManul += "==================================================\n";
+
+	return strUserManul;
+}
+

@@ -2,6 +2,7 @@
 #define PARSED_CHAR_INFO_H
 
 #include <cstdlib>
+#include <string>
 #include "charUtil.h"
 
 struct PosInfo
@@ -10,17 +11,19 @@ struct PosInfo
 	int  nCol;
 
 	size_t nCharIdx;
+	std::string getLineInfo();
 };
 
 struct ParsedCharInfo
 {
 	ParsedCharInfo();
 
-	PosInfo pos;
+	PosInfo position;
 
 	bool hasPreviousChar;
 	bool isLastChar;
 	char previousChar;
+	char currentChar;
 
 	CharBaseInfo* baseInfo;
 };

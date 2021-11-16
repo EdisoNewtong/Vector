@@ -30,6 +30,8 @@ enum E_PaserType
   E_P_MULTI_LINE_COMMENT,
   //
   E_P_BLANK,
+  //
+  E_P_ENDLESEE_SEMICOLON, // To Do Calculation
 
 };
 
@@ -51,18 +53,21 @@ enum E_TokenType
 	   Sub Operator Type
     */
 	//////////////////////////////////////////////////
-	E_TOKEN_OP_ADD,              // +
-	E_TOKEN_OP_MINUS,            // -
-	E_TOKEN_OP_MULTIPLY,         // *
-	E_TOKEN_OP_DIVIDE,           // /
-	E_TOKEN_OP_MOD,              // %
-	E_TOKEN_OP_BIT_AND,          // &
-	E_TOKEN_OP_BIT_OR,           // |
-	E_TOKEN_OP_BIT_XOR,          // ^
-	E_TOKEN_OP_BIT_NOT,          // ~
-	E_TOKEN_OP_BIT_LEFT_SHIFT,   // <<
-	E_TOKEN_OP_BIT_RIGHT_SHIFT,  // >>
-	E_TOKEN_OP_ASSIGNMENT,       // =
+	E_TOKEN_OP_OPEN_PARENTHESES,  // (
+	E_TOKEN_OP_CLOSE_PARENTHESES, // )
+
+	E_TOKEN_OP_ADD,               // +
+	E_TOKEN_OP_MINUS,             // -
+	E_TOKEN_OP_MULTIPLY,          // *
+	E_TOKEN_OP_DIVIDE,            // /
+	E_TOKEN_OP_MOD,               // %
+	E_TOKEN_OP_BIT_AND,           // &
+	E_TOKEN_OP_BIT_OR,            // |
+	E_TOKEN_OP_BIT_XOR,           // ^
+	E_TOKEN_OP_BIT_NOT,           // ~
+	E_TOKEN_OP_BIT_LEFT_SHIFT,    // <<
+	E_TOKEN_OP_BIT_RIGHT_SHIFT,   // >>
+	E_TOKEN_OP_ASSIGNMENT,        // =
 	//////////////////////////////////////////////////
 
 	E_TOKEN_SINGLE_COMMENT,    //    //
@@ -70,7 +75,7 @@ enum E_TokenType
 
 	E_TOKEN_BLANK,  // <Space> <Tab> \r \n
 
-	E_TOKEN_IGNORE,  // Skip ignore
+	E_TOKEN_IGNORE, // Placehold Dummy Token Type
 };
 
 

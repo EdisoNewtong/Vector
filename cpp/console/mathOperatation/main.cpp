@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <fstream>
 #include <string>
+#include <list>
 #include <new>
 #include <exception>
 
@@ -9,6 +10,7 @@
 #include "parserException.h"
 #include "charUtil.h"
 #include "typeUtil.h"
+#include "tokenParserMgr.h"
 
 using namespace std;
 
@@ -18,15 +20,18 @@ static auto bPrintFileLengthFlag = true;
 
 int main(int argc, char* argv[], char* env[])
 {
-	if ( argc < 2 ) {
-		cout << "[ERROR] : Missing file name to parse !!" << endl;
+	Parser p;
+	if ( argc < 3 ) {
+		cout << "[ERROR] : arglist.count < 3" << endl;
+		cout << p.getUserManual() << endl;
+		cout << endl;
 		return -1;
 	}
 
 	//
 	// check file is existed or not
 	//
-	string fname(argv[1]);
+	string fname(argv[argc-1]);
 	ifstream file(fname.c_str(), ios::in | ios::binary);
 	if ( !file ) {
 		cout << "[ERROR] : File < " << fname << "> not found " << endl;
@@ -53,32 +58,46 @@ int main(int argc, char* argv[], char* env[])
 
 	TypeUtil::init();
 	CharUtil::init();
+	TokenParserMgr::init();
 
-	Parser p;
+	list<string> strArgList;
+	for( int i = 1; i <= (argc-2); ++i ) {
+		strArgList.push_back( string(argv[i]) );
+	}
+	
+
+	string errorMsg;
 	char* filebuf = nullptr;
-	try {
-		// read all
-		filebuf = new char[filelen];
-		file.read(filebuf, filelen);
+	auto anaRet = p.analyzeOptionArgs(strArgList, errorMsg);
 
-		p.setContent(filebuf, filelen );
-		//
-		// Core Core Core / Operation
-		//
-		auto iret = p.doParse();
+	if ( anaRet ) {
+		try {
+			// read all
+			filebuf = new char[filelen];
+			file.read(filebuf, filelen);
 
-		if ( iret ) {
-		} else {
+			p.setContent(filebuf, filelen );
+			//
+			// Core Core Core / Operation
+			//
+			auto iret = p.doParse();
+
+			if ( iret ) {
+			} else {
+			}
+		} catch( const  std::bad_array_new_length& e_alloc ) {
+			(void)e_alloc;
+			cout << "Can't Alloc Memory for file content" << endl;
+		} catch ( const ParserExpection& e ) {
+			cout << "[ERROR] Parse Failed : " << e.what() << endl;
+		} catch ( const std::exception& e ) {
+			cout << "[ERROR] Meet an exception : " << e.what() << endl;
+		} catch ( ... ) {
+			cout << "[ERROR] Meet unexpected expection, ... " << endl;
 		}
-	} catch( const  std::bad_array_new_length& e_alloc ) {
-		(void)e_alloc;
-		cout << "Can't Alloc Memory for file content" << endl;
-	} catch ( const ParserExpection& e ) {
-		cout << "[ERROR] Parse Failed : " << e.what() << endl;
-	} catch ( const std::exception& e ) {
-		cout << "[ERROR] Meet an exception : " << e.what() << endl;
-	} catch ( ... ) {
-		cout << "[ERROR] Meet unexpected expection, ... " << endl;
+	} else {
+		cout << "[ERROR] : Invalid arguments => \" " << errorMsg << "\" " << endl;
+		cout << p.getUserManual() << endl << endl;
 	}
 
 	//
@@ -86,12 +105,14 @@ int main(int argc, char* argv[], char* env[])
 	//
 	file.close();
 
-	delete [] filebuf;
-    filebuf = nullptr;
+	if ( filebuf != nullptr ) {
+		delete [] filebuf;
+		filebuf = nullptr;
+	}
 
 	CharUtil::finalize();
 	TypeUtil::finalize();
-
+	TokenParserMgr::finalize();
 
 	return 0;
 }

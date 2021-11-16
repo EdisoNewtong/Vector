@@ -1,5 +1,7 @@
 #include "blankParser.h"
 
+#include "tokenParserMgr.h"
+
 
 using namespace std;
 
@@ -29,20 +31,25 @@ void BlankParser::init() // override
 // virtual 
 E_PaserType  BlankParser::appendContent(ParsedCharInfo* pInfo, list<TokenInfo*>* pTokenList) // override
 {
-	if ( pInfo->baseInfo == nullptr ) {
-		return E_P_DEFAULT;	
+	auto curCh = pInfo->currentChar;
+	if ( pInfo->baseInfo == nullptr || !( pInfo->baseInfo->isBlank() ) ) {
+		//
+		// blank buffer is End, TODO Check TokenList Logic
+		//
+		pTokenList->push_back( this->generateToken() );
+
+		auto concreteParserType = TokenParserBase::appendContent( pInfo, pTokenList);
+		auto pConcreteParser = TokenParserMgr::getParserByType( concreteParserType );
+		if ( pConcreteParser != nullptr && pConcreteParser->isEnd() ) {
+			pTokenList->push_back( pConcreteParser->generateToken() ) ;
+			return E_P_DEFAULT;
+		} else {
+			return concreteParserType;
+		}
+	} else {
+		m_alreadyTravelsaledString += curCh;
 	}
 
-	//
-	// pInfo->baseInfo != nullptr
-	//
-	char ch = pInfo->baseInfo->getCh();
-	auto pBaseInfo = getInsideCharSetBaseInfo(ch);
-	if ( pBaseInfo == nullptr ) {
-		return E_P_DEFAULT;	
-	} else {
-		m_token += ch;
-	}
 
 	return m_type;
 }
@@ -51,6 +58,24 @@ E_PaserType  BlankParser::appendContent(ParsedCharInfo* pInfo, list<TokenInfo*>*
 TokenInfo* BlankParser::generateToken() // override
 {
 	auto retInfo = new TokenInfo(E_TOKEN_BLANK, E_TOKEN_BLANK);
+	m_token = m_alreadyTravelsaledString;
+
 	retInfo->setDetail(m_token);
 	return retInfo;
 }
+
+
+// virtual 
+bool BlankParser::isEnd() // override
+{
+	if ( m_alreadyTravelsaledString.empty() ) {
+		return false;
+	}
+
+	// not empty
+	char lastCh = m_alreadyTravelsaledString.back();
+	auto pChInfo = getInsideCharSetBaseInfo(lastCh);
+	return (pChInfo == nullptr);
+}
+
+

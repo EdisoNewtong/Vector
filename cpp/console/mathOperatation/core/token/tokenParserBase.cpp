@@ -1,3 +1,6 @@
+#include <iostream>
+#include <cassert>
+
 #include "tokenParserBase.h"
 #include "parserException.h"
 
@@ -7,16 +10,10 @@ TokenParserBase::TokenParserBase(E_PaserType tp)
 	: m_alreadyTravelsaledString("")
 	, m_token("")
 	, m_type(tp)
-	, m_isValidEnd( false )
+	, m_isValidEnd(0)
+	, m_switchFlag( E_TERMINAL_NONE )
 {
 	m_AllAvalibleCharacters.clear();
-
-	// copy
-	auto pMap = CharUtil::getAllCharSet();
-	for ( auto it = pMap->begin();  it != pMap->end();  ++it )
-	{
-		m_AllAvalibleCharacters.insert( make_pair(it->first, it->second) ); 
-	}
 }
 
 
@@ -29,14 +26,17 @@ TokenParserBase::~TokenParserBase()
 // virtual 
 void TokenParserBase::init()
 {
-
+	// copy
+	auto pMap = CharUtil::getAllCharSet();
+	m_AllAvalibleCharacters = *pMap;
 }
 
 
 CharBaseInfo* TokenParserBase::commonCheck(char ch, ParsedCharInfo* pInfo)
 {
 	auto pCharInfo = getInsideCharSetBaseInfo(ch);
-	if ( pCharInfo == nullptr  ) {
+
+	if ( pCharInfo == nullptr ) {
 		ParserExpection	e(E_ExceptionCode::E_UNKNOWN_CHAR);
 
 		string info;
@@ -69,11 +69,11 @@ CharBaseInfo* TokenParserBase::commonCheck(char ch, ParsedCharInfo* pInfo)
 		}
 
 		info += "  | index = ";
-		info += std::to_string(pInfo->pos.nCharIdx);
+		info += std::to_string(pInfo->position.nCharIdx);
 		info += " @Line ";
-		info += std::to_string(pInfo->pos.nLine);
+		info += std::to_string(pInfo->position.nLine);
 		info += ":";
-		info += std::to_string(pInfo->pos.nCol);
+		info += std::to_string(pInfo->position.nCol);
 
 		e.setDetail(info);
 
@@ -86,29 +86,47 @@ CharBaseInfo* TokenParserBase::commonCheck(char ch, ParsedCharInfo* pInfo)
 // virtual 
 E_PaserType  TokenParserBase::appendContent(ParsedCharInfo* pInfo, list<TokenInfo*>* pTokenList) // override;
 {
+	auto ch = pInfo->currentChar;
+
+	// must be empty
+	if ( !m_alreadyTravelsaledString.empty() ) {
+		cout << "[ERROR] In Default Parser, m_alreadyTravelsaledString != \"\" = \"" << m_alreadyTravelsaledString << "\"" << endl;
+		assert(false);
+	}
+
 	auto isTokenListEmpty = pTokenList->empty();
-	if ( isTokenListEmpty ) {
+
+	(void)isTokenListEmpty;
+	// if ( isTokenListEmpty ) {
+	
 		if ( pInfo->baseInfo != nullptr ) {
-			char ch = pInfo->baseInfo->getCh();
-
 			m_alreadyTravelsaledString += ch;
-
 			if ( pInfo->baseInfo->isOpType() ) {
-				if ( ch == '/' ) {
-					return E_P_OPERATOR;
-				}
+				// m_switchFlag = TokenParserBase::E_TRANSFER_NON_DEFAULT_PARSER_WAIT_NEXT;
+				return E_P_OPERATOR;
 			} else if ( pInfo->baseInfo->isBlank() ) {
+				// m_switchFlag = TokenParserBase::E_TRANSFER_NON_DEFAULT_PARSER_WAIT_NEXT;
 				return E_P_BLANK;
 			} else if ( pInfo->baseInfo->isVaribleHeadChar() ) {
+				// m_switchFlag = TokenParserBase::E_TRANSFER_NON_DEFAULT_PARSER_WAIT_NEXT;
 				return E_P_VARIBLE;
 			} else if ( pInfo->baseInfo->isNumber() ) {
 				// guess it as an decimal number
+				// m_switchFlag = TokenParserBase::E_TRANSFER_NON_DEFAULT_PARSER_WAIT_NEXT;
 				return E_P_DECIMAL; // guess it as an decimal number
+			} else {
+				if ( ch == '.' ) {
+					return E_P_FLOAT;
+				} else {
+					//    ;
+					return E_P_ENDLESEE_SEMICOLON;
+				}
 			}
 		} else {
-
+			commonCheck(ch, pInfo);
 		}
-	}
+
+	// } 
 
 	return m_type;	
 }
@@ -117,6 +135,13 @@ E_PaserType  TokenParserBase::appendContent(ParsedCharInfo* pInfo, list<TokenInf
 TokenInfo* TokenParserBase::generateToken()
 {
 	return new TokenInfo(E_TOKEN_UNKNOWN, E_TOKEN_IGNORE);
+}
+
+
+// virtual 
+void TokenParserBase::reset()
+{
+	m_switchFlag = E_TERMINAL_NONE;
 }
 
 
@@ -133,13 +158,13 @@ CharBaseInfo* TokenParserBase::getInsideCharSetBaseInfo(char ch)
 
 
 
-void TokenParserBase::transferToken(TokenParserBase* pBase)
+void TokenParserBase::transferToken(TokenParserBase* pNewParser)
 {
-	this->m_alreadyTravelsaledString = pBase->m_alreadyTravelsaledString;
-	pBase->m_alreadyTravelsaledString.clear();
+	pNewParser->m_alreadyTravelsaledString = this->m_alreadyTravelsaledString;
+	this->m_alreadyTravelsaledString.clear();
 
 	// Set Begin Flag
-	this->m_beginInfo = pBase->m_beginInfo;
+	pNewParser->m_beginInfo = this->m_beginInfo;
 }
 
 
@@ -159,3 +184,18 @@ void TokenParserBase::markBeginTag(ParsedCharInfo* pInfo)
 {
 	m_beginInfo = *pInfo;
 }
+
+
+
+TokenParserBase::E_TERMINAL_STATUS TokenParserBase::getSwitchFlag()
+{
+	return m_switchFlag;
+}
+
+
+// virtual 
+bool TokenParserBase::isEnd()
+{
+	return false;
+}
+
