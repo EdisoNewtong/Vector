@@ -23,7 +23,7 @@ void MultiLineCommentParser::init() // override
 
 
 // virtual 
-E_PaserType  MultiLineCommentParser::appendContent(ParsedCharInfo* pInfo, list<TokenInfo*>* pTokenList) // override
+E_PaserType  MultiLineCommentParser::appendContent(ParsedCharInfo* pInfo) // override
 {
 	char curCh = pInfo->currentChar;
 	m_alreadyTravelsaledString += curCh; // add current first

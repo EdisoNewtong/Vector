@@ -31,10 +31,9 @@ void OctalParser::init() // override
 }
 
 // virtual 
-E_PaserType  OctalParser::appendContent(ParsedCharInfo* pInfo, list<TokenInfo*>* pTokenList) // override
+E_PaserType  OctalParser::appendContent(ParsedCharInfo* pInfo) // override
 {
 	(void)pInfo;
-	(void)pTokenList;
 	return E_P_DEFAULT;	
 }
 

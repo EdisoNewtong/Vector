@@ -34,7 +34,7 @@ public:
 	virtual ~TokenParserBase();
 
 	virtual void init();
-	virtual E_PaserType appendContent(ParsedCharInfo* pInfo, std::list<TokenInfo*>* pTokenList);
+	virtual E_PaserType appendContent(ParsedCharInfo* pInfo);
 	virtual TokenInfo* generateToken();
 	virtual void reset();
 	virtual bool isEnd();

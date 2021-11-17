@@ -29,19 +29,17 @@ void BlankParser::init() // override
 
 
 // virtual 
-E_PaserType  BlankParser::appendContent(ParsedCharInfo* pInfo, list<TokenInfo*>* pTokenList) // override
+E_PaserType  BlankParser::appendContent(ParsedCharInfo* pInfo) // override
 {
 	auto curCh = pInfo->currentChar;
 	if ( pInfo->baseInfo == nullptr || !( pInfo->baseInfo->isBlank() ) ) {
 		//
 		// blank buffer is End, TODO Check TokenList Logic
 		//
-		pTokenList->push_back( this->generateToken() );
 
-		auto concreteParserType = TokenParserBase::appendContent( pInfo, pTokenList);
+		auto concreteParserType = TokenParserBase::appendContent(pInfo);
 		auto pConcreteParser = TokenParserMgr::getParserByType( concreteParserType );
 		if ( pConcreteParser != nullptr && pConcreteParser->isEnd() ) {
-			pTokenList->push_back( pConcreteParser->generateToken() ) ;
 			return E_P_DEFAULT;
 		} else {
 			return concreteParserType;

@@ -84,7 +84,7 @@ CharBaseInfo* TokenParserBase::commonCheck(char ch, ParsedCharInfo* pInfo)
 }
 
 // virtual 
-E_PaserType  TokenParserBase::appendContent(ParsedCharInfo* pInfo, list<TokenInfo*>* pTokenList) // override;
+E_PaserType  TokenParserBase::appendContent(ParsedCharInfo* pInfo) // override;
 {
 	auto ch = pInfo->currentChar;
 
@@ -94,39 +94,34 @@ E_PaserType  TokenParserBase::appendContent(ParsedCharInfo* pInfo, list<TokenInf
 		assert(false);
 	}
 
-	auto isTokenListEmpty = pTokenList->empty();
-
-	(void)isTokenListEmpty;
-	// if ( isTokenListEmpty ) {
 	
-		if ( pInfo->baseInfo != nullptr ) {
-			m_alreadyTravelsaledString += ch;
-			if ( pInfo->baseInfo->isOpType() ) {
-				// m_switchFlag = TokenParserBase::E_TRANSFER_NON_DEFAULT_PARSER_WAIT_NEXT;
-				return E_P_OPERATOR;
-			} else if ( pInfo->baseInfo->isBlank() ) {
-				// m_switchFlag = TokenParserBase::E_TRANSFER_NON_DEFAULT_PARSER_WAIT_NEXT;
-				return E_P_BLANK;
-			} else if ( pInfo->baseInfo->isVaribleHeadChar() ) {
-				// m_switchFlag = TokenParserBase::E_TRANSFER_NON_DEFAULT_PARSER_WAIT_NEXT;
-				return E_P_VARIBLE;
-			} else if ( pInfo->baseInfo->isNumber() ) {
-				// guess it as an decimal number
-				// m_switchFlag = TokenParserBase::E_TRANSFER_NON_DEFAULT_PARSER_WAIT_NEXT;
-				return E_P_DECIMAL; // guess it as an decimal number
-			} else {
-				if ( ch == '.' ) {
-					return E_P_FLOAT;
-				} else {
-					//    ;
-					return E_P_ENDLESEE_SEMICOLON;
-				}
-			}
+	if ( pInfo->baseInfo != nullptr ) {
+		m_alreadyTravelsaledString += ch;
+		if ( pInfo->baseInfo->isOpType() ) {
+			// m_switchFlag = TokenParserBase::E_TRANSFER_NON_DEFAULT_PARSER_WAIT_NEXT;
+			return E_P_OPERATOR;
+		} else if ( pInfo->baseInfo->isBlank() ) {
+			// m_switchFlag = TokenParserBase::E_TRANSFER_NON_DEFAULT_PARSER_WAIT_NEXT;
+			return E_P_BLANK;
+		} else if ( pInfo->baseInfo->isVaribleHeadChar() ) {
+			// m_switchFlag = TokenParserBase::E_TRANSFER_NON_DEFAULT_PARSER_WAIT_NEXT;
+			return E_P_VARIBLE;
+		} else if ( pInfo->baseInfo->isNumber() ) {
+			// guess it as an decimal number
+			// m_switchFlag = TokenParserBase::E_TRANSFER_NON_DEFAULT_PARSER_WAIT_NEXT;
+			return E_P_DECIMAL; // guess it as an decimal number
 		} else {
-			commonCheck(ch, pInfo);
+			if ( ch == '.' ) {
+				return E_P_FLOAT;
+			} else {
+				//    ;
+				return E_P_ENDLESEE_SEMICOLON;
+			}
 		}
+	} else {
+		commonCheck(ch, pInfo);
+	}
 
-	// } 
 
 	return m_type;	
 }

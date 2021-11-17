@@ -13,7 +13,7 @@ public:
 	virtual ~HexParser();
 
 	virtual void init() override;
-	virtual E_PaserType appendContent(ParsedCharInfo* pInfo, std::list<TokenInfo*>* pTokenList) override;
+	virtual E_PaserType appendContent(ParsedCharInfo* pInfo) override;
 	virtual TokenInfo* generateToken() override;
 protected:
 };

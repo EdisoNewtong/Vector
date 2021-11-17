@@ -24,7 +24,7 @@ void SingleLineCommentParser::init() // override
 }
 
 // virtual 
-E_PaserType SingleLineCommentParser::appendContent(ParsedCharInfo* pInfo, list<TokenInfo*>* pTokenList) // override
+E_PaserType SingleLineCommentParser::appendContent(ParsedCharInfo* pInfo) // override
 {
 	auto curCh = pInfo->currentChar;
 	auto lastCh = m_alreadyTravelsaledString.back();

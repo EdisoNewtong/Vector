@@ -45,10 +45,9 @@ void HexParser::init() // override
 
 
 // virtual 
-E_PaserType HexParser::appendContent(ParsedCharInfo* pInfo, list<TokenInfo*>* pTokenList) // override
+E_PaserType HexParser::appendContent(ParsedCharInfo* pInfo) // override
 {
 	(void)pInfo;
-	(void)pTokenList;
 	return E_P_DEFAULT;	
 }
 

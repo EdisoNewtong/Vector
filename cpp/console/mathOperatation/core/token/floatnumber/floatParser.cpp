@@ -41,10 +41,9 @@ void FloatParser::init() // override
 
 
 // virtual 
-E_PaserType  FloatParser::appendContent(ParsedCharInfo* pInfo, list<TokenInfo*>* pTokenList) // override
+E_PaserType  FloatParser::appendContent(ParsedCharInfo* pInfo) // override
 {
 	(void)pInfo;
-	(void)pTokenList;
 	return E_P_DEFAULT;	
 }
 

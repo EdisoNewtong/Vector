@@ -13,6 +13,8 @@ Parser::Parser()
 	, m_debugOption(0)
 	, m_flag(0)
     // Parser
+	, m_defaultParser( nullptr )
+	, m_currentParser( nullptr )
 	, m_currentPaserType( E_P_DEFAULT )
 	, m_pInfo()
 	, m_optKeyWordprefix_1()
@@ -20,7 +22,6 @@ Parser::Parser()
 	, m_optKeyWordprefix_2()
 	, m_optKeyWord_2()
 {
-	m_tokenList.clear();
 
     m_defaultParser = TokenParserMgr::getParserByType(E_P_DEFAULT); // set default parser
 	m_currentParser = m_defaultParser;                              // set current parser
@@ -31,12 +32,6 @@ Parser::Parser()
 // virtual 
 Parser::~Parser()
 {
-	// clear token list
-	for ( auto& pToken : m_tokenList ) {
-		delete pToken;
-		pToken = nullptr;
-	}
-	m_tokenList.clear();
 }
 
 
@@ -160,7 +155,7 @@ int Parser::doParse()
 		}
 
 		/*
-		auto nextParserType = m_currentParser->appendContent(&m_pInfo, &m_tokenList);
+		auto nextParserType = m_currentParser->appendContent(&m_pInfo);
 		if ( nextParserType != m_currentPaserType ) {
 			if ( m_debugOption == 1 ) {
 				cout << "[Changed] : " << getstrParserType(m_currentPaserType) << " -> " << getstrParserType(nextParserType) << " , " <<  m_pInfo.position.getLineInfo() << endl;

@@ -5,7 +5,7 @@ INC_PATH := -Icore -Icore/token -Icore/util -Icore/token/interger -Icore/token/f
 COMPILE_OPT :=  -Wall  -std=c++11  
 
 
-main:build/parser.o build/parsedCharInfo.o build/parserException.o  build/keywordList.o build/typeUtil.o build/charUtil.o build/tokenInfo.o  build/decimalParser.o build/octalParser.o build/hexParser.o build/floatParser.o build/varibleParser.o  build/tokenParserBase.o build/blankParser.o build/singleLineCommentParser.o build/multiLineCommentParser.o build/operatorParser.o  build/expevaluation.o build/tokenParserMgr.o  build/main.o
+main:build/parser.o build/parsedCharInfo.o build/parserException.o  build/keywordList.o build/typeUtil.o build/charUtil.o build/tokenInfo.o  build/decimalParser.o build/octalParser.o build/hexParser.o build/floatParser.o build/varibleParser.o  build/tokenParserBase.o build/blankParser.o build/singleLineCommentParser.o build/multiLineCommentParser.o build/operatorParser.o  build/expevaluation.o build/tokenParserMgr.o  build/tokenListAnalyzer.o  build/main.o
 	g++   $(COMPILE_OPT) -o main build/*.o
 
 
@@ -13,7 +13,7 @@ main:build/parser.o build/parsedCharInfo.o build/parserException.o  build/keywor
 build/main.o:main.cpp core/commonEnum.h core/parser.h core/parserException.h core/util/charUtil.h core/util/typeUtil.h core/token/tokenParserMgr.h
 	g++   $(COMPILE_OPT)   $(INC_PATH)   -c -o build/main.o main.cpp
 
-build/parser.o:core/parser.cpp core/parser.h core/commonEnum.h core/token/tokenParserBase.h  core/token/tokenParserMgr.h
+build/parser.o:core/parser.cpp core/parser.h core/commonEnum.h core/token/tokenParserBase.h  core/token/tokenParserMgr.h  core/token/tokenListAnalyzer.h
 	g++   $(COMPILE_OPT)   $(INC_PATH)   -c -o build/parser.o core/parser.cpp
 
 build/parsedCharInfo.o:core/parsedCharInfo.cpp core/parsedCharInfo.h core/util/charUtil.h
@@ -108,6 +108,9 @@ build/tokenParserMgr.o:core/token/tokenParserMgr.cpp  core/token/tokenParserMgr.
 	g++   $(COMPILE_OPT)   $(INC_PATH)  -c -o build/tokenParserMgr.o  core/token/tokenParserMgr.cpp
 
 
+
+build/tokenListAnalyzer.o:core/token/tokenListAnalyzer.cpp  core/token/tokenListAnalyzer.h core/commonEnum.h core/token/tokenInfo.h
+	g++   $(COMPILE_OPT)   $(INC_PATH)  -c -o build/tokenListAnalyzer.o  core/token/tokenListAnalyzer.cpp
 
 .PHONY:clean
 clean:

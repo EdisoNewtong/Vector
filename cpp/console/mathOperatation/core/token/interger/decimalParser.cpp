@@ -31,10 +31,9 @@ void DecimalParser::init() // override
 
 
 // virtual 
-E_PaserType  DecimalParser::appendContent(ParsedCharInfo* pInfo, list<TokenInfo*>* pTokenList) // override
+E_PaserType  DecimalParser::appendContent(ParsedCharInfo* pInfo) // override
 {
 	(void)pInfo;
-	(void)pTokenList;
 	return E_P_DEFAULT;	
 }
 

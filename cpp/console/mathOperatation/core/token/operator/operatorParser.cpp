@@ -41,9 +41,8 @@ void OperatorParser::init() // override
 }
 
 // virtual 
-E_PaserType OperatorParser::appendContent(ParsedCharInfo* pInfo, list<TokenInfo*>* pTokenList) // override
+E_PaserType OperatorParser::appendContent(ParsedCharInfo* pInfo) // override
 {
-	(void)pTokenList;
 	// cout << "Inside op appendContent() . m_alreadyTravelsaledString = \"" << m_alreadyTravelsaledString << "\" , ch = " << pInfo->currentChar << " = " << static_cast<int>(pInfo->currentChar) << endl;
 
 	if ( pInfo->baseInfo != nullptr ) {

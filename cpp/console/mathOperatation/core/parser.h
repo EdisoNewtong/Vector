@@ -8,6 +8,7 @@
 #include "tokenParserBase.h"
 #include "tokenInfo.h"
 #include "parsedCharInfo.h"
+#include "tokenListAnalyzer.h"
 
 
 class Parser
@@ -36,16 +37,13 @@ protected:
 	  int    m_debugOption;
 	  int    m_flag;
 
-	  // std::unordered_map<int, TokenParserBase*> m_parserMap;
-	  std::list<TokenInfo*>                     m_tokenList;
-
       TokenParserBase* m_defaultParser;    // default
 	  TokenParserBase* m_currentParser;    // current
-
 	  E_PaserType      m_currentPaserType;
 
-	  ParsedCharInfo       m_pInfo;
+	  TokenListAnalyzer m_pTokenListAnalyzer;
 
+	  ParsedCharInfo       m_pInfo;
 private:
 	  std::string m_optKeyWordprefix_1;
 	  std::string m_optKeyWord_1;

@@ -40,9 +40,8 @@ void VaribleParser::init() // override
 
 
 // virtual 
-E_PaserType  VaribleParser::appendContent(ParsedCharInfo* pInfo, list<TokenInfo*>* pTokenList) // override
+E_PaserType  VaribleParser::appendContent(ParsedCharInfo* pInfo) // override
 {
-	(void)pTokenList;
 
 	auto curCh = pInfo->currentChar;
 
