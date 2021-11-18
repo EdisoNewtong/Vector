@@ -11,4 +11,9 @@ ExpEvaluation::~ExpEvaluation()
 
 }
 
+// virtual 
+void ExpEvaluation::init() // override
+{
+	m_tokenType = E_TOKEN_SEMICOLON;
+}
 

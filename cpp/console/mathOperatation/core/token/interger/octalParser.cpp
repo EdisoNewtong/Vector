@@ -17,8 +17,9 @@ OctalParser::~OctalParser()
 // virtual 
 void OctalParser::init() // override
 {
-	m_AllAvalibleCharacters.insert( make_pair('+', CharUtil::getCharBaseInfo('+') ) );
-	m_AllAvalibleCharacters.insert( make_pair('-', CharUtil::getCharBaseInfo('-') ) );
+	// m_AllAvalibleCharacters.insert( make_pair('+', CharUtil::getCharBaseInfo('+') ) );
+	// m_AllAvalibleCharacters.insert( make_pair('-', CharUtil::getCharBaseInfo('-') ) );
+	
 	for( char ch = '0'; ch <='7'; ++ch ) {
 		m_AllAvalibleCharacters.insert( make_pair(ch, CharUtil::getCharBaseInfo(ch) ) );
 	}
@@ -27,6 +28,8 @@ void OctalParser::init() // override
 	m_AllAvalibleCharacters.insert( make_pair('U', CharUtil::getCharBaseInfo('U') ) );
 	m_AllAvalibleCharacters.insert( make_pair('l', CharUtil::getCharBaseInfo('l') ) );
 	m_AllAvalibleCharacters.insert( make_pair('L', CharUtil::getCharBaseInfo('L') ) );
+
+	m_tokenType = E_TOKEN_OCTAL_NUMBER;
 
 }
 
@@ -38,10 +41,4 @@ E_PaserType  OctalParser::appendContent(ParsedCharInfo* pInfo) // override
 }
 
 
-// virtual 
-TokenInfo* OctalParser::generateToken() // override
-{
-	auto retInfo = new TokenInfo(E_TOKEN_OCTAL_NUMBER, E_TOKEN_OCTAL_NUMBER);
-	retInfo->setDetail(m_token);
-	return retInfo;
-}
+

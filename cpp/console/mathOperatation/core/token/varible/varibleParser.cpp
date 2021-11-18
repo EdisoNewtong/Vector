@@ -36,47 +36,47 @@ void VaribleParser::init() // override
 	// Add   '_'
 	m_AllAvalibleCharacters.insert( make_pair('_', CharUtil::getCharBaseInfo('_') ) );
 
+	m_tokenType = E_TOKEN_VARIBLE;
 }
 
 
 // virtual 
 E_PaserType  VaribleParser::appendContent(ParsedCharInfo* pInfo) // override
 {
-
 	auto curCh = pInfo->currentChar;
-
-	if ( pInfo->baseInfo != nullptr ) {
-		if ( pInfo->baseInfo->isVaribleCharSet() ) {
-			m_alreadyTravelsaledString += curCh;
-		} else {
-			// set End flag
-			m_switchFlag = E_TRANSFER_DEFAULT_PARSER_AND_DO_REPARSE;
-			return E_P_DEFAULT;
-		}
+	auto pBaseInfo = getInsideCharSetBaseInfo(curCh);
+	if ( pBaseInfo != nullptr ) {
+		m_alreadyTravelsaledString += curCh;
 	} else {
-		// set End flag
-		m_switchFlag = E_TRANSFER_DEFAULT_PARSER_AND_DO_REPARSE;
+		/*
+		   e.g.
+
+		       abc+
+                  ^
+			   Re-Parse   '+'
+		*/
+
+		m_switchFlag = E_TOKEN_TERMINATE_TO_DEFAULT_RE_PARSE;
 		return E_P_DEFAULT;
 	}
+
 
 	return m_type;
 }
 
-// virtual 
-TokenInfo* VaribleParser::generateToken() // override
-{
-	auto retInfo = new TokenInfo(E_TOKEN_VARIBLE, E_TOKEN_VARIBLE);
-	retInfo->setDetail(m_token);
-	return retInfo;
-}
+
 
 
 // virtual
-bool VaribleParser::isEnd()
+bool VaribleParser::isEnd(ParsedCharInfo* pInfo) // override
 {
-	if ( m_alreadyTravelsaledString.empty() ) {
-		return false;
-	}
-
+	//if ( m_alreadyTravelsaledString.empty() ) {
+	//	return false;
+	//}
+	// 
+	//return true;
+	
+	(void)pInfo;
 	return true;
+
 }

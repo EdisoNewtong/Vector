@@ -25,9 +25,24 @@ public:
 		// or    // abc \n
 		E_TERMINAL_NONE,
 
-		E_NATURALLY_TERMINAL_GEN_TOKEN_AND_PUSH,      // e.g. comment is end with     */    or   // axxx\n
-		E_TRANSFER_NON_DEFAULT_PARSER_WAIT_NEXT_CHAR, // start with /*  :     operator parser ->  comment parser 
-		E_TRANSFER_DEFAULT_PARSER_AND_DO_REPARSE,     // \t\t123  \t\ta : parser char : "1"  or parser char : "a"
+		// 
+		//   e.g. comment is end with  */         
+		//                 or   // axxx\n
+		//
+		E_TOKEN_TERMINATE_TO_DEFAULT,
+
+		// 
+		//   e.g.   abc+ 
+		//             ^
+		//   "abc" is force interrupted by character '+'
+		//   so should re-parse '+'
+		E_TOKEN_TERMINATE_TO_DEFAULT_RE_PARSE,                   
+
+		//
+		//   /*
+		//    ^
+		//   convert from opParser to    <Multi-Line Comment Parser>
+		E_TOKEN_CONVERT_TO_OTHER,
 	};
 
 	TokenParserBase(E_PaserType tp);
@@ -37,7 +52,7 @@ public:
 	virtual E_PaserType appendContent(ParsedCharInfo* pInfo);
 	virtual TokenInfo* generateToken();
 	virtual void reset();
-	virtual bool isEnd();
+	virtual bool isEnd(ParsedCharInfo* pInfo);
 
 	CharBaseInfo* getInsideCharSetBaseInfo(char ch);
 	CharBaseInfo* commonCheck(char ch, ParsedCharInfo* pInfo);
@@ -45,7 +60,7 @@ public:
 	void transferToken(TokenParserBase* pBase);
 	E_PaserType getType();
 	std::string getToken();
-	void markBeginTag(ParsedCharInfo* pInfo);
+	void markBeginTag(const PosInfo& pInfo);
 	E_TERMINAL_STATUS getSwitchFlag();
 protected:
 	std::unordered_map<char, CharBaseInfo*> m_AllAvalibleCharacters;
@@ -54,12 +69,14 @@ protected:
 	std::string m_token;
 
 	E_PaserType m_type;
+	E_TokenType m_tokenType;
+
 	bool m_isValidEnd;
 
 	E_TERMINAL_STATUS  m_switchFlag;
 	
-	ParsedCharInfo m_beginInfo;
-	ParsedCharInfo m_endInfo;
+	PosInfo m_beginInfo;
+	PosInfo m_endInfo;
 };
 
 #endif

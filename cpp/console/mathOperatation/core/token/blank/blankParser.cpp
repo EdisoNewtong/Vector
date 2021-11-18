@@ -25,6 +25,8 @@ void BlankParser::init() // override
 	m_AllAvalibleCharacters.insert(  make_pair('\t', CharUtil::getCharBaseInfo('\t') ) );
 	m_AllAvalibleCharacters.insert(  make_pair('\r', CharUtil::getCharBaseInfo('\r') ) );
 	m_AllAvalibleCharacters.insert(  make_pair('\n', CharUtil::getCharBaseInfo('\n') ) );
+
+	m_tokenType = E_TOKEN_BLANK;
 }
 
 
@@ -32,48 +34,39 @@ void BlankParser::init() // override
 E_PaserType  BlankParser::appendContent(ParsedCharInfo* pInfo) // override
 {
 	auto curCh = pInfo->currentChar;
-	if ( pInfo->baseInfo == nullptr || !( pInfo->baseInfo->isBlank() ) ) {
-		//
-		// blank buffer is End, TODO Check TokenList Logic
-		//
-
-		auto concreteParserType = TokenParserBase::appendContent(pInfo);
-		auto pConcreteParser = TokenParserMgr::getParserByType( concreteParserType );
-		if ( pConcreteParser != nullptr && pConcreteParser->isEnd() ) {
-			return E_P_DEFAULT;
-		} else {
-			return concreteParserType;
-		}
-	} else {
+	if ( pInfo->baseInfo != nullptr &&  pInfo->baseInfo->isBlank() ) {
 		m_alreadyTravelsaledString += curCh;
+	} else {
+		// blank buffer is End, TODO Check TokenList Logic
+		m_switchFlag = E_TOKEN_TERMINATE_TO_DEFAULT_RE_PARSE;
+		return E_P_DEFAULT;
 	}
-
 
 	return m_type;
 }
 
-// virtual 
-TokenInfo* BlankParser::generateToken() // override
-{
-	auto retInfo = new TokenInfo(E_TOKEN_BLANK, E_TOKEN_BLANK);
-	m_token = m_alreadyTravelsaledString;
 
-	retInfo->setDetail(m_token);
-	return retInfo;
-}
 
 
 // virtual 
-bool BlankParser::isEnd() // override
+bool BlankParser::isEnd(ParsedCharInfo* pInfo) // override
 {
+	// (void)pInfo;
 	if ( m_alreadyTravelsaledString.empty() ) {
 		return false;
 	}
 
-	// not empty
-	char lastCh = m_alreadyTravelsaledString.back();
-	auto pChInfo = getInsideCharSetBaseInfo(lastCh);
-	return (pChInfo == nullptr);
+	bool isAllInside = true;
+	for( const auto& ch : m_alreadyTravelsaledString)
+	{
+		auto pCharInfo = getInsideCharSetBaseInfo(ch);
+		if ( pCharInfo == nullptr ) {
+			isAllInside = false;
+			break;
+		}
+	}
+
+	return isAllInside;
 }
 
 

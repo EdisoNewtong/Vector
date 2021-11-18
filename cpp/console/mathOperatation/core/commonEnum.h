@@ -75,6 +75,8 @@ enum E_TokenType
 
 	E_TOKEN_BLANK,  // <Space> <Tab> \r \n
 
+	E_TOKEN_SEMICOLON,
+
 	E_TOKEN_IGNORE, // Placehold Dummy Token Type
 };
 

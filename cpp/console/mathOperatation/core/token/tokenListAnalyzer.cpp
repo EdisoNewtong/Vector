@@ -26,3 +26,8 @@ bool TokenListAnalyzer::checkParserIsValid(E_PaserType tp)
 	return true;
 }
 
+bool TokenListAnalyzer::pushToken(TokenInfo* pToken)
+{
+	m_tokenList.push_back( pToken );
+	return true;
+}

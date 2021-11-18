@@ -19,6 +19,8 @@ void MultiLineCommentParser::init() // override
 {
 	m_AllAvalibleCharacters.insert( make_pair('/', CharUtil::getCharBaseInfo('/') ) );
 	m_AllAvalibleCharacters.insert( make_pair('*', CharUtil::getCharBaseInfo('*') ) );
+
+    m_tokenType = E_TOKEN_MULTI_COMMENT;
 }
 
 
@@ -26,8 +28,9 @@ void MultiLineCommentParser::init() // override
 E_PaserType  MultiLineCommentParser::appendContent(ParsedCharInfo* pInfo) // override
 {
 	char curCh = pInfo->currentChar;
-	m_alreadyTravelsaledString += curCh; // add current first
+	m_alreadyTravelsaledString += curCh; // append current char first
 
+	// new-size After   Append += curCh;
 	int sz = static_cast<int>( m_alreadyTravelsaledString.size() );
 	if ( sz >= 4 ) {
 		auto last2str = m_alreadyTravelsaledString.substr( sz-2 );
@@ -41,7 +44,7 @@ E_PaserType  MultiLineCommentParser::appendContent(ParsedCharInfo* pInfo) // ove
 			//  */
 	 		++m_warningCnt;
 		} else if ( last2str == "*/" ) {
-	 		// m_switchFlag = 2;
+			m_switchFlag = E_TOKEN_TERMINATE_TO_DEFAULT;
 	 		return E_P_DEFAULT;	
 		}
 	}
@@ -51,16 +54,9 @@ E_PaserType  MultiLineCommentParser::appendContent(ParsedCharInfo* pInfo) // ove
 
 
 
-// virtual 
-TokenInfo* MultiLineCommentParser::generateToken() // override
-{
-	auto retInfo = new TokenInfo(E_TOKEN_MULTI_COMMENT, E_TOKEN_MULTI_COMMENT);
-	retInfo->setDetail(m_token);
-	return retInfo;
-}
 
 // virtual
-bool MultiLineCommentParser::isEnd() // override
+bool MultiLineCommentParser::isEnd(ParsedCharInfo* pInfo) // override
 {
 	int sz = static_cast<int>( m_alreadyTravelsaledString.size() );
 	if ( sz < 4 ) {
@@ -68,6 +64,6 @@ bool MultiLineCommentParser::isEnd() // override
 	} 
 
 	// else >=4
-	string last2str = m_alreadyTravelsaledString.substr( sz - 2);
+	string last2str = m_alreadyTravelsaledString.substr( sz - 2 );
 	return last2str == "*/";
 }

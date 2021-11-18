@@ -24,8 +24,9 @@ FloatParser::~FloatParser()
 void FloatParser::init() // override
 {
 	// -1.23e-2f
-	m_AllAvalibleCharacters.insert( make_pair('+', CharUtil::getCharBaseInfo('+') ) );
-	m_AllAvalibleCharacters.insert( make_pair('-', CharUtil::getCharBaseInfo('-') ) );
+	// m_AllAvalibleCharacters.insert( make_pair('+', CharUtil::getCharBaseInfo('+') ) );
+	// m_AllAvalibleCharacters.insert( make_pair('-', CharUtil::getCharBaseInfo('-') ) );
+
 	for( char ch = '0'; ch <='9'; ++ch ) {
 		m_AllAvalibleCharacters.insert( make_pair(ch, CharUtil::getCharBaseInfo(ch) ) );
 	}
@@ -37,6 +38,7 @@ void FloatParser::init() // override
 	m_AllAvalibleCharacters.insert( make_pair('f', CharUtil::getCharBaseInfo('f') ) );
 	m_AllAvalibleCharacters.insert( make_pair('F', CharUtil::getCharBaseInfo('F') ) );
 
+	m_tokenType = E_TOKEN_FLOAT_NUMBER;
 }
 
 
@@ -47,10 +49,4 @@ E_PaserType  FloatParser::appendContent(ParsedCharInfo* pInfo) // override
 	return E_P_DEFAULT;	
 }
 
-// virtual 
-TokenInfo* FloatParser::generateToken()  // override
-{
-	auto retInfo = new TokenInfo(E_TOKEN_FLOAT_NUMBER, E_TOKEN_FLOAT_NUMBER);
-	retInfo->setDetail(m_token);
-	return retInfo;
-}
+

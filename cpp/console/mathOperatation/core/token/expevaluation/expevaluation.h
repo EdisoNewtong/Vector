@@ -16,6 +16,8 @@ public:
 	ExpEvaluation(E_PaserType tp);
 	virtual ~ExpEvaluation();
 
+	virtual void init() override;
+
 };
 
 #endif

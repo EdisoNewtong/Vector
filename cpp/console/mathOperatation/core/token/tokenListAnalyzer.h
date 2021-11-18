@@ -12,6 +12,7 @@ public:
 	virtual ~TokenListAnalyzer();
 
 	bool checkParserIsValid(E_PaserType tp);
+	bool pushToken(TokenInfo* pToken);
 protected:
 	std::list<TokenInfo*> m_tokenList;
 };

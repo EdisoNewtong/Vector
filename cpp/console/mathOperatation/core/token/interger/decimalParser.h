@@ -14,8 +14,23 @@ public:
 
 	virtual void init() override;
 	virtual E_PaserType appendContent(ParsedCharInfo* pInfo) override;
-	virtual TokenInfo* generateToken() override;
+
+	virtual void reset() override;
 protected:
+	unsigned short m_uCnt;
+	unsigned short m_UCnt;
+	unsigned short m_lCnt;
+	unsigned short m_LCnt;
+
+private:
+	bool is_dot(char ch);
+	bool is_eE(char ch);
+	bool is_xX(char ch);
+	bool is_uU_lL(char ch);
+	bool isSuffixExisted();
+
+	void update_uU_lLCnt(char ch);
+	
 };
 
 #endif

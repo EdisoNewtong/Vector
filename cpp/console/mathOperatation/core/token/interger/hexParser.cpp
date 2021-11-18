@@ -41,6 +41,8 @@ void HexParser::init() // override
 	m_AllAvalibleCharacters.insert( make_pair('U', CharUtil::getCharBaseInfo('U') ) );
 	m_AllAvalibleCharacters.insert( make_pair('l', CharUtil::getCharBaseInfo('l') ) );
 	m_AllAvalibleCharacters.insert( make_pair('L', CharUtil::getCharBaseInfo('L') ) );
+
+	m_tokenType = E_TOKEN_HEX_NUMBER;
 }
 
 
@@ -52,10 +54,4 @@ E_PaserType HexParser::appendContent(ParsedCharInfo* pInfo) // override
 }
 
 
-// virtual 
-TokenInfo* HexParser::generateToken() // override
-{
-	auto retInfo = new TokenInfo(E_TOKEN_HEX_NUMBER, E_TOKEN_HEX_NUMBER);
-	retInfo->setDetail(m_token);
-	return retInfo;
-}
+

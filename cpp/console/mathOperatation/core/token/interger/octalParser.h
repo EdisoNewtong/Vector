@@ -13,7 +13,6 @@ public:
 
 	virtual void init() override;
 	virtual E_PaserType appendContent(ParsedCharInfo* pInfo) override;
-	virtual TokenInfo* generateToken() override;
 protected:
 };
 

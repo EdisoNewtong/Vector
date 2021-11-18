@@ -41,7 +41,7 @@ protected:
 	  TokenParserBase* m_currentParser;    // current
 	  E_PaserType      m_currentPaserType;
 
-	  TokenListAnalyzer m_pTokenListAnalyzer;
+	  TokenListAnalyzer m_TokenListAnalyzer;
 
 	  ParsedCharInfo       m_pInfo;
 private:
