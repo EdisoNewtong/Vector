@@ -129,82 +129,67 @@ int Parser::doParse()
 		// common process
 		processLineInfo(ch,idx);
 
-		if ( idx == 0 ) {
-			// current must be default
-			m_currentParser->markBeginTag(m_pInfo.position);
-		}
-
-		auto previousParserType = m_currentPaserType;
 		auto nextParserType = m_currentParser->appendContent(&m_pInfo);
 		if ( nextParserType != m_currentPaserType ) {
 			if ( m_debugOption == 1 ) {
 				cout << "[Changed] : " << getstrParserType(m_currentPaserType) << " -> " << getstrParserType(nextParserType) << " , " <<  m_pInfo.position.getLineInfo() << endl;
 			}
 
-			if ( previousParserType == E_P_DEFAULT ) {
-				//
-				// E_P_DEFAULT --> Others
-				//
-				auto newParser = TokenParserMgr::getParserByType(nextParserType);
-				m_currentParser->transferToken( newParser );
-				auto bEndFlag = newParser->isEnd(&m_pInfo);
-				if ( bEndFlag ) {
-					// Core return to default Parser
-					m_TokenListAnalyzer.pushToken( newParser->generateToken() );
-					if ( m_debugOption == 1 ) {
-						cout << "\t[Changed] : " << getstrParserType(nextParserType) << " -> " << getstrParserType(E_P_DEFAULT) << " , " <<  m_pInfo.position.getLineInfo() << endl;
-					}
-					nextParserType = E_P_DEFAULT;
-				}
-			} else {
-
-				auto switchFlag = m_currentParser->getSwitchFlag();
-				switch( switchFlag )
+			auto switchFlag = m_currentParser->getSwitchFlag();
+			switch( switchFlag )
+			{
+			case TokenParserBase::E_TOKEN_TERMINATE_TO_DEFAULT:
 				{
-				case TokenParserBase::E_TOKEN_TERMINATE_TO_DEFAULT:
-					{
-						m_TokenListAnalyzer.pushToken( m_currentParser->generateToken() );
-						// Other -> Default
-					}
-					break;
-				case TokenParserBase::E_TOKEN_TERMINATE_TO_DEFAULT_RE_PARSE:
-					{
-						auto nextParserType2 = m_defaultParser->appendContent(&m_pInfo);
-						auto newParser = TokenParserMgr::getParserByType(nextParserType2);
-						m_defaultParser->transferToken( newParser );
-						auto bEndFlag = newParser->isEnd(&m_pInfo);
-						if ( bEndFlag ) {
-							// Core return to default Parser
-							m_TokenListAnalyzer.pushToken( newParser->generateToken() );
-							if ( m_debugOption == 1 ) {
-								cout << "\t[Changed] : " << getstrParserType(nextParserType2) << " -> " << getstrParserType(E_P_DEFAULT) << " , " <<  m_pInfo.position.getLineInfo() << endl;
-							}
-							nextParserType = E_P_DEFAULT;
-						} else {
-							nextParserType = nextParserType2;
-						}
-					}
-					break;
-				case TokenParserBase::E_TOKEN_CONVERT_TO_OTHER:
-					{
-						auto newParser = TokenParserMgr::getParserByType( nextParserType );
-						m_currentParser->transferToken( newParser );
-						auto bEndFlag = newParser->isEnd(&m_pInfo);
-						if ( bEndFlag ) {
-							// Core return to default Parser
-							m_TokenListAnalyzer.pushToken( newParser->generateToken() );
-							if ( m_debugOption == 1 ) {
-								cout << "\t[Changed] : " << getstrParserType(nextParserType) << " -> " << getstrParserType(E_P_DEFAULT) << " , " <<  m_pInfo.position.getLineInfo() << endl;
-							}
-							nextParserType = E_P_DEFAULT;
-						} 
-					}
-					break;
-				default:
-					break;
+					// Other -> Default
+					m_TokenListAnalyzer.pushToken( m_currentParser->generateToken() );
 				}
+				break;
+			case TokenParserBase::E_TOKEN_TERMINATE_TO_DEFAULT_RE_PARSE:
+				{
+					// push previous terminated Token
+					m_TokenListAnalyzer.pushToken( m_currentParser->generateToken() );
+					m_currentParser->reset();
+
+					auto next_MiddleParser = TokenParserMgr::getParserByType(nextParserType);
+					auto nextParserType2 = next_MiddleParser->appendContent(&m_pInfo);
+					auto newParser = TokenParserMgr::getParserByType(nextParserType2);
+					next_MiddleParser->transferToken( newParser );
+
+					auto bEndFlag = newParser->isEnd(&m_pInfo);
+					if ( bEndFlag ) {
+						// Core return to default Parser
+						m_TokenListAnalyzer.pushToken( newParser->generateToken() );
+						if ( m_debugOption == 1 ) {
+							cout << "  [Inner Changed] : " << getstrParserType(nextParserType2) << " -> " << getstrParserType(E_P_DEFAULT) << " , " <<  m_pInfo.position.getLineInfo() << endl;
+						}
+						nextParserType = E_P_DEFAULT;
+					} else {
+						nextParserType = nextParserType2;
+					}
+				}
+				break;
+			case TokenParserBase::E_TOKEN_CONVERT_TO_OTHER:
+				{
+					auto newParser = TokenParserMgr::getParserByType( nextParserType );
+					m_currentParser->transferToken( newParser );
+					// m_currentParser->reset();
+
+					auto bEndFlag = newParser->isEnd(&m_pInfo);
+					if ( bEndFlag ) {
+						// Core return to default Parser
+						m_TokenListAnalyzer.pushToken( newParser->generateToken() );
+						if ( m_debugOption == 1 ) {
+							cout << "  [Inner Changed] : " << getstrParserType(nextParserType) << " -> " << getstrParserType(E_P_DEFAULT) << " , " <<  m_pInfo.position.getLineInfo() << endl;
+						}
+						nextParserType = E_P_DEFAULT;
+					} 
+				}
+				break;
+			default:
+				break;
 			}
 
+			// Final Switch to the proper Parser
 			m_currentParser = TokenParserMgr::getParserByType( nextParserType );
 			m_currentPaserType = nextParserType;
 		}

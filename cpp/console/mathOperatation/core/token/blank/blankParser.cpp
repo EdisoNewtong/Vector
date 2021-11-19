@@ -34,10 +34,12 @@ void BlankParser::init() // override
 E_PaserType  BlankParser::appendContent(ParsedCharInfo* pInfo) // override
 {
 	auto curCh = pInfo->currentChar;
-	if ( pInfo->baseInfo != nullptr &&  pInfo->baseInfo->isBlank() ) {
+	auto pBlankCharInfo = getInsideCharSetBaseInfo(curCh);
+	if ( pBlankCharInfo != nullptr ) {
 		m_alreadyTravelsaledString += curCh;
+		m_endInfo = pInfo->position;
 	} else {
-		// blank buffer is End, TODO Check TokenList Logic
+		// Blank buffer is <End>
 		m_switchFlag = E_TOKEN_TERMINATE_TO_DEFAULT_RE_PARSE;
 		return E_P_DEFAULT;
 	}

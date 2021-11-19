@@ -47,6 +47,7 @@ E_PaserType  VaribleParser::appendContent(ParsedCharInfo* pInfo) // override
 	auto pBaseInfo = getInsideCharSetBaseInfo(curCh);
 	if ( pBaseInfo != nullptr ) {
 		m_alreadyTravelsaledString += curCh;
+		m_endInfo = pInfo->position;
 	} else {
 		/*
 		   e.g.
@@ -60,7 +61,6 @@ E_PaserType  VaribleParser::appendContent(ParsedCharInfo* pInfo) // override
 		return E_P_DEFAULT;
 	}
 
-
 	return m_type;
 }
 
@@ -70,13 +70,13 @@ E_PaserType  VaribleParser::appendContent(ParsedCharInfo* pInfo) // override
 // virtual
 bool VaribleParser::isEnd(ParsedCharInfo* pInfo) // override
 {
-	//if ( m_alreadyTravelsaledString.empty() ) {
-	//	return false;
-	//}
-	// 
-	//return true;
-	
-	(void)pInfo;
-	return true;
+	auto curCh = pInfo->currentChar;
+	auto pBaseInfo = getInsideCharSetBaseInfo(curCh);
+	if ( pBaseInfo == nullptr ) {
+		return true;
+	} 
+
+	// pBaseInfo != nullptr;
+	return pInfo->isLastChar;
 
 }

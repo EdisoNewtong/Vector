@@ -13,11 +13,17 @@ public:
 	bool isBinaryOp();          // 0:None   1:unary op         2:binary op   
 	bool isLeft2Right();        // 0:None   1:Left-to-Right    2:Right-to-Left
 protected:
-	//    32   bits int is enough
+	//    16   bits int is enough  ( C++ Standard ensure that     sizeof(int) >= 16
 	// | Associativlity | Unary or Binary | Priority |
 	// |  2 bit         |  2 bit          |  6 bits  |
 	char         m_ch;
 	unsigned int m_metaInfo;
+public:
+	static const unsigned int S_UNARY_OP_FLAG;
+	static const unsigned int S_BINARY_OP_FLAG;
+
+	static const unsigned int S_Left2Right_FLAG;
+	static const unsigned int S_Right2Left_FLAG;
 };
 
 class CharBaseInfo

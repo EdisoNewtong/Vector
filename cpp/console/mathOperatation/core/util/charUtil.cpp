@@ -1,6 +1,15 @@
 #include "charUtil.h"
 using namespace std;
 
+//
+// static member init
+//
+const unsigned int OperatorBaseInfo::S_UNARY_OP_FLAG   = (1U << 6U);
+const unsigned int OperatorBaseInfo::S_BINARY_OP_FLAG  = (2U << 6U);
+const unsigned int OperatorBaseInfo::S_Left2Right_FLAG = (1U << 8U);
+const unsigned int OperatorBaseInfo::S_Right2Left_FLAG = (2U << 8U);
+
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 OperatorBaseInfo::OperatorBaseInfo(char ch, unsigned int meta)
@@ -192,64 +201,120 @@ void CharUtil::init()
 		s_allCharSetMap.insert( make_pair(ch, new CharBaseInfo(ch, nullptr) ) );
 	}
 
+	/*
+	   Operator            Precedence                  Description
+	---------------------------------------------------------------------------------------
+	    ( )                 2                          Left-to-Right
+	---------------------------------------------------------------------------------------
+		+a   -a             3                          Right-to-Left
+		~a                  3
+	---------------------------------------------------------------------------------------
+		a*b   a/b   a%b     5                          Left-to-Right
+	---------------------------------------------------------------------------------------
+		a+b   a-b           6                          Left-to-Right
+	---------------------------------------------------------------------------------------
+		a<<b  a>>b          7                          Left-to-Right
+	---------------------------------------------------------------------------------------
+		a&b                 11                         Left-to-Right
+	---------------------------------------------------------------------------------------
+		a^b                 12                         Left-to-Right
+	---------------------------------------------------------------------------------------
+		a|b                 13                         Left-to-Right
+	---------------------------------------------------------------------------------------
+	    a=b                 16                         Right-to-Left
+	---------------------------------------------------------------------------------------
+
+	*/
+
+	///////////////////////////////////////////////////////////////////////////////////////
 	//
-	// Operator Part , TODO
+	// Operator Part 
 	//
-	the_ch = '+';
-	OperatorBaseInfo* additionInfo = new OperatorBaseInfo( the_ch, 0);
+	///////////////////////////////////////////////////////////////////////////////////////
+	unsigned int meta = 0U;
+
+	the_ch = '+';           
+	meta = OperatorBaseInfo::S_Left2Right_FLAG | OperatorBaseInfo::S_BINARY_OP_FLAG | 6U;
+	OperatorBaseInfo* additionInfo = new OperatorBaseInfo( the_ch, meta);
 	s_allCharSetMap.insert( make_pair(the_ch, new CharBaseInfo(the_ch, additionInfo) ) );
 
 	the_ch = '-';
-	OperatorBaseInfo* substractionInfo = new OperatorBaseInfo( the_ch, 0);
+    meta = OperatorBaseInfo::S_Left2Right_FLAG | OperatorBaseInfo::S_BINARY_OP_FLAG | 6U;
+	OperatorBaseInfo* substractionInfo = new OperatorBaseInfo( the_ch, meta);
 	s_allCharSetMap.insert( make_pair(the_ch, new CharBaseInfo(the_ch, substractionInfo) ) );
 
 	the_ch = '*';
-	OperatorBaseInfo* multiplyInfo = new OperatorBaseInfo( the_ch, 0);
+    meta = OperatorBaseInfo::S_Left2Right_FLAG | OperatorBaseInfo::S_BINARY_OP_FLAG | 5U;
+	OperatorBaseInfo* multiplyInfo = new OperatorBaseInfo( the_ch, meta);
 	s_allCharSetMap.insert( make_pair(the_ch, new CharBaseInfo(the_ch, multiplyInfo) ) );
 
 	the_ch = '/';
-	OperatorBaseInfo* divideInfo = new OperatorBaseInfo( the_ch, 0);
+    meta = OperatorBaseInfo::S_Left2Right_FLAG | OperatorBaseInfo::S_BINARY_OP_FLAG | 5U;
+	OperatorBaseInfo* divideInfo = new OperatorBaseInfo( the_ch, meta);
 	s_allCharSetMap.insert( make_pair(the_ch, new CharBaseInfo(the_ch, divideInfo) ) );
 
 	the_ch = '%';
-	OperatorBaseInfo* modInfo = new OperatorBaseInfo( the_ch, 0);
+    meta = OperatorBaseInfo::S_Left2Right_FLAG | OperatorBaseInfo::S_BINARY_OP_FLAG | 5U;
+	OperatorBaseInfo* modInfo = new OperatorBaseInfo( the_ch, meta);
 	s_allCharSetMap.insert( make_pair(the_ch, new CharBaseInfo(the_ch, modInfo) ) );
 
 	the_ch = '&';
-	OperatorBaseInfo* bitAndInfo = new OperatorBaseInfo( the_ch, 0);
+    meta = OperatorBaseInfo::S_Left2Right_FLAG | OperatorBaseInfo::S_BINARY_OP_FLAG | 11U;
+	OperatorBaseInfo* bitAndInfo = new OperatorBaseInfo( the_ch, meta);
 	s_allCharSetMap.insert( make_pair(the_ch, new CharBaseInfo(the_ch, bitAndInfo) ) );
 
-	the_ch = '|';
-	OperatorBaseInfo* bitOrInfo = new OperatorBaseInfo( the_ch, 0);
-	s_allCharSetMap.insert( make_pair(the_ch, new CharBaseInfo(the_ch, bitOrInfo) ) );
-
 	the_ch = '^';
-	OperatorBaseInfo* bitXOrInfo = new OperatorBaseInfo( the_ch, 0);
+    meta = OperatorBaseInfo::S_Left2Right_FLAG | OperatorBaseInfo::S_BINARY_OP_FLAG | 12U;
+	OperatorBaseInfo* bitXOrInfo = new OperatorBaseInfo( the_ch, meta);
 	s_allCharSetMap.insert( make_pair(the_ch, new CharBaseInfo(the_ch, bitXOrInfo) ) );
 
+	the_ch = '|';
+    meta = OperatorBaseInfo::S_Left2Right_FLAG | OperatorBaseInfo::S_BINARY_OP_FLAG | 13U;
+	OperatorBaseInfo* bitOrInfo = new OperatorBaseInfo( the_ch, meta);
+	s_allCharSetMap.insert( make_pair(the_ch, new CharBaseInfo(the_ch, bitOrInfo) ) );
+
 	the_ch = '~';
-	OperatorBaseInfo* bitNotInfo = new OperatorBaseInfo( the_ch, 0);
+    meta = OperatorBaseInfo::S_Right2Left_FLAG | OperatorBaseInfo::S_UNARY_OP_FLAG | 3U;
+	OperatorBaseInfo* bitNotInfo = new OperatorBaseInfo( the_ch, meta);
 	s_allCharSetMap.insert( make_pair(the_ch, new CharBaseInfo(the_ch, bitNotInfo) ) );
 
-	the_ch = '<';
-	OperatorBaseInfo* bitLeftShiftInfo = new OperatorBaseInfo( the_ch, 0);
+	the_ch = '<'; // <<
+    meta = OperatorBaseInfo::S_Left2Right_FLAG | OperatorBaseInfo::S_BINARY_OP_FLAG | 7U;
+	OperatorBaseInfo* bitLeftShiftInfo = new OperatorBaseInfo( the_ch, meta);
 	s_allCharSetMap.insert( make_pair(the_ch, new CharBaseInfo(the_ch, bitLeftShiftInfo) ) );
 
-	the_ch = '>';
-	OperatorBaseInfo* bitRightShiftInfo = new OperatorBaseInfo( the_ch, 0);
+	the_ch = '>'; // >>
+    meta = OperatorBaseInfo::S_Left2Right_FLAG | OperatorBaseInfo::S_BINARY_OP_FLAG | 7U;
+	OperatorBaseInfo* bitRightShiftInfo = new OperatorBaseInfo( the_ch, meta);
 	s_allCharSetMap.insert( make_pair(the_ch, new CharBaseInfo(the_ch, bitRightShiftInfo) ) );
 
 	the_ch = '(';
-	OperatorBaseInfo* openParentheseInfo = new OperatorBaseInfo( the_ch, 0);
+    meta = 0U | 0U | 2U;
+	OperatorBaseInfo* openParentheseInfo = new OperatorBaseInfo( the_ch, meta);
 	s_allCharSetMap.insert( make_pair(the_ch, new CharBaseInfo(the_ch, openParentheseInfo) ) );
 
 	the_ch = ')';
-	OperatorBaseInfo* closeParentheseInfo = new OperatorBaseInfo( the_ch, 0);
+    meta = 0U | 0U | 2U;
+	OperatorBaseInfo* closeParentheseInfo = new OperatorBaseInfo( the_ch, meta);
 	s_allCharSetMap.insert( make_pair(the_ch, new CharBaseInfo(the_ch, closeParentheseInfo) ) );
 
 	the_ch = '=';
+    meta = OperatorBaseInfo::S_Right2Left_FLAG | OperatorBaseInfo::S_BINARY_OP_FLAG | 16U;
 	OperatorBaseInfo* equalInfo = new OperatorBaseInfo( the_ch, 0);
 	s_allCharSetMap.insert( make_pair(the_ch, new CharBaseInfo(the_ch, equalInfo) ) );
+
+	// +a
+	meta = OperatorBaseInfo::S_Right2Left_FLAG | OperatorBaseInfo::S_UNARY_OP_FLAG | 3U;
+	OperatorBaseInfo* positiveOpInfo = new OperatorBaseInfo('+' , 0);
+	CharUtil::s_positiveCharInfo = new CharBaseInfo('+', positiveOpInfo);
+
+	// -a
+	meta = OperatorBaseInfo::S_Right2Left_FLAG | OperatorBaseInfo::S_UNARY_OP_FLAG | 3U;
+	OperatorBaseInfo* negativeOpInfo = new OperatorBaseInfo('-', meta);
+	CharUtil::s_negativeCharInfo = new CharBaseInfo('-', negativeOpInfo);
+
+	///////////////////////////////////////////////////////////////////////////////////////
+
 
 	//////////////////////////////////////////////////
 	the_ch = '_';
@@ -277,9 +342,6 @@ void CharUtil::init()
 	s_allCharSetMap.insert( make_pair(the_ch, new CharBaseInfo(the_ch, nullptr) ) );
 
 
-	// TODO
-	CharUtil::s_positiveCharInfo = new CharBaseInfo('+', nullptr);
-	CharUtil::s_positiveCharInfo = new CharBaseInfo('-', nullptr);
 }
 
 // static 
@@ -325,13 +387,13 @@ CharBaseInfo* CharUtil::getCharBaseInfo(char ch)
 
 
 // static 
-CharBaseInfo* CharUtil::getPositiveCharInfo() // +
+CharBaseInfo* CharUtil::getPositiveCharInfo() // +a
 {
 	return s_positiveCharInfo;
 }
 
 // static 
-CharBaseInfo* CharUtil::getNegativeCharInfo() // -
+CharBaseInfo* CharUtil::getNegativeCharInfo() // -a
 {
 	return s_negativeCharInfo;
 }

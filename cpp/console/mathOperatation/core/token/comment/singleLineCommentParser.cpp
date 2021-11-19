@@ -34,7 +34,10 @@ E_PaserType SingleLineCommentParser::appendContent(ParsedCharInfo* pInfo) // ove
 	if ( curCh == '\n' ) {
 		//    //  abc\n   , '\n' is the end of line character
 		m_alreadyTravelsaledString += curCh;
+		m_endInfo = pInfo->position;
+
 		m_switchFlag = E_TOKEN_TERMINATE_TO_DEFAULT;
+
 		return E_P_DEFAULT;	
 	} else {
 		// curCh != '\n'
@@ -55,6 +58,7 @@ E_PaserType SingleLineCommentParser::appendContent(ParsedCharInfo* pInfo) // ove
 		} else {
 			// lastCh != '\r'  , append content
 			m_alreadyTravelsaledString += curCh;
+			m_endInfo = pInfo->position;
 		}
 	}
 

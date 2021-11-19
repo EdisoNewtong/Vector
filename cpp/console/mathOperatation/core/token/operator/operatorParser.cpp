@@ -36,6 +36,26 @@ OperatorParser::~OperatorParser()
 // virtual 
 void OperatorParser::init() // override
 {
+	// +    -    *    /    %    &    |    ^    ~    <<    >>    (    )    =      // Operator Type
+	m_AllAvalibleCharacters.insert(  make_pair('+', CharUtil::getCharBaseInfo('+')  ) );
+	m_AllAvalibleCharacters.insert(  make_pair('-', CharUtil::getCharBaseInfo('-') ) );
+	m_AllAvalibleCharacters.insert(  make_pair('*', CharUtil::getCharBaseInfo('*') ) );
+	m_AllAvalibleCharacters.insert(  make_pair('/', CharUtil::getCharBaseInfo('/') ) );
+	m_AllAvalibleCharacters.insert(  make_pair('%', CharUtil::getCharBaseInfo('%') ) );
+
+	m_AllAvalibleCharacters.insert(  make_pair('&', CharUtil::getCharBaseInfo('&')  ) );
+	m_AllAvalibleCharacters.insert(  make_pair('|', CharUtil::getCharBaseInfo('|') ) );
+	m_AllAvalibleCharacters.insert(  make_pair('^', CharUtil::getCharBaseInfo('^') ) );
+	m_AllAvalibleCharacters.insert(  make_pair('~', CharUtil::getCharBaseInfo('~') ) );
+
+	m_AllAvalibleCharacters.insert(  make_pair('<', CharUtil::getCharBaseInfo('<') ) );
+	m_AllAvalibleCharacters.insert(  make_pair('>', CharUtil::getCharBaseInfo('>') ) );
+
+	m_AllAvalibleCharacters.insert(  make_pair('(', CharUtil::getCharBaseInfo('(') ) );
+	m_AllAvalibleCharacters.insert(  make_pair(')', CharUtil::getCharBaseInfo(')') ) );
+
+	m_AllAvalibleCharacters.insert(  make_pair('=', CharUtil::getCharBaseInfo('=') ) );
+
 	m_tokenType = E_TOKEN_OPERATOR;
 }
 
@@ -89,11 +109,7 @@ E_PaserType OperatorParser::appendContent(ParsedCharInfo* pInfo) // override
 		} else {
 			// Rest possibility is OK
 		}
-	} else {
-		//  >= 2
-		m_switchFlag = E_TOKEN_TERMINATE_TO_DEFAULT_RE_PARSE;
-		return E_P_DEFAULT;
-	}
+	} 
 
 	return m_type;	
 }
@@ -113,7 +129,7 @@ bool OperatorParser::isEnd(ParsedCharInfo* pInfo) // override;
 {
 	auto sz = static_cast<int>( m_alreadyTravelsaledString.size() );
 	if ( sz == 1 ) {
-		char lastCh =  m_alreadyTravelsaledString.back();
+		char lastCh =  m_alreadyTravelsaledString.at(0);
 		if (lastCh == '<'  ||  lastCh == '>') {
 			// Need  subsequent  '<'   or  subsequent '>'
 			return false;
@@ -122,7 +138,7 @@ bool OperatorParser::isEnd(ParsedCharInfo* pInfo) // override;
 				// means  '/' =>  divide operator
 				return pInfo->isLastChar;
 			} else {
-				//   !=  '/'
+				//  lastCh  !=  '/'
 				return true;
 			}
 		}

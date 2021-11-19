@@ -114,7 +114,7 @@ E_PaserType  DecimalParser::appendContent(ParsedCharInfo* pInfo) // override
 					m_alreadyTravelsaledString += curCh;
 					m_switchFlag = E_TOKEN_CONVERT_TO_OTHER;
 					return E_P_FLOAT;
-				} else if ( is_eE(curCh) ) {
+				} else if ( is_xX(curCh) ) {
 					// TODO throw
 				} else {
 					// u/U   or  l/L
@@ -131,6 +131,8 @@ E_PaserType  DecimalParser::appendContent(ParsedCharInfo* pInfo) // override
 // virtual 
 void DecimalParser::reset() // override;
 {
+	TokenParserBase::reset();
+
 	m_uCnt = 0;
 	m_UCnt = 0;
 	m_lCnt = 0;

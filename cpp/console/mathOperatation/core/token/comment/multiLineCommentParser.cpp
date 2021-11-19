@@ -29,6 +29,7 @@ E_PaserType  MultiLineCommentParser::appendContent(ParsedCharInfo* pInfo) // ove
 {
 	char curCh = pInfo->currentChar;
 	m_alreadyTravelsaledString += curCh; // append current char first
+	m_endInfo = pInfo->position;
 
 	// new-size After   Append += curCh;
 	int sz = static_cast<int>( m_alreadyTravelsaledString.size() );

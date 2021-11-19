@@ -100,32 +100,38 @@ E_PaserType  TokenParserBase::appendContent(ParsedCharInfo* pInfo) // override;
 	}
 
 	if ( pInfo->baseInfo != nullptr ) {
+		m_beginInfo = pInfo->position;
 		m_alreadyTravelsaledString += ch;
+
+		E_PaserType nextParserType =  m_type;
 		if ( pInfo->baseInfo->isBlank() ) {
 			// <Space> <Tab> <\r> <\n>
-			return E_P_BLANK;
+			nextParserType =  E_P_BLANK;
 		} else if ( pInfo->baseInfo->isVaribleHeadChar() ) {
 			// a-z A-Z _
-			return E_P_VARIBLE;
+			nextParserType = E_P_VARIBLE;
 		} else if ( pInfo->baseInfo->isNumber() ) {
 			// 0-9
-			return E_P_DECIMAL; // guess it as an decimal number
+			nextParserType =  E_P_DECIMAL; // guess it as an decimal number
 		} else if ( pInfo->baseInfo->isOpType()  ) {
 			//  +  -  *  /  %    ...
-			return E_P_OPERATOR;
+			nextParserType = E_P_OPERATOR;
 		} else {
 			if ( ch == '.' ) {
-				return E_P_FLOAT;
-			} else {
+				nextParserType = E_P_FLOAT;
+			} else if ( ch == ';' ) {
 				//    ;
-				return E_P_ENDLESEE_SEMICOLON;
+				nextParserType = E_P_ENDLESEE_SEMICOLON;
 			}
 		}
+
+		m_switchFlag = E_TOKEN_CONVERT_TO_OTHER;
+		return nextParserType;
 	} else {
 		commonCheck(ch, pInfo);
 	}
 
-	return m_type;	
+	return m_type;
 }
 
 // virtual
@@ -142,6 +148,7 @@ TokenInfo* TokenParserBase::generateToken()
 void TokenParserBase::reset()
 {
 	m_switchFlag = E_TERMINAL_NONE;
+	m_alreadyTravelsaledString.clear();
 }
 
 
@@ -161,7 +168,8 @@ CharBaseInfo* TokenParserBase::getInsideCharSetBaseInfo(char ch)
 void TokenParserBase::transferToken(TokenParserBase* pNewParser)
 {
 	pNewParser->m_alreadyTravelsaledString = this->m_alreadyTravelsaledString;
-	this->m_alreadyTravelsaledString.clear();
+
+	this->reset();
 
 	// Set Begin Flag
 	pNewParser->m_beginInfo = this->m_beginInfo;
