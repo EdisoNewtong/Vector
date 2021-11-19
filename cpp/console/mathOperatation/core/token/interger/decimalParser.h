@@ -22,7 +22,6 @@ protected:
 	unsigned short m_lCnt;
 	unsigned short m_LCnt;
 
-private:
 	bool is_dot(char ch);
 	bool is_eE(char ch);
 	bool is_xX(char ch);

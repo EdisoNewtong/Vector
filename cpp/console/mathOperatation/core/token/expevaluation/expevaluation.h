@@ -17,7 +17,7 @@ public:
 	virtual ~ExpEvaluation();
 
 	virtual void init() override;
-
+	virtual bool isEnd(ParsedCharInfo* pInfo) override;
 };
 
 #endif

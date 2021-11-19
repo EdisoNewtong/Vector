@@ -3,7 +3,7 @@
 using namespace std;
 
 OctalParser::OctalParser(E_PaserType tp)
-	: TokenParserBase(tp)
+	: DecimalParser(tp)
 {
 }
 
@@ -36,9 +36,56 @@ void OctalParser::init() // override
 // virtual 
 E_PaserType  OctalParser::appendContent(ParsedCharInfo* pInfo) // override
 {
-	(void)pInfo;
+	char curCh = pInfo->currentChar;
+	// int sz = static_cast<int>( m_alreadyTravelsaledString.size() );
+	auto inSideCharInfo = getInsideCharSetBaseInfo( curCh );
+	if ( inSideCharInfo == nullptr ) {
+		//  0123+
+		//      ^
+		m_switchFlag = E_TOKEN_TERMINATE_TO_DEFAULT_RE_PARSE;
+		return E_P_DEFAULT;
+	} else {
+		if( isOctCode(curCh) ) {
+			if ( isSuffixExisted() ) {
+				// TODO : throw
+			} else {
+				m_alreadyTravelsaledString += curCh;
+			}
+		} else {
+			// u/U  l/L
+			update_uU_lLCnt(curCh);
+		}
+	}
+
 	return E_P_DEFAULT;	
+}
+
+// virtual
+bool OctalParser::isEnd(ParsedCharInfo* pInfo) // override;
+{
+	int sz = static_cast<int>( m_alreadyTravelsaledString.size() );
+	if ( sz <= 1 ) {
+		return false;
+	}
+
+	//  sz >=2
+	char prefix = m_alreadyTravelsaledString.at(0);
+	if ( prefix != '0' ) {
+		return false;
+	}
+
+	char ch2nd = m_alreadyTravelsaledString.at(1);
+	if ( !isOctCode(ch2nd) ) {
+		return false;
+	}
+
+	return true;
 }
 
 
 
+
+bool OctalParser::isOctCode(char ch)
+{
+	return ch>='0' && ch<='7';
+}

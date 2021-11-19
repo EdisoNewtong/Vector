@@ -21,3 +21,11 @@ void ExpEvaluation::init() // override
 	m_tokenType = E_TOKEN_SEMICOLON;
 }
 
+
+// virtual 
+bool ExpEvaluation::isEnd(ParsedCharInfo* pInfo) // override;
+{
+	return      (m_alreadyTravelsaledString.size() == 1)
+		   &&   (m_alreadyTravelsaledString.at(0) == ';');
+}
+

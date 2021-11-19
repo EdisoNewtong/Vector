@@ -2,10 +2,10 @@
 #define OCTAL_PARSER_H
 
 #include <unordered_map>
-#include "tokenParserBase.h"
+#include "decimalParser.h"
 #include "parsedCharInfo.h"
 
-class OctalParser : public TokenParserBase
+class OctalParser : public DecimalParser
 {
 public:
 	OctalParser(E_PaserType tp);
@@ -13,7 +13,9 @@ public:
 
 	virtual void init() override;
 	virtual E_PaserType appendContent(ParsedCharInfo* pInfo) override;
+	virtual bool isEnd(ParsedCharInfo* pInfo) override;
 protected:
+	bool isOctCode(char ch);
 };
 
 #endif
