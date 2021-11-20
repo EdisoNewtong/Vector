@@ -5,11 +5,14 @@
 #include <string>
 #include <unordered_map>
 #include "commonEnum.h"
+#include "parsedCharInfo.h"
+
+
 
 class ParserExpection : public std::exception
 {
 public:
-	ParserExpection(E_ExceptionCode errorCode);
+	ParserExpection(E_ExceptionCode errorCode, ParsedCharInfo* pInfo);
 	ParserExpection(const  ParserExpection& r);
 	virtual const char* what() const throw();
 
@@ -21,6 +24,8 @@ protected:
 
     // std::unordered_map<E_ExceptionCode, std::string> m_shortInfoMap;
     std::unordered_map<int, std::string> m_shortInfoMap;
+
+	ParsedCharInfo* m_pParsedCharInfo;
 
 };
 

@@ -109,6 +109,18 @@ bool CharBaseInfo::isNumber()
 	return (m_ch >= '0' && m_ch <= '9');
 }
 
+bool CharBaseInfo::isOctNumber()
+{
+	return (m_ch >= '0' && m_ch <= '7');
+}
+
+bool CharBaseInfo::isHexNumber()
+{
+	return    (m_ch >= '0' && m_ch <= '9')
+	       || (m_ch >= 'a' && m_ch <= 'f')
+		   || (m_ch >= 'A' && m_ch <= 'F');
+}
+
 bool CharBaseInfo::isUnderLine()
 {
 	return m_ch == '_';

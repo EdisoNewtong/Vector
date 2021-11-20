@@ -20,7 +20,7 @@ build/parsedCharInfo.o:core/parsedCharInfo.cpp core/parsedCharInfo.h core/util/c
 	g++   $(COMPILE_OPT)   $(INC_PATH)   -c -o build/parsedCharInfo.o core/parsedCharInfo.cpp 
 
 
-build/parserException.o:core/parserException.cpp core/parserException.h core/commonEnum.h
+build/parserException.o:core/parserException.cpp core/parserException.h core/commonEnum.h  core/parsedCharInfo.h
 	g++   $(COMPILE_OPT)   $(INC_PATH)   -c -o build/parserException.o  core/parserException.cpp
 
 build/keywordList.o:core/util/keywordList.cpp  core/util/keywordList.h

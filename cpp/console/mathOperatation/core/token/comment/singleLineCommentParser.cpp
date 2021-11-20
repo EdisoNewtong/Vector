@@ -59,6 +59,11 @@ E_PaserType SingleLineCommentParser::appendContent(ParsedCharInfo* pInfo) // ove
 			// lastCh != '\r'  , append content
 			m_alreadyTravelsaledString += curCh;
 			m_endInfo = pInfo->position;
+
+			if ( pInfo->isLastChar ) {
+				m_switchFlag = E_TOKEN_TERMINATE_TO_DEFAULT;
+				return E_P_DEFAULT;	
+			}
 		}
 	}
 
@@ -79,8 +84,9 @@ bool SingleLineCommentParser::isEnd(ParsedCharInfo* pInfo) // override;
 
 	// sz >=2
 	string prefix = m_alreadyTravelsaledString.substr(0,2);
-	char lastCh = m_alreadyTravelsaledString.back();
+	// char lastCh = m_alreadyTravelsaledString.back();
 	if ( prefix == "//" ) {
+		char curCh = pInfo->currentChar;
 		if ( pInfo->isLastChar ) {
 			//      Last Line     :    x = 10 + 5; //               OK
 			//      Last Line     :    x = 10 + 5; //a              OK
@@ -89,7 +95,8 @@ bool SingleLineCommentParser::isEnd(ParsedCharInfo* pInfo) // override;
 			//      Last Line     :    x = 10 + 5; //\r\n           OK
 			return true;
 		} else {
-			return (lastCh == '\r' || lastCh == '\n');
+			return      (curCh == '\n')
+				     || (curCh == '\r' && pInfo->nextChar != '\n');
 		}
 	} else {
 		return false;

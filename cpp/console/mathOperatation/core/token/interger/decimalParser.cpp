@@ -40,6 +40,10 @@ void DecimalParser::init() // override
 	m_AllAvalibleCharacters.insert( make_pair('l', CharUtil::getCharBaseInfo('l') ) );
 	m_AllAvalibleCharacters.insert( make_pair('L', CharUtil::getCharBaseInfo('L') ) );
 
+	// very special string     1f   123f   334f
+	m_AllAvalibleCharacters.insert( make_pair('f', CharUtil::getCharBaseInfo('f') ) );
+	m_AllAvalibleCharacters.insert( make_pair('F', CharUtil::getCharBaseInfo('F') ) );
+
 	m_tokenType = E_TOKEN_DECIMAL_NUMBER;
 }
 
@@ -54,7 +58,6 @@ E_PaserType  DecimalParser::appendContent(ParsedCharInfo* pInfo) // override
 		/*
 		     123+ 
 			    ^
-
 		*/
 		m_switchFlag = E_TOKEN_TERMINATE_TO_DEFAULT_RE_PARSE;
 		return E_P_DEFAULT;
@@ -73,10 +76,13 @@ E_PaserType  DecimalParser::appendContent(ParsedCharInfo* pInfo) // override
 				} else {
 					// [1-9] + [0-9]   
 					// e.g.   21    20
+					m_endInfo = pInfo->position;
 				}
-			} else if ( is_dot(curCh) || is_eE(curCh) ) {
+			} else if ( is_dot(curCh) || is_eE(curCh) || is_fF(curCh) ) {
 				// 0.   [0-9].      or    [0-9]e    or  [0-9]E
+				//      [0-9]f      [0-9]F
 				m_alreadyTravelsaledString += curCh;
+				// m_endInfo = pInfo->position;
 				m_switchFlag = E_TOKEN_CONVERT_TO_OTHER;
 				return E_P_FLOAT;
 			} else if ( is_xX(curCh) ) {
@@ -102,15 +108,16 @@ E_PaserType  DecimalParser::appendContent(ParsedCharInfo* pInfo) // override
 				if ( is_uU_lL(curCh) ) {
 					update_uU_lLCnt(curCh);
 				} else {
-					// 0-9        .
-					// e/E   x/X
+					// 0-9        "."
+					// e/E   x/X  f/F
 					// TODO : throw
 				}
 			} else {
 				// 0  u/U(s)    &&   0 l/L(s) ,   previous string are all  numbers
 				if ( inSideCharInfo->isNumber() ) {
 					m_alreadyTravelsaledString += curCh;
-				} else if ( is_dot(curCh) || is_eE(curCh) ) {
+					m_endInfo = pInfo->position;
+				} else if ( is_dot(curCh) || is_eE(curCh) || is_fF(curCh) ) {
 					m_alreadyTravelsaledString += curCh;
 					m_switchFlag = E_TOKEN_CONVERT_TO_OTHER;
 					return E_P_FLOAT;
@@ -257,3 +264,9 @@ bool DecimalParser::isSuffixExisted()
 {
 	return m_uCnt>0 || m_UCnt>0 || m_lCnt>0 || m_LCnt>0;
 }
+
+bool DecimalParser::is_fF(char ch)
+{
+	return ch == 'f' || ch == 'F';
+}
+

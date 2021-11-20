@@ -88,6 +88,12 @@ void Parser::processLineInfo(char ch, size_t idx)
     //
 	m_pInfo.position.nCharIdx = idx;
     m_pInfo.isLastChar = (idx == m_size-1);
+
+	// set next char in advance
+	if ( !m_pInfo.isLastChar ) {
+		m_pInfo.nextChar = m_buf[idx+1];
+	}
+
 	m_pInfo.currentChar = ch;
 
 	//  Set Ch BaseInfo

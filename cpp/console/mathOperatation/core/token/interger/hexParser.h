@@ -16,7 +16,7 @@ public:
 	virtual E_PaserType appendContent(ParsedCharInfo* pInfo) override;
 	virtual bool isEnd(ParsedCharInfo* pInfo) override;
 protected:
-	bool isHexCode(char ch);
+	// bool isHexCode(char ch);
 };
 
 #endif

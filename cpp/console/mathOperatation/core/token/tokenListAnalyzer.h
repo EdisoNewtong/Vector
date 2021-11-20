@@ -11,6 +11,7 @@ public:
 	TokenListAnalyzer();
 	virtual ~TokenListAnalyzer();
 
+	TokenInfo* getPreviousValidToken();
 	bool checkParserIsValid(E_PaserType tp);
 	bool pushToken(TokenInfo* pToken);
 protected:

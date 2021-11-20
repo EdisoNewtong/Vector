@@ -38,6 +38,10 @@ E_PaserType  BlankParser::appendContent(ParsedCharInfo* pInfo) // override
 	if ( pBlankCharInfo != nullptr ) {
 		m_alreadyTravelsaledString += curCh;
 		m_endInfo = pInfo->position;
+		if ( pInfo->isLastChar ) {
+			m_switchFlag = E_TOKEN_TERMINATE_TO_DEFAULT_RE_PARSE;
+			return E_P_DEFAULT;
+		}
 	} else {
 		// Blank buffer is <End>
 		m_switchFlag = E_TOKEN_TERMINATE_TO_DEFAULT_RE_PARSE;
@@ -59,7 +63,7 @@ bool BlankParser::isEnd(ParsedCharInfo* pInfo) // override
 	}
 
 	bool isAllInside = true;
-	for( const auto& ch : m_alreadyTravelsaledString)
+	for( const auto& ch : m_alreadyTravelsaledString )
 	{
 		auto pCharInfo = getInsideCharSetBaseInfo(ch);
 		if ( pCharInfo == nullptr ) {

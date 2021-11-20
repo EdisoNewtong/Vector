@@ -45,7 +45,8 @@ E_PaserType  OctalParser::appendContent(ParsedCharInfo* pInfo) // override
 		m_switchFlag = E_TOKEN_TERMINATE_TO_DEFAULT_RE_PARSE;
 		return E_P_DEFAULT;
 	} else {
-		if( isOctCode(curCh) ) {
+		// inSideCharInfo != nullptr 
+		if( inSideCharInfo->isOctNumber() ) {
 			if ( isSuffixExisted() ) {
 				// TODO : throw
 			} else {
@@ -75,7 +76,8 @@ bool OctalParser::isEnd(ParsedCharInfo* pInfo) // override;
 	}
 
 	char ch2nd = m_alreadyTravelsaledString.at(1);
-	if ( !isOctCode(ch2nd) ) {
+	auto inSideCharInfo = getInsideCharSetBaseInfo( ch2nd );
+	if ( inSideCharInfo == nullptr || !(inSideCharInfo->isOctNumber()) ) {
 		return false;
 	}
 
@@ -83,9 +85,7 @@ bool OctalParser::isEnd(ParsedCharInfo* pInfo) // override;
 }
 
 
-
-
-bool OctalParser::isOctCode(char ch)
-{
-	return ch>='0' && ch<='7';
-}
+// bool OctalParser::isOctCode(char ch)
+// {
+// 	return ch>='0' && ch<='7';
+// }

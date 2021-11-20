@@ -11,7 +11,6 @@ TokenParserBase::TokenParserBase(E_PaserType tp)
 	, m_token("")
 	, m_type(tp)
 	, m_tokenType( E_TOKEN_UNKNOWN )
-	, m_isValidEnd(0)
 	, m_switchFlag( E_TERMINAL_NONE )
 	, m_beginInfo()
 	, m_endInfo()
@@ -37,51 +36,12 @@ void TokenParserBase::init()
 }
 
 
-CharBaseInfo* TokenParserBase::commonCheck(char ch, ParsedCharInfo* pInfo)
+CharBaseInfo* TokenParserBase::commonCheckWithException(char ch, ParsedCharInfo* pInfo)
 {
 	auto pCharInfo = getInsideCharSetBaseInfo(ch);
 
 	if ( pCharInfo == nullptr ) {
-		ParserExpection	e(E_ExceptionCode::E_UNKNOWN_CHAR);
-
-		string info;
-		if ( ch >= 0 ) {
-			// < 32
-			if ( ch < 32 ) {
-				if ( ch == '\t' ) {
-					info += "'\\t'";
-				} else if ( ch == '\r' ) {
-					info += "'\\r'";
-				} else if ( ch == '\n' ) {
-					info += "'\\n'";
-				} else {
-					info += " ? , code = ";  
-					info += std::to_string( static_cast<int>(ch & 0xFFU) );
-				}
-			} else {
-				if ( ch == 32 ) {
-					info += "' '";
-				} else {
-					info += "'";
-					info += ch;
-					info += "'";
-				}
-			}
-		} else {
-			// < 0
-			info += " ? , code = ";  
-			info += std::to_string( static_cast<int>(ch & 0xFFU) );
-		}
-
-		info += "  | index = ";
-		info += std::to_string(pInfo->position.nCharIdx);
-		info += " @Line ";
-		info += std::to_string(pInfo->position.nLine);
-		info += ":";
-		info += std::to_string(pInfo->position.nCol);
-
-		e.setDetail(info);
-
+		ParserExpection	e(E_ExceptionCode::E_UNKNOWN_CHAR, pInfo);
 		throw e;
 	}
 
@@ -128,7 +88,7 @@ E_PaserType  TokenParserBase::appendContent(ParsedCharInfo* pInfo) // override;
 		m_switchFlag = E_TOKEN_CONVERT_TO_OTHER;
 		return nextParserType;
 	} else {
-		commonCheck(ch, pInfo);
+		commonCheckWithException(ch, pInfo);
 	}
 
 	return m_type;

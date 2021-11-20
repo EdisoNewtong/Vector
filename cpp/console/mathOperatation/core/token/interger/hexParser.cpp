@@ -63,7 +63,8 @@ E_PaserType HexParser::appendContent(ParsedCharInfo* pInfo) // override
 			m_switchFlag = E_TOKEN_TERMINATE_TO_DEFAULT_RE_PARSE;
 			return E_P_DEFAULT;
 		} else {
-			if ( isHexCode(curCh) ) {
+			// inSideCharInfo != nullptr
+			if ( inSideCharInfo->isHexNumber()  ) {
 				m_alreadyTravelsaledString += curCh;
 			} else {
 				// 3rd char must be inside a-f A-F  0-9
@@ -83,14 +84,14 @@ E_PaserType HexParser::appendContent(ParsedCharInfo* pInfo) // override
 			return E_P_DEFAULT;
 		} else {
 			if ( isSuffixExisted() ) {
-				if ( isHexCode(curCh) ) {
+				if ( inSideCharInfo->isHexNumber()  ) {
 					// TODO : throw  HexCode is end ,can't append  a-f A-F 0-9
 				} else {
 					// u/U  l/L
 					update_uU_lLCnt(curCh);
 				}
 			} else {
-				if ( isHexCode(curCh) ) {
+				if ( inSideCharInfo->isHexNumber()  ) {
 					m_alreadyTravelsaledString += curCh;
 				} else {
 					// u/U  l/L
@@ -119,19 +120,21 @@ bool HexParser::isEnd(ParsedCharInfo* pInfo) // override;
 	}
 
 	char ch3rd = m_alreadyTravelsaledString.at(2);
-	if ( !isHexCode(ch3rd) ) {
+	auto inSideCharInfo = getInsideCharSetBaseInfo( ch3rd );
+	if ( inSideCharInfo == nullptr ||  !( inSideCharInfo->isHexNumber() ) ) {
 		return false;
 	}
 
 	return true;
 }
 
-bool HexParser::isHexCode(char ch)
-{
-	return    (ch>='0' && ch<='9')
-		   || (ch>='a' && ch<='f')
-		   || (ch>='A' && ch<='F');
-}
+
+// bool HexParser::isHexCode(char ch)
+// {
+// 	return    (ch>='0' && ch<='9')
+// 		   || (ch>='a' && ch<='f')
+// 		   || (ch>='A' && ch<='F');
+// }
 
 
 

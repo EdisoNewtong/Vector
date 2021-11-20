@@ -24,6 +24,7 @@ struct ParsedCharInfo
 	bool isLastChar;
 	char previousChar;
 	char currentChar;
+	char nextChar;
 
 	CharBaseInfo* baseInfo;
 };

@@ -55,7 +55,7 @@ public:
 	virtual bool isEnd(ParsedCharInfo* pInfo);
 
 	CharBaseInfo* getInsideCharSetBaseInfo(char ch);
-	CharBaseInfo* commonCheck(char ch, ParsedCharInfo* pInfo);
+	CharBaseInfo* commonCheckWithException(char ch, ParsedCharInfo* pInfo);
 
 	void transferToken(TokenParserBase* pBase);
 	E_PaserType getType();
@@ -70,8 +70,6 @@ protected:
 
 	E_PaserType m_type;
 	E_TokenType m_tokenType;
-
-	bool m_isValidEnd;
 
 	E_TERMINAL_STATUS  m_switchFlag;
 	

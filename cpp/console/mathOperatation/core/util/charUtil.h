@@ -37,6 +37,8 @@ public:
 
 	bool isAlpha();
 	bool isNumber();
+	bool isOctNumber();
+	bool isHexNumber();
 	bool isUnderLine();
 	bool isVaribleCharSet();
 	bool isVaribleHeadChar();

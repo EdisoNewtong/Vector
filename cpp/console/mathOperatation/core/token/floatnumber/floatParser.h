@@ -14,7 +14,27 @@ public:
 
 	virtual void init() override;
 	virtual E_PaserType appendContent(ParsedCharInfo* pInfo) override;
+
+	virtual void reset() override;
+	virtual bool isEnd(ParsedCharInfo* pInfo) override;
 protected:
+	int m_dotCnt;      // .
+	int m_eECnt;       // e/E
+	int m_fFCnt;       // f/F
+	int m_numberCnt;   // 0-9
+	int m_positieCnt;  // +
+	int m_negativeCnt; // -
+
+	void innerReset();
+
+	bool is_eE(char ch);
+	bool is_fF(char ch);
+	bool is_dot(char ch);
+	bool is_positiveSign(char ch);
+	bool is_negativeSign(char ch);
+	bool is_number(char ch);
+
+	void summary_eE_fF_dot_number();
 };
 
 #endif
