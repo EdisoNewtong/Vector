@@ -179,6 +179,47 @@ protected:
 
     QString                 m_strDetailOutput;
 
+    /*
+     * "m_pickedInfo" in detail
+     *
+     *
+            | 8765 | 4321 |
+
+            ==================================================
+
+            1st       -Bit : signed/unsigned flag   =>   1:signed,   0:unsigned
+
+            ==================================================
+
+            2nd ~ 4th -Bit : Data Type
+                
+                0 = 000 : char
+                1 = 001 : short
+                2 = 010 : int
+                3 = 011 : long
+                4 = 100 : long long
+
+            ==================================================
+
+            5th ~ 6th -Bit : Present-Style
+                 
+                0 = 00 : Binary
+                1 = 01 : Oct
+                2 = 10 : Hex
+                3 = 11 : Decimal
+
+            ==================================================
+
+            7th       -Bit : Char Type Only ( Letter Mode / AscII Mode )
+
+                0  : Letter Mode
+                1  : Ascii Code Mode
+
+            ==================================================
+
+
+
+    */
     //                      | ? 1 + 2 | 3 + 1 |
     unsigned int            m_pickedInfo;
     const int               m_errorMsgShowTime; // in milli-seconds

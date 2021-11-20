@@ -730,7 +730,7 @@ unsigned int myhardcodewindow::getPresentStyle()
 inline 
 unsigned int myhardcodewindow::getCharPresentStyle()
 {
-    return ((m_pickedInfo >> 6) & 0x1);
+    return ((m_pickedInfo >> 6) & 0x1U);
 }
 
 
@@ -856,6 +856,7 @@ void myhardcodewindow::updateDataTypeInfo()
 
     if ( isCharType ) {
         m_pRepresentationCharacterAsciiGrp->show();
+        m_pAsciiChkBox->setText( QString("Ascii Code (Based on %1) ").arg( m_baseMap[getPresentStyle()] ) );
     } else {
         m_pRepresentationCharacterAsciiGrp->hide();
     }
@@ -881,8 +882,33 @@ void myhardcodewindow::updateInputPromptInfo()
             m_pInputBox->setPlaceholderText( tr("Please input only One character "));
         } else {
             // ascii code (10)
-            m_pInputPrompt->setText( tr("Character : ") );
-            m_pInputBox->setPlaceholderText( tr("Please input the ascii code (10) of the character "));
+            switch ( ps )
+            {
+            case 0: // Binary
+                m_pInputPrompt->setText( tr("Ascii Code : (01)") );
+                // m_pInputBox->setPlaceholderText( tr("Please input a Binary Number only contains [01] "));
+                m_pInputBox->setPlaceholderText( tr("Please input the Ascii Code (10) of the character ") );
+                break;
+            case 1: // Octal
+                m_pInputPrompt->setText( tr("Ascii Code : 0") );
+                m_pInputBox->setPlaceholderText( tr("Please input the Ascii Code [0-7] of the character ") );
+                break;
+            case 2: // Hex
+                m_pInputPrompt->setText( tr("Ascii Code : 0x") );
+                m_pInputBox->setPlaceholderText( ( tr("Please input the ascii code [0-9a-fA-F] of the character ") ));
+                break;
+            case 3: // Decimal
+                m_pInputPrompt->setText( tr("Ascii Code (Dec) : ") );
+                m_pInputBox->setPlaceholderText( ( tr("Please input the Ascii code [0-9] of the character ") ) );
+                break;
+            default:
+                break;
+            }
+
+            m_pAsciiChkBox->setText( QString("Ascii Code (Based on %1) ").arg( m_baseMap[ps] ) );
+
+            // m_pInputPrompt->setText( tr("Ascii : ") );
+            // m_pInputBox->setPlaceholderText( tr("Please input the ascii code (10) of the character "));
         }
     } else {
         // Not char type
@@ -1052,6 +1078,7 @@ void myhardcodewindow::doBinaryConvert()
 
 void myhardcodewindow::updateCharBits()
 {
+
     using namespace limitedNumber;
 
     QString inputText = m_pInputBox->text();
@@ -1065,6 +1092,7 @@ void myhardcodewindow::updateCharBits()
     auto us = getUnsignedSigned();
     auto isFullBitChecked = (m_pShowFullBitsChkBox->checkState() == Qt::Checked);
     auto letAscii = getCharPresentStyle();
+    auto bohd = getPresentStyle();
     auto truncateFlag = true;
     auto succ = false;
     signed short code = 0;
@@ -1086,18 +1114,38 @@ void myhardcodewindow::updateCharBits()
         // Single Letter Mode
         if ( inputText.size() == 1 && ((code = static_cast<signed short>(inputText.at(0).unicode())) <= 127 ) ) {
             succ = true;
-        } 
+        }
     } else {
-        // Ascii Code Mode (Only Support Base 10)
+        // Ascii Code Mode (Only Support Base 2/8/16/10)
         auto convertRet = false;
-        code = inputText.toShort(&convertRet, 10);
-        if ( convertRet ) {
+        // code = inputText.toShort(&convertRet, 10);
+        
+
+        auto hightestBit_1Flag = isHightestBit_1(inputText, m_charBits, m_baseMap[bohd] );
+        if ( hightestBit_1Flag ) {
+            QByteArray ary = string2ByteArray_WithAlignmentByte( inputText, m_charBits, m_baseMap[bohd] );
+            QDataStream in(&ary,QIODevice::ReadOnly);
+            qint8 schar8   = 0;
+            quint8 uschar8 = 0;
             if ( us == 0 ) {
                 // unsigned char
-                succ = (code >= static_cast<int>(min_unsigned_char) &&  code <= static_cast<int>(max_unsigned_char));
+                in >> uschar8;
+                code = static_cast<signed short>( uschar8 & 0xFFU);
             } else {
-                //   signed char
-                succ = (code >= static_cast<int>(min_signed_char) &&  code <= static_cast<int>(max_signed_char));
+                in >> schar8;
+                code = static_cast<signed short>( schar8 & 0xFFU);
+            }
+            succ = true;
+        } else {
+            code = inputText.toShort(&convertRet, m_baseMap[bohd] );
+            if ( convertRet ) {
+                if ( us == 0 ) {
+                    // unsigned char
+                    succ = (code >= static_cast<int>(min_unsigned_char) &&  code <= static_cast<int>(max_unsigned_char));
+                } else {
+                    //   signed char
+                    succ = (code >= static_cast<int>(min_signed_char) &&  code <= static_cast<int>(max_signed_char));
+                }
             }
         }
     }
@@ -1499,10 +1547,10 @@ void myhardcodewindow::updateDetailOutput()
             QString strNumber(m_byteDecimal);
             int num = strNumber.toInt(&convertRet, 10);
             if ( num < 0 ) {
-                m_pDecialCharDetailBox->setText( QString(" = %1(10) = 0x%2(16) = %3(2) = 0%4(8)").arg(QString(m_byteDecimal)).arg(QString(m_byteHex)).arg(QString(m_byteBin)).arg(QString(m_byteOct))  );
+                m_pDecialCharDetailBox->setText( QString(" = '?' = %1(10) = 0x%2(16) = %3(2) = 0%4(8)").arg(QString(m_byteDecimal)).arg(QString(m_byteHex)).arg(QString(m_byteBin)).arg(QString(m_byteOct))  );
             } else {
                 if ( num > 127 ) {
-                    m_pDecialCharDetailBox->setText( QString(" = %1(10) = 0x%2(16) = %3(2) = 0%4(8)").arg(QString(m_byteDecimal)).arg(QString(m_byteHex)).arg(QString(m_byteBin)).arg(QString(m_byteOct))  );
+                    m_pDecialCharDetailBox->setText( QString(" = '?' = %1(10) = 0x%2(16) = %3(2) = 0%4(8)").arg(QString(m_byteDecimal)).arg(QString(m_byteHex)).arg(QString(m_byteBin)).arg(QString(m_byteOct))  );
                 } else {
                     auto it = m_unprintedTable.find(num);
                     QString chInfo;
@@ -1532,10 +1580,12 @@ void myhardcodewindow::updateDetailOutput()
             QString strNumber(m_byteDecimal);
             int num = strNumber.toInt(&convertRet, 10);
             if ( num < 0 ) {
+                chInfo = "?";
                 // flag = 1;
                 // m_pDecialCharDetailBox->setText( QString(" = %1(10) = 0x%2(16) = %3(2) = 0%4(8)").arg(QString(m_byteDecimal)).arg(QString(m_byteHex)).arg(QString(m_byteBin)).arg(QString(m_byteOct))  );
             } else {
                 if ( num > 127 ) {
+                     chInfo = "?";
                     // flag = 2;
                     // m_pDecialCharDetailBox->setText( QString(" = %1(10) = 0x%2(16) = %3(2) = 0%4(8)").arg(QString(m_byteDecimal)).arg(QString(m_byteHex)).arg(QString(m_byteBin)).arg(QString(m_byteOct))  );
                 } else {
@@ -1634,7 +1684,7 @@ void myhardcodewindow::updateDetailOutput()
             // With  Letter Display
             m_pDecialCharDetailBox->setText( QString(" = '%1' = %2(10) = %3(16) = %4(2) = 0%5(8)").arg(chInfo).arg(QString(m_byteDecimal)).arg(fmt16).arg(QString(fmt2)).arg(QString(m_byteOct))  );
         } else {
-            m_pDecialCharDetailBox->setText( QString(" = %1(10) = %2(16) = %3(2) = 0%4(8)").arg(QString(m_byteDecimal)).arg(fmt16).arg(fmt2).arg(QString(m_byteOct))  );
+            m_pDecialCharDetailBox->setText( QString(" = '%1' = %2(10) = %3(16) = %4(2) = 0%5(8)").arg(chInfo).arg(QString(m_byteDecimal)).arg(fmt16).arg(fmt2).arg(QString(m_byteOct))  );
         }
 
         m_strDetailOutput += QString("%1 num = %2;\n").arg(strDataType).arg( QString(m_byteDecimal) );
@@ -1709,8 +1759,6 @@ bool myhardcodewindow::isHightestBit_1(const QString& targetStr, size_t nBits, i
     int strSize = targetStr.size();
     auto bret = false;
     if ( baseOpt == 2 ) {
-        nHighestBit /= 1;
-
         if ( strSize != nHighestBit ) {
             bret = false;
         } else {
