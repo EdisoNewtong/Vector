@@ -5,6 +5,7 @@
 .DS_Store
 *.o
 main
+main.exe
 build-*
 
 cpp/console/binarycmp/binarycmp
