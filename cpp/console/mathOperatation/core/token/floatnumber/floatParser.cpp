@@ -68,10 +68,12 @@ E_PaserType  FloatParser::appendContent(ParsedCharInfo* pInfo) // override
 		m_switchFlag = E_TOKEN_TERMINATE_TO_DEFAULT_RE_PARSE;
 		return E_P_DEFAULT;
 	} else {
+		//
         // inSideCharInfo != nullptr
-		char firstCh = 0;
+		//
+		
 		if ( sz == 1 ) {
-			firstCh = m_alreadyTravelsaledString.at(0);
+			char firstCh = m_alreadyTravelsaledString.at(0);
 			if ( !is_dot(firstCh)  ) {
 				cout << "[ERROR] In E_P_FLOAT Parser, First char != '0' , m_alreadyTravelsaledString = \"" << m_alreadyTravelsaledString << "\"" << endl;
 				assert(false);
@@ -84,11 +86,19 @@ E_PaserType  FloatParser::appendContent(ParsedCharInfo* pInfo) // override
 				// TODO : throw
 			}
 		} else if ( sz == 2 ) {
-			// [0-9].      [0-9]e   or [0-9]E    
+			// [0-9].      [0-9]e   or [0-9]E      or    .[0-9]
 			if ( m_dotCnt == 1 ) {
-				// [0-9].
+				// [0-9].    or   .[0-9]
 				if ( is_number(curCh)  || is_eE(curCh) ) {
-					// 1.2    or   1.e
+					//
+					//   1.     
+					//          3. ==>     3.2
+					//          3. ==>     3.e
+					//
+					//   2.     
+					//          .3 ==>     .32
+					//          .3 ==>     .3e
+					//
 					m_alreadyTravelsaledString += curCh;
 				} else if ( is_fF(curCh)  ) {
 					m_alreadyTravelsaledString += curCh;
@@ -97,16 +107,17 @@ E_PaserType  FloatParser::appendContent(ParsedCharInfo* pInfo) // override
 				} else if ( is_dot(curCh ) ) {
 					// TODO : throw   multi   2 '.'s
 				} else {
-					//  +/- ,    + : addition ,   - : substract
+					//  +/- ,    + : must be addition ,   - : must be substract
 					m_switchFlag = E_TOKEN_TERMINATE_TO_DEFAULT_RE_PARSE;
 					return E_P_DEFAULT;
 				}
 			} else if ( m_eECnt == 1 ) {
 				// [0-9]e   or   [0-9]E
 				if ( is_number(curCh) ) {
+					// e.g.    3e2
 					m_alreadyTravelsaledString += curCh;
 				} else if ( is_positiveSign(curCh) || is_negativeSign(curCh) ) {
-					// 2e+      or    2e-
+					// e.g.    2e+      or    2e-
 					m_alreadyTravelsaledString += curCh;
 				} else if ( is_dot(curCh) ) {
 					// TODO : throw  "e."    "E."  is not allowed
@@ -132,10 +143,15 @@ E_PaserType  FloatParser::appendContent(ParsedCharInfo* pInfo) // override
 							// TODO : throw
 						}
 					} else if ( is_dot(lastCh) ) {
-						/*
+						/*  ****************************************************************************************************
+						 *  In this condition , the str contain both   "."   and      e/E     
+						 *      the  "." can't be at the last      
+						 *   123.4e   or   123.4e12   or    123.4e+    or   123.4e-
+						    ****************************************************************************************************
+
+						
 						     last is Not  e/E
 							 1234.
-						*/
 						if ( is_number(curCh) || is_eE(curCh) ) {
 							// 123.4 or   123.e
 							m_alreadyTravelsaledString += curCh;
@@ -151,6 +167,9 @@ E_PaserType  FloatParser::appendContent(ParsedCharInfo* pInfo) // override
 							// "."
 							// TODO : throw
 						} 
+
+
+						*/
 						
 					} else if ( is_positiveSign(lastCh) || is_negativeSign(lastCh) ) {
 						// 2e+   or   2e-
@@ -161,6 +180,7 @@ E_PaserType  FloatParser::appendContent(ParsedCharInfo* pInfo) // override
 							// TODO : throw    
 						}
 					} else if ( is_number(lastCh) ) {
+						//   e.g    123.4e2    
 						if ( is_number(curCh) ) {
 							m_alreadyTravelsaledString += curCh;
 						} else if ( is_fF(curCh) ) {
@@ -174,17 +194,23 @@ E_PaserType  FloatParser::appendContent(ParsedCharInfo* pInfo) // override
 				} else {
 					//   0 "."(s)   ,  with only 1 e/E
 					if ( is_number(lastCh) ) {
+						//  123e1   
 						if ( is_number(curCh ) ) {
 							m_alreadyTravelsaledString += curCh;
 						} else if ( is_fF(curCh) ) {
 							m_alreadyTravelsaledString += curCh;
 							m_switchFlag = E_TOKEN_TERMINATE_TO_DEFAULT;
 							return E_P_DEFAULT;
+						} else if ( is_positiveSign(curCh) || is_negativeSign(curCh) ) {
+							//  +/- ,    + : must be addition ,   - : must be substract
+							// e.g.   123e1+     or    123e1-
+							m_switchFlag = E_TOKEN_TERMINATE_TO_DEFAULT_RE_PARSE;
+							return E_P_DEFAULT;
 						} else {
-							// "." ,    e/E   ,   +/-
-							// TODO : throw   
+							// TODO : throw    "."     e/E   
 						}
 					} else if ( is_positiveSign(lastCh) ||  is_negativeSign(lastCh) ) {
+						// e.g.   123e+    or    123e-
 						if ( is_number(curCh) ) {
 							m_alreadyTravelsaledString += curCh;
 						} else {
@@ -204,7 +230,7 @@ E_PaserType  FloatParser::appendContent(ParsedCharInfo* pInfo) // override
 				// 0 e/E(s) , with 1 "." only
 				if ( is_dot(lastCh) ) {
 					if ( is_number(curCh) || is_eE(curCh) ) {
-						// 1.1  or   1.e
+						// 1.1  or   1.e     or     .1e      or         .23
 						m_alreadyTravelsaledString += curCh;
 					} else if ( is_dot(curCh) ) {
 						// 1..
@@ -221,7 +247,7 @@ E_PaserType  FloatParser::appendContent(ParsedCharInfo* pInfo) // override
 					}
 				} else if ( is_number(lastCh)  )  {
 					if ( is_number(curCh) || is_eE(curCh) ) {
-						// 1.23   1.2e
+						// 1.23   or   1.2e
 						m_alreadyTravelsaledString += curCh;
 					} else if ( is_dot(curCh) ) {
 						// 1.2.
@@ -235,7 +261,7 @@ E_PaserType  FloatParser::appendContent(ParsedCharInfo* pInfo) // override
 						m_switchFlag = E_TOKEN_TERMINATE_TO_DEFAULT_RE_PARSE;
 						return E_P_DEFAULT;
 					}
-				}
+				} 
 			}
 		}
 	}

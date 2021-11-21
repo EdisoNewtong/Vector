@@ -24,6 +24,11 @@ void OctalParser::init() // override
 		m_AllAvalibleCharacters.insert( make_pair(ch, CharUtil::getCharBaseInfo(ch) ) );
 	}
 
+	m_AllAvalibleCharacters.insert( make_pair('e', CharUtil::getCharBaseInfo('e') ) );
+	m_AllAvalibleCharacters.insert( make_pair('E', CharUtil::getCharBaseInfo('E') ) );
+
+	m_AllAvalibleCharacters.insert( make_pair('.', CharUtil::getCharBaseInfo('.') ) );
+
 	m_AllAvalibleCharacters.insert( make_pair('u', CharUtil::getCharBaseInfo('u') ) );
 	m_AllAvalibleCharacters.insert( make_pair('U', CharUtil::getCharBaseInfo('U') ) );
 	m_AllAvalibleCharacters.insert( make_pair('l', CharUtil::getCharBaseInfo('l') ) );
@@ -51,6 +56,14 @@ E_PaserType  OctalParser::appendContent(ParsedCharInfo* pInfo) // override
 				// TODO : throw
 			} else {
 				m_alreadyTravelsaledString += curCh;
+			}
+		} else if ( is_dot(curCh) || is_eE(curCh) ) {
+			if ( isSuffixExisted() ) {
+				// TODO : throw
+			} else {
+				m_alreadyTravelsaledString += curCh;
+				m_switchFlag = E_TOKEN_CONVERT_TO_OTHER;
+				return E_P_FLOAT;
 			}
 		} else {
 			// u/U  l/L
@@ -83,6 +96,8 @@ bool OctalParser::isEnd(ParsedCharInfo* pInfo) // override;
 
 	return true;
 }
+
+
 
 
 // bool OctalParser::isOctCode(char ch)

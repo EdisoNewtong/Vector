@@ -15,7 +15,6 @@ public:
 	virtual E_PaserType appendContent(ParsedCharInfo* pInfo) override;
 	virtual bool isEnd(ParsedCharInfo* pInfo) override;
 protected:
-	// bool isOctCode(char ch);
 };
 
 #endif

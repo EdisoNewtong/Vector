@@ -26,7 +26,8 @@ protected:
 	bool is_eE(char ch);
 	bool is_xX(char ch);
 	bool is_uU_lL(char ch);
-	bool is_fF(char ch);
+
+	// bool is_fF(char ch);
 
 	// u/U   l/L
 	bool isSuffixExisted();
