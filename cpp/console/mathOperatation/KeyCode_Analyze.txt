@@ -192,7 +192,234 @@ Next Character Possibility <After> a Specific Token
    2. Comment       | YES |
    3. Interger      | NO  |
    4. Float         | NO  |
-   5. Operator      |PART |   TODO :Very Complicate
+   5. Operator      | TBD |   
+      + :  
+	       +          | NO  |  ++ is not supported
+	       -          | YES |  +-  e.g.    int a = 10+-3;   // int a = 10 + (-3) = 7;
+           *          | NO  |
+           /          | NO  |
+           %          | NO  |
+           &          | NO  |
+           |          | NO  |
+           ^          | NO  |
+           ~          | YES |  +~  e.g.    int a = 1+~2;
+           <<         | NO  | 
+           >>         | NO  |  
+           (          | YES |  
+           )          | NO  |  
+		   =          | NO  | "+=" is not supported
+
+      - :  
+	       +          | YES |  -+  e.g.    int a = 10-+3;   // int a = 10 - (+3) = 7;
+	       -          | NO  |  -- is not supported
+           *          | NO  |
+           /          | NO  |
+           %          | NO  |
+           &          | NO  |
+           |          | NO  |
+           ^          | NO  |
+           ~          | YES |  -~  e.g.    int a = 1-~2;
+           <<         | NO  | 
+           >>         | NO  |  
+           (          | YES |  
+           )          | NO  |  
+		   =          | NO  | "-=" is not supported
+
+      * :  
+	       +          | YES |  *+  e.g.    int a = 10*+3;   // int a = 30 = 10 * (+3);
+	       -          | YES |  *-  e.g.    int a = 10*-3;   // int a = 10 * (-3) = -30;
+           *          | NO  |  
+           /          | NO  |
+           %          | NO  |
+           &          | NO  |
+           |          | NO  |
+           ^          | NO  |
+           ~          | YES |  *~  e.g.    int a = 10*~2;
+           <<         | NO  | 
+           >>         | NO  |  
+           (          | YES |  
+           )          | NO  |  
+		   =          | NO  | "*=" is not supported
+
+      / :  
+	       +          | YES |  *+  e.g.    int a = 10*+3;   // int a = 30 = 10 * (+3);
+	       -          | YES |  *-  e.g.    int a = 10*-3;   // int a = 10 * (-3) = -30;
+           *          | YES |  /* multi-line comment */
+           /          | YES |  // singline line comment 
+           %          | NO  |
+           &          | NO  |
+           |          | NO  |
+           ^          | NO  |
+           ~          | YES |  /~  e.g.    int a = 10/~2;
+           <<         | NO  | 
+           >>         | NO  |  
+           (          | YES |  
+           )          | NO  |  
+		   =          | NO  | "/=" is not supported
+
+      % :  
+	       +          | YES |  %+  e.g.    int a = 10%+3;   // int a = 10%(+3) = 1;
+	       -          | YES |  %-  e.g.    int a = 10%-3;   // int a = 10%(-3) = 1;
+           *          | NO  |  
+           /          | NO  |  
+           %          | NO  |
+           &          | NO  |
+           |          | NO  |
+           ^          | NO  |
+           ~          | YES |  %~  e.g.    int a = 10%~2 = 10 % (~2);
+           <<         | NO  | 
+           >>         | NO  |  
+           (          | YES |  
+           )          | NO  |  
+		   =          | NO  | "%=" is not supported
+
+
+      & :  
+	       +          | YES |  &+  e.g.    int a = 10&+3;   // int a = 10 & (+3); 
+	       -          | YES |  *-  e.g.    int a = 10&-3;   // int a = 10 & (-3);
+           *          | NO  |  
+           /          | NO  |
+           %          | NO  |
+           &          | NO  |  "&&"  is not supported
+           |          | NO  |  
+           ^          | NO  |  
+           ~          | YES |  &~  e.g.   int a = 10&~2;  // int a = 10 & (~2);
+           <<         | NO  | 
+           >>         | NO  |  
+           (          | YES |  
+           )          | NO  |  
+		   =          | NO  | "&=" is not supported
+
+
+      | :  
+	       +          | YES |  |+  e.g.    int a = 10|+3;   // int a = 10 | (+3); 
+	       -          | YES |  |-  e.g.    int a = 10|-3;   // int a = 10 | (-3);
+           *          | NO  |  
+           /          | NO  |
+           %          | NO  |
+           &          | NO  |  
+           |          | NO  |  "||" is not supported
+           ^          | NO  |  
+           ~          | YES |  |~  e.g.   int a = 10|~2;  // int a = 10 / (~2);
+           <<         | NO  | 
+           >>         | NO  |  
+           (          | YES |  
+           )          | NO  |  
+		   =          | NO  | "|=" is not supported
+
+      ^ :  
+	       +          | YES |  ^+  e.g.    int a = 10^+3;   // int a = 10 ^ (+3); 
+	       -          | YES |  ^-  e.g.    int a = 10^-3;   // int a = 10 ^ (-3);
+           *          | NO  |  
+           /          | NO  |
+           %          | NO  |
+           &          | NO  |  
+           |          | NO  |  
+           ^          | NO  |  
+           ~          | YES |  ^~  e.g.   int a = 10^~2;  // int a = 10 ^ (~2);
+           <<         | NO  | 
+           >>         | NO  |  
+           (          | YES |  
+           )          | NO  |  
+		   =          | NO  | "^=" is not supported
+
+      ~ :  
+	       +          | YES |  ~+  e.g.    int a = ~+3;   // int a = 10 ~ (+3); 
+	       -          | YES |  ~-  e.g.    int a = ~-3;   // int a = 10 ~ (-3);
+           *          | NO  |  
+           /          | NO  |
+           %          | NO  |
+           &          | NO  |  
+           |          | NO  |  
+           ^          | NO  |  
+           ~          | YES |  ~~  e.g.   int a = ~~2;  // int a = ~( ~2 );
+           <<         | NO  | 
+           >>         | NO  |  
+           (          | YES |  
+           )          | NO  |  
+		   =          | NO  | "~=" is not supported
+
+
+     << :  
+	       +          | YES |  <<+  e.g.    int a = 10<<+3;   // int a = 10 << (+3); 
+	       -          | YES |  <<-  e.g.    int a = 10<<-2;   // int a = 10 << (-2);  //  警告：左移次数为负 [默认启用]
+           *          | NO  |  
+           /          | NO  |
+           %          | NO  |
+           &          | NO  |  
+           |          | NO  |  
+           ^          | NO  |  
+           ~          | YES |  <<~  e.g.   int a = 10<<~2;  // int a = 10 << (~2);  //  警告：左移次数为负 [默认启用]                    //  int a = 10<<~-2;   OK
+           <<         | NO  | 
+           >>         | NO  |  
+           (          | YES |  
+           )          | NO  |  
+		   =          | NO  | "<<=" is not supported
+
+     >> :  
+	       +          | YES |  >>+  e.g.    int a = 10>>+3;   // int a = 10 >> (+3); 
+	       -          | NO  |  >>-  e.g.    int a = 10>>-2;   // int a = 10 >> (-2);  //  警告 : 右左移次数为负 [默认启用]
+           *          | NO  |  
+           /          | NO  |
+           %          | NO  |
+           &          | NO  |  
+           |          | NO  |  
+           ^          | NO  |  
+           ~          | YES |  >>~  e.g.   int a = 10>>~2;  // int a = 10 >> (~2);  //  警告 : 右移次数为负 [默认启用]                    //  int a = 10>>~-2;   =>   int a = 10 >> (~-2);  OK
+           <<         | NO  | 
+           >>         | NO  |  
+           (          | YES |  
+           )          | NO  |  
+		   =          | NO  | ">>=" is not supported
+
+     (  :  
+	       +          | YES |  (+  e.g.     a = (+3+2);
+	       -          | YES |  (-  e.g.     a = (-3+2);
+           *          | NO  |  
+           /          | NO  |
+           %          | NO  |
+           &          | NO  |  
+           |          | NO  |  
+           ^          | NO  |  
+           ~          | YES |  (~ e.g.      a = (~2);
+           <<         | NO  | 
+           >>         | NO  |  
+           (          | YES |  
+           )          | NO  |  () is not allowed 
+		   =          | NO  |  (=     e.g.   (a)=3;
+
+     )  :  
+	       +          | YES |  )+  e.g.     a = (-a)+3;
+	       -          | YES |  (-  e.g.     a = (-a)-3;
+           *          | YES |  
+           /          | YES |
+           %          | YES |
+           &          | YES |  
+           |          | YES |  
+           ^          | YES |  
+           ~          | NO  |  )~  ???
+           <<         | NO  | 
+           >>         | NO  |  
+           (          | YES |  
+           )          | NO  |  () is not allowed 
+		   =          | YES |  )=     e.g.   (a)=3;
+
+     =  :  
+	       +          | YES |  =+  e.g.     a =+3;
+	       -          | YES |  =-  e.g.     a =-3; 
+           *          | NO  |  
+           /          | NO  |
+           %          | NO  |
+           &          | NO  |  
+           |          | NO  |  
+           ^          | NO  |  
+           ~          | YES |  =~   e.g.  a=~2;
+           <<         | NO  | 
+           >>         | NO  |  
+           (          | YES |  
+           )          | NO  |  =)  is not allowed 
+		   =          | NO  |  ==  is not allowed   
+
    6. Varible       | YES |
    7. Semicolon     | YES |   Not Avalible List  : + - * / % & | ^ ~ << >> ( =     |    Only Avalible is :  )     e.g.    a=(b+c);
 

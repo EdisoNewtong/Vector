@@ -1,6 +1,7 @@
 #ifndef TOKEN_LIST_ANALYZER_H
 #define TOKEN_LIST_ANALYZER_H
 
+#include <unordered_map>
 #include <list>
 #include "tokenInfo.h"
 #include "commonEnum.h"
@@ -11,11 +12,18 @@ public:
 	TokenListAnalyzer();
 	virtual ~TokenListAnalyzer();
 
-	TokenInfo* getPreviousValidToken();
+	TokenInfo* getPreviousToken(bool needSkipBlankComment, int* pHasSkipBlankComment);
+
+	bool isListEmpty();
 	bool checkParserIsValid(E_PaserType tp);
 	bool pushToken(TokenInfo* pToken);
 protected:
 	std::list<TokenInfo*> m_tokenList;
+	std::unordered_map<unsigned int,int> m_banPickCfgMap;
+
+	unsigned int genFlag(E_TokenType frontToken, E_TokenType genToken);
+	void initBanPickCfg();
+
 };
 
 #endif

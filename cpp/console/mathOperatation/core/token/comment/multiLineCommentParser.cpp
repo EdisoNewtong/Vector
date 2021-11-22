@@ -68,3 +68,15 @@ bool MultiLineCommentParser::isEnd(ParsedCharInfo* pInfo) // override
 	string last2str = m_alreadyTravelsaledString.substr( sz - 2 );
 	return last2str == "*/";
 }
+
+
+// virtual 
+TokenInfo* MultiLineCommentParser::generateToken() // override;
+{
+	auto subType = m_tokenType;
+	auto pRetToken = new TokenInfo( E_TOKEN_COMMENT_TYPE , subType);
+	m_token = m_alreadyTravelsaledString;
+	pRetToken->setDetail( m_token );
+	return pRetToken;
+}
+
