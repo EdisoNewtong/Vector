@@ -2,8 +2,9 @@
 
 INC_PATH := -Icore -Icore/token -Icore/util -Icore/token/interger -Icore/token/floatnumber -Icore/token/varible -Icore/token/operator -Icore/token/comment -Icore/token/blank -Icore/token/expevaluation
 
-COMPILE_OPT :=  -Wall  -std=c++11  
-
+#COMPILE_OPT  :=  -Wall  -std=c++11  
+#
+COMPILE_OPT :=  -Wall  -std=c++11   -DUSE_INT_INSTEAD_OF_ENUM
 
 main:build/parser.o build/parsedCharInfo.o build/parserException.o  build/keywordList.o build/typeUtil.o build/charUtil.o build/tokenInfo.o  build/decimalParser.o build/octalParser.o build/hexParser.o build/floatParser.o build/varibleParser.o  build/tokenParserBase.o build/blankParser.o build/singleLineCommentParser.o build/multiLineCommentParser.o build/operatorParser.o  build/expevaluation.o build/tokenParserMgr.o  build/tokenListAnalyzer.o  build/main.o
 	g++   $(COMPILE_OPT) -o main build/*.o

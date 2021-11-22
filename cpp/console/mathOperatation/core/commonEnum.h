@@ -116,5 +116,12 @@ enum E_DataType
 	E_TP_LONG_DOUBLE,
 };
 
+// Common Convert Marco
+#ifdef USE_INT_INSTEAD_OF_ENUM
+    #define enumCvt(enumVar)  ( static_cast<int>(enumVar) )
+#else
+    #define enumCvt(enumVar)  ( enumVar )
+#endif
+
 
 #endif

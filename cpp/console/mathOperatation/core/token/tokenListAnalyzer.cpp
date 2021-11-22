@@ -392,10 +392,9 @@ void TokenListAnalyzer::initBanPickCfg()
 	//
 	// E_TOKEN_BLANK   -->  ???
 	//
-	auto 
-	retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_BLANK, E_TOKEN_BLANK) , 1) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_BLANK, E_TOKEN_BLANK) Failed " << endl; }
-	retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_BLANK, E_TOKEN_SINGLE_COMMENT) , 1) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_BLANK, E_TOKEN_SINGLE_COMMENT)  Failed " << endl; }
-	retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_BLANK, E_TOKEN_MULTI_COMMENT) , 1) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_BLANK, E_TOKEN_MULTI_COMMENT)  Failed " << endl; }
+	auto retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_BLANK, E_TOKEN_BLANK) , 1) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_BLANK, E_TOKEN_BLANK) Failed " << endl; }
+	retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_BLANK, E_TOKEN_COMMENT_TYPE) , 1) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_BLANK, E_TOKEN_COMMENT_TYPE)  Failed " << endl; }
+	// retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_BLANK, E_TOKEN_MULTI_COMMENT) , 1) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_BLANK, E_TOKEN_MULTI_COMMENT)  Failed " << endl; }
 	retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_BLANK, E_TOKEN_DECIMAL_NUMBER) , 1) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_BLANK, E_TOKEN_DECIMAL_NUMBER)  Failed " << endl; }
 	retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_BLANK, E_TOKEN_OCTAL_NUMBER) , 1) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_BLANK, E_TOKEN_OCTAL_NUMBER)  Failed " << endl; }
 	retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_BLANK, E_TOKEN_HEX_NUMBER) , 1) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_BLANK, E_TOKEN_HEX_NUMBER)  Failed " << endl; }

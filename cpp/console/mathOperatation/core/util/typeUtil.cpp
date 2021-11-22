@@ -80,32 +80,37 @@ bool TypeBaseInfo::isIntegerFamily()
 //
 
 
-// static 
-std::unordered_map<E_DataType, TypeBaseInfo*> TypeUtil::s_typeFamily;
+#ifdef USE_INT_INSTEAD_OF_ENUM
+    // static 
+    std::unordered_map<int, TypeBaseInfo*> TypeUtil::s_typeFamily;
+#else
+    // static 
+    std::unordered_map<E_DataType, TypeBaseInfo*> TypeUtil::s_typeFamily;
+#endif
 
 
 // static
 void TypeUtil::init()
 {
 	s_typeFamily.clear();
-	s_typeFamily.insert( make_pair(E_TP_U_CHAR, new TypeBaseInfo(E_TP_U_CHAR) ) );
-	s_typeFamily.insert( make_pair(E_TP_S_CHAR, new TypeBaseInfo(E_TP_S_CHAR) ) );
+	s_typeFamily.insert( make_pair(enumCvt(E_TP_U_CHAR), new TypeBaseInfo(E_TP_U_CHAR) ) );
+	s_typeFamily.insert( make_pair(enumCvt(E_TP_S_CHAR), new TypeBaseInfo(E_TP_S_CHAR) ) );
 
-	s_typeFamily.insert( make_pair(E_TP_U_SHORT, new TypeBaseInfo(E_TP_U_SHORT) ) );
-	s_typeFamily.insert( make_pair(E_TP_S_SHORT, new TypeBaseInfo(E_TP_S_SHORT) ) );
+	s_typeFamily.insert( make_pair(enumCvt(E_TP_U_SHORT), new TypeBaseInfo(E_TP_U_SHORT) ) );
+	s_typeFamily.insert( make_pair(enumCvt(E_TP_S_SHORT), new TypeBaseInfo(E_TP_S_SHORT) ) );
 
-	s_typeFamily.insert( make_pair(E_TP_U_INT, new TypeBaseInfo(E_TP_U_INT) ) );
-	s_typeFamily.insert( make_pair(E_TP_S_INT, new TypeBaseInfo(E_TP_S_INT) ) );
+	s_typeFamily.insert( make_pair(enumCvt(E_TP_U_INT), new TypeBaseInfo(E_TP_U_INT) ) );
+	s_typeFamily.insert( make_pair(enumCvt(E_TP_S_INT), new TypeBaseInfo(E_TP_S_INT) ) );
 
-	s_typeFamily.insert( make_pair(E_TP_U_LONG, new TypeBaseInfo(E_TP_U_LONG) ) );
-	s_typeFamily.insert( make_pair(E_TP_S_LONG, new TypeBaseInfo(E_TP_S_LONG) ) );
+	s_typeFamily.insert( make_pair(enumCvt(E_TP_U_LONG), new TypeBaseInfo(E_TP_U_LONG) ) );
+	s_typeFamily.insert( make_pair(enumCvt(E_TP_S_LONG), new TypeBaseInfo(E_TP_S_LONG) ) );
 
-	s_typeFamily.insert( make_pair(E_TP_U_LONG_LONG, new TypeBaseInfo(E_TP_U_LONG_LONG) ) );
-	s_typeFamily.insert( make_pair(E_TP_S_LONG_LONG, new TypeBaseInfo(E_TP_S_LONG_LONG) ) );
+	s_typeFamily.insert( make_pair(enumCvt(E_TP_U_LONG_LONG), new TypeBaseInfo(E_TP_U_LONG_LONG) ) );
+	s_typeFamily.insert( make_pair(enumCvt(E_TP_S_LONG_LONG), new TypeBaseInfo(E_TP_S_LONG_LONG) ) );
 
-	s_typeFamily.insert( make_pair(E_TP_FLOAT, new TypeBaseInfo(E_TP_FLOAT) ) );
-	s_typeFamily.insert( make_pair(E_TP_DOUBLE, new TypeBaseInfo(E_TP_DOUBLE) ) );
-	s_typeFamily.insert( make_pair(E_TP_LONG_DOUBLE, new TypeBaseInfo(E_TP_LONG_DOUBLE) ) );
+	s_typeFamily.insert( make_pair(enumCvt(E_TP_FLOAT), new TypeBaseInfo(E_TP_FLOAT) ) );
+	s_typeFamily.insert( make_pair(enumCvt(E_TP_DOUBLE), new TypeBaseInfo(E_TP_DOUBLE) ) );
+	s_typeFamily.insert( make_pair(enumCvt(E_TP_LONG_DOUBLE), new TypeBaseInfo(E_TP_LONG_DOUBLE) ) );
 }
 
 
@@ -126,7 +131,13 @@ void TypeUtil::finalize()
 // static 
 TypeBaseInfo* TypeUtil::getTypeInfo(E_DataType dtype)
 {
-	auto it = s_typeFamily.find(dtype);
+
+#ifdef USE_INT_INSTEAD_OF_ENUM
+	auto it = s_typeFamily.find( enumCvt(dtype) );
+#else
+	auto it = s_typeFamily.find( dtype );
+#endif
+
 	if ( it != s_typeFamily.end() ) {
 		return it->second;
 	} else {

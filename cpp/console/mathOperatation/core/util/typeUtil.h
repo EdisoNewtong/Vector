@@ -6,6 +6,8 @@
 #include <unordered_map>
 #include "commonEnum.h"
 
+
+
 class TypeBaseInfo
 {
 public:
@@ -34,7 +36,12 @@ public:
 	static void finalize();
 	static TypeBaseInfo* getTypeInfo(E_DataType dtype);
 protected:
+
+#ifdef USE_INT_INSTEAD_OF_ENUM
+	static std::unordered_map<int, TypeBaseInfo*> s_typeFamily;
+#else
 	static std::unordered_map<E_DataType, TypeBaseInfo*> s_typeFamily;
+#endif
 };
 
 
