@@ -9,8 +9,10 @@ using namespace std;
 TokenParserBase::TokenParserBase(E_PaserType tp)
 	: m_alreadyTravelsaledString("")
 	, m_token("")
+	, m_parserName("")
 	, m_type(tp)
 	, m_tokenType( E_TOKEN_UNKNOWN )
+	, m_exceptionCode(E_UNKNOWN_CHAR)
 	, m_switchFlag( E_TERMINAL_NONE )
 	, m_beginInfo()
 	, m_endInfo()
@@ -33,6 +35,8 @@ void TokenParserBase::init()
 	m_AllAvalibleCharacters = *pMap;
 
 	m_tokenType = E_TOKEN_UNKNOWN;
+    m_exceptionCode = E_UNKNOWN_CHAR;
+	m_parserName = "TokenParserBase";
 }
 
 
@@ -41,8 +45,7 @@ CharBaseInfo* TokenParserBase::commonCheckWithException(char ch, ParsedCharInfo*
 	auto pCharInfo = getInsideCharSetBaseInfo(ch);
 
 	if ( pCharInfo == nullptr ) {
-		ParserExpection	e(E_ExceptionCode::E_UNKNOWN_CHAR, pInfo);
-		throw e;
+		throwErrMsg(pInfo," unknown character");
 	}
 
 	return pCharInfo;
@@ -166,5 +169,77 @@ bool TokenParserBase::isEnd(ParsedCharInfo* pInfo)
 {
 	(void)pInfo;
 	return false;
+}
+
+string TokenParserBase::genPositionCharStr(ParsedCharInfo* pInfo)
+{
+	string retstr;
+
+	if ( pInfo != nullptr ) {
+		retstr += '\t';
+		retstr += "@";
+		retstr += m_parserName;
+		retstr += " , ";
+		retstr += "@";
+		retstr += to_string(pInfo->position.nLine);
+		retstr += ":";
+		retstr += to_string(pInfo->position.nCol);
+		retstr += ", charIdx = ";
+		retstr += to_string( static_cast<int>(pInfo->position.nCharIdx) );
+		retstr += ", retCh = ";
+
+		//
+		// Output Char Info
+		//
+		char ch = pInfo->currentChar;
+		if ( ch >= 0 ) {
+			// < 32
+			if ( ch < 32 ) {
+				if ( ch == '\t' ) {
+					retstr += "'\\t'";
+				} else if ( ch == '\r' ) {
+					retstr += "'\\r'";
+				} else if ( ch == '\n' ) {
+					retstr += "'\\n'";
+				} else {
+					retstr += " ? , code = ";
+					retstr += std::to_string( static_cast<int>(ch & 0xFFU) );
+				}
+			} else {
+				// char >= 32
+				if ( ch == 32 ) {
+					retstr += "<space>";
+				} else if ( ch <= 127 ) {
+					retstr += "'";
+					retstr += ch;
+					retstr += "'";
+				} else {
+					retstr += " ? , code = ";  
+					retstr += std::to_string( static_cast<int>(ch & 0xFFU) );
+				}
+			}
+		} else {
+			// < 0
+			retstr += " ? , code = ";  
+			retstr += std::to_string( static_cast<int>(ch & 0xFFU) );
+		}
+		// retstr += "\n";
+
+	}
+
+	return retstr;
+}
+
+
+void TokenParserBase::throwErrMsg(ParsedCharInfo* pInfo, const string& errMsg)
+{
+	ParserException err(m_exceptionCode);
+	auto detailstr = genPositionCharStr(pInfo);
+	detailstr += " ==>      \"";
+	detailstr += m_alreadyTravelsaledString;
+	detailstr += "\" , ";
+	detailstr += errMsg;
+	err.setDetail( detailstr );
+	throw err;
 }
 

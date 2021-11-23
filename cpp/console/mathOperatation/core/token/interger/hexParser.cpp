@@ -1,4 +1,6 @@
+#include <iostream>
 #include "hexParser.h"
+#include "parserException.h"
 
 using namespace std;
 
@@ -43,6 +45,8 @@ void HexParser::init() // override
 	m_AllAvalibleCharacters.insert( make_pair('L', CharUtil::getCharBaseInfo('L') ) );
 
 	m_tokenType = E_TOKEN_HEX_NUMBER;
+    m_exceptionCode = E_HEX_INVALID_FORMAT;
+	m_parserName = "HexParser";
 }
 
 
@@ -54,23 +58,21 @@ E_PaserType HexParser::appendContent(ParsedCharInfo* pInfo) // override
 	auto inSideCharInfo = getInsideCharSetBaseInfo( curCh );
 	if ( sz == 2 ) {
 		// start with 0x or 0X
-		if ( inSideCharInfo == nullptr ) {
+		if ( inSideCharInfo == nullptr || !(inSideCharInfo->isHexNumber()) ) {
 			/* 
 			   e.g.
-			        0xK
+			        0x+
 					  ^
 			*/
-			m_switchFlag = E_TOKEN_TERMINATE_TO_DEFAULT_RE_PARSE;
-			return E_P_DEFAULT;
+
+			// 3rd char must be inside a-f A-F  0-9
+			//  u/U  l/L is not allowed
+			// update_uU_lLCnt(curCh, pInfo);
+
+			throwErrMsg(pInfo,  "After prefix '0x/0x' , must append at least One Hex code");
 		} else {
-			// inSideCharInfo != nullptr
-			if ( inSideCharInfo->isHexNumber()  ) {
-				m_alreadyTravelsaledString += curCh;
-			} else {
-				// 3rd char must be inside a-f A-F  0-9
-				//  u/U  l/L is not allowed
-				// update_uU_lLCnt(curCh);
-			}
+			
+			m_alreadyTravelsaledString += curCh;
 		}
 	} else {
 		// sz >= 3
@@ -85,23 +87,24 @@ E_PaserType HexParser::appendContent(ParsedCharInfo* pInfo) // override
 		} else {
 			if ( isSuffixExisted() ) {
 				if ( inSideCharInfo->isHexNumber()  ) {
-					// TODO : throw  HexCode is end ,can't append  a-f A-F 0-9
+					//  throw  HexCode is end ,can't append  a-f A-F 0-9
+					throwErrMsg(pInfo, "  HexCode 0-9a-fA-F  can't append after u/U l/L");
 				} else {
 					// u/U  l/L
-					update_uU_lLCnt(curCh);
+					update_uU_lLCnt(curCh, pInfo);
 				}
 			} else {
 				if ( inSideCharInfo->isHexNumber()  ) {
 					m_alreadyTravelsaledString += curCh;
 				} else {
 					// u/U  l/L
-					update_uU_lLCnt(curCh);
+					update_uU_lLCnt(curCh, pInfo);
 				} 
 			}
 		}
 	}
 
-	return E_P_DEFAULT;	
+	return m_type;	
 }
 
 

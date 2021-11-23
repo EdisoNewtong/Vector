@@ -23,8 +23,6 @@ Parser::Parser()
 	, m_optKeyWord_2()
 {
 
-    m_defaultParser = TokenParserMgr::getParserByType(E_P_DEFAULT); // set default parser
-	m_currentParser = m_defaultParser;                              // set current parser
 
 	prepareOptionKeyWord();
 }
@@ -47,6 +45,10 @@ void Parser::prepareOptionKeyWord()
 
 bool Parser::analyzeOptionArgs(const std::list<string>& argList, string& errorMsg)
 {
+
+    m_defaultParser = TokenParserMgr::getParserByType(E_P_DEFAULT); // set default parser
+	m_currentParser = m_defaultParser;                              // set current parser
+
 	auto bret = true;
 
 	for ( const auto& sOption : argList ) 

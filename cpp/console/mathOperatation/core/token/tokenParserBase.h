@@ -63,13 +63,20 @@ public:
 	void markBeginTag(const PosInfo& pInfo);
 	E_TERMINAL_STATUS getSwitchFlag();
 protected:
+	std::string genPositionCharStr(ParsedCharInfo* pInfo);
+
+	void throwErrMsg(ParsedCharInfo* pInfo, const std::string& errMsg);
+
+protected:
 	std::unordered_map<char, CharBaseInfo*> m_AllAvalibleCharacters;
 
 	std::string m_alreadyTravelsaledString;
 	std::string m_token;
+	std::string m_parserName;
 
 	E_PaserType m_type;
 	E_TokenType m_tokenType;
+    E_ExceptionCode m_exceptionCode;
 
 	E_TERMINAL_STATUS  m_switchFlag;
 	

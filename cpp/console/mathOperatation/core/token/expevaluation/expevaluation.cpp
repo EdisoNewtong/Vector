@@ -19,6 +19,8 @@ void ExpEvaluation::init() // override
 	m_AllAvalibleCharacters.insert(  make_pair(';', CharUtil::getCharBaseInfo(';')  ) );
 
 	m_tokenType = E_TOKEN_SEMICOLON;
+    m_exceptionCode = E_EXP_EVALUATION_INVALID_FORMAT;
+	m_parserName = "ExpEvaluation";
 }
 
 

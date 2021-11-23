@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cassert>
 #include "floatParser.h"
+#include "parserException.h"
 
 using namespace std;
 
@@ -49,6 +50,8 @@ void FloatParser::init() // override
 	m_AllAvalibleCharacters.insert( make_pair('-', CharUtil::getCharBaseInfo('-') ) );
 
 	m_tokenType = E_TOKEN_FLOAT_NUMBER;
+    m_exceptionCode = E_FLOAT_INVALID_FORMAT;
+	m_parserName = "FloatParser";
 }
 
 
@@ -83,7 +86,11 @@ E_PaserType  FloatParser::appendContent(ParsedCharInfo* pInfo) // override
 				m_alreadyTravelsaledString += curCh;
 				m_endInfo = pInfo->position;
 			} else {
-				// TODO : throw
+				// throw
+				string errMsg = "Can't append '";
+				errMsg += curCh;
+				errMsg += "' when after 1st  '.' (only 1 size)  ";
+				throwErrMsg(pInfo, errMsg);
 			}
 		} else if ( sz == 2 ) {
 			// [0-9].      [0-9]e   or [0-9]E      or    .[0-9]
@@ -105,7 +112,8 @@ E_PaserType  FloatParser::appendContent(ParsedCharInfo* pInfo) // override
 					m_switchFlag = E_TOKEN_TERMINATE_TO_DEFAULT;
 					return E_P_DEFAULT;
 				} else if ( is_dot(curCh ) ) {
-					// TODO : throw   multi   2 '.'s
+					// throw   multi   2 '.'s
+					throwErrMsg(pInfo, "multi 2 '.'s ");
 				} else {
 					//  +/- ,    + : must be addition ,   - : must be substract
 					m_switchFlag = E_TOKEN_TERMINATE_TO_DEFAULT_RE_PARSE;
@@ -120,11 +128,14 @@ E_PaserType  FloatParser::appendContent(ParsedCharInfo* pInfo) // override
 					// e.g.    2e+      or    2e-
 					m_alreadyTravelsaledString += curCh;
 				} else if ( is_dot(curCh) ) {
-					// TODO : throw  "e."    "E."  is not allowed
+					//  throw  "e."    "E."  is not allowed
+					throwErrMsg(pInfo, " e./E. is not allowed");
 				} else if( is_fF(curCh) ) {
-					// TODO : throw  "1eF"    "1EF"  is not allowed
+					//  throw  "1eF"    "1EF"  is not allowed
+					throwErrMsg(pInfo, " 'f/F'    [0-9]eF/[0-9]EF is not allowed");
 				} else if ( is_eE(curCh) ) {
-					// TODO : "1eE"  or  "1EE" is not allowed
+					//  "1eE"  or  "1EE" is not allowed
+					throwErrMsg(pInfo, " 'e/E'    [0-9]eE/[0-9]EE is not allowed");
 				}
 			}
 		} else {
@@ -140,44 +151,19 @@ E_PaserType  FloatParser::appendContent(ParsedCharInfo* pInfo) // override
 							m_alreadyTravelsaledString += curCh;
 						} else {
 							// "."    e/E   f/F
-							// TODO : throw
+							// throw
+							throwErrMsg(pInfo, " '.'s = 1 && 'e/E's = 1,  append '.' 'e/E'  is not allowed");
 						}
 					} else if ( is_dot(lastCh) ) {
-						/*  ****************************************************************************************************
-						 *  In this condition , the str contain both   "."   and      e/E     
-						 *      the  "." can't be at the last      
-						 *   123.4e   or   123.4e12   or    123.4e+    or   123.4e-
-						    ****************************************************************************************************
-
-						
-						     last is Not  e/E
-							 1234.
-						if ( is_number(curCh) || is_eE(curCh) ) {
-							// 123.4 or   123.e
-							m_alreadyTravelsaledString += curCh;
-						} else if ( is_fF(curCh) ) {
-							m_alreadyTravelsaledString += curCh;
-							m_switchFlag = E_TOKEN_TERMINATE_TO_DEFAULT;
-							return E_P_DEFAULT;
-						} else if ( is_positiveSign(curCh) || is_negativeSign(curCh) ) {
-							// + : additive    ,  - : substract
-							m_switchFlag = E_TOKEN_TERMINATE_TO_DEFAULT_RE_PARSE;
-							return E_P_DEFAULT;
-						} else {
-							// "."
-							// TODO : throw
-						} 
-
-
-						*/
-						
+						throwErrMsg(pInfo, " '.'s = 1 && 'e/E's = 1,  '.' can't be the last character ");
 					} else if ( is_positiveSign(lastCh) || is_negativeSign(lastCh) ) {
 						// 2e+   or   2e-
 						if ( is_number(curCh) ) {
 							m_alreadyTravelsaledString += curCh;
 						} else {
 							//       "."  e/E   f/F    +-
-							// TODO : throw    
+							// throw    
+							throwErrMsg(pInfo, " '.'s = 1 'e/E's = 1, when append '.' or 'e/E' or 'f/F' or '+/-'  is not allowed");
 						}
 					} else if ( is_number(lastCh) ) {
 						//   e.g    123.4e2    
@@ -188,7 +174,8 @@ E_PaserType  FloatParser::appendContent(ParsedCharInfo* pInfo) // override
 							m_switchFlag = E_TOKEN_TERMINATE_TO_DEFAULT;
 							return E_P_DEFAULT;
 						} else {
-							// TODO : throw
+							// throw
+							throwErrMsg(pInfo, " '.'s = 1 'e/E's = 1,  append '.' 'e/E'  is not allowed");
 						}
 					}
 				} else {
@@ -207,7 +194,8 @@ E_PaserType  FloatParser::appendContent(ParsedCharInfo* pInfo) // override
 							m_switchFlag = E_TOKEN_TERMINATE_TO_DEFAULT_RE_PARSE;
 							return E_P_DEFAULT;
 						} else {
-							// TODO : throw    "."     e/E   
+							//  throw    "."     e/E   
+							throwErrMsg(pInfo, " '.'s = 0 'e/E's = 1,  append '.' 'e/E'  is not allowed");
 						}
 					} else if ( is_positiveSign(lastCh) ||  is_negativeSign(lastCh) ) {
 						// e.g.   123e+    or    123e-
@@ -215,14 +203,16 @@ E_PaserType  FloatParser::appendContent(ParsedCharInfo* pInfo) // override
 							m_alreadyTravelsaledString += curCh;
 						} else {
 							// "."     e/E    f/F    +/-
-							// TODO : throw
+							//  throw
+							throwErrMsg(pInfo, " '.'s = 0 'e/E's = 1,  append '.' 'e/E' 'f/F' '+/-'   is not allowed");
 						}
 					} else if ( is_eE(lastCh) ) {
 						if ( is_number(curCh) ||  is_positiveSign(curCh) || is_negativeSign(curCh) ) {
 							m_alreadyTravelsaledString += curCh;
 						} else {
 							//   "."   e/E   f/F
-							//   TODO : throw
+							//      throw
+							throwErrMsg(pInfo, " '.'s = 0 'e/E's = 1,  append '.' 'e/E' 'f/F'   is not allowed");
 						}
 					}
 				}
@@ -234,7 +224,8 @@ E_PaserType  FloatParser::appendContent(ParsedCharInfo* pInfo) // override
 						m_alreadyTravelsaledString += curCh;
 					} else if ( is_dot(curCh) ) {
 						// 1..
-						// TODO : throw
+						//    throw
+						throwErrMsg(pInfo, " '.'s = 1 'e/E's = 0,  append '.'   [0-9]..   is not allowed");
 					} else if ( is_fF(curCh) ) {
 						// 1.f
 						m_alreadyTravelsaledString += curCh;
@@ -252,6 +243,7 @@ E_PaserType  FloatParser::appendContent(ParsedCharInfo* pInfo) // override
 					} else if ( is_dot(curCh) ) {
 						// 1.2.
 						// TODO : throw
+						throwErrMsg(pInfo, " '.'s = 1 'e/E's = 0,  append '.'   [0-9].[0-9].   is not allowed");
 					} else if ( is_fF(curCh) ) {
 						m_alreadyTravelsaledString += curCh;
 						m_switchFlag = E_TOKEN_TERMINATE_TO_DEFAULT;
@@ -363,5 +355,6 @@ void FloatParser::innerReset()
 	m_positieCnt = 0;
 	m_negativeCnt = 0;
 }
+
 
 

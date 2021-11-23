@@ -37,6 +37,8 @@ void VaribleParser::init() // override
 	m_AllAvalibleCharacters.insert( make_pair('_', CharUtil::getCharBaseInfo('_') ) );
 
 	m_tokenType = E_TOKEN_VARIBLE;
+    m_exceptionCode = E_VARIBLE_INVALID_FORMAT;
+	m_parserName = "VaribleParser";
 }
 
 

@@ -27,6 +27,8 @@ void BlankParser::init() // override
 	m_AllAvalibleCharacters.insert(  make_pair('\n', CharUtil::getCharBaseInfo('\n') ) );
 
 	m_tokenType = E_TOKEN_BLANK;
+    m_exceptionCode = E_BLANK_INVALID_FORMAT;
+	m_parserName = "BlankParser";
 }
 
 
@@ -72,7 +74,7 @@ bool BlankParser::isEnd(ParsedCharInfo* pInfo) // override
 		}
 	}
 
-	return isAllInside;
+	return !isAllInside;
 }
 
 

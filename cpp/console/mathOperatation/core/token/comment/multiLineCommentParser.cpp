@@ -21,6 +21,8 @@ void MultiLineCommentParser::init() // override
 	m_AllAvalibleCharacters.insert( make_pair('*', CharUtil::getCharBaseInfo('*') ) );
 
     m_tokenType = E_TOKEN_MULTI_COMMENT;
+    m_exceptionCode = E_MULTI_LINE_COMMENT_INVALID_FORMAT;
+	m_parserName = "MultiLineCommentParser";
 }
 
 

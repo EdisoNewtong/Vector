@@ -459,3 +459,11 @@ unsigned int TokenListAnalyzer::genFlag(E_TokenType frontToken, E_TokenType genT
 
 	return ret;
 }
+
+unsigned int TokenListAnalyzer::genBanPickMask(bool noContinuedFlag, bool continuedFlag)
+{
+	unsigned int retMask = 0;
+	retMask |= ((noContinuedFlag ? 1u : 0u) << 1u);
+	retMask |= ((  continuedFlag ? 1u : 0u) << 0u);
+	return retMask;
+}

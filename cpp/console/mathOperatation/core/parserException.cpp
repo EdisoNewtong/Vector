@@ -3,30 +3,34 @@
 
 using namespace std;
 
-ParserExpection::ParserExpection(E_ExceptionCode errorCode, ParsedCharInfo* pInfo)
+ParserException::ParserException(E_ExceptionCode errorCode)
 	: m_code(errorCode)
 	, m_exceptionDetail("Unknown Error")
 	, m_formatDetail("")
 	, m_shortInfoMap()
-	, m_pParsedCharInfo(pInfo)
 {
 	m_shortInfoMap.clear();
-	m_shortInfoMap.insert( make_pair(static_cast<int>(E_UNKNOWN_CHAR), string("Unknown Character") ) );
+	m_shortInfoMap.insert( make_pair( enumCvt(E_UNKNOWN_CHAR), string("Unknown Character") ) );
+
+	m_shortInfoMap.insert( make_pair( enumCvt(E_DECIMAL_INVALID_FORMAT), string("Invalid Decimal Format") ) );
+	m_shortInfoMap.insert( make_pair( enumCvt(E_OCT_INVALID_FORMAT), string("Invalid Oct Format") ) );
+	m_shortInfoMap.insert( make_pair( enumCvt(E_HEX_INVALID_FORMAT), string("Invalid Hex Format") ) );
+
+	m_shortInfoMap.insert( make_pair( enumCvt(E_FLOAT_INVALID_FORMAT), string("Invalid Float Format") ) );
 }
 
-ParserExpection::ParserExpection(const  ParserExpection& r)
+ParserException::ParserException(const  ParserException& r)
 	: m_code(r.m_code)
     , m_exceptionDetail( r.m_exceptionDetail )
 	, m_formatDetail( r.m_formatDetail )
     , m_shortInfoMap( r.m_shortInfoMap )
-	, m_pParsedCharInfo( r.m_pParsedCharInfo )
 {
 
 	// cout << endl << "\tCopying ()" << endl;
 }
 
 
-void ParserExpection::setDetail(const string& detail)
+void ParserException::setDetail(const string& detail)
 {
 /*
 
@@ -74,15 +78,22 @@ e.setDetail(info);
 }
 
 // virtual 
-const char* ParserExpection::what() const throw()
+const char* ParserException::what() const throw()
 {
-	// cout << "InSide ParserExpection ... ()" << endl;
-	auto it = m_shortInfoMap.find(m_code);
+	// cout << "InSide ParserException ... ()" << endl;
+	auto it = m_shortInfoMap.find( enumCvt(m_code) );
 	if ( it != m_shortInfoMap.end() ) {
 		m_formatDetail += (it->second);
 		m_formatDetail += std::string(" : ");
-	} 
-	m_formatDetail += m_exceptionDetail;
+		m_formatDetail += "\n";
+	}
+
+	if ( !m_exceptionDetail.empty() ) {
+		m_formatDetail += "==================================================\n";
+		m_formatDetail += m_exceptionDetail;
+		m_formatDetail += "\n";
+		m_formatDetail += "==================================================\n";
+	}
 
 	return m_formatDetail.c_str();
 }

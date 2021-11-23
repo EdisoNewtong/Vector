@@ -19,9 +19,10 @@ public:
 	bool pushToken(TokenInfo* pToken);
 protected:
 	std::list<TokenInfo*> m_tokenList;
-	std::unordered_map<unsigned int,int> m_banPickCfgMap;
+	std::unordered_map<unsigned int,unsigned int> m_banPickCfgMap;
 
 	unsigned int genFlag(E_TokenType frontToken, E_TokenType genToken);
+	unsigned int genBanPickMask(bool noContinuedFlag, bool continuedFlag);
 	void initBanPickCfg();
 
 };

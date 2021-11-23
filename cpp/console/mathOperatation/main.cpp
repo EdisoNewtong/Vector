@@ -87,11 +87,11 @@ int main(int argc, char* argv[], char* env[])
 			}
 		} catch( const  std::bad_array_new_length& e_alloc ) {
 			(void)e_alloc;
-			cout << "Can't Alloc Memory for file content" << endl;
-		} catch ( const ParserExpection& e ) {
+			cout << "Can't Alloc Array Buffer Memory for file content" << endl;
+		} catch ( const ParserException& e ) {
 			cout << "[ERROR] Parse Failed : " << e.what() << endl;
 		} catch ( const std::exception& e ) {
-			cout << "[ERROR] Meet an exception : " << e.what() << endl;
+			cout << "[ERROR] Meet a Normal exception => " << e.what() << endl;
 		} catch ( ... ) {
 			cout << "[ERROR] Meet unexpected expection, ... " << endl;
 		}

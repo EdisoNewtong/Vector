@@ -5,15 +5,14 @@
 #include <string>
 #include <unordered_map>
 #include "commonEnum.h"
-#include "parsedCharInfo.h"
 
 
 
-class ParserExpection : public std::exception
+class ParserException : public std::exception
 {
 public:
-	ParserExpection(E_ExceptionCode errorCode, ParsedCharInfo* pInfo);
-	ParserExpection(const  ParserExpection& r);
+	ParserException(E_ExceptionCode errorCode);
+	ParserException(const  ParserException& r);
 	virtual const char* what() const throw();
 
 	void setDetail(const std::string& detail);
@@ -22,10 +21,12 @@ protected:
 	std::string m_exceptionDetail;
 	mutable std::string m_formatDetail;
 
-    // std::unordered_map<E_ExceptionCode, std::string> m_shortInfoMap;
+#ifdef USE_INT_INSTEAD_OF_ENUM
     std::unordered_map<int, std::string> m_shortInfoMap;
+#else
+    std::unordered_map<E_ExceptionCode, std::string> m_shortInfoMap;
+#endif
 
-	ParsedCharInfo* m_pParsedCharInfo;
 
 };
 

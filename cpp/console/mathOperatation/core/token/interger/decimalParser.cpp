@@ -1,4 +1,5 @@
 #include "decimalParser.h"
+#include "parserException.h"
 
 using namespace std;
 
@@ -45,6 +46,8 @@ void DecimalParser::init() // override
 	// m_AllAvalibleCharacters.insert( make_pair('F', CharUtil::getCharBaseInfo('F') ) );
 
 	m_tokenType = E_TOKEN_DECIMAL_NUMBER;
+    m_exceptionCode = E_DECIMAL_INVALID_FORMAT;
+	m_parserName = "DecimalParser";
 }
 
 
@@ -92,12 +95,12 @@ E_PaserType  DecimalParser::appendContent(ParsedCharInfo* pInfo) // override
 					m_switchFlag = E_TOKEN_CONVERT_TO_OTHER;
 					return E_P_HEX;
 				} else {
-					// 1-9    , [1-9]x  or  [1-9]X
-					// TODO : throw    
+					// throw :    1-9    , [1-9]x  or  [1-9]X
+					throwErrMsg(pInfo,  "[1-9] append 'x/X' is invalid");
 				}
 			} else {
 				// u/U  or  l/L
-				update_uU_lLCnt(curCh);
+				update_uU_lLCnt(curCh, pInfo);
 			}
 			//
 			////////////////////////////////////////////////////////////////////
@@ -106,11 +109,11 @@ E_PaserType  DecimalParser::appendContent(ParsedCharInfo* pInfo) // override
 			if ( isSuffixExisted() ) {
 				// End Flag has already been set
 				if ( is_uU_lL(curCh) ) {
-					update_uU_lLCnt(curCh);
+					update_uU_lLCnt(curCh, pInfo);
 				} else {
 					// 0-9        "."
-					// e/E   x/X  f/F
-					// TODO : throw
+					// e/E   x/X  
+					throwErrMsg(pInfo,  "After u/U l/L suffix , Append [0-9] . e/E x/X  is not allowed");
 				}
 			} else {
 				// 0  u/U(s)    &&   0 l/L(s) ,   previous string are all  numbers
@@ -122,10 +125,10 @@ E_PaserType  DecimalParser::appendContent(ParsedCharInfo* pInfo) // override
 					m_switchFlag = E_TOKEN_CONVERT_TO_OTHER;
 					return E_P_FLOAT;
 				} else if ( is_xX(curCh) ) {
-					// TODO throw
+					throwErrMsg(pInfo,  "[1-9] append 'x/X' is invalid");
 				} else {
 					// u/U   or  l/L
-					update_uU_lLCnt(curCh);
+					update_uU_lLCnt(curCh, pInfo);
 				}
 			}
 		}
@@ -147,19 +150,25 @@ void DecimalParser::reset() // override;
 }
 
 
-void DecimalParser::update_uU_lLCnt(char ch)
+
+
+
+
+void DecimalParser::update_uU_lLCnt(char ch, ParsedCharInfo* pInfo)
 {
 	if ( ch == 'u' ) {
 		m_alreadyTravelsaledString += ch;
 
 		if ( m_UCnt > 0 ) {
-			// TODO : throw 'U' already existed
+			//  throw 'U' already existed
+			throwErrMsg(pInfo, " 2 u/U(s) is not allowed ");
 		} else {
 			// 0 'U'
 			++m_uCnt;
 
 			if ( m_uCnt > 1 ) {
-				// TODO : multi 'u' s
+				// throw multi 'u' s
+				throwErrMsg(pInfo, " 2 u/U(s) is not allowed ");
 			}
 			// u.cnt == 1
 		}
@@ -167,20 +176,24 @@ void DecimalParser::update_uU_lLCnt(char ch)
 
 		m_alreadyTravelsaledString += ch;
 		if ( m_uCnt > 0 ) {
-			// TODO : throw 'u' already existed
+			// throw 'u' already existed
+			throwErrMsg(pInfo, " 2 u/U(s) is not allowed ");
 		} else {
 			// 0 'u'
 			++m_UCnt;
 
 			if ( m_UCnt > 1 ) {
-				// TODO : multi 'U' s
+				// throw multi 'U' s
+				throwErrMsg(pInfo, " 2 u/U(s) is not allowed ");
 			}
 			// U.cnt == 1
 		}
 	} else if ( ch == 'l' ) {
 
 		if ( m_LCnt > 0 ) {
-			// TODO : throw      'L' already existed
+			//  throw      'L' already existed
+			m_alreadyTravelsaledString += ch;
+			throwErrMsg(pInfo, " 'L' is already existed , 'l' is not  allowed ");
 		} else {
 			// L.cnt == 0
 
@@ -193,12 +206,14 @@ void DecimalParser::update_uU_lLCnt(char ch)
 			++m_lCnt;
 			if ( m_lCnt > 2 ) {
 				m_alreadyTravelsaledString += ch;
-				// TODO : throw     l.cnt > 2
+				// throw     l.cnt > 2
+				throwErrMsg(pInfo, " 2 l/L(s) is not allowed ");
 			} else if ( m_lCnt == 2 ) {
 				// l.cnt <=2 : OK
 				if ( isLast_uU ) {
 					m_alreadyTravelsaledString += ch;
-					// TODO : throw ...   "lul"  is not allowed
+					//  throw ...   "lul"  is not allowed
+					throwErrMsg(pInfo, " 'lul' is not allowed ");
 				} else {
 					m_alreadyTravelsaledString += ch;
 				}
@@ -218,18 +233,24 @@ void DecimalParser::update_uU_lLCnt(char ch)
 		++m_LCnt;
 		if ( m_LCnt > 2 ) {
 			m_alreadyTravelsaledString += ch;
-			// TODO : throw     L.cnt > 2
+			// throw     L.cnt > 2
+			throwErrMsg(pInfo,  " 2 l/L(s) is not allowed "); 
 		} else if ( m_LCnt == 2 ) {
 			// L.cnt == 2
 			if ( isLast_uU ) {
 				m_alreadyTravelsaledString += ch;
-				// TODO : throw ...   "LuL"  is not allowed
+				//  throw ...   "LuL"  is not allowed
+				throwErrMsg(pInfo, " 'LuL' is not allowed ");
 			} else {
 				m_alreadyTravelsaledString += ch;
 			}
 		} else {
 			// L.cnt == 1
 			m_alreadyTravelsaledString += ch;
+			if ( m_lCnt > 0 ) {
+				throwErrMsg(pInfo, " 'l' is already existed , 'L' is not  allowed ");
+			} 
+			// OK  l.cnt = 0
 		}
 	}
 }

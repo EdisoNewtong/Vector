@@ -23,6 +23,8 @@ void SingleLineCommentParser::init() // override
 	m_AllAvalibleCharacters.insert( make_pair('/', CharUtil::getCharBaseInfo('/') ) );
 
 	m_tokenType = E_TOKEN_SINGLE_COMMENT;
+    m_exceptionCode = E_SINGLE_LINE_COMMENT_INVALID_FORMAT;
+	m_parserName = "SingleLineCommentParser";
 }
 
 // virtual 

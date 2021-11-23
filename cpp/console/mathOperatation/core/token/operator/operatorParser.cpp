@@ -57,6 +57,8 @@ void OperatorParser::init() // override
 	m_AllAvalibleCharacters.insert(  make_pair('=', CharUtil::getCharBaseInfo('=') ) );
 
 	m_tokenType = E_TOKEN_OPERATOR;
+    m_exceptionCode = E_OPERATOR_INVALID_FORMAT;
+	m_parserName = "OperatorParser";
 }
 
 // virtual 
@@ -117,8 +119,9 @@ E_PaserType OperatorParser::appendContent(ParsedCharInfo* pInfo) // override
 // virtual 
 TokenInfo* OperatorParser::generateToken() // override
 {
-	auto it = m_opMap.find( m_token.at(0) );
+	auto it = m_opMap.find( m_alreadyTravelsaledString.at(0) );
 	auto retInfo = new TokenInfo(E_TOKEN_OPERATOR, it->second);
+	m_token = m_alreadyTravelsaledString;
 	retInfo->setDetail(m_token);
 	return  retInfo;
 }

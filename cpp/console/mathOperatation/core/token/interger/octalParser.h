@@ -15,6 +15,8 @@ public:
 	virtual E_PaserType appendContent(ParsedCharInfo* pInfo) override;
 	virtual bool isEnd(ParsedCharInfo* pInfo) override;
 protected:
+	bool isOctBufValid(std::string& errMsg);
+	bool isInnerOctCode(char ch);
 };
 
 #endif

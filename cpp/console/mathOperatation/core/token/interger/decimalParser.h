@@ -32,7 +32,9 @@ protected:
 	// u/U   l/L
 	bool isSuffixExisted();
 
-	void update_uU_lLCnt(char ch);
+	void update_uU_lLCnt(char ch, ParsedCharInfo* pInfo);
+
+	// void throw2uUlL(char ch,int flag,ParsedCharInfo* pInfo);
 	
 };
 
