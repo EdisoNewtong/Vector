@@ -20,7 +20,8 @@ void MultiLineCommentParser::init() // override
 	m_AllAvalibleCharacters.insert( make_pair('/', CharUtil::getCharBaseInfo('/') ) );
 	m_AllAvalibleCharacters.insert( make_pair('*', CharUtil::getCharBaseInfo('*') ) );
 
-    m_tokenType = E_TOKEN_MULTI_COMMENT;
+    m_tokenType = E_TOKEN_COMMENT_TYPE;
+	m_tokenSubType = E_TOKEN_MULTI_COMMENT; 
     m_exceptionCode = E_MULTI_LINE_COMMENT_INVALID_FORMAT;
 	m_parserName = "MultiLineCommentParser";
 }
@@ -72,13 +73,5 @@ bool MultiLineCommentParser::isEnd(ParsedCharInfo* pInfo) // override
 }
 
 
-// virtual 
-TokenInfo* MultiLineCommentParser::generateToken() // override;
-{
-	auto subType = m_tokenType;
-	auto pRetToken = new TokenInfo( E_TOKEN_COMMENT_TYPE , subType);
-	m_token = m_alreadyTravelsaledString;
-	pRetToken->setDetail( m_token );
-	return pRetToken;
-}
+
 

@@ -48,7 +48,8 @@ void OctalParser::init() // override
 	m_AllAvalibleCharacters.insert( make_pair('l', CharUtil::getCharBaseInfo('l') ) );
 	m_AllAvalibleCharacters.insert( make_pair('L', CharUtil::getCharBaseInfo('L') ) );
 
-	m_tokenType = E_TOKEN_OCTAL_NUMBER;
+	m_tokenType = E_TOKEN_INTEGER_NUMBER;
+	m_tokenSubType = E_TOKEN_OCTAL_NUMBER;
     m_exceptionCode = E_OCT_INVALID_FORMAT;
 	m_parserName = "OctalParser";
 

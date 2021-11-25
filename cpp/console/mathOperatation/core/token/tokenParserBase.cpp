@@ -12,6 +12,7 @@ TokenParserBase::TokenParserBase(E_PaserType tp)
 	, m_parserName("")
 	, m_type(tp)
 	, m_tokenType( E_TOKEN_UNKNOWN )
+	, m_tokenSubType( E_TOKEN_UNKNOWN )
 	, m_exceptionCode(E_UNKNOWN_CHAR)
 	, m_switchFlag( E_TERMINAL_NONE )
 	, m_beginInfo()
@@ -35,7 +36,8 @@ void TokenParserBase::init()
 	m_AllAvalibleCharacters = *pMap;
 
 	m_tokenType = E_TOKEN_UNKNOWN;
-    m_exceptionCode = E_UNKNOWN_CHAR;
+	m_tokenSubType = E_TOKEN_UNKNOWN;
+	m_exceptionCode = E_UNKNOWN_CHAR;
 	m_parserName = "TokenParserBase";
 }
 
@@ -100,7 +102,7 @@ E_PaserType  TokenParserBase::appendContent(ParsedCharInfo* pInfo) // override;
 // virtual
 TokenInfo* TokenParserBase::generateToken()
 {
-	auto pRetToken = new TokenInfo( m_tokenType , m_tokenType);
+	auto pRetToken = new TokenInfo( m_tokenType , m_tokenSubType);
 	m_token = m_alreadyTravelsaledString;
 	pRetToken->setDetail( m_token );
 	return pRetToken;

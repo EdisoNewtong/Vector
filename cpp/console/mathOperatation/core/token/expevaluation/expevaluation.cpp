@@ -27,7 +27,10 @@ void ExpEvaluation::init() // override
 // virtual 
 bool ExpEvaluation::isEnd(ParsedCharInfo* pInfo) // override;
 {
+	(void)pInfo;
+
 	return      (m_alreadyTravelsaledString.size() == 1)
 		   &&   (m_alreadyTravelsaledString.at(0) == ';');
 }
+
 

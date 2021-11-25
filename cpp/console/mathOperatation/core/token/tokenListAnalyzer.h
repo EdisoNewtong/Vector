@@ -21,9 +21,10 @@ protected:
 	std::list<TokenInfo*> m_tokenList;
 	std::unordered_map<unsigned int,unsigned int> m_banPickCfgMap;
 
+	void initBanPickCfg();
+
 	unsigned int genFlag(E_TokenType frontToken, E_TokenType genToken);
 	unsigned int genBanPickMask(bool noContinuedFlag, bool continuedFlag);
-	void initBanPickCfg();
 
 };
 

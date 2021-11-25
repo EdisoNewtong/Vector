@@ -50,6 +50,7 @@ void FloatParser::init() // override
 	m_AllAvalibleCharacters.insert( make_pair('-', CharUtil::getCharBaseInfo('-') ) );
 
 	m_tokenType = E_TOKEN_FLOAT_NUMBER;
+	m_tokenSubType = E_TOKEN_FLOAT_NUMBER;
     m_exceptionCode = E_FLOAT_INVALID_FORMAT;
 	m_parserName = "FloatParser";
 }

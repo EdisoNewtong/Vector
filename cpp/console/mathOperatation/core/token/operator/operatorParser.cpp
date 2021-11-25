@@ -26,7 +26,6 @@ OperatorParser::OperatorParser(E_PaserType tp)
 	m_opMap.insert( make_pair('>', E_TOKEN_OP_BIT_RIGHT_SHIFT ) );    // >>
 	m_opMap.insert( make_pair('=', E_TOKEN_OP_ASSIGNMENT ) );         // =
 
-
 }
 
 OperatorParser::~OperatorParser()
@@ -98,6 +97,8 @@ E_PaserType OperatorParser::appendContent(ParsedCharInfo* pInfo) // override
 				return E_P_DEFAULT;
 			} else {
 				// TODO : throw  exception
+				string errMsg;
+				throwErrMsg(pInfo," curCh != '<' is not allowed when previous char is '<' ");
 			}
 		} else if ( previousCh == '>' ) {
 			if ( curCh == '>' ) {
@@ -107,9 +108,10 @@ E_PaserType OperatorParser::appendContent(ParsedCharInfo* pInfo) // override
 				return E_P_DEFAULT;
 			} else {
 				// TODO : throw  exception
+				throwErrMsg(pInfo," curCh != '>' is not allowed when previous char is '>' ");
 			}
 		} else {
-			// Rest possibility is OK
+			// Rest possibility is valid
 		}
 	} 
 

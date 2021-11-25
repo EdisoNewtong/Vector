@@ -35,7 +35,10 @@ bool TokenListAnalyzer::isListEmpty()
 // 
 // Next Character Possibility <After> a Specific Token
 // 
-// 1. Blank Type
+// 1. Blank Type    <== || Before ||
+//----------------------------------------
+//  ||   After      ||
+//----------------------------------------
 //    1. Blank         | YES |
 //    2. Comment       | YES |
 //    3. Interger      | YES |
@@ -45,7 +48,10 @@ bool TokenListAnalyzer::isListEmpty()
 //    7. Semicolon     | YES |   a=b+c   ;
 
 // 
-// 2. Comment Type
+// 2. Comment Type    <== || Before ||
+//----------------------------------------
+// ||    After      ||
+//----------------------------------------
 //    1. Blank         | YES |
 //    2. Comment       | YES |
 //    3. Interger      | YES |
@@ -55,227 +61,236 @@ bool TokenListAnalyzer::isListEmpty()
 //    7. Semicolon     | YES |   a=b+c/*Comment Line*/;
 
 // 
-// 3. Interger
+// 3. Interger    <== || Before ||
+//----------------------------------------
+// ||    After      ||
+//----------------------------------------
 //    1. Blank         | YES |
 //    2. Comment       | YES |
-//    3. Interger      | NO  |
-//    4. Float         | NO  |
-//    5. Operator      |PART |   Not Avalible List :      ~  ,  ( , =
-//    6. Varible       | NO  |
+//    3. Interger      |  NO |
+//    4. Float         |  NO |
+//    5. Operator      |PART |   Not Avalible List :      ~  ,  ( ,
+//    6. Varible       |  NO |
 //    7. Semicolon     | YES |   a = 10 + 3;
 
 //
-// 4. Float Type
+// 4. Float Type    <== || Before ||
+//----------------------------------------
+// ||    After      ||
+//----------------------------------------
 //    1. Blank         | YES |
 //    2. Comment       | YES |
-//    3. Interger      | NO  |
-//    4. Float         | NO  |
+//    3. Interger      |  NO |
+//    4. Float         |  NO |
 //    5. Operator      |PART |   Not Avalible List  : %  &  | ^  ~  << >>   (   =
-//    6. Varible       | NO  |
+//    6. Varible       |  NO |
 //    7. Semicolon     | YES |   a = 10 + 3.1f;
 // 
 
 // 
-// 5. Operator Type
+// 5. Operator Type    <== || Before ||
+//----------------------------------------
+// ||    After      ||
+//----------------------------------------
 //    1. Blank         | YES |
 //    2. Comment       | YES |
-//    3. Interger      | NO  |
-//    4. Float         | NO  |
+//    3. Interger      | YES |
+//    4. Float         | YES |
 //    5. Operator      | TBD |   
 //       + :  
-//            +          | NO  |  ++ is not supported
+//            +          |  NO |  ++ is not supported
 //            -          | YES |  +-  e.g.    int a = 10+-3;   // int a = 10 + (-3) = 7;
-//            *          | NO  |
-//            /          | NO  |
-//            %          | NO  |
-//            &          | NO  |
-//            |          | NO  |
-//            ^          | NO  |
+//            *          |  NO |
+//            /          |  NO |
+//            %          |  NO |
+//            &          |  NO |
+//            |          |  NO |
+//            ^          |  NO |
 //            ~          | YES |  +~  e.g.    int a = 1+~2;
-//            <<         | NO  | 
-//            >>         | NO  |  
+//            <<         |  NO | 
+//            >>         |  NO |  
 //            (          | YES |  
-//            )          | NO  |  
-//            =          | NO  | "+=" is not supported
+//            )          |  NO |  
+//            =          |  NO | "+=" is not supported
 // 
 //       - :  
 //            +          | YES |  -+  e.g.    int a = 10-+3;   // int a = 10 - (+3) = 7;
-//            -          | NO  |  -- is not supported
-//            *          | NO  |
-//            /          | NO  |
-//            %          | NO  |
-//            &          | NO  |
-//            |          | NO  |
-//            ^          | NO  |
+//            -          |  NO |  -- is not supported
+//            *          |  NO |
+//            /          |  NO |
+//            %          |  NO |
+//            &          |  NO |
+//            |          |  NO |
+//            ^          |  NO |
 //            ~          | YES |  -~  e.g.    int a = 1-~2;
-//            <<         | NO  | 
-//            >>         | NO  |  
+//            <<         |  NO | 
+//            >>         |  NO |  
 //            (          | YES |  
-//            )          | NO  |  
-//           =          | NO  | "-=" is not supported
+//            )          |  NO |  
+//            =          |  NO | "-=" is not supported
 // 
 //       * :  
 //            +          | YES |  *+  e.g.    int a = 10*+3;   // int a = 30 = 10 * (+3);
 //            -          | YES |  *-  e.g.    int a = 10*-3;   // int a = 10 * (-3) = -30;
-//            *          | NO  |  
-//            /          | NO  |
-//            %          | NO  |
-//            &          | NO  |
-//            |          | NO  |
-//            ^          | NO  |
+//            *          |  NO |  
+//            /          |  NO |
+//            %          |  NO |
+//            &          |  NO |
+//            |          |  NO |
+//            ^          |  NO |
 //            ~          | YES |  *~  e.g.    int a = 10*~2;
-//            <<         | NO  | 
-//            >>         | NO  |  
+//            <<         |  NO | 
+//            >>         |  NO |  
 //            (          | YES |  
-//            )          | NO  |  
-//            =          | NO  | "*=" is not supported
+//            )          |  NO |  
+//            =          |  NO | "*=" is not supported
 // 
 //       / :  
 //            +          | YES |  *+  e.g.    int a = 10*+3;   // int a = 30 = 10 * (+3);
 //            -          | YES |  *-  e.g.    int a = 10*-3;   // int a = 10 * (-3) = -30;
 //            *          | YES |  /* multi-line comment */
 //            /          | YES |  // singline line comment 
-//            %          | NO  |
-//            &          | NO  |
-//            |          | NO  |
-//            ^          | NO  |
+//            %          |  NO |
+//            &          |  NO |
+//            |          |  NO |
+//            ^          |  NO |
 //            ~          | YES |  /~  e.g.    int a = 10/~2;
-//            <<         | NO  | 
-//            >>         | NO  |  
+//            <<         |  NO | 
+//            >>         |  NO |  
 //            (          | YES |  
-//            )          | NO  |  
-//            =          | NO  | "/=" is not supported
+//            )          |  NO |  
+//            =          |  NO | "/=" is not supported
 // 
 //       % :  
 //            +          | YES |  %+  e.g.    int a = 10%+3;   // int a = 10%(+3) = 1;
 //            -          | YES |  %-  e.g.    int a = 10%-3;   // int a = 10%(-3) = 1;
-//            *          | NO  |  
-//            /          | NO  |  
-//            %          | NO  |
-//            &          | NO  |
-//            |          | NO  |
-//            ^          | NO  |
+//            *          |  NO |  
+//            /          |  NO |  
+//            %          |  NO |
+//            &          |  NO |
+//            |          |  NO |
+//            ^          |  NO |
 //            ~          | YES |  %~  e.g.    int a = 10%~2 = 10 % (~2);
-//            <<         | NO  | 
-//            >>         | NO  |  
+//            <<         |  NO | 
+//            >>         |  NO |  
 //            (          | YES |  
-//            )          | NO  |  
-//            =          | NO  | "%=" is not supported
+//            )          |  NO |  
+//            =          |  NO | "%=" is not supported
 // 
 // 
 //       & :  
 //            +          | YES |  &+  e.g.    int a = 10&+3;   // int a = 10 & (+3); 
 //            -          | YES |  *-  e.g.    int a = 10&-3;   // int a = 10 & (-3);
-//            *          | NO  |  
-//            /          | NO  |
-//            %          | NO  |
-//            &          | NO  |  "&&"  is not supported
-//            |          | NO  |  
-//            ^          | NO  |  
+//            *          |  NO |  
+//            /          |  NO |
+//            %          |  NO |
+//            &          |  NO |  "&&"  is not supported
+//            |          |  NO |  
+//            ^          |  NO |  
 //            ~          | YES |  &~  e.g.   int a = 10&~2;  // int a = 10 & (~2);
-//            <<         | NO  | 
-//            >>         | NO  |  
+//            <<         |  NO | 
+//            >>         |  NO |  
 //            (          | YES |  
-//            )          | NO  |  
-//            =          | NO  | "&=" is not supported
+//            )          |  NO |  
+//            =          |  NO | "&=" is not supported
 // 
 // 
 //       | :  
 //            +          | YES |  |+  e.g.    int a = 10|+3;   // int a = 10 | (+3); 
 //            -          | YES |  |-  e.g.    int a = 10|-3;   // int a = 10 | (-3);
-//            *          | NO  |  
-//            /          | NO  |
-//            %          | NO  |
-//            &          | NO  |  
-//            |          | NO  |  "||" is not supported
-//            ^          | NO  |  
+//            *          |  NO |  
+//            /          |  NO |
+//            %          |  NO |
+//            &          |  NO |  
+//            |          |  NO |  "||" is not supported
+//            ^          |  NO |  
 //            ~          | YES |  |~  e.g.   int a = 10|~2;  // int a = 10 / (~2);
-//            <<         | NO  | 
-//            >>         | NO  |  
+//            <<         |  NO | 
+//            >>         |  NO |  
 //            (          | YES |  
-//            )          | NO  |  
-//            =          | NO  | "|=" is not supported
+//            )          |  NO |  
+//            =          |  NO | "|=" is not supported
 // 
 //       ^ :  
 //            +          | YES |  ^+  e.g.    int a = 10^+3;   // int a = 10 ^ (+3); 
 //            -          | YES |  ^-  e.g.    int a = 10^-3;   // int a = 10 ^ (-3);
-//            *          | NO  |  
-//            /          | NO  |
-//            %          | NO  |
-//            &          | NO  |  
-//            |          | NO  |  
-//            ^          | NO  |  
+//            *          |  NO |  
+//            /          |  NO |
+//            %          |  NO |
+//            &          |  NO |  
+//            |          |  NO |  
+//            ^          |  NO |  
 //            ~          | YES |  ^~  e.g.   int a = 10^~2;  // int a = 10 ^ (~2);
-//            <<         | NO  | 
-//            >>         | NO  |  
+//            <<         |  NO | 
+//            >>         |  NO |  
 //            (          | YES |  
-//            )          | NO  |  
-//            =          | NO  | "^=" is not supported
+//            )          |  NO |  
+//            =          |  NO | "^=" is not supported
 // 
 //       ~ :  
 //            +          | YES |  ~+  e.g.    int a = ~+3;   // int a = 10 ~ (+3); 
 //            -          | YES |  ~-  e.g.    int a = ~-3;   // int a = 10 ~ (-3);
-//            *          | NO  |  
-//            /          | NO  |
-//            %          | NO  |
-//            &          | NO  |  
-//            |          | NO  |  
-//            ^          | NO  |  
+//            *          |  NO |  
+//            /          |  NO |
+//            %          |  NO |
+//            &          |  NO |  
+//            |          |  NO |  
+//            ^          |  NO |  
 //            ~          | YES |  ~~  e.g.   int a = ~~2;  // int a = ~( ~2 );
-//            <<         | NO  | 
-//            >>         | NO  |  
+//            <<         |  NO | 
+//            >>         |  NO |  
 //            (          | YES |  
-//            )          | NO  |  
-//            =          | NO  | "~=" is not supported
+//            )          |  NO |  
+//            =          |  NO | "~=" is not supported
 // 
 // 
 //      << :  
 //            +          | YES |  <<+  e.g.    int a = 10<<+3;   // int a = 10 << (+3); 
 //            -          | YES |  <<-  e.g.    int a = 10<<-2;   // int a = 10 << (-2);  //  警告：左移次数为负 [默认启用]
-//            *          | NO  |  
-//            /          | NO  |
-//            %          | NO  |
-//            &          | NO  |  
-//            |          | NO  |  
-//            ^          | NO  |  
+//            *          |  NO |  
+//            /          |  NO |
+//            %          |  NO |
+//            &          |  NO |  
+//            |          |  NO |  
+//            ^          |  NO |  
 //            ~          | YES |  <<~  e.g.   int a = 10<<~2;  // int a = 10 << (~2);  //  警告：左移次数为负 [默认启用]                    //  int a = 10<<~-2;   OK
-//            <<         | NO  | 
-//            >>         | NO  |  
+//            <<         |  NO | 
+//            >>         |  NO |  
 //            (          | YES |  
-//            )          | NO  |  
-//            =          | NO  | "<<=" is not supported
+//            )          |  NO |  
+//            =          |  NO | "<<=" is not supported
 // 
 //      >> :  
 //            +          | YES |  >>+  e.g.    int a = 10>>+3;   // int a = 10 >> (+3); 
-//            -          | NO  |  >>-  e.g.    int a = 10>>-2;   // int a = 10 >> (-2);  //  警告 : 右左移次数为负 [默认启用]
-//            *          | NO  |  
-//            /          | NO  |
-//            %          | NO  |
-//            &          | NO  |  
-//            |          | NO  |  
-//            ^          | NO  |  
+//            -          |  NO |  >>-  e.g.    int a = 10>>-2;   // int a = 10 >> (-2);  //  警告 : 右左移次数为负 [默认启用]
+//            *          |  NO |  
+//            /          |  NO |
+//            %          |  NO |
+//            &          |  NO |  
+//            |          |  NO |  
+//            ^          |  NO |  
 //            ~          | YES |  >>~  e.g.   int a = 10>>~2;  // int a = 10 >> (~2);  //  警告 : 右移次数为负 [默认启用]                    //  int a = 10>>~-2;   =>   int a = 10 >> (~-2);  OK
-//            <<         | NO  | 
-//            >>         | NO  |  
+//            <<         |  NO | 
+//            >>         |  NO |  
 //            (          | YES |  
-//            )          | NO  |  
-//            =          | NO  | ">>=" is not supported
+//            )          |  NO |  
+//            =          |  NO | ">>=" is not supported
 // 
 //      (  :  
 //            +          | YES |  (+  e.g.     a = (+3+2);
 //            -          | YES |  (-  e.g.     a = (-3+2);
-//            *          | NO  |  
-//            /          | NO  |
-//            %          | NO  |
-//            &          | NO  |  
-//            |          | NO  |  
-//            ^          | NO  |  
+//            *          |  NO |  
+//            /          |  NO |
+//            %          |  NO |
+//            &          |  NO |  
+//            |          |  NO |  
+//            ^          |  NO |  
 //            ~          | YES |  (~ e.g.      a = (~2);
-//            <<         | NO  | 
-//            >>         | NO  |  
+//            <<         |  NO | 
+//            >>         |  NO |  
 //            (          | YES |  
-//            )          | NO  |  () is not allowed 
-//            =          | NO  |  (=     e.g.   (a)=3;
+//            )          |  NO |  () is not allowed 
+//            =          |  NO |  (=     e.g.   (a)=3;
 // 
 //      )  :  
 //            +          | YES |  )+  e.g.     a = (-a)+3;
@@ -286,46 +301,52 @@ bool TokenListAnalyzer::isListEmpty()
 //            &          | YES |  
 //            |          | YES |  
 //            ^          | YES |  
-//            ~          | NO  |  )~  ???
-//            <<         | NO  | 
-//            >>         | NO  |  
+//            ~          |  NO |  )~  ???
+//            <<         |  NO | 
+//            >>         |  NO |  
 //            (          | YES |  
-//            )          | NO  |  () is not allowed 
+//            )          |  NO |  () is not allowed 
 //            =          | YES |  )=     e.g.   (a)=3;
 // 
 //      =  :  
 //            +          | YES |  =+  e.g.     a =+3;
 //            -          | YES |  =-  e.g.     a =-3; 
-//            *          | NO  |  
-//            /          | NO  |
-//            %          | NO  |
-//            &          | NO  |  
-//            |          | NO  |  
-//            ^          | NO  |  
+//            *          |  NO |  
+//            /          |  NO |
+//            %          |  NO |
+//            &          |  NO |  
+//            |          |  NO |  
+//            ^          |  NO |  
 //            ~          | YES |  =~   e.g.  a=~2;
-//            <<         | NO  | 
-//            >>         | NO  |  
+//            <<         |  NO | 
+//            >>         |  NO |  
 //            (          | YES |  
-//            )          | NO  |  =)  is not allowed 
-//            =          | NO  |  ==  is not allowed   
+//            )          |  NO |  =)  is not allowed 
+//            =          |  NO |  ==  is not allowed   
 // 
 //    6. Varible       | YES |
 //    7. Semicolon     | YES |   Not Avalible List  : + - * / % & | ^ ~ << >> ( =     |    Only Avalible is :  )     e.g.    a=(b+c);
 
 
 // 
-// 6. Varible Type
+// 6. Varible Type    <== || Before ||
+//----------------------------------------
+// ||    After      ||
+//----------------------------------------
 //    1. Blank         | YES |
 //    2. Comment       | YES |
-//    3. Interger      | NO  |
-//    4. Float         | NO  |
+//    3. Interger      |  NO |
+//    4. Float         |  NO |
 //    5. Operator      |PART |   Not Avalible List :      ~  ,  ( 
-//    6. Varible       | NO  |
+//    6. Varible       |  NO |
 //    7. Semicolon     | YES |   
 // 
 
 //
-// 7. Expression Evaluate Type      ==>   Semicolon       ";"
+// 7. Expression Evaluate Type (;)    <== || Before || 
+//----------------------------------------
+// ||    After      ||
+//----------------------------------------
 //    1. Blank         | YES |
 //    2. Comment       | YES |
 //    3. Interger      | YES |
@@ -390,58 +411,504 @@ void TokenListAnalyzer::initBanPickCfg()
 	m_banPickCfgMap.clear();
 
 	//
-	// E_TOKEN_BLANK   -->  ???
+	// E_TOKEN_BLANK , E_TOKEN_COMMENT_TYPE are always valid after any token type no matter skip Blank/Comment or Not-Skip Blank/Comment
 	//
-	auto retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_BLANK, E_TOKEN_BLANK) , 1) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_BLANK, E_TOKEN_BLANK) Failed " << endl; }
-	retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_BLANK, E_TOKEN_COMMENT_TYPE) , 1) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_BLANK, E_TOKEN_COMMENT_TYPE)  Failed " << endl; }
-	// retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_BLANK, E_TOKEN_MULTI_COMMENT) , 1) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_BLANK, E_TOKEN_MULTI_COMMENT)  Failed " << endl; }
-	retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_BLANK, E_TOKEN_DECIMAL_NUMBER) , 1) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_BLANK, E_TOKEN_DECIMAL_NUMBER)  Failed " << endl; }
-	retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_BLANK, E_TOKEN_OCTAL_NUMBER) , 1) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_BLANK, E_TOKEN_OCTAL_NUMBER)  Failed " << endl; }
-	retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_BLANK, E_TOKEN_HEX_NUMBER) , 1) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_BLANK, E_TOKEN_HEX_NUMBER)  Failed " << endl; }
-	retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_BLANK, E_TOKEN_FLOAT_NUMBER) , 1) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_BLANK, E_TOKEN_FLOAT_NUMBER)  Failed " << endl; }
-	for ( int tp = static_cast<int>(E_TOKEN_OP_BEGIN); tp <= E_TOKEN_OP_ASSIGNMENT; ++tp ) {
-		retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_BLANK, static_cast<E_TokenType>(tp) ) , 1) );
-		if ( !retpr.second ) { cout << "genFlag(E_TOKEN_BLANK, " << tp << ")  Failed " << endl; }
-	}
-
-	retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_BLANK, E_TOKEN_VARIBLE) , 1) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_BLANK, E_TOKEN_VARIBLE)  Failed " << endl; }
-	retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_BLANK, E_TOKEN_SEMICOLON) , 1) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_BLANK, E_TOKEN_SEMICOLON)  Failed " << endl; }
-
+	pair< unordered_map<unsigned int,unsigned int>::iterator,bool>  retpr;
 
 	//
-	// E_TOKEN_COMMENT   -->  ???
+	// E_TOKEN_INTEGER_NUMBER
 	//
-	//    E_TOKEN_SINGLE_COMMENT
-	retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_SINGLE_COMMENT, E_TOKEN_BLANK) , 1) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_SINGLE_COMMENT, E_TOKEN_SINGLE_COMMENT)  Failed " << endl; }
-	retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_SINGLE_COMMENT, E_TOKEN_SINGLE_COMMENT) , 1) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_SINGLE_COMMENT, E_TOKEN_SINGLE_COMMENT)  Failed " << endl; }
-	retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_SINGLE_COMMENT, E_TOKEN_MULTI_COMMENT) , 1) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_SINGLE_COMMENT, E_TOKEN_MULTI_COMMENT)  Failed " << endl; }
-	retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_SINGLE_COMMENT, E_TOKEN_DECIMAL_NUMBER) , 1) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_SINGLE_COMMENT, E_TOKEN_DECIMAL_NUMBER)  Failed " << endl; }
-	retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_SINGLE_COMMENT, E_TOKEN_OCTAL_NUMBER) , 1) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_SINGLE_COMMENT, E_TOKEN_OCTAL_NUMBER)  Failed " << endl; }
-	retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_SINGLE_COMMENT, E_TOKEN_HEX_NUMBER) , 1) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_SINGLE_COMMENT, E_TOKEN_HEX_NUMBER)  Failed " << endl; }
-	retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_SINGLE_COMMENT, E_TOKEN_FLOAT_NUMBER) , 1) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_SINGLE_COMMENT, E_TOKEN_FLOAT_NUMBER)  Failed " << endl; }
-	for ( int tp = static_cast<int>(E_TOKEN_OP_BEGIN); tp <= E_TOKEN_OP_ASSIGNMENT; ++tp ) {
-		retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_SINGLE_COMMENT, static_cast<E_TokenType>(tp) ) , 1) );
-		if ( !retpr.second ) { cout << "genFlag(E_TOKEN_SINGLE_COMMENT, " << tp << ")  Failed " << endl; }
-	}
-	retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_SINGLE_COMMENT, E_TOKEN_VARIBLE) , 1) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_MULTI_COMMENT, E_TOKEN_VARIBLE)  Failed " << endl; }
-	retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_SINGLE_COMMENT, E_TOKEN_SEMICOLON) , 1) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_MULTI_COMMENT, E_TOKEN_SEMICOLON)  Failed " << endl; }
+    retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_INTEGER_NUMBER, E_TOKEN_INTEGER_NUMBER) , genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_INTEGER_NUMBER, E_TOKEN_DECIMAL_NUMBER) Failed " << endl; }
+    retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_INTEGER_NUMBER, E_TOKEN_FLOAT_NUMBER)   , genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_INTEGER_NUMBER, E_TOKEN_FLOAT_NUMBER) Failed " << endl; }
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      // Operator Begin
+    retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_INTEGER_NUMBER, E_TOKEN_OP_ADD)         , genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_INTEGER_NUMBER, E_TOKEN_OP_ADD) Failed " << endl; }
+    retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_INTEGER_NUMBER, E_TOKEN_OP_MINUS)       , genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_INTEGER_NUMBER, E_TOKEN_OP_MINUS) Failed " << endl; }
+    retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_INTEGER_NUMBER, E_TOKEN_OP_MULTIPLY)    , genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_INTEGER_NUMBER, E_TOKEN_OP_MULTIPLY) Failed " << endl; }
+    retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_INTEGER_NUMBER, E_TOKEN_OP_DIVIDE)      , genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_INTEGER_NUMBER, E_TOKEN_OP_DIVIDE) Failed " << endl; }
+    retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_INTEGER_NUMBER, E_TOKEN_OP_MOD)         , genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_INTEGER_NUMBER, E_TOKEN_OP_MOD) Failed " << endl; }
 
-	//     E_TOKEN_MULTI_COMMENT
-	retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_MULTI_COMMENT, E_TOKEN_BLANK) , 1) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_MULTI_COMMENT, E_TOKEN_SINGLE_COMMENT)  Failed " << endl; }
-	retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_MULTI_COMMENT, E_TOKEN_SINGLE_COMMENT) , 1) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_MULTI_COMMENT, E_TOKEN_SINGLE_COMMENT)  Failed " << endl; }
-	retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_MULTI_COMMENT, E_TOKEN_MULTI_COMMENT) , 1) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_MULTI_COMMENT, E_TOKEN_MULTI_COMMENT)  Failed " << endl; }
-	retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_MULTI_COMMENT, E_TOKEN_DECIMAL_NUMBER) , 1) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_MULTI_COMMENT, E_TOKEN_DECIMAL_NUMBER)  Failed " << endl; }
-	retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_MULTI_COMMENT, E_TOKEN_OCTAL_NUMBER) , 1) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_MULTI_COMMENT, E_TOKEN_OCTAL_NUMBER)  Failed " << endl; }
-	retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_MULTI_COMMENT, E_TOKEN_HEX_NUMBER) , 1) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_MULTI_COMMENT, E_TOKEN_HEX_NUMBER)  Failed " << endl; }
-	retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_MULTI_COMMENT, E_TOKEN_FLOAT_NUMBER) , 1) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_MULTI_COMMENT, E_TOKEN_FLOAT_NUMBER)  Failed " << endl; }
-	for ( int tp = static_cast<int>(E_TOKEN_OP_BEGIN); tp <= E_TOKEN_OP_ASSIGNMENT; ++tp ) {
-		retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_MULTI_COMMENT, static_cast<E_TokenType>(tp) ) , 1) );
-		if ( !retpr.second ) { cout << "genFlag(E_TOKEN_MULTI_COMMENT, " << tp << ")  Failed " << endl; }
-	}
-	retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_MULTI_COMMENT, E_TOKEN_VARIBLE) , 1) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_MULTI_COMMENT, E_TOKEN_VARIBLE)  Failed " << endl; }
-	retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_MULTI_COMMENT, E_TOKEN_SEMICOLON) , 1) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_MULTI_COMMENT, E_TOKEN_SEMICOLON)  Failed " << endl; }
+    retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_INTEGER_NUMBER, E_TOKEN_OP_BIT_AND)     , genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_INTEGER_NUMBER, E_TOKEN_OP_BIT_AND) Failed " << endl; }
+    retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_INTEGER_NUMBER, E_TOKEN_OP_BIT_OR)      , genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_INTEGER_NUMBER, E_TOKEN_OP_BIT_OR) Failed " << endl; }
+    retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_INTEGER_NUMBER, E_TOKEN_OP_BIT_XOR)     , genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_INTEGER_NUMBER, E_TOKEN_OP_BIT_XOR) Failed " << endl; }
+    retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_INTEGER_NUMBER, E_TOKEN_OP_BIT_NOT)     , genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_INTEGER_NUMBER, E_TOKEN_OP_BIT_NOT) Failed " << endl; }
+    retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_INTEGER_NUMBER, E_TOKEN_OP_BIT_LEFT_SHIFT) , genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_INTEGER_NUMBER, E_TOKEN_OP_BIT_LEFT_SHIFT) Failed " << endl; }
+    retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_INTEGER_NUMBER, E_TOKEN_OP_BIT_RIGHT_SHIFT), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_INTEGER_NUMBER, E_TOKEN_OP_BIT_RIGHT_SHIFT) Failed " << endl; }
+    retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_INTEGER_NUMBER, E_TOKEN_OP_ASSIGNMENT), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_INTEGER_NUMBER, E_TOKEN_OP_ASSIGNMENT) Failed " << endl; }
+    retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_INTEGER_NUMBER, E_TOKEN_OP_OPEN_PARENTHESES), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_INTEGER_NUMBER, E_TOKEN_OP_OPEN_PARENTHESES) Failed " << endl; }
+    retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_INTEGER_NUMBER, E_TOKEN_OP_CLOSE_PARENTHESES), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_INTEGER_NUMBER, E_TOKEN_OP_CLOSE_PARENTHESES) Failed " << endl; } // e.g.   a = (3 + 4);
+      // Operator End
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	  
+    retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_INTEGER_NUMBER, E_TOKEN_VARIBLE), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_INTEGER_NUMBER, E_TOKEN_VARIBLE) Failed " << endl; }
+    retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_INTEGER_NUMBER, E_TOKEN_SEMICOLON), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_INTEGER_NUMBER, E_TOKEN_SEMICOLON) Failed " << endl; }
+
+	//
+	// E_TOKEN_FLOAT_NUMBER
+	//
+    retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_FLOAT_NUMBER, E_TOKEN_INTEGER_NUMBER), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_FLOAT_NUMBER, E_TOKEN_INTEGER_NUMBER) Failed " << endl; }
+    retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_FLOAT_NUMBER, E_TOKEN_FLOAT_NUMBER),   genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_FLOAT_NUMBER, E_TOKEN_FLOAT_NUMBER) Failed " << endl; }
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      // Operator Begin
+    retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_FLOAT_NUMBER, E_TOKEN_OP_ADD)         , genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_FLOAT_NUMBER, E_TOKEN_OP_ADD) Failed " << endl; }
+    retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_FLOAT_NUMBER, E_TOKEN_OP_MINUS)       , genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_FLOAT_NUMBER, E_TOKEN_OP_MINUS) Failed " << endl; }
+    retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_FLOAT_NUMBER, E_TOKEN_OP_MULTIPLY)    , genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_FLOAT_NUMBER, E_TOKEN_OP_MULTIPLY) Failed " << endl; }
+    retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_FLOAT_NUMBER, E_TOKEN_OP_DIVIDE)      , genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_FLOAT_NUMBER, E_TOKEN_OP_DIVIDE) Failed " << endl; }
+    retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_FLOAT_NUMBER, E_TOKEN_OP_MOD)         , genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_FLOAT_NUMBER, E_TOKEN_OP_MOD) Failed " << endl; }
+
+    retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_FLOAT_NUMBER, E_TOKEN_OP_BIT_AND)     , genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_FLOAT_NUMBER, E_TOKEN_OP_BIT_AND) Failed " << endl; }
+    retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_FLOAT_NUMBER, E_TOKEN_OP_BIT_OR)      , genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_FLOAT_NUMBER, E_TOKEN_OP_BIT_OR) Failed " << endl; }
+    retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_FLOAT_NUMBER, E_TOKEN_OP_BIT_XOR)     , genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_FLOAT_NUMBER, E_TOKEN_OP_BIT_XOR) Failed " << endl; }
+    retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_FLOAT_NUMBER, E_TOKEN_OP_BIT_NOT)     , genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_FLOAT_NUMBER, E_TOKEN_OP_BIT_NOT) Failed " << endl; }
+    retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_FLOAT_NUMBER, E_TOKEN_OP_BIT_LEFT_SHIFT) , genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_FLOAT_NUMBER, E_TOKEN_OP_BIT_LEFT_SHIFT) Failed " << endl; }
+    retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_FLOAT_NUMBER, E_TOKEN_OP_BIT_RIGHT_SHIFT), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_FLOAT_NUMBER, E_TOKEN_OP_BIT_RIGHT_SHIFT) Failed " << endl; }
+    retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_FLOAT_NUMBER, E_TOKEN_OP_ASSIGNMENT), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_FLOAT_NUMBER, E_TOKEN_OP_ASSIGNMENT) Failed " << endl; }
+    retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_FLOAT_NUMBER, E_TOKEN_OP_OPEN_PARENTHESES), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_FLOAT_NUMBER, E_TOKEN_OP_OPEN_PARENTHESES) Failed " << endl; }
+    retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_FLOAT_NUMBER, E_TOKEN_OP_CLOSE_PARENTHESES), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_FLOAT_NUMBER, E_TOKEN_OP_CLOSE_PARENTHESES) Failed " << endl; } 
+      // Operator End
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_FLOAT_NUMBER, E_TOKEN_VARIBLE), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_FLOAT_NUMBER, E_TOKEN_VARIBLE) Failed " << endl; }
+    retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_FLOAT_NUMBER, E_TOKEN_SEMICOLON), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_FLOAT_NUMBER, E_TOKEN_SEMICOLON) Failed " << endl; }
 
 
+	//
+	// E_TOKEN_OPERATOR
+	//
+	 //
+	 // '+'
+	 //
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_ADD, E_TOKEN_INTEGER_NUMBER), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_ADD, E_TOKEN_INTEGER_NUMBER) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_ADD, E_TOKEN_FLOAT_NUMBER), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_ADD, E_TOKEN_FLOAT_NUMBER) Failed " << endl; }
+
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      // Operator Begin
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_ADD, E_TOKEN_OP_ADD), genBanPickMask(1,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_ADD, E_TOKEN_OP_ADD) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_ADD, E_TOKEN_OP_MINUS), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_ADD, E_TOKEN_OP_MINUS) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_ADD, E_TOKEN_OP_MULTIPLY), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_ADD, E_TOKEN_OP_MULTIPLY) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_ADD, E_TOKEN_OP_DIVIDE), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_ADD, E_TOKEN_OP_DIVIDE) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_ADD, E_TOKEN_OP_MOD), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_ADD, E_TOKEN_OP_MOD) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_ADD, E_TOKEN_OP_BIT_AND), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_ADD, E_TOKEN_OP_BIT_AND) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_ADD, E_TOKEN_OP_BIT_OR), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_ADD, E_TOKEN_OP_BIT_OR) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_ADD, E_TOKEN_OP_BIT_XOR), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_ADD, E_TOKEN_OP_BIT_XOR) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_ADD, E_TOKEN_OP_BIT_NOT), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_ADD, E_TOKEN_OP_BIT_NOT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_ADD, E_TOKEN_OP_BIT_LEFT_SHIFT), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_ADD, E_TOKEN_OP_BIT_LEFT_SHIFT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_ADD, E_TOKEN_OP_BIT_RIGHT_SHIFT), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_ADD, E_TOKEN_OP_BIT_RIGHT_SHIFT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_ADD, E_TOKEN_OP_ASSIGNMENT), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_ADD, E_TOKEN_OP_ASSIGNMENT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_ADD, E_TOKEN_OP_OPEN_PARENTHESES), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_ADD, E_TOKEN_OP_OPEN_PARENTHESES) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_ADD, E_TOKEN_OP_CLOSE_PARENTHESES), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_ADD, E_TOKEN_OP_CLOSE_PARENTHESES) Failed " << endl; }
+      // Operator End
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_ADD, E_TOKEN_VARIBLE), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_ADD, E_TOKEN_VARIBLE) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_ADD, E_TOKEN_SEMICOLON), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_ADD, E_TOKEN_SEMICOLON) Failed " << endl; }
+
+	 //
+	 // '-'
+	 //
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_MINUS, E_TOKEN_INTEGER_NUMBER), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_MINUS, E_TOKEN_INTEGER_NUMBER) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_MINUS, E_TOKEN_FLOAT_NUMBER), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_MINUS, E_TOKEN_FLOAT_NUMBER) Failed " << endl; }
+
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      // Operator Begin
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_MINUS, E_TOKEN_OP_ADD), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_MINUS, E_TOKEN_OP_ADD) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_MINUS, E_TOKEN_OP_MINUS), genBanPickMask(1,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_MINUS, E_TOKEN_OP_MINUS) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_MINUS, E_TOKEN_OP_MULTIPLY), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_MINUS, E_TOKEN_OP_MULTIPLY) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_MINUS, E_TOKEN_OP_DIVIDE), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_MINUS, E_TOKEN_OP_DIVIDE) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_MINUS, E_TOKEN_OP_MOD), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_MINUS, E_TOKEN_OP_MOD) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_MINUS, E_TOKEN_OP_BIT_AND), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_MINUS, E_TOKEN_OP_BIT_AND) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_MINUS, E_TOKEN_OP_BIT_OR), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_MINUS, E_TOKEN_OP_BIT_OR) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_MINUS, E_TOKEN_OP_BIT_XOR), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_MINUS, E_TOKEN_OP_BIT_XOR) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_MINUS, E_TOKEN_OP_BIT_NOT), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_MINUS, E_TOKEN_OP_BIT_NOT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_MINUS, E_TOKEN_OP_BIT_LEFT_SHIFT), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_MINUS, E_TOKEN_OP_BIT_LEFT_SHIFT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_MINUS, E_TOKEN_OP_BIT_RIGHT_SHIFT), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_MINUS, E_TOKEN_OP_BIT_RIGHT_SHIFT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_MINUS, E_TOKEN_OP_ASSIGNMENT), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_MINUS, E_TOKEN_OP_ASSIGNMENT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_MINUS, E_TOKEN_OP_OPEN_PARENTHESES), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_MINUS, E_TOKEN_OP_OPEN_PARENTHESES) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_MINUS, E_TOKEN_OP_CLOSE_PARENTHESES), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_MINUS, E_TOKEN_OP_CLOSE_PARENTHESES) Failed " << endl; }
+      // Operator End
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_MINUS, E_TOKEN_VARIBLE), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_MINUS, E_TOKEN_VARIBLE) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_MINUS, E_TOKEN_SEMICOLON), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_MINUS, E_TOKEN_SEMICOLON) Failed " << endl; }
+
+	 //
+	 // '*'
+	 //
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_MULTIPLY, E_TOKEN_INTEGER_NUMBER), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_MULTIPLY, E_TOKEN_INTEGER_NUMBER) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_MULTIPLY, E_TOKEN_FLOAT_NUMBER), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_MULTIPLY, E_TOKEN_FLOAT_NUMBER) Failed " << endl; }
+
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      // Operator Begin
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_MULTIPLY, E_TOKEN_OP_ADD), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_MULTIPLY, E_TOKEN_OP_ADD) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_MULTIPLY, E_TOKEN_OP_MINUS), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_MULTIPLY, E_TOKEN_OP_MINUS) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_MULTIPLY, E_TOKEN_OP_MULTIPLY), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_MULTIPLY, E_TOKEN_OP_MULTIPLY) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_MULTIPLY, E_TOKEN_OP_DIVIDE), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_MULTIPLY, E_TOKEN_OP_DIVIDE) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_MULTIPLY, E_TOKEN_OP_MOD), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_MULTIPLY, E_TOKEN_OP_MOD) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_MULTIPLY, E_TOKEN_OP_BIT_AND), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_MULTIPLY, E_TOKEN_OP_BIT_AND) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_MULTIPLY, E_TOKEN_OP_BIT_OR), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_MULTIPLY, E_TOKEN_OP_BIT_OR) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_MULTIPLY, E_TOKEN_OP_BIT_XOR), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_MULTIPLY, E_TOKEN_OP_BIT_XOR) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_MULTIPLY, E_TOKEN_OP_BIT_NOT), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_MULTIPLY, E_TOKEN_OP_BIT_NOT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_MULTIPLY, E_TOKEN_OP_BIT_LEFT_SHIFT), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_MULTIPLY, E_TOKEN_OP_BIT_LEFT_SHIFT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_MULTIPLY, E_TOKEN_OP_BIT_RIGHT_SHIFT), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_MULTIPLY, E_TOKEN_OP_BIT_RIGHT_SHIFT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_MULTIPLY, E_TOKEN_OP_ASSIGNMENT), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_MULTIPLY, E_TOKEN_OP_ASSIGNMENT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_MULTIPLY, E_TOKEN_OP_OPEN_PARENTHESES), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_MULTIPLY, E_TOKEN_OP_OPEN_PARENTHESES) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_MULTIPLY, E_TOKEN_OP_CLOSE_PARENTHESES), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_MULTIPLY, E_TOKEN_OP_CLOSE_PARENTHESES) Failed " << endl; }
+      // Operator End
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_MULTIPLY, E_TOKEN_VARIBLE), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_MULTIPLY, E_TOKEN_VARIBLE) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_MULTIPLY, E_TOKEN_SEMICOLON), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_MULTIPLY, E_TOKEN_SEMICOLON) Failed " << endl; }
+
+
+	 //
+	 // '/'
+	 //
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_DIVIDE, E_TOKEN_INTEGER_NUMBER), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_DIVIDE, E_TOKEN_INTEGER_NUMBER) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_DIVIDE, E_TOKEN_FLOAT_NUMBER), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_DIVIDE, E_TOKEN_FLOAT_NUMBER) Failed " << endl; }
+
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      // Operator Begin
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_DIVIDE, E_TOKEN_OP_ADD), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_DIVIDE, E_TOKEN_OP_ADD) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_DIVIDE, E_TOKEN_OP_MINUS), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_DIVIDE, E_TOKEN_OP_MINUS) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_DIVIDE, E_TOKEN_OP_MULTIPLY), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_DIVIDE, E_TOKEN_OP_MULTIPLY) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_DIVIDE, E_TOKEN_OP_DIVIDE), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_DIVIDE, E_TOKEN_OP_DIVIDE) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_DIVIDE, E_TOKEN_OP_MOD), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_DIVIDE, E_TOKEN_OP_MOD) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_DIVIDE, E_TOKEN_OP_BIT_AND), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_DIVIDE, E_TOKEN_OP_BIT_AND) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_DIVIDE, E_TOKEN_OP_BIT_OR), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_DIVIDE, E_TOKEN_OP_BIT_OR) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_DIVIDE, E_TOKEN_OP_BIT_XOR), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_DIVIDE, E_TOKEN_OP_BIT_XOR) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_DIVIDE, E_TOKEN_OP_BIT_NOT), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_DIVIDE, E_TOKEN_OP_BIT_NOT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_DIVIDE, E_TOKEN_OP_BIT_LEFT_SHIFT), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_DIVIDE, E_TOKEN_OP_BIT_LEFT_SHIFT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_DIVIDE, E_TOKEN_OP_BIT_RIGHT_SHIFT), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_DIVIDE, E_TOKEN_OP_BIT_RIGHT_SHIFT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_DIVIDE, E_TOKEN_OP_ASSIGNMENT), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_DIVIDE, E_TOKEN_OP_ASSIGNMENT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_DIVIDE, E_TOKEN_OP_OPEN_PARENTHESES), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_DIVIDE, E_TOKEN_OP_OPEN_PARENTHESES) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_DIVIDE, E_TOKEN_OP_CLOSE_PARENTHESES), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_DIVIDE, E_TOKEN_OP_CLOSE_PARENTHESES) Failed " << endl; }
+      // Operator End
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_DIVIDE, E_TOKEN_VARIBLE), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_DIVIDE, E_TOKEN_VARIBLE) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_DIVIDE, E_TOKEN_SEMICOLON), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_DIVIDE, E_TOKEN_SEMICOLON) Failed " << endl; }
+
+	 //
+	 // '%'
+	 //
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_MOD, E_TOKEN_INTEGER_NUMBER), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_MOD, E_TOKEN_INTEGER_NUMBER) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_MOD, E_TOKEN_FLOAT_NUMBER), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_MOD, E_TOKEN_FLOAT_NUMBER) Failed " << endl; }
+
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      // Operator Begin
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_MOD, E_TOKEN_OP_ADD), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_MOD, E_TOKEN_OP_ADD) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_MOD, E_TOKEN_OP_MINUS), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_MOD, E_TOKEN_OP_MINUS) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_MOD, E_TOKEN_OP_MULTIPLY), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_MOD, E_TOKEN_OP_MULTIPLY) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_MOD, E_TOKEN_OP_DIVIDE), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_MOD, E_TOKEN_OP_DIVIDE) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_MOD, E_TOKEN_OP_MOD), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_MOD, E_TOKEN_OP_MOD) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_MOD, E_TOKEN_OP_BIT_AND), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_MOD, E_TOKEN_OP_BIT_AND) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_MOD, E_TOKEN_OP_BIT_OR), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_MOD, E_TOKEN_OP_BIT_OR) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_MOD, E_TOKEN_OP_BIT_XOR), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_MOD, E_TOKEN_OP_BIT_XOR) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_MOD, E_TOKEN_OP_BIT_NOT), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_MOD, E_TOKEN_OP_BIT_NOT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_MOD, E_TOKEN_OP_BIT_LEFT_SHIFT), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_MOD, E_TOKEN_OP_BIT_LEFT_SHIFT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_MOD, E_TOKEN_OP_BIT_RIGHT_SHIFT), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_MOD, E_TOKEN_OP_BIT_RIGHT_SHIFT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_MOD, E_TOKEN_OP_ASSIGNMENT), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_MOD, E_TOKEN_OP_ASSIGNMENT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_MOD, E_TOKEN_OP_OPEN_PARENTHESES), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_MOD, E_TOKEN_OP_OPEN_PARENTHESES) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_MOD, E_TOKEN_OP_CLOSE_PARENTHESES), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_MOD, E_TOKEN_OP_CLOSE_PARENTHESES) Failed " << endl; }
+      // Operator End
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_MOD, E_TOKEN_VARIBLE), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_MOD, E_TOKEN_VARIBLE) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_MOD, E_TOKEN_SEMICOLON), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_MOD, E_TOKEN_SEMICOLON) Failed " << endl; }
+
+	 //
+	 // '&'
+	 //
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_AND, E_TOKEN_INTEGER_NUMBER), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_AND, E_TOKEN_INTEGER_NUMBER) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_AND, E_TOKEN_FLOAT_NUMBER), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_AND, E_TOKEN_FLOAT_NUMBER) Failed " << endl; }
+
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      // Operator Begin
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_AND, E_TOKEN_OP_ADD), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_AND, E_TOKEN_OP_ADD) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_AND, E_TOKEN_OP_MINUS), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_AND, E_TOKEN_OP_MINUS) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_AND, E_TOKEN_OP_MULTIPLY), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_AND, E_TOKEN_OP_MULTIPLY) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_AND, E_TOKEN_OP_DIVIDE), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_AND, E_TOKEN_OP_DIVIDE) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_AND, E_TOKEN_OP_MOD), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_AND, E_TOKEN_OP_MOD) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_AND, E_TOKEN_OP_BIT_AND), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_AND, E_TOKEN_OP_BIT_AND) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_AND, E_TOKEN_OP_BIT_OR), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_AND, E_TOKEN_OP_BIT_OR) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_AND, E_TOKEN_OP_BIT_XOR), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_AND, E_TOKEN_OP_BIT_XOR) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_AND, E_TOKEN_OP_BIT_NOT), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_AND, E_TOKEN_OP_BIT_NOT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_AND, E_TOKEN_OP_BIT_LEFT_SHIFT), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_AND, E_TOKEN_OP_BIT_LEFT_SHIFT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_AND, E_TOKEN_OP_BIT_RIGHT_SHIFT), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_AND, E_TOKEN_OP_BIT_RIGHT_SHIFT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_AND, E_TOKEN_OP_ASSIGNMENT), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_AND, E_TOKEN_OP_ASSIGNMENT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_AND, E_TOKEN_OP_OPEN_PARENTHESES), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_AND, E_TOKEN_OP_OPEN_PARENTHESES) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_AND, E_TOKEN_OP_CLOSE_PARENTHESES), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_AND, E_TOKEN_OP_CLOSE_PARENTHESES) Failed " << endl; }
+      // Operator End
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_AND, E_TOKEN_VARIBLE), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_AND, E_TOKEN_VARIBLE) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_AND, E_TOKEN_SEMICOLON), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_AND, E_TOKEN_SEMICOLON) Failed " << endl; }
+
+	 //
+	 // '|'
+	 //
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_OR, E_TOKEN_INTEGER_NUMBER), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_OR, E_TOKEN_INTEGER_NUMBER) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_OR, E_TOKEN_FLOAT_NUMBER), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_OR, E_TOKEN_FLOAT_NUMBER) Failed " << endl; }
+
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      // Operator Begin
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_OR, E_TOKEN_OP_ADD), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_OR, E_TOKEN_OP_ADD) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_OR, E_TOKEN_OP_MINUS), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_OR, E_TOKEN_OP_MINUS) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_OR, E_TOKEN_OP_MULTIPLY), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_OR, E_TOKEN_OP_MULTIPLY) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_OR, E_TOKEN_OP_DIVIDE), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_OR, E_TOKEN_OP_DIVIDE) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_OR, E_TOKEN_OP_MOD), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_OR, E_TOKEN_OP_MOD) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_OR, E_TOKEN_OP_BIT_AND), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_OR, E_TOKEN_OP_BIT_AND) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_OR, E_TOKEN_OP_BIT_OR), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_OR, E_TOKEN_OP_BIT_OR) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_OR, E_TOKEN_OP_BIT_XOR), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_OR, E_TOKEN_OP_BIT_XOR) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_OR, E_TOKEN_OP_BIT_NOT), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_OR, E_TOKEN_OP_BIT_NOT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_OR, E_TOKEN_OP_BIT_LEFT_SHIFT), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_OR, E_TOKEN_OP_BIT_LEFT_SHIFT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_OR, E_TOKEN_OP_BIT_RIGHT_SHIFT), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_OR, E_TOKEN_OP_BIT_RIGHT_SHIFT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_OR, E_TOKEN_OP_ASSIGNMENT), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_OR, E_TOKEN_OP_ASSIGNMENT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_OR, E_TOKEN_OP_OPEN_PARENTHESES), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_OR, E_TOKEN_OP_OPEN_PARENTHESES) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_OR, E_TOKEN_OP_CLOSE_PARENTHESES), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_OR, E_TOKEN_OP_CLOSE_PARENTHESES) Failed " << endl; }
+      // Operator End
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_OR, E_TOKEN_VARIBLE), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_OR, E_TOKEN_VARIBLE) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_OR, E_TOKEN_SEMICOLON), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_OR, E_TOKEN_SEMICOLON) Failed " << endl; }
+
+	 //
+	 // '^'
+	 //
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_XOR, E_TOKEN_INTEGER_NUMBER), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_XOR, E_TOKEN_INTEGER_NUMBER) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_XOR, E_TOKEN_FLOAT_NUMBER), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_XOR, E_TOKEN_FLOAT_NUMBER) Failed " << endl; }
+
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      // Operator Begin
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_XOR, E_TOKEN_OP_ADD), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_XOR, E_TOKEN_OP_ADD) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_XOR, E_TOKEN_OP_MINUS), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_XOR, E_TOKEN_OP_MINUS) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_XOR, E_TOKEN_OP_MULTIPLY), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_XOR, E_TOKEN_OP_MULTIPLY) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_XOR, E_TOKEN_OP_DIVIDE), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_XOR, E_TOKEN_OP_DIVIDE) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_XOR, E_TOKEN_OP_MOD), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_XOR, E_TOKEN_OP_MOD) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_XOR, E_TOKEN_OP_BIT_AND), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_XOR, E_TOKEN_OP_BIT_AND) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_XOR, E_TOKEN_OP_BIT_OR), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_XOR, E_TOKEN_OP_BIT_OR) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_XOR, E_TOKEN_OP_BIT_XOR), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_XOR, E_TOKEN_OP_BIT_XOR) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_XOR, E_TOKEN_OP_BIT_NOT), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_XOR, E_TOKEN_OP_BIT_NOT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_XOR, E_TOKEN_OP_BIT_LEFT_SHIFT), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_XOR, E_TOKEN_OP_BIT_LEFT_SHIFT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_XOR, E_TOKEN_OP_BIT_RIGHT_SHIFT), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_XOR, E_TOKEN_OP_BIT_RIGHT_SHIFT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_XOR, E_TOKEN_OP_ASSIGNMENT), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_XOR, E_TOKEN_OP_ASSIGNMENT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_XOR, E_TOKEN_OP_OPEN_PARENTHESES), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_XOR, E_TOKEN_OP_OPEN_PARENTHESES) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_XOR, E_TOKEN_OP_CLOSE_PARENTHESES), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_XOR, E_TOKEN_OP_CLOSE_PARENTHESES) Failed " << endl; }
+      // Operator End
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_XOR, E_TOKEN_VARIBLE), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_XOR, E_TOKEN_VARIBLE) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_XOR, E_TOKEN_SEMICOLON), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_XOR, E_TOKEN_SEMICOLON) Failed " << endl; }
+
+	 //
+	 // '~'
+	 //
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_NOT, E_TOKEN_INTEGER_NUMBER), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_NOT, E_TOKEN_INTEGER_NUMBER) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_NOT, E_TOKEN_FLOAT_NUMBER), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_NOT, E_TOKEN_FLOAT_NUMBER) Failed " << endl; }
+
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      // Operator Begin
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_NOT, E_TOKEN_OP_ADD), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_NOT, E_TOKEN_OP_ADD) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_NOT, E_TOKEN_OP_MINUS), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_NOT, E_TOKEN_OP_MINUS) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_NOT, E_TOKEN_OP_MULTIPLY), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_NOT, E_TOKEN_OP_MULTIPLY) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_NOT, E_TOKEN_OP_DIVIDE), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_NOT, E_TOKEN_OP_DIVIDE) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_NOT, E_TOKEN_OP_MOD), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_NOT, E_TOKEN_OP_MOD) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_NOT, E_TOKEN_OP_BIT_AND), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_NOT, E_TOKEN_OP_BIT_AND) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_NOT, E_TOKEN_OP_BIT_OR), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_NOT, E_TOKEN_OP_BIT_OR) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_NOT, E_TOKEN_OP_BIT_XOR), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_NOT, E_TOKEN_OP_BIT_XOR) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_NOT, E_TOKEN_OP_BIT_NOT), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_NOT, E_TOKEN_OP_BIT_NOT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_NOT, E_TOKEN_OP_BIT_LEFT_SHIFT), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_NOT, E_TOKEN_OP_BIT_LEFT_SHIFT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_NOT, E_TOKEN_OP_BIT_RIGHT_SHIFT), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_NOT, E_TOKEN_OP_BIT_RIGHT_SHIFT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_NOT, E_TOKEN_OP_ASSIGNMENT), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_NOT, E_TOKEN_OP_ASSIGNMENT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_NOT, E_TOKEN_OP_OPEN_PARENTHESES), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_NOT, E_TOKEN_OP_OPEN_PARENTHESES) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_NOT, E_TOKEN_OP_CLOSE_PARENTHESES), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_NOT, E_TOKEN_OP_CLOSE_PARENTHESES) Failed " << endl; }
+      // Operator End
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_NOT, E_TOKEN_VARIBLE), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_NOT, E_TOKEN_VARIBLE) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_NOT, E_TOKEN_SEMICOLON), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_NOT, E_TOKEN_SEMICOLON) Failed " << endl; }
+
+	 //
+	 // '<<'
+	 //
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_LEFT_SHIFT, E_TOKEN_INTEGER_NUMBER), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_LEFT_SHIFT, E_TOKEN_INTEGER_NUMBER) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_LEFT_SHIFT, E_TOKEN_FLOAT_NUMBER), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_LEFT_SHIFT, E_TOKEN_FLOAT_NUMBER) Failed " << endl; }
+
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      // Operator Begin
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_LEFT_SHIFT, E_TOKEN_OP_ADD), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_LEFT_SHIFT, E_TOKEN_OP_ADD) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_LEFT_SHIFT, E_TOKEN_OP_MINUS), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_LEFT_SHIFT, E_TOKEN_OP_MINUS) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_LEFT_SHIFT, E_TOKEN_OP_MULTIPLY), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_LEFT_SHIFT, E_TOKEN_OP_MULTIPLY) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_LEFT_SHIFT, E_TOKEN_OP_DIVIDE), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_LEFT_SHIFT, E_TOKEN_OP_DIVIDE) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_LEFT_SHIFT, E_TOKEN_OP_MOD), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_LEFT_SHIFT, E_TOKEN_OP_MOD) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_LEFT_SHIFT, E_TOKEN_OP_BIT_AND), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_LEFT_SHIFT, E_TOKEN_OP_BIT_AND) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_LEFT_SHIFT, E_TOKEN_OP_BIT_OR), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_LEFT_SHIFT, E_TOKEN_OP_BIT_OR) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_LEFT_SHIFT, E_TOKEN_OP_BIT_XOR), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_LEFT_SHIFT, E_TOKEN_OP_BIT_XOR) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_LEFT_SHIFT, E_TOKEN_OP_BIT_NOT), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_LEFT_SHIFT, E_TOKEN_OP_BIT_NOT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_LEFT_SHIFT, E_TOKEN_OP_BIT_LEFT_SHIFT), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_LEFT_SHIFT, E_TOKEN_OP_BIT_LEFT_SHIFT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_LEFT_SHIFT, E_TOKEN_OP_BIT_RIGHT_SHIFT), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_LEFT_SHIFT, E_TOKEN_OP_BIT_RIGHT_SHIFT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_LEFT_SHIFT, E_TOKEN_OP_ASSIGNMENT), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_LEFT_SHIFT, E_TOKEN_OP_ASSIGNMENT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_LEFT_SHIFT, E_TOKEN_OP_OPEN_PARENTHESES), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_LEFT_SHIFT, E_TOKEN_OP_OPEN_PARENTHESES) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_LEFT_SHIFT, E_TOKEN_OP_CLOSE_PARENTHESES), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_LEFT_SHIFT, E_TOKEN_OP_CLOSE_PARENTHESES) Failed " << endl; }
+      // Operator End
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_LEFT_SHIFT, E_TOKEN_VARIBLE), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_LEFT_SHIFT, E_TOKEN_VARIBLE) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_LEFT_SHIFT, E_TOKEN_SEMICOLON), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_LEFT_SHIFT, E_TOKEN_SEMICOLON) Failed " << endl; }
+
+	 //
+	 // '>>'
+	 //
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_RIGHT_SHIFT, E_TOKEN_INTEGER_NUMBER), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_RIGHT_SHIFT, E_TOKEN_INTEGER_NUMBER) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_RIGHT_SHIFT, E_TOKEN_FLOAT_NUMBER), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_RIGHT_SHIFT, E_TOKEN_FLOAT_NUMBER) Failed " << endl; }
+
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      // Operator Begin
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_RIGHT_SHIFT, E_TOKEN_OP_ADD), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_RIGHT_SHIFT, E_TOKEN_OP_ADD) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_RIGHT_SHIFT, E_TOKEN_OP_MINUS), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_RIGHT_SHIFT, E_TOKEN_OP_MINUS) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_RIGHT_SHIFT, E_TOKEN_OP_MULTIPLY), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_RIGHT_SHIFT, E_TOKEN_OP_MULTIPLY) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_RIGHT_SHIFT, E_TOKEN_OP_DIVIDE), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_RIGHT_SHIFT, E_TOKEN_OP_DIVIDE) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_RIGHT_SHIFT, E_TOKEN_OP_MOD), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_RIGHT_SHIFT, E_TOKEN_OP_MOD) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_RIGHT_SHIFT, E_TOKEN_OP_BIT_AND), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_RIGHT_SHIFT, E_TOKEN_OP_BIT_AND) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_RIGHT_SHIFT, E_TOKEN_OP_BIT_OR), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_RIGHT_SHIFT, E_TOKEN_OP_BIT_OR) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_RIGHT_SHIFT, E_TOKEN_OP_BIT_XOR), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_RIGHT_SHIFT, E_TOKEN_OP_BIT_XOR) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_RIGHT_SHIFT, E_TOKEN_OP_BIT_NOT), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_RIGHT_SHIFT, E_TOKEN_OP_BIT_NOT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_RIGHT_SHIFT, E_TOKEN_OP_BIT_LEFT_SHIFT), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_RIGHT_SHIFT, E_TOKEN_OP_BIT_LEFT_SHIFT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_RIGHT_SHIFT, E_TOKEN_OP_BIT_RIGHT_SHIFT), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_RIGHT_SHIFT, E_TOKEN_OP_BIT_RIGHT_SHIFT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_RIGHT_SHIFT, E_TOKEN_OP_ASSIGNMENT), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_RIGHT_SHIFT, E_TOKEN_OP_ASSIGNMENT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_RIGHT_SHIFT, E_TOKEN_OP_OPEN_PARENTHESES), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_RIGHT_SHIFT, E_TOKEN_OP_OPEN_PARENTHESES) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_RIGHT_SHIFT, E_TOKEN_OP_CLOSE_PARENTHESES), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_RIGHT_SHIFT, E_TOKEN_OP_CLOSE_PARENTHESES) Failed " << endl; }
+      // Operator End
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_RIGHT_SHIFT, E_TOKEN_VARIBLE), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_RIGHT_SHIFT, E_TOKEN_VARIBLE) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_BIT_RIGHT_SHIFT, E_TOKEN_SEMICOLON), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_BIT_RIGHT_SHIFT, E_TOKEN_SEMICOLON) Failed " << endl; }
+
+
+	 //
+	 // '='
+	 //
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_ASSIGNMENT, E_TOKEN_INTEGER_NUMBER), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_ASSIGNMENT, E_TOKEN_INTEGER_NUMBER) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_ASSIGNMENT, E_TOKEN_FLOAT_NUMBER), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_ASSIGNMENT, E_TOKEN_FLOAT_NUMBER) Failed " << endl; }
+
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      // Operator Begin
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_ASSIGNMENT, E_TOKEN_OP_ADD), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_ASSIGNMENT, E_TOKEN_OP_ADD) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_ASSIGNMENT, E_TOKEN_OP_MINUS), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_ASSIGNMENT, E_TOKEN_OP_MINUS) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_ASSIGNMENT, E_TOKEN_OP_MULTIPLY), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_ASSIGNMENT, E_TOKEN_OP_MULTIPLY) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_ASSIGNMENT, E_TOKEN_OP_DIVIDE), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_ASSIGNMENT, E_TOKEN_OP_DIVIDE) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_ASSIGNMENT, E_TOKEN_OP_MOD), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_ASSIGNMENT, E_TOKEN_OP_MOD) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_ASSIGNMENT, E_TOKEN_OP_BIT_AND), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_ASSIGNMENT, E_TOKEN_OP_BIT_AND) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_ASSIGNMENT, E_TOKEN_OP_BIT_OR), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_ASSIGNMENT, E_TOKEN_OP_BIT_OR) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_ASSIGNMENT, E_TOKEN_OP_BIT_XOR), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_ASSIGNMENT, E_TOKEN_OP_BIT_XOR) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_ASSIGNMENT, E_TOKEN_OP_BIT_NOT), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_ASSIGNMENT, E_TOKEN_OP_BIT_NOT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_ASSIGNMENT, E_TOKEN_OP_BIT_LEFT_SHIFT), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_ASSIGNMENT, E_TOKEN_OP_BIT_LEFT_SHIFT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_ASSIGNMENT, E_TOKEN_OP_BIT_RIGHT_SHIFT), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_ASSIGNMENT, E_TOKEN_OP_BIT_RIGHT_SHIFT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_ASSIGNMENT, E_TOKEN_OP_ASSIGNMENT), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_ASSIGNMENT, E_TOKEN_OP_ASSIGNMENT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_ASSIGNMENT, E_TOKEN_OP_OPEN_PARENTHESES), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_ASSIGNMENT, E_TOKEN_OP_OPEN_PARENTHESES) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_ASSIGNMENT, E_TOKEN_OP_CLOSE_PARENTHESES), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_ASSIGNMENT, E_TOKEN_OP_CLOSE_PARENTHESES) Failed " << endl; }
+      // Operator End
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_ASSIGNMENT, E_TOKEN_VARIBLE), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_ASSIGNMENT, E_TOKEN_VARIBLE) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_ASSIGNMENT, E_TOKEN_SEMICOLON), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_ASSIGNMENT, E_TOKEN_SEMICOLON) Failed " << endl; }
+
+
+	 //
+	 // '('
+	 //
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_OPEN_PARENTHESES, E_TOKEN_INTEGER_NUMBER), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_OPEN_PARENTHESES, E_TOKEN_INTEGER_NUMBER) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_OPEN_PARENTHESES, E_TOKEN_FLOAT_NUMBER), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_OPEN_PARENTHESES, E_TOKEN_FLOAT_NUMBER) Failed " << endl; }
+
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      // Operator Begin
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_OPEN_PARENTHESES, E_TOKEN_OP_ADD), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_OPEN_PARENTHESES, E_TOKEN_OP_ADD) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_OPEN_PARENTHESES, E_TOKEN_OP_MINUS), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_OPEN_PARENTHESES, E_TOKEN_OP_MINUS) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_OPEN_PARENTHESES, E_TOKEN_OP_MULTIPLY), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_OPEN_PARENTHESES, E_TOKEN_OP_MULTIPLY) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_OPEN_PARENTHESES, E_TOKEN_OP_DIVIDE), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_OPEN_PARENTHESES, E_TOKEN_OP_DIVIDE) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_OPEN_PARENTHESES, E_TOKEN_OP_MOD), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_OPEN_PARENTHESES, E_TOKEN_OP_MOD) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_OPEN_PARENTHESES, E_TOKEN_OP_BIT_AND), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_OPEN_PARENTHESES, E_TOKEN_OP_BIT_AND) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_OPEN_PARENTHESES, E_TOKEN_OP_BIT_OR), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_OPEN_PARENTHESES, E_TOKEN_OP_BIT_OR) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_OPEN_PARENTHESES, E_TOKEN_OP_BIT_XOR), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_OPEN_PARENTHESES, E_TOKEN_OP_BIT_XOR) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_OPEN_PARENTHESES, E_TOKEN_OP_BIT_NOT), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_OPEN_PARENTHESES, E_TOKEN_OP_BIT_NOT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_OPEN_PARENTHESES, E_TOKEN_OP_BIT_LEFT_SHIFT), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_OPEN_PARENTHESES, E_TOKEN_OP_BIT_LEFT_SHIFT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_OPEN_PARENTHESES, E_TOKEN_OP_BIT_RIGHT_SHIFT), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_OPEN_PARENTHESES, E_TOKEN_OP_BIT_RIGHT_SHIFT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_OPEN_PARENTHESES, E_TOKEN_OP_ASSIGNMENT), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_OPEN_PARENTHESES, E_TOKEN_OP_ASSIGNMENT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_OPEN_PARENTHESES, E_TOKEN_OP_OPEN_PARENTHESES), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_OPEN_PARENTHESES, E_TOKEN_OP_OPEN_PARENTHESES) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_OPEN_PARENTHESES, E_TOKEN_OP_CLOSE_PARENTHESES), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_OPEN_PARENTHESES, E_TOKEN_OP_CLOSE_PARENTHESES) Failed " << endl; }
+      // Operator End
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_OPEN_PARENTHESES, E_TOKEN_VARIBLE), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_OPEN_PARENTHESES, E_TOKEN_VARIBLE) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_OPEN_PARENTHESES, E_TOKEN_SEMICOLON), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_OPEN_PARENTHESES, E_TOKEN_SEMICOLON) Failed " << endl; }
+
+	 //
+	 // ')'
+	 //
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_CLOSE_PARENTHESES, E_TOKEN_INTEGER_NUMBER), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_CLOSE_PARENTHESES, E_TOKEN_INTEGER_NUMBER) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_CLOSE_PARENTHESES, E_TOKEN_FLOAT_NUMBER), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_CLOSE_PARENTHESES, E_TOKEN_FLOAT_NUMBER) Failed " << endl; }
+
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      // Operator Begin
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_CLOSE_PARENTHESES, E_TOKEN_OP_ADD), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_CLOSE_PARENTHESES, E_TOKEN_OP_ADD) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_CLOSE_PARENTHESES, E_TOKEN_OP_MINUS), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_CLOSE_PARENTHESES, E_TOKEN_OP_MINUS) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_CLOSE_PARENTHESES, E_TOKEN_OP_MULTIPLY), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_CLOSE_PARENTHESES, E_TOKEN_OP_MULTIPLY) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_CLOSE_PARENTHESES, E_TOKEN_OP_DIVIDE), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_CLOSE_PARENTHESES, E_TOKEN_OP_DIVIDE) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_CLOSE_PARENTHESES, E_TOKEN_OP_MOD), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_CLOSE_PARENTHESES, E_TOKEN_OP_MOD) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_CLOSE_PARENTHESES, E_TOKEN_OP_BIT_AND), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_CLOSE_PARENTHESES, E_TOKEN_OP_BIT_AND) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_CLOSE_PARENTHESES, E_TOKEN_OP_BIT_OR), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_CLOSE_PARENTHESES, E_TOKEN_OP_BIT_OR) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_CLOSE_PARENTHESES, E_TOKEN_OP_BIT_XOR), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_CLOSE_PARENTHESES, E_TOKEN_OP_BIT_XOR) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_CLOSE_PARENTHESES, E_TOKEN_OP_BIT_NOT), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_CLOSE_PARENTHESES, E_TOKEN_OP_BIT_NOT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_CLOSE_PARENTHESES, E_TOKEN_OP_BIT_LEFT_SHIFT), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_CLOSE_PARENTHESES, E_TOKEN_OP_BIT_LEFT_SHIFT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_CLOSE_PARENTHESES, E_TOKEN_OP_BIT_RIGHT_SHIFT), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_CLOSE_PARENTHESES, E_TOKEN_OP_BIT_RIGHT_SHIFT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_CLOSE_PARENTHESES, E_TOKEN_OP_ASSIGNMENT), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_CLOSE_PARENTHESES, E_TOKEN_OP_ASSIGNMENT) Failed " << endl; } // e.g.   (a)=3;
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_CLOSE_PARENTHESES, E_TOKEN_OP_OPEN_PARENTHESES), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_CLOSE_PARENTHESES, E_TOKEN_OP_OPEN_PARENTHESES) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_CLOSE_PARENTHESES, E_TOKEN_OP_CLOSE_PARENTHESES), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_CLOSE_PARENTHESES, E_TOKEN_OP_CLOSE_PARENTHESES) Failed " << endl; }
+      // Operator End
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_CLOSE_PARENTHESES, E_TOKEN_VARIBLE), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_CLOSE_PARENTHESES, E_TOKEN_VARIBLE) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_CLOSE_PARENTHESES, E_TOKEN_SEMICOLON), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_OPEN_PARENTHESES, E_TOKEN_SEMICOLON) Failed " << endl; }
+
+
+   //
+   // Varible
+   //
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_VARIBLE, E_TOKEN_INTEGER_NUMBER), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_VARIBLE, E_TOKEN_INTEGER_NUMBER) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_VARIBLE, E_TOKEN_FLOAT_NUMBER), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_VARIBLE, E_TOKEN_FLOAT_NUMBER) Failed " << endl; }
+
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      // Operator Begin
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_VARIBLE, E_TOKEN_OP_ADD), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_VARIBLE, E_TOKEN_OP_ADD) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_VARIBLE, E_TOKEN_OP_MINUS), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_VARIBLE, E_TOKEN_OP_MINUS) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_VARIBLE, E_TOKEN_OP_MULTIPLY), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_VARIBLE, E_TOKEN_OP_MULTIPLY) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_VARIBLE, E_TOKEN_OP_DIVIDE), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_VARIBLE, E_TOKEN_OP_DIVIDE) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_VARIBLE, E_TOKEN_OP_MOD), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_VARIBLE, E_TOKEN_OP_MOD) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_VARIBLE, E_TOKEN_OP_BIT_AND), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_VARIBLE, E_TOKEN_OP_BIT_AND) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_VARIBLE, E_TOKEN_OP_BIT_OR), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_VARIBLE, E_TOKEN_OP_BIT_OR) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_VARIBLE, E_TOKEN_OP_BIT_XOR), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_VARIBLE, E_TOKEN_OP_BIT_XOR) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_VARIBLE, E_TOKEN_OP_BIT_NOT), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_VARIBLE, E_TOKEN_OP_BIT_NOT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_VARIBLE, E_TOKEN_OP_BIT_LEFT_SHIFT), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_VARIBLE, E_TOKEN_OP_BIT_LEFT_SHIFT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_VARIBLE, E_TOKEN_OP_BIT_RIGHT_SHIFT), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_VARIBLE, E_TOKEN_OP_BIT_RIGHT_SHIFT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_VARIBLE, E_TOKEN_OP_ASSIGNMENT), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_VARIBLE, E_TOKEN_OP_ASSIGNMENT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_VARIBLE, E_TOKEN_OP_OPEN_PARENTHESES), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_VARIBLE, E_TOKEN_OP_OPEN_PARENTHESES) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_VARIBLE, E_TOKEN_OP_CLOSE_PARENTHESES), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_VARIBLE, E_TOKEN_OP_CLOSE_PARENTHESES) Failed " << endl; }
+      // Operator End
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_VARIBLE, E_TOKEN_VARIBLE), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_VARIBLE, E_TOKEN_VARIBLE) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_VARIBLE, E_TOKEN_SEMICOLON), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_VARIBLE, E_TOKEN_SEMICOLON) Failed " << endl; }
+
+   //
+   // Semicolon
+   //
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_SEMICOLON, E_TOKEN_INTEGER_NUMBER), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_SEMICOLON, E_TOKEN_INTEGER_NUMBER) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_SEMICOLON, E_TOKEN_FLOAT_NUMBER), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_SEMICOLON, E_TOKEN_FLOAT_NUMBER) Failed " << endl; }
+
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      // Operator Begin
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_SEMICOLON, E_TOKEN_OP_ADD), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_SEMICOLON, E_TOKEN_OP_ADD) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_SEMICOLON, E_TOKEN_OP_MINUS), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_SEMICOLON, E_TOKEN_OP_MINUS) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_SEMICOLON, E_TOKEN_OP_MULTIPLY), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_SEMICOLON, E_TOKEN_OP_MULTIPLY) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_SEMICOLON, E_TOKEN_OP_DIVIDE), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_SEMICOLON, E_TOKEN_OP_DIVIDE) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_SEMICOLON, E_TOKEN_OP_MOD), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_SEMICOLON, E_TOKEN_OP_MOD) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_SEMICOLON, E_TOKEN_OP_BIT_AND), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_SEMICOLON, E_TOKEN_OP_BIT_AND) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_SEMICOLON, E_TOKEN_OP_BIT_OR), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_SEMICOLON, E_TOKEN_OP_BIT_OR) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_SEMICOLON, E_TOKEN_OP_BIT_XOR), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_SEMICOLON, E_TOKEN_OP_BIT_XOR) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_SEMICOLON, E_TOKEN_OP_BIT_NOT), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_SEMICOLON, E_TOKEN_OP_BIT_NOT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_SEMICOLON, E_TOKEN_OP_BIT_LEFT_SHIFT), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_SEMICOLON, E_TOKEN_OP_BIT_LEFT_SHIFT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_SEMICOLON, E_TOKEN_OP_BIT_RIGHT_SHIFT), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_SEMICOLON, E_TOKEN_OP_BIT_RIGHT_SHIFT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_SEMICOLON, E_TOKEN_OP_ASSIGNMENT), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_SEMICOLON, E_TOKEN_OP_ASSIGNMENT) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_SEMICOLON, E_TOKEN_OP_OPEN_PARENTHESES), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_SEMICOLON, E_TOKEN_OP_OPEN_PARENTHESES) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_SEMICOLON, E_TOKEN_OP_CLOSE_PARENTHESES), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_SEMICOLON, E_TOKEN_OP_CLOSE_PARENTHESES) Failed " << endl; }
+      // Operator End
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_SEMICOLON, E_TOKEN_VARIBLE), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_SEMICOLON, E_TOKEN_VARIBLE) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_SEMICOLON, E_TOKEN_SEMICOLON), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_SEMICOLON, E_TOKEN_SEMICOLON) Failed " << endl; }
 
 }
 

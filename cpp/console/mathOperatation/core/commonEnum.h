@@ -40,46 +40,47 @@ enum E_TokenType
 {
 	E_TOKEN_UNKNOWN = 0,
 
-	E_TOKEN_DECIMAL_NUMBER = 1,
-	E_TOKEN_OCTAL_NUMBER = 2,
-	E_TOKEN_HEX_NUMBER = 3,
+	E_TOKEN_INTEGER_NUMBER = 1,
+	  E_TOKEN_DECIMAL_NUMBER = 2,
+	  E_TOKEN_OCTAL_NUMBER = 3,
+	  E_TOKEN_HEX_NUMBER = 4,
 
-	E_TOKEN_FLOAT_NUMBER = 4,
+	E_TOKEN_FLOAT_NUMBER = 5,
 
-	E_TOKEN_VARIBLE = 5,
+	E_TOKEN_VARIBLE = 6,
 
-	E_TOKEN_OPERATOR = 6,
+	E_TOKEN_OPERATOR = 7,
 	/*
 	   Sub Operator Type
     */
 	//////////////////////////////////////////////////
-	E_TOKEN_OP_OPEN_PARENTHESES = 7,  // (
 	E_TOKEN_OP_BEGIN = E_TOKEN_OPERATOR,      // 7
-	E_TOKEN_OP_CLOSE_PARENTHESES = 8, // )
+	E_TOKEN_OP_OPEN_PARENTHESES = 8,  // (
+	E_TOKEN_OP_CLOSE_PARENTHESES = 9, // )
 
-	E_TOKEN_OP_ADD = 9,                // +
-	E_TOKEN_OP_MINUS = 10,             // -
-	E_TOKEN_OP_MULTIPLY = 11,          // *
-	E_TOKEN_OP_DIVIDE = 12,            // /
-	E_TOKEN_OP_MOD = 13,               // %
-	E_TOKEN_OP_BIT_AND = 14,           // &
-	E_TOKEN_OP_BIT_OR = 15,            // |
-	E_TOKEN_OP_BIT_XOR = 16,           // ^
-	E_TOKEN_OP_BIT_NOT = 17,           // ~
-	E_TOKEN_OP_BIT_LEFT_SHIFT = 18,    // <<
-	E_TOKEN_OP_BIT_RIGHT_SHIFT = 19,   // >>
-	E_TOKEN_OP_ASSIGNMENT = 20,        // =
+	E_TOKEN_OP_ADD = 10,                // +
+	E_TOKEN_OP_MINUS = 11,             // -
+	E_TOKEN_OP_MULTIPLY = 12,          // *
+	E_TOKEN_OP_DIVIDE = 13,            // /
+	E_TOKEN_OP_MOD = 14,               // %
+	E_TOKEN_OP_BIT_AND = 15,           // &
+	E_TOKEN_OP_BIT_OR = 16,            // |
+	E_TOKEN_OP_BIT_XOR = 17,           // ^
+	E_TOKEN_OP_BIT_NOT = 18,           // ~
+	E_TOKEN_OP_BIT_LEFT_SHIFT = 19,    // <<
+	E_TOKEN_OP_BIT_RIGHT_SHIFT = 20,   // >>
+	E_TOKEN_OP_ASSIGNMENT = 21,        // =
 
 	E_TOKEN_OP_END = E_TOKEN_OP_ASSIGNMENT, // 20
 	//////////////////////////////////////////////////
 
-	E_TOKEN_COMMENT_TYPE = 21,
-	E_TOKEN_SINGLE_COMMENT = 22,    //    //
-	E_TOKEN_MULTI_COMMENT = 23,     //    /*   */
+	E_TOKEN_COMMENT_TYPE = 22,
+	E_TOKEN_SINGLE_COMMENT = 23,    //    //
+	E_TOKEN_MULTI_COMMENT = 24,     //    /*   */
 
-	E_TOKEN_BLANK = 24,  // <Space> <Tab> \r \n
+	E_TOKEN_BLANK = 25,  // <Space> <Tab> \r \n
 
-	E_TOKEN_SEMICOLON = 25,
+	E_TOKEN_SEMICOLON = 26,
 
 	E_TOKEN_IGNORE, // Placehold Dummy Token Type
 };

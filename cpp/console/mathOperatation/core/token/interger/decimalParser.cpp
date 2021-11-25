@@ -46,6 +46,7 @@ void DecimalParser::init() // override
 	// m_AllAvalibleCharacters.insert( make_pair('F', CharUtil::getCharBaseInfo('F') ) );
 
 	m_tokenType = E_TOKEN_DECIMAL_NUMBER;
+	m_tokenSubType = E_TOKEN_DECIMAL_NUMBER;
     m_exceptionCode = E_DECIMAL_INVALID_FORMAT;
 	m_parserName = "DecimalParser";
 }

@@ -75,8 +75,11 @@ protected:
 	std::string m_parserName;
 
 	E_PaserType m_type;
+
 	E_TokenType m_tokenType;
-    E_ExceptionCode m_exceptionCode;
+	E_TokenType m_tokenSubType;
+
+	E_ExceptionCode m_exceptionCode;
 
 	E_TERMINAL_STATUS  m_switchFlag;
 	

@@ -49,7 +49,7 @@ void TokenParserMgr::init()
  	s_parserMap.insert( make_pair(enumCvt(E_P_MULTI_LINE_COMMENT),  new MultiLineCommentParser(E_P_MULTI_LINE_COMMENT)  ) );
     //
  	s_parserMap.insert( make_pair(enumCvt(E_P_BLANK),  new BlankParser(E_P_BLANK) ) );
-
+	// 
  	s_parserMap.insert( make_pair(enumCvt(E_P_ENDLESEE_SEMICOLON),  new ExpEvaluation(E_P_ENDLESEE_SEMICOLON) ) );
 
 	//
