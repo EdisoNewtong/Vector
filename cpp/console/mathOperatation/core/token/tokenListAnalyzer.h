@@ -24,7 +24,7 @@ protected:
 	void initBanPickCfg();
 
 	unsigned int genFlag(E_TokenType frontToken, E_TokenType genToken);
-	unsigned int genBanPickMask(bool noContinuedFlag, bool continuedFlag);
+	unsigned int genBanPickMask(unsigned int noContinuedFlag, unsigned int continuedFlag);
 
 };
 
