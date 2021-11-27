@@ -1,5 +1,7 @@
+#include <cassert>
 #include <iostream>
 #include "tokenListAnalyzer.h"
+#include "parserException.h"
 using namespace std;
 
 TokenListAnalyzer::TokenListAnalyzer()
@@ -362,15 +364,106 @@ bool TokenListAnalyzer::checkParserIsValid(E_PaserType tp)
 	return true;
 }
 
-bool TokenListAnalyzer::pushToken(TokenInfo* pToken)
+void TokenListAnalyzer::pushToken(TokenInfo* pToken)
 {
 	m_tokenList.push_back( pToken );
-	return true;
+
+	if ( pToken != nullptr ) {
+		auto curTp = pToken->getType();
+		if ( curTp == E_TOKEN_OPERATOR ) {
+			curTp = pToken->getSubType();
+		}
+		auto curTokenType = getTokenName(curTp);
+
+		if ( !(curTp == E_TOKEN_BLANK || curTp == E_TOKEN_COMMENT_TYPE) ) {
+			int hasSkipBlank = 0;
+			auto previousValidToken = getPreviousToken(true, &hasSkipBlank, true);
+			if ( previousValidToken != nullptr ) {
+				auto previousType = previousValidToken->getType();
+				if ( previousType == E_TOKEN_OPERATOR ) {
+					previousType = previousValidToken->getSubType();
+				}
+				auto previousTokenType = getTokenName(previousType);
+
+                auto key = genFlag(previousType, curTp);
+				auto foundIt = m_banPickCfgMap.find(key);
+				if ( foundIt != m_banPickCfgMap.end() ) {
+					auto banPickFlag = foundIt->second;
+
+					if ( banPickFlag == 0 ) {
+						// Not Allowed at all
+						auto detail = previousTokenType + string(" Can't located in front of Type   ") + curTokenType;
+
+						ParserException e(E_TOKEN_LOGIC_INVALID);
+						e.setDetail( detail );
+						throw e;
+					} else if ( banPickFlag == 1 ) {
+						// No flag whose value is (0,1)
+					} else if ( banPickFlag == 2 ) {
+						//  banPickFlag = 10(2) = 2(10)
+						if ( hasSkipBlank == 1 ) {
+							// Valid
+						} else {
+							// continuously token next to previous is not valid
+							auto detail = previousTokenType + string(" Can't located <No-Skip> in front of Type   ") + curTokenType;
+
+							ParserException e(E_TOKEN_LOGIC_INVALID);
+							e.setDetail( detail );
+							throw e;
+						}
+					} else {
+						// banPickFlag == 3u,  both is OK
+					}
+				} else { 
+					cout << "[ERROR] : Can't find key : " << previousTokenType << " After " <<  curTokenType <<  endl;
+					assert(false);
+				}
+			} else {
+				// previousValidToken == nullptr
+				// pToken is the 1st pushed token
+				//     int  / float   / varible / semicolon /  : All Valid
+				//     123; /  3.5f;  /   nCnt  /    ;      /
+				//  /* ... */ : 1st is OK
+				//  // ...    : 1st is OK
+				/*
+
+				    Operator is partially valid
+					Valid list include : +    -    ~     ( 
+
+				*/
+				if (    curTp == E_TOKEN_BLANK 
+					 || curTp == E_TOKEN_COMMENT_TYPE
+					 ||	curTp == E_TOKEN_INTEGER_NUMBER 
+					 || curTp == E_TOKEN_FLOAT_NUMBER 
+					 || curTp == E_TOKEN_VARIBLE
+					 || curTp == E_TOKEN_SEMICOLON
+					 || curTp == E_TOKEN_OP_ADD
+					 || curTp == E_TOKEN_OP_MINUS
+					 || curTp == E_TOKEN_OP_BIT_NOT
+					 || curTp == E_TOKEN_OP_OPEN_PARENTHESES ) 
+				{
+					// 1st pushed is valid
+				} else {
+					ParserException e(E_TOKEN_LOGIC_INVALID);
+					string detail = curTokenType + " Can't be pushed at the 1st position";
+					e.setDetail( detail );
+					throw e;
+				}
+
+			}
+		}
+
+		// tp == E_TOKEN_BLANK || tp == E_TOKEN_COMMENT_TYPE  is always valid no matter  previous token is which type
+
+	} else {
+		cout << "[ERROR] : Pushed Token == nullptr" << endl;
+		assert(false);
+	}
 }
 
 
 
-TokenInfo* TokenListAnalyzer::getPreviousToken(bool needSkipBlankComment, int* pHasSkipBlankComment)
+TokenInfo* TokenListAnalyzer::getPreviousToken(bool needSkipBlankComment, int* pHasSkipBlankComment, bool needBack2LastButOne)
 {
 	// init  flag
 	if ( pHasSkipBlankComment != nullptr ) {
@@ -382,7 +475,13 @@ TokenInfo* TokenListAnalyzer::getPreviousToken(bool needSkipBlankComment, int* p
 	}
 
 	TokenInfo* pRetTokenInfo = nullptr;
-	for( auto r_it = m_tokenList.rbegin(); r_it != m_tokenList.rend();  )
+
+	auto r_it = m_tokenList.rbegin();
+	if ( needBack2LastButOne ) {
+		++r_it;
+	}
+
+	for( ; r_it != m_tokenList.rend();  )
 	{
 		auto pTokenInfo = *r_it;
 		if ( pTokenInfo != nullptr ) {
@@ -460,7 +559,7 @@ void TokenListAnalyzer::initBanPickCfg()
     retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_FLOAT_NUMBER, E_TOKEN_OP_BIT_OR)      , genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_FLOAT_NUMBER, E_TOKEN_OP_BIT_OR) Failed " << endl; }
     retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_FLOAT_NUMBER, E_TOKEN_OP_BIT_XOR)     , genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_FLOAT_NUMBER, E_TOKEN_OP_BIT_XOR) Failed " << endl; }
     retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_FLOAT_NUMBER, E_TOKEN_OP_BIT_NOT)     , genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_FLOAT_NUMBER, E_TOKEN_OP_BIT_NOT) Failed " << endl; }
-    retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_FLOAT_NUMBER, E_TOKEN_OP_BIT_LEFT_SHIFT) , genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_FLOAT_NUMBER, E_TOKEN_OP_BIT_LEFT_SHIFT) Failed " << endl; }
+    retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_FLOAT_NUMBER, E_TOKEN_OP_BIT_LEFT_SHIFT) , genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_FLOAT_NUMBER, E_TOKEN_OP_BIT_LEFT_SHIFT) Failed " << endl; }
     retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_FLOAT_NUMBER, E_TOKEN_OP_BIT_RIGHT_SHIFT), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_FLOAT_NUMBER, E_TOKEN_OP_BIT_RIGHT_SHIFT) Failed " << endl; }
     retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_FLOAT_NUMBER, E_TOKEN_OP_ASSIGNMENT), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_FLOAT_NUMBER, E_TOKEN_OP_ASSIGNMENT) Failed " << endl; }
     retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_FLOAT_NUMBER, E_TOKEN_OP_OPEN_PARENTHESES), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_FLOAT_NUMBER, E_TOKEN_OP_OPEN_PARENTHESES) Failed " << endl; }
@@ -847,12 +946,12 @@ void TokenListAnalyzer::initBanPickCfg()
    retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_CLOSE_PARENTHESES, E_TOKEN_OP_BIT_NOT), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_CLOSE_PARENTHESES, E_TOKEN_OP_BIT_NOT) Failed " << endl; }
    retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_CLOSE_PARENTHESES, E_TOKEN_OP_BIT_LEFT_SHIFT), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_CLOSE_PARENTHESES, E_TOKEN_OP_BIT_LEFT_SHIFT) Failed " << endl; }
    retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_CLOSE_PARENTHESES, E_TOKEN_OP_BIT_RIGHT_SHIFT), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_CLOSE_PARENTHESES, E_TOKEN_OP_BIT_RIGHT_SHIFT) Failed " << endl; }
-   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_CLOSE_PARENTHESES, E_TOKEN_OP_ASSIGNMENT), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_CLOSE_PARENTHESES, E_TOKEN_OP_ASSIGNMENT) Failed " << endl; } // e.g.   (a)=3;
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_CLOSE_PARENTHESES, E_TOKEN_OP_ASSIGNMENT), genBanPickMask(1,1) ) ); /* e.g. (a)=3; */ if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_CLOSE_PARENTHESES, E_TOKEN_OP_ASSIGNMENT) Failed " << endl; } // e.g.   (a)=3;
    retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_CLOSE_PARENTHESES, E_TOKEN_OP_OPEN_PARENTHESES), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_CLOSE_PARENTHESES, E_TOKEN_OP_OPEN_PARENTHESES) Failed " << endl; }
    retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_CLOSE_PARENTHESES, E_TOKEN_OP_CLOSE_PARENTHESES), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_CLOSE_PARENTHESES, E_TOKEN_OP_CLOSE_PARENTHESES) Failed " << endl; }
       // Operator End
       ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_CLOSE_PARENTHESES, E_TOKEN_VARIBLE), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_CLOSE_PARENTHESES, E_TOKEN_VARIBLE) Failed " << endl; }
+   retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_CLOSE_PARENTHESES, E_TOKEN_VARIBLE), genBanPickMask(0,0) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_CLOSE_PARENTHESES, E_TOKEN_VARIBLE) Failed " << endl; }
    retpr = m_banPickCfgMap.insert( make_pair( genFlag(E_TOKEN_OP_CLOSE_PARENTHESES, E_TOKEN_SEMICOLON), genBanPickMask(1,1) ) ); if ( !retpr.second ) { cout << "genFlag(E_TOKEN_OP_OPEN_PARENTHESES, E_TOKEN_SEMICOLON) Failed " << endl; }
 
 
@@ -934,3 +1033,79 @@ unsigned int TokenListAnalyzer::genBanPickMask(unsigned int noContinuedFlag, uns
 	retMask |= continuedFlag;
 	return retMask;
 }
+
+
+
+string  TokenListAnalyzer::getTokenName(E_TokenType tp)
+{
+	string ret;
+	switch( tp )
+	{
+	case E_TOKEN_UNKNOWN:
+		ret = "E_TOKEN_UNKNOWN";
+		break;
+	case E_TOKEN_BLANK:
+		ret = "E_TOKEN_BLANK";
+		break;
+	case E_TOKEN_COMMENT_TYPE:
+		ret = "E_TOKEN_COMMENT_TYPE";
+		break;
+	case E_TOKEN_INTEGER_NUMBER:
+		ret = "E_TOKEN_INTEGER_NUMBER";
+		break;
+	case E_TOKEN_FLOAT_NUMBER:
+		ret = "E_TOKEN_FLOAT_NUMBER";
+		break;
+	case E_TOKEN_VARIBLE:
+		ret = "E_TOKEN_VARIBLE";
+		break;
+	case E_TOKEN_OP_OPEN_PARENTHESES: // = 8,  // (
+		ret = "'('";
+		break;
+	case E_TOKEN_OP_CLOSE_PARENTHESES: // = 9, // )
+		ret = "')'";
+		break;
+	case E_TOKEN_OP_ADD: // = 10,                // +
+		ret = "'+'";
+		break;
+	case E_TOKEN_OP_MINUS: // = 11,             // -
+		ret = "'-'";
+		break;
+	case E_TOKEN_OP_MULTIPLY: // = 12,          // *
+		ret = "'*'";
+		break;
+	case E_TOKEN_OP_DIVIDE: // = 13,            // /
+		ret = "'/'";
+		break;
+	case E_TOKEN_OP_MOD: // = 14,               // %
+		ret = "'%'";
+		break;
+	case E_TOKEN_OP_BIT_AND: // = 15,           // &
+		ret = "'&'";
+		break;
+	case E_TOKEN_OP_BIT_OR: // = 16,            // |
+		ret = "'|'";
+		break;
+	case E_TOKEN_OP_BIT_XOR: // = 17,           // ^
+		ret = "'^'";
+		break;
+	case E_TOKEN_OP_BIT_NOT: // = 18,           // ~
+		ret = "'~'";
+		break;
+	case E_TOKEN_OP_BIT_LEFT_SHIFT: // = 19,    // <<
+		ret = "'<<'";
+		break;
+	case E_TOKEN_OP_BIT_RIGHT_SHIFT: // = 20,   // >>
+		ret = "'>>'";
+		break;
+	case E_TOKEN_OP_ASSIGNMENT: // = 21,        // =
+		ret = "'='";
+		break;
+	default:
+		ret = "In switch-case default part :  E_TOKEN_UNKNOWN";
+		break;
+	}
+
+	return ret;
+}
+

@@ -12,11 +12,19 @@ ParserException::ParserException(E_ExceptionCode errorCode)
 	m_shortInfoMap.clear();
 	m_shortInfoMap.insert( make_pair( enumCvt(E_UNKNOWN_CHAR), string("Unknown Character") ) );
 
+	m_shortInfoMap.insert( make_pair( enumCvt(E_MULTI_LINE_COMMENT_INVALID_FORMAT), string("Invalid Mutli-Line Comment Format") ) );
+	m_shortInfoMap.insert( make_pair( enumCvt(E_SINGLE_LINE_COMMENT_INVALID_FORMAT), string("Invalid Single-Line Comment Format") ) );
+
 	m_shortInfoMap.insert( make_pair( enumCvt(E_DECIMAL_INVALID_FORMAT), string("Invalid Decimal Format") ) );
 	m_shortInfoMap.insert( make_pair( enumCvt(E_OCT_INVALID_FORMAT), string("Invalid Oct Format") ) );
 	m_shortInfoMap.insert( make_pair( enumCvt(E_HEX_INVALID_FORMAT), string("Invalid Hex Format") ) );
 
 	m_shortInfoMap.insert( make_pair( enumCvt(E_FLOAT_INVALID_FORMAT), string("Invalid Float Format") ) );
+
+	m_shortInfoMap.insert( make_pair( enumCvt(E_OPERATOR_INVALID_FORMAT), string("Invalid Operator Format") ) );
+	m_shortInfoMap.insert( make_pair( enumCvt(E_VARIBLE_INVALID_FORMAT), string("Invalid Varible Format") ) );
+	m_shortInfoMap.insert( make_pair( enumCvt(E_TOKEN_LOGIC_INVALID), string("Invalid Token Pushing Logic") ) );
+
 }
 
 ParserException::ParserException(const  ParserException& r)

@@ -9,7 +9,18 @@ a-z A-Z   _                                                               // Alp
 <Space>   <Tab>   <\r>    <\n>                                            // Blank Type
 
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+Token Type
+   Blank / Comment
+   
+   Int
+      decimal / octal /hex
+   
+   Float
+   Varible
+   Operator 
+   Semicolon ;
 
 
 

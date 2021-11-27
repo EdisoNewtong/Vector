@@ -108,6 +108,8 @@ enum E_ExceptionCode
 
 	E_EXP_EVALUATION_INVALID_FORMAT = 10,
 
+	E_TOKEN_LOGIC_INVALID = 11,
+
 };
 
 enum E_DataType
