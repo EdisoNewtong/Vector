@@ -28,6 +28,13 @@ E_TokenType TokenInfo::getSubType()
 }
 
 
+void TokenInfo::setSubType(E_TokenType tp)
+{
+	m_subType = tp;
+}
+
+
+
 std::string TokenInfo::getDetail()
 {
 	return m_strSequence;

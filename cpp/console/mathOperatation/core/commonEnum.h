@@ -58,29 +58,32 @@ enum E_TokenType
 	E_TOKEN_OP_OPEN_PARENTHESES = 8,  // (
 	E_TOKEN_OP_CLOSE_PARENTHESES = 9, // )
 
-	E_TOKEN_OP_ADD = 10,                // +
-	E_TOKEN_OP_MINUS = 11,             // -
-	E_TOKEN_OP_MULTIPLY = 12,          // *
-	E_TOKEN_OP_DIVIDE = 13,            // /
-	E_TOKEN_OP_MOD = 14,               // %
-	E_TOKEN_OP_BIT_AND = 15,           // &
-	E_TOKEN_OP_BIT_OR = 16,            // |
-	E_TOKEN_OP_BIT_XOR = 17,           // ^
-	E_TOKEN_OP_BIT_NOT = 18,           // ~
-	E_TOKEN_OP_BIT_LEFT_SHIFT = 19,    // <<
-	E_TOKEN_OP_BIT_RIGHT_SHIFT = 20,   // >>
-	E_TOKEN_OP_ASSIGNMENT = 21,        // =
+	E_TOKEN_OP_ADD = 10,               // +
+     E_TOKEN_OP_POSITIVE = 11,          // +3
+	E_TOKEN_OP_MINUS = 12,             // -
+     E_TOKEN_OP_NEGATIVE = 13,          // -3
+
+	E_TOKEN_OP_MULTIPLY = 14,          // *
+	E_TOKEN_OP_DIVIDE = 15,            // /
+	E_TOKEN_OP_MOD = 16,               // %
+	E_TOKEN_OP_BIT_AND = 17,           // &
+	E_TOKEN_OP_BIT_OR = 18,            // |
+	E_TOKEN_OP_BIT_XOR = 19,           // ^
+	E_TOKEN_OP_BIT_NOT = 20,           // ~
+	E_TOKEN_OP_BIT_LEFT_SHIFT = 21,    // <<
+	E_TOKEN_OP_BIT_RIGHT_SHIFT = 22,   // >>
+	E_TOKEN_OP_ASSIGNMENT = 23,        // =
 
 	E_TOKEN_OP_END = E_TOKEN_OP_ASSIGNMENT, // 20
 	//////////////////////////////////////////////////
 
-	E_TOKEN_COMMENT_TYPE = 22,
-	E_TOKEN_SINGLE_COMMENT = 23,    //    //
-	E_TOKEN_MULTI_COMMENT = 24,     //    /*   */
+	E_TOKEN_COMMENT_TYPE = 24,
+	E_TOKEN_SINGLE_COMMENT = 25,    //    //
+	E_TOKEN_MULTI_COMMENT = 26,     //    /*   */
 
-	E_TOKEN_BLANK = 25,  // <Space> <Tab> \r \n
+	E_TOKEN_BLANK = 27,  // <Space> <Tab> \r \n
 
-	E_TOKEN_SEMICOLON = 26,
+	E_TOKEN_SEMICOLON = 28,
 
 	E_TOKEN_IGNORE, // Placehold Dummy Token Type
 };
