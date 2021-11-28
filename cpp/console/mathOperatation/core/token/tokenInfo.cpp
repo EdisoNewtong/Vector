@@ -28,7 +28,7 @@ E_TokenType TokenInfo::getSubType()
 }
 
 
-void TokenInfo::setSubType(E_TokenType tp)
+void TokenInfo::resetSubType(E_TokenType tp)
 {
 	m_subType = tp;
 }

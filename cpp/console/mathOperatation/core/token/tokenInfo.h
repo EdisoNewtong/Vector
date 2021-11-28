@@ -13,7 +13,7 @@ public:
 
 	E_TokenType getType();
 	E_TokenType getSubType();
-	void        setSubType(E_TokenType tp);
+	void        resetSubType(E_TokenType tp);
 	std::string getDetail();
 	void setDetail(const std::string& token);
 protected:

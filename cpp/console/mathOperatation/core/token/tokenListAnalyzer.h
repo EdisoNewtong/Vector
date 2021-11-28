@@ -21,6 +21,7 @@ protected:
 	std::unordered_map<unsigned int,unsigned int> m_banPickCfgMap;
 
 	TokenInfo* getPreviousToken(bool needSkipBlankComment, int* pHasSkipBlankComment, bool needBack2LastButOne);
+	void judgeTokenIsPositiveOrNegativeAndReset(TokenInfo* pToken);
 
 	void initBanPickCfg();
 

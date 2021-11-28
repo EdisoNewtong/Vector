@@ -366,6 +366,7 @@ bool TokenListAnalyzer::checkParserIsValid(E_PaserType tp)
 
 void TokenListAnalyzer::pushToken(TokenInfo* pToken)
 {
+	judgeTokenIsPositiveOrNegativeAndReset(pToken);
 	m_tokenList.push_back( pToken );
 
 	if ( pToken != nullptr ) {
@@ -1132,6 +1133,69 @@ unsigned int TokenListAnalyzer::genBanPickMask(unsigned int noContinuedFlag, uns
 	retMask |= (noContinuedFlag << 1);
 	retMask |= continuedFlag;
 	return retMask;
+}
+
+void TokenListAnalyzer::judgeTokenIsPositiveOrNegativeAndReset(TokenInfo* pToken)
+{
+	if ( pToken == nullptr ) {
+		return;
+	}
+
+	int skipFlag = 0;
+	TokenInfo* pPreviousInfo = getPreviousToken(true,&skipFlag, false);
+
+	//
+	// pPreviousInfo != nullptr
+	//
+	auto tp = pToken->getType();
+	auto subTp = pToken->getSubType();
+	if (       tp == E_TOKEN_OPERATOR 
+		 && (subTp == E_TOKEN_OP_ADD || subTp == E_TOKEN_OP_MINUS)
+	)
+	{
+		if ( pPreviousInfo == nullptr ) {
+			pToken->resetSubType( (subTp == E_TOKEN_OP_ADD) ? E_TOKEN_OP_POSITIVE : E_TOKEN_OP_NEGATIVE );
+		} else {
+			auto previousTp = pPreviousInfo->getType();
+			auto previousSubTp = pPreviousInfo->getSubType();
+			if ( previousTp == E_TOKEN_INTEGER_NUMBER || previousTp == E_TOKEN_FLOAT_NUMBER || previousTp == E_TOKEN_VARIBLE ) {
+				// keep it as  add/minus   rather than   positive/negative
+			} else {
+				if ( previousTp == E_TOKEN_OPERATOR ) {
+					/*
+					switch ( previousSubTp )
+					{
+					case E_TOKEN_OP_ADD:
+					case E_TOKEN_OP_POSITIVE:
+					case E_TOKEN_OP_MINUS:
+					case E_TOKEN_OP_NEGATIVE:
+					case E_TOKEN_OP_MULTIPLY:
+					case E_TOKEN_OP_DIVIDE:
+					case E_TOKEN_OP_MOD:
+					case E_TOKEN_OP_BIT_AND:
+					case E_TOKEN_OP_BIT_OR:
+					case E_TOKEN_OP_BIT_XOR:
+					case E_TOKEN_OP_BIT_NOT:
+					case E_TOKEN_OP_BIT_LEFT_SHIFT:
+					case E_TOKEN_OP_BIT_RIGHT_SHIFT:
+					case E_TOKEN_OP_OPEN_PARENTHESES:
+					case E_TOKEN_OP_OPEN_PARENTHESES:
+						pToken->resetSubType( (subTp == E_TOKEN_OP_ADD) ? E_TOKEN_OP_POSITIVE : E_TOKEN_OP_NEGATIVE );
+						break;
+					}
+					*/
+
+					if ( previousSubTp != E_TOKEN_OP_CLOSE_PARENTHESES ) {
+						pToken->resetSubType( (subTp == E_TOKEN_OP_ADD) ? E_TOKEN_OP_POSITIVE : E_TOKEN_OP_NEGATIVE );
+					}
+				} else {
+					// previousTp == E_TOKEN_SEMICOLON
+					pToken->resetSubType( (subTp == E_TOKEN_OP_ADD) ? E_TOKEN_OP_POSITIVE : E_TOKEN_OP_NEGATIVE );
+				}
+			}
+		}
+
+	}
 }
 
 
