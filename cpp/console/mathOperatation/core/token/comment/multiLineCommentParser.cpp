@@ -73,5 +73,19 @@ bool MultiLineCommentParser::isEnd(ParsedCharInfo* pInfo) // override
 }
 
 
+// virtual
+bool MultiLineCommentParser::isTokenValid() // override
+{
+	int sz = static_cast<int>( m_alreadyTravelsaledString.size() );
+	if ( sz < 4 ) {
+		return false;
+	} 
+
+	// else >=4
+	string first2sr = m_alreadyTravelsaledString.substr(0,2);
+	string last2str = m_alreadyTravelsaledString.substr( sz - 2 );
+	return (first2sr == "/*"   &&   last2str == "*/");
+
+}
 
 

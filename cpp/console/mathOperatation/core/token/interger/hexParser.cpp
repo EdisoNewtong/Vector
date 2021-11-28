@@ -119,7 +119,7 @@ bool HexParser::isEnd(ParsedCharInfo* pInfo) // override;
 
 	//  sz >=3
 	string prefix = m_alreadyTravelsaledString.substr(0,2);
-	if ( prefix != "0x" && prefix !="0X" ) {
+	if ( !(prefix == "0x" || prefix =="0X") ) {
 		return false;
 	}
 
@@ -133,12 +133,52 @@ bool HexParser::isEnd(ParsedCharInfo* pInfo) // override;
 }
 
 
-// bool HexParser::isHexCode(char ch)
-// {
-// 	return    (ch>='0' && ch<='9')
-// 		   || (ch>='a' && ch<='f')
-// 		   || (ch>='A' && ch<='F');
-// }
+// virtual 
+bool HexParser::isTokenValid() // override;
+{
+	int sz = static_cast<int>( m_alreadyTravelsaledString.size() );
+	if ( sz <= 2 ) {
+		return false;
+	} 
+
+	// else >= 3
+	string first2str = m_alreadyTravelsaledString.substr(0,2);
+	if ( !(first2str == "0x" || first2str == "0X") ) {
+		return false;
+	}
+
+	//
+	// Prefix is 0x / 0X
+	//
+	string reststr = m_alreadyTravelsaledString.substr(2);
+	int restsz = static_cast<int>( reststr.size() );
+
+	int prefixNumberCnt = 0;
+	int suffixNumberCnt = 0;
+	auto meetSuffix = false;
+
+	for( int i = 0 ; i <  restsz; ++i ) {
+		char ch = reststr.at(i);
+		if ( isHexCode(ch) ) {
+			if ( !meetSuffix ) {
+				++prefixNumberCnt;
+			} else {
+				++suffixNumberCnt;
+			}
+		} else if ( is_uU_lL(ch) ) {
+			meetSuffix = true;
+		}
+	}
+
+	return (prefixNumberCnt > 0 && suffixNumberCnt == 0);
+}
+
+bool HexParser::isHexCode(char ch)
+{
+	return    (ch>='0' && ch<='9')
+		   || (ch>='a' && ch<='f')
+		   || (ch>='A' && ch<='F');
+}
 
 
 

@@ -108,6 +108,20 @@ bool SingleLineCommentParser::isEnd(ParsedCharInfo* pInfo) // override;
 
 
 // virtual 
+bool SingleLineCommentParser::isTokenValid() // override;
+{
+	int sz = static_cast<int>( m_alreadyTravelsaledString.size() );
+	if ( sz < 2 ) {
+		return false;
+	}
+
+	// else sz >=2
+	string first2sr = m_alreadyTravelsaledString.substr(0,2);
+	return first2sr == "//";
+}
+
+
+// virtual 
 // TokenInfo*  SingleLineCommentParser::generateToken() // override;
 // {
 // 	auto subType = m_tokenType;

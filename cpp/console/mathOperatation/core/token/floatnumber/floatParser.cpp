@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cassert>
+#include <vector>
 #include "floatParser.h"
 #include "parserException.h"
 
@@ -358,4 +359,179 @@ void FloatParser::innerReset()
 }
 
 
+
+// virtual 
+bool FloatParser::isTokenValid() // override
+{
+	int sz = static_cast<int>( m_alreadyTravelsaledString.size() );
+	if ( sz < 2 ) {
+		return false;
+	}
+
+	vector<int> numIdxVec;
+	vector<int> dotIdxVec;
+	vector<int> eEIdxVec;
+	vector<int> positiveIdxVec;
+	vector<int> negativeIdxVec;
+	vector<int> fFIdxVec;
+
+
+	bool invalidFlag = false;
+	// sz >=2
+	for ( int i = 0; i < sz; ++i )
+	{
+		auto ch = m_alreadyTravelsaledString.at(i);
+		if ( is_number(ch) ) {
+			numIdxVec.push_back(i);
+		} else if ( is_dot(ch) ) {
+			dotIdxVec.push_back(i);
+			if ( dotIdxVec.size() >= 2U ) {
+				invalidFlag = true;
+				break;
+			}
+		} else if ( is_eE(ch) ) {
+			eEIdxVec.push_back(i);
+			if ( eEIdxVec.size() >= 2U ) {
+				invalidFlag = true;
+				break;
+			}
+		} else if ( is_positiveSign(ch) ) {
+			positiveIdxVec.push_back(i);
+			if ( positiveIdxVec.size() >= 2U ) {
+				invalidFlag = true;
+				break;
+			}
+		} else if ( is_negativeSign(ch) ) {
+			negativeIdxVec.push_back(i);
+			if ( negativeIdxVec.size() >= 2U ) {
+				invalidFlag = true;
+				break;
+			}
+		} else if ( is_fF(ch) ) {
+			fFIdxVec.push_back(i);
+			if ( fFIdxVec.size() >= 2U ) {
+				invalidFlag = true;
+				break;
+			}
+		}
+	}
+
+	// check f/F index is last or not
+	if ( !fFIdxVec.empty() ) {
+		int fIdx = fFIdxVec.at(0);
+		if ( fIdx != (sz-1) ) {
+			return false;
+		}
+	}
+
+	if ( invalidFlag ) {
+		return false;
+	}
+
+	int dotCnt = static_cast<int>( dotIdxVec.size() );
+	int eECnt = static_cast<int>( eEIdxVec.size() );
+	if ( !(dotCnt == 1 || eECnt == 1) ) {
+		return false;
+	}
+
+	if ( dotCnt == 1 && eECnt == 1 ) {
+		int dotIdx = dotIdxVec.at(0);
+		int eEIdx  = eEIdxVec.at(0);
+		if ( dotIdx > eEIdx ) {
+			return false;
+		}
+
+		// dotIdx < eEIdx
+		int dotBeforeNumCnt = 0;
+		int dotAfterNumCnt = 0;
+		int eAfterNumCnt = 0;
+		int sz = static_cast<int>( numIdxVec.size() );
+		for( int i = 0; i < sz; ++i ) 
+		{
+			int idx = numIdxVec.at(i);
+			if ( idx < dotIdx ) {
+				++dotBeforeNumCnt;
+			} else if ( idx < eEIdx ) {
+				++dotAfterNumCnt;
+			} else {
+				// idx > eEIdx
+				++eAfterNumCnt;
+			}
+		}
+
+		if ( !(dotBeforeNumCnt >=1 || dotAfterNumCnt >=1) ) {
+			return false;
+		}
+
+		//
+		// dotBeforeNumCnt >= 1   ||   dotAfterNumCnt >= 1
+		//
+		if ( eAfterNumCnt <= 0 ) {
+			return false;
+		}
+
+		// positiveIdxVec   negativeIdxVec
+		if ( !positiveIdxVec.empty() && !negativeIdxVec.empty() ) {
+			return false;
+		} else if ( positiveIdxVec.empty() ) {
+			// negativeIdxVec is not empty
+			int neIdx = static_cast<int>(negativeIdxVec.at(0));
+			if ( neIdx != (eEIdx+1) ) {
+				return false;
+			}
+		} else if ( negativeIdxVec.empty() ) {
+			// positiveIdxVec is not empty
+			int poIdx = static_cast<int>(positiveIdxVec.at(0));
+			if ( poIdx != (eEIdx+1) ) {
+				return false;
+			}
+		} else {
+			// both is empty
+		}
+	} else if ( dotCnt == 1 ) {
+		// dotCnt == 1 && eECnt == 0
+		int dotIdx = dotIdxVec.at(0);
+
+		int dotBeforeNumCnt = 0;
+		int dotAfterNumCnt = 0;
+		int sz = static_cast<int>( numIdxVec.size() );
+		for( int i = 0; i < sz; ++i ) 
+		{
+			int idx = numIdxVec.at(i);
+			if ( idx < dotIdx ) {
+				++dotBeforeNumCnt;
+			} else {
+				++dotAfterNumCnt;
+			} 
+		}
+
+		if ( !(dotBeforeNumCnt >=1 || dotAfterNumCnt >=1) ) {
+			return false;
+		}
+	} else if ( eECnt == 1 ) {
+		// dotCnt == 0 && eECnt == 1
+		int eEIdx  = eEIdxVec.at(0);
+
+		int eBeforeNumCnt = 0;
+		int eAfterNumCnt = 0;
+		int sz = static_cast<int>( numIdxVec.size() );
+		for( int i = 0; i < sz; ++i ) 
+		{
+			int idx = numIdxVec.at(i);
+			if ( idx < eEIdx ) {
+				++eBeforeNumCnt;
+			} else {
+				++eAfterNumCnt;
+			} 
+		}
+
+		if ( !(eBeforeNumCnt >=1 || eAfterNumCnt >=1) ) {
+			return false;
+		}
+	} else {
+		return false;
+	}
+
+	return true;
+}
 

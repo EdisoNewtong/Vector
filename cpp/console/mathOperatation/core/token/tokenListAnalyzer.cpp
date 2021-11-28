@@ -33,330 +33,6 @@ bool TokenListAnalyzer::isListEmpty()
 }
 
 
-// 
-// 
-// Next Character Possibility <After> a Specific Token
-// 
-// 1. Blank Type    <== || Before ||
-//----------------------------------------
-//  ||   After      ||
-//----------------------------------------
-//    1. Blank         | YES |
-//    2. Comment       | YES |
-//    3. Interger      | YES |
-//    4. Float         | YES |
-//    5. Operator      | YES |
-//    6. Varible       | YES |
-//    7. Semicolon     | YES |   a=b+c   ;
-
-// 
-// 2. Comment Type    <== || Before ||
-//----------------------------------------
-// ||    After      ||
-//----------------------------------------
-//    1. Blank         | YES |
-//    2. Comment       | YES |
-//    3. Interger      | YES |
-//    4. Float         | YES |
-//    5. Operator      | YES |
-//    6. Varible       | YES |
-//    7. Semicolon     | YES |   a=b+c/*Comment Line*/;
-
-// 
-// 3. Interger    <== || Before ||
-//----------------------------------------
-// ||    After      ||
-//----------------------------------------
-//    1. Blank         | YES |
-//    2. Comment       | YES |
-//    3. Interger      |  NO |
-//    4. Float         |  NO |
-//    5. Operator      |PART |   Not Avalible List :      ~  ,  ( ,
-//    6. Varible       |  NO |
-//    7. Semicolon     | YES |   a = 10 + 3;
-
-//
-// 4. Float Type    <== || Before ||
-//----------------------------------------
-// ||    After      ||
-//----------------------------------------
-//    1. Blank         | YES |
-//    2. Comment       | YES |
-//    3. Interger      |  NO |
-//    4. Float         |  NO |
-//    5. Operator      |PART |   Not Avalible List  : %  &  | ^  ~  << >>   (   =
-//    6. Varible       |  NO |
-//    7. Semicolon     | YES |   a = 10 + 3.1f;
-// 
-
-// 
-// 5. Operator Type    <== || Before ||
-//----------------------------------------
-// ||    After      ||
-//----------------------------------------
-//    1. Blank         | YES |
-//    2. Comment       | YES |
-//    3. Interger      | YES |
-//    4. Float         | YES |
-//    5. Operator      | TBD |   
-//       + :  
-//            +          |  NO |  ++ is not supported
-//            -          | YES |  +-  e.g.    int a = 10+-3;   // int a = 10 + (-3) = 7;
-//            *          |  NO |
-//            /          |  NO |
-//            %          |  NO |
-//            &          |  NO |
-//            |          |  NO |
-//            ^          |  NO |
-//            ~          | YES |  +~  e.g.    int a = 1+~2;
-//            <<         |  NO | 
-//            >>         |  NO |  
-//            (          | YES |  
-//            )          |  NO |  
-//            =          |  NO | "+=" is not supported
-// 
-//       - :  
-//            +          | YES |  -+  e.g.    int a = 10-+3;   // int a = 10 - (+3) = 7;
-//            -          |  NO |  -- is not supported
-//            *          |  NO |
-//            /          |  NO |
-//            %          |  NO |
-//            &          |  NO |
-//            |          |  NO |
-//            ^          |  NO |
-//            ~          | YES |  -~  e.g.    int a = 1-~2;
-//            <<         |  NO | 
-//            >>         |  NO |  
-//            (          | YES |  
-//            )          |  NO |  
-//            =          |  NO | "-=" is not supported
-// 
-//       * :  
-//            +          | YES |  *+  e.g.    int a = 10*+3;   // int a = 30 = 10 * (+3);
-//            -          | YES |  *-  e.g.    int a = 10*-3;   // int a = 10 * (-3) = -30;
-//            *          |  NO |  
-//            /          |  NO |
-//            %          |  NO |
-//            &          |  NO |
-//            |          |  NO |
-//            ^          |  NO |
-//            ~          | YES |  *~  e.g.    int a = 10*~2;
-//            <<         |  NO | 
-//            >>         |  NO |  
-//            (          | YES |  
-//            )          |  NO |  
-//            =          |  NO | "*=" is not supported
-// 
-//       / :  
-//            +          | YES |  *+  e.g.    int a = 10*+3;   // int a = 30 = 10 * (+3);
-//            -          | YES |  *-  e.g.    int a = 10*-3;   // int a = 10 * (-3) = -30;
-//            *          | YES |  /* multi-line comment */
-//            /          | YES |  // singline line comment 
-//            %          |  NO |
-//            &          |  NO |
-//            |          |  NO |
-//            ^          |  NO |
-//            ~          | YES |  /~  e.g.    int a = 10/~2;
-//            <<         |  NO | 
-//            >>         |  NO |  
-//            (          | YES |  
-//            )          |  NO |  
-//            =          |  NO | "/=" is not supported
-// 
-//       % :  
-//            +          | YES |  %+  e.g.    int a = 10%+3;   // int a = 10%(+3) = 1;
-//            -          | YES |  %-  e.g.    int a = 10%-3;   // int a = 10%(-3) = 1;
-//            *          |  NO |  
-//            /          |  NO |  
-//            %          |  NO |
-//            &          |  NO |
-//            |          |  NO |
-//            ^          |  NO |
-//            ~          | YES |  %~  e.g.    int a = 10%~2 = 10 % (~2);
-//            <<         |  NO | 
-//            >>         |  NO |  
-//            (          | YES |  
-//            )          |  NO |  
-//            =          |  NO | "%=" is not supported
-// 
-// 
-//       & :  
-//            +          | YES |  &+  e.g.    int a = 10&+3;   // int a = 10 & (+3); 
-//            -          | YES |  *-  e.g.    int a = 10&-3;   // int a = 10 & (-3);
-//            *          |  NO |  
-//            /          |  NO |
-//            %          |  NO |
-//            &          |  NO |  "&&"  is not supported
-//            |          |  NO |  
-//            ^          |  NO |  
-//            ~          | YES |  &~  e.g.   int a = 10&~2;  // int a = 10 & (~2);
-//            <<         |  NO | 
-//            >>         |  NO |  
-//            (          | YES |  
-//            )          |  NO |  
-//            =          |  NO | "&=" is not supported
-// 
-// 
-//       | :  
-//            +          | YES |  |+  e.g.    int a = 10|+3;   // int a = 10 | (+3); 
-//            -          | YES |  |-  e.g.    int a = 10|-3;   // int a = 10 | (-3);
-//            *          |  NO |  
-//            /          |  NO |
-//            %          |  NO |
-//            &          |  NO |  
-//            |          |  NO |  "||" is not supported
-//            ^          |  NO |  
-//            ~          | YES |  |~  e.g.   int a = 10|~2;  // int a = 10 / (~2);
-//            <<         |  NO | 
-//            >>         |  NO |  
-//            (          | YES |  
-//            )          |  NO |  
-//            =          |  NO | "|=" is not supported
-// 
-//       ^ :  
-//            +          | YES |  ^+  e.g.    int a = 10^+3;   // int a = 10 ^ (+3); 
-//            -          | YES |  ^-  e.g.    int a = 10^-3;   // int a = 10 ^ (-3);
-//            *          |  NO |  
-//            /          |  NO |
-//            %          |  NO |
-//            &          |  NO |  
-//            |          |  NO |  
-//            ^          |  NO |  
-//            ~          | YES |  ^~  e.g.   int a = 10^~2;  // int a = 10 ^ (~2);
-//            <<         |  NO | 
-//            >>         |  NO |  
-//            (          | YES |  
-//            )          |  NO |  
-//            =          |  NO | "^=" is not supported
-// 
-//       ~ :  
-//            +          | YES |  ~+  e.g.    int a = ~+3;   // int a = 10 ~ (+3); 
-//            -          | YES |  ~-  e.g.    int a = ~-3;   // int a = 10 ~ (-3);
-//            *          |  NO |  
-//            /          |  NO |
-//            %          |  NO |
-//            &          |  NO |  
-//            |          |  NO |  
-//            ^          |  NO |  
-//            ~          | YES |  ~~  e.g.   int a = ~~2;  // int a = ~( ~2 );
-//            <<         |  NO | 
-//            >>         |  NO |  
-//            (          | YES |  
-//            )          |  NO |  
-//            =          |  NO | "~=" is not supported
-// 
-// 
-//      << :  
-//            +          | YES |  <<+  e.g.    int a = 10<<+3;   // int a = 10 << (+3); 
-//            -          | YES |  <<-  e.g.    int a = 10<<-2;   // int a = 10 << (-2);  //  警告：左移次数为负 [默认启用]
-//            *          |  NO |  
-//            /          |  NO |
-//            %          |  NO |
-//            &          |  NO |  
-//            |          |  NO |  
-//            ^          |  NO |  
-//            ~          | YES |  <<~  e.g.   int a = 10<<~2;  // int a = 10 << (~2);  //  警告：左移次数为负 [默认启用]                    //  int a = 10<<~-2;   OK
-//            <<         |  NO | 
-//            >>         |  NO |  
-//            (          | YES |  
-//            )          |  NO |  
-//            =          |  NO | "<<=" is not supported
-// 
-//      >> :  
-//            +          | YES |  >>+  e.g.    int a = 10>>+3;   // int a = 10 >> (+3); 
-//            -          |  NO |  >>-  e.g.    int a = 10>>-2;   // int a = 10 >> (-2);  //  警告 : 右左移次数为负 [默认启用]
-//            *          |  NO |  
-//            /          |  NO |
-//            %          |  NO |
-//            &          |  NO |  
-//            |          |  NO |  
-//            ^          |  NO |  
-//            ~          | YES |  >>~  e.g.   int a = 10>>~2;  // int a = 10 >> (~2);  //  警告 : 右移次数为负 [默认启用]                    //  int a = 10>>~-2;   =>   int a = 10 >> (~-2);  OK
-//            <<         |  NO | 
-//            >>         |  NO |  
-//            (          | YES |  
-//            )          |  NO |  
-//            =          |  NO | ">>=" is not supported
-// 
-//      (  :  
-//            +          | YES |  (+  e.g.     a = (+3+2);
-//            -          | YES |  (-  e.g.     a = (-3+2);
-//            *          |  NO |  
-//            /          |  NO |
-//            %          |  NO |
-//            &          |  NO |  
-//            |          |  NO |  
-//            ^          |  NO |  
-//            ~          | YES |  (~ e.g.      a = (~2);
-//            <<         |  NO | 
-//            >>         |  NO |  
-//            (          | YES |  
-//            )          |  NO |  () is not allowed 
-//            =          |  NO |  (=     e.g.   (a)=3;
-// 
-//      )  :  
-//            +          | YES |  )+  e.g.     a = (-a)+3;
-//            -          | YES |  (-  e.g.     a = (-a)-3;
-//            *          | YES |  
-//            /          | YES |
-//            %          | YES |
-//            &          | YES |  
-//            |          | YES |  
-//            ^          | YES |  
-//            ~          |  NO |  )~  ???
-//            <<         |  NO | 
-//            >>         |  NO |  
-//            (          | YES |  
-//            )          |  NO |  () is not allowed 
-//            =          | YES |  )=     e.g.   (a)=3;
-// 
-//      =  :  
-//            +          | YES |  =+  e.g.     a =+3;
-//            -          | YES |  =-  e.g.     a =-3; 
-//            *          |  NO |  
-//            /          |  NO |
-//            %          |  NO |
-//            &          |  NO |  
-//            |          |  NO |  
-//            ^          |  NO |  
-//            ~          | YES |  =~   e.g.  a=~2;
-//            <<         |  NO | 
-//            >>         |  NO |  
-//            (          | YES |  
-//            )          |  NO |  =)  is not allowed 
-//            =          |  NO |  ==  is not allowed   
-// 
-//    6. Varible       | YES |
-//    7. Semicolon     | YES |   Not Avalible List  : + - * / % & | ^ ~ << >> ( =     |    Only Avalible is :  )     e.g.    a=(b+c);
-
-
-// 
-// 6. Varible Type    <== || Before ||
-//----------------------------------------
-// ||    After      ||
-//----------------------------------------
-//    1. Blank         | YES |
-//    2. Comment       | YES |
-//    3. Interger      |  NO |
-//    4. Float         |  NO |
-//    5. Operator      |PART |   Not Avalible List :      ~  ,  ( 
-//    6. Varible       |  NO |
-//    7. Semicolon     | YES |   
-// 
-
-//
-// 7. Expression Evaluate Type (;)    <== || Before || 
-//----------------------------------------
-// ||    After      ||
-//----------------------------------------
-//    1. Blank         | YES |
-//    2. Comment       | YES |
-//    3. Interger      | YES |
-//    4. Float         | YES |
-//    5. Operator      |PART |   Not Avalible List :  *  /  %  &  | ^  << >>  )  =
-//    6. Varible       | YES |
-//    7. Semicolon     | YES |   
-// 
 
 bool TokenListAnalyzer::checkParserIsValid(E_PaserType tp)
 {
@@ -366,6 +42,9 @@ bool TokenListAnalyzer::checkParserIsValid(E_PaserType tp)
 
 void TokenListAnalyzer::pushToken(TokenInfo* pToken)
 {
+	static const string SC_LEFT(" ( ");
+	static const string SC_RIGHT(" ) ");
+
 	judgeTokenIsPositiveOrNegativeAndReset(pToken);
 	m_tokenList.push_back( pToken );
 
@@ -393,7 +72,10 @@ void TokenListAnalyzer::pushToken(TokenInfo* pToken)
 
 					if ( banPickFlag == 0 ) {
 						// Not Allowed at all
-						auto detail = previousTokenType + string(" Can't located in front of Type   ") + curTokenType;
+						auto detail =   previousTokenType 
+							          + SC_LEFT + previousValidToken->getDetail() + SC_RIGHT 
+									  + string(" Can't located in front of Type   ") + curTokenType
+							          + SC_LEFT + pToken->getDetail() + SC_RIGHT;
 
 						ParserException e(E_TOKEN_LOGIC_INVALID);
 						e.setDetail( detail );
@@ -406,7 +88,11 @@ void TokenListAnalyzer::pushToken(TokenInfo* pToken)
 							// Valid
 						} else {
 							// continuously token next to previous is not valid
-							auto detail = previousTokenType + string(" Can't located <No-Skip> in front of Type   ") + curTokenType;
+							// auto detail = previousTokenType + string(" Can't located <No-Skip> in front of Type   ") + curTokenType;
+							auto detail =   previousTokenType 
+							              + SC_LEFT + previousValidToken->getDetail() + SC_RIGHT 
+									      + string(" Can't located <No-Skip> in front of Type   ") + curTokenType
+							              + SC_LEFT + pToken->getDetail() + SC_RIGHT;
 
 							ParserException e(E_TOKEN_LOGIC_INVALID);
 							e.setDetail( detail );
@@ -448,14 +134,16 @@ void TokenListAnalyzer::pushToken(TokenInfo* pToken)
 					 ////////////////////////////////////////////////
 				 ) 
 				{
-					// 1st pushed is valid
+					// 1st pushed is Valid
 				} else {
 					ParserException e(E_TOKEN_LOGIC_INVALID);
-					string detail = curTokenType + " Can't be pushed at the 1st position";
+					string detail = curTokenType 
+							        + SC_LEFT + pToken->getDetail() + SC_RIGHT 
+						            + string(" Can't be pushed at the 1st position");
+
 					e.setDetail( detail );
 					throw e;
 				}
-
 			}
 		}
 

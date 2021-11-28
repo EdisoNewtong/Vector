@@ -53,6 +53,7 @@ public:
 	virtual TokenInfo* generateToken();
 	virtual void reset();
 	virtual bool isEnd(ParsedCharInfo* pInfo);
+	virtual bool isTokenValid();
 
 	CharBaseInfo* getInsideCharSetBaseInfo(char ch);
 	CharBaseInfo* commonCheckWithException(char ch, ParsedCharInfo* pInfo);

@@ -245,3 +245,10 @@ void TokenParserBase::throwErrMsg(ParsedCharInfo* pInfo, const string& errMsg)
 	throw err;
 }
 
+
+// virtual 
+bool TokenParserBase::isTokenValid()
+{
+	return true;
+}
+

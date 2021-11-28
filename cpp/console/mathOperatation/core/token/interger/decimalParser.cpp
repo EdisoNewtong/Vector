@@ -208,7 +208,7 @@ void DecimalParser::update_uU_lLCnt(char ch, ParsedCharInfo* pInfo)
 			if ( m_lCnt > 2 ) {
 				m_alreadyTravelsaledString += ch;
 				// throw     l.cnt > 2
-				throwErrMsg(pInfo, " 2 l/L(s) is not allowed ");
+				throwErrMsg(pInfo, "more than 2 l(s) is not allowed ");
 			} else if ( m_lCnt == 2 ) {
 				// l.cnt <=2 : OK
 				if ( isLast_uU ) {
@@ -235,7 +235,7 @@ void DecimalParser::update_uU_lLCnt(char ch, ParsedCharInfo* pInfo)
 		if ( m_LCnt > 2 ) {
 			m_alreadyTravelsaledString += ch;
 			// throw     L.cnt > 2
-			throwErrMsg(pInfo,  " 2 l/L(s) is not allowed "); 
+			throwErrMsg(pInfo,  "more than 2 L(s) is not allowed "); 
 		} else if ( m_LCnt == 2 ) {
 			// L.cnt == 2
 			if ( isLast_uU ) {

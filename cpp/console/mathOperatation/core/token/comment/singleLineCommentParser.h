@@ -16,6 +16,7 @@ public:
 	// virtual TokenInfo*  generateToken() override;
 
 	virtual bool isEnd(ParsedCharInfo* pInfo) override;
+	virtual bool isTokenValid() override;
 
 };
 

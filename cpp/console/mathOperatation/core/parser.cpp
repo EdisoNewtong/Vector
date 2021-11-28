@@ -131,6 +131,10 @@ void Parser::processLineInfo(char ch, size_t idx)
 int Parser::doParse()
 {
 	size_t idx;
+
+	auto isLastCharChanged = false;
+	TokenParserBase::E_TERMINAL_STATUS lastChangeStatus = TokenParserBase::E_TERMINAL_NONE;
+
 	for ( idx = 0; idx < m_size; ++idx )
 	{
 		char ch = m_buf[idx];
@@ -197,6 +201,11 @@ int Parser::doParse()
 				break;
 			}
 
+			if ( m_pInfo.isLastChar ) {
+				isLastCharChanged = true;
+				lastChangeStatus = switchFlag;
+			}
+
 			// Final Switch to the proper Parser
 			m_currentParser = TokenParserMgr::getParserByType( nextParserType );
 			m_currentPaserType = nextParserType;
@@ -209,10 +218,15 @@ int Parser::doParse()
 		m_pInfo.hasPreviousChar = true; 
 	}
 
-
 	//
 	// TODO : Endless Logic Check
 	//
+	if ( isLastCharChanged ) {
+		if ( lastChangeStatus == TokenParserBase::E_TOKEN_TERMINATE_TO_DEFAULT ) {
+		}
+	} else {
+
+	}
 
 	return 1;
 }

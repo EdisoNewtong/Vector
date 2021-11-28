@@ -85,10 +85,14 @@ int main(int argc, char* argv[], char* env[])
 			if ( iret ) {
 			} else {
 			}
-		} catch( const  std::bad_array_new_length& e_alloc ) {
+		} 
+		/*
+		catch( const  std::bad_array_new_length& e_alloc ) {
 			(void)e_alloc;
 			cout << "Can't Alloc Array Buffer Memory for file content" << endl;
-		} catch ( const ParserException& e ) {
+		} 
+		*/
+		catch ( const ParserException& e ) {
 			cout << "[ERROR] Parse Failed : " << e.what() << endl;
 		} catch ( const std::exception& e ) {
 			cout << "[ERROR] Meet a Normal exception => " << e.what() << endl;

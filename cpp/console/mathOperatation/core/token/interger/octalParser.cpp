@@ -36,8 +36,6 @@ void OctalParser::init() // override
 		m_AllAvalibleCharacters.insert( make_pair(ch, CharUtil::getCharBaseInfo(ch) ) );
 	}
 
-
-
 	m_AllAvalibleCharacters.insert( make_pair('e', CharUtil::getCharBaseInfo('e') ) );
 	m_AllAvalibleCharacters.insert( make_pair('E', CharUtil::getCharBaseInfo('E') ) );
 
@@ -181,5 +179,45 @@ bool OctalParser::isOctBufValid(string& errMsg)
 bool OctalParser::isInnerOctCode(char ch)
 {
 	return ch>='0' && ch<='7';
+}
+
+
+// virtual 
+bool OctalParser::isTokenValid() // override;
+{
+	int sz = static_cast<int>( m_alreadyTravelsaledString.size() );
+	if ( sz < 2 ) {
+		return false;
+	}
+
+	// sz >=2
+	char firstCh = m_alreadyTravelsaledString.at(0);
+	if ( firstCh != '0' ) {
+		return false;
+	}
+
+	// firstCh == '0'
+	string reststr = m_alreadyTravelsaledString.substr(1);
+	sz = static_cast<int>( reststr.size() );
+
+
+	int prefixNumberCnt = 0;
+	int suffixNumberCnt = 0;
+	auto meetSuffix = false;
+	for( int i = 0; i < sz; ++i )
+	{
+		char ch = reststr.at(0);
+		if ( isInnerOctCode(ch) ) {
+			if ( !meetSuffix ) {
+				++prefixNumberCnt;
+			} else {
+				++suffixNumberCnt;
+			}
+		} else if ( is_uU_lL(ch) ) {
+			meetSuffix = true;
+		}
+	}
+
+	return (prefixNumberCnt > 0 && suffixNumberCnt == 0);
 }
 
