@@ -153,19 +153,23 @@ int Parser::doParse()
 			case TokenParserBase::E_TOKEN_TERMINATE_TO_DEFAULT:
 				{
 					// Other -> Default
+					checkEndLogic();
+
 					m_TokenListAnalyzer.pushToken( m_currentParser->generateToken() );
 				}
 				break;
 			case TokenParserBase::E_TOKEN_TERMINATE_TO_DEFAULT_RE_PARSE:
 				{
 					// push previous terminated Token
+					checkEndLogic();
+
 					m_TokenListAnalyzer.pushToken( m_currentParser->generateToken() );
 					m_currentParser->reset();
 
 					auto next_MiddleParser = TokenParserMgr::getParserByType(nextParserType);
 					auto nextParserType2 = next_MiddleParser->appendContent(&m_pInfo);
 					auto newParser = TokenParserMgr::getParserByType(nextParserType2);
-					next_MiddleParser->transferToken( newParser );
+					next_MiddleParser->transferToken( newParser, &m_pInfo );
 
 					auto bEndFlag = newParser->isEnd(&m_pInfo);
 					if ( bEndFlag ) {
@@ -183,7 +187,7 @@ int Parser::doParse()
 			case TokenParserBase::E_TOKEN_CONVERT_TO_OTHER:
 				{
 					auto newParser = TokenParserMgr::getParserByType( nextParserType );
-					m_currentParser->transferToken( newParser );
+					m_currentParser->transferToken( newParser, &m_pInfo );
 					// m_currentParser->reset();
 
 					auto bEndFlag = newParser->isEnd(&m_pInfo);
@@ -219,13 +223,22 @@ int Parser::doParse()
 	}
 
 	//
-	// TODO : Endless Logic Check
+	// Endless Logic Check
 	//
 	if ( isLastCharChanged ) {
-		if ( lastChangeStatus == TokenParserBase::E_TOKEN_TERMINATE_TO_DEFAULT ) {
+		switch ( lastChangeStatus )
+		{
+		case TokenParserBase::E_TOKEN_TERMINATE_TO_DEFAULT_RE_PARSE:
+		case TokenParserBase::E_TOKEN_CONVERT_TO_OTHER:
+			{
+				checkEndLogic();
+			}
+			break;
+		default:
+			break;
 		}
 	} else {
-
+		checkEndLogic();
 	}
 
 	return 1;
@@ -301,3 +314,19 @@ string Parser::getUserManual()
 	return strUserManul;
 }
 
+
+void Parser::checkEndLogic()
+{
+	if ( m_currentParser != nullptr ) {
+		auto tp = m_currentParser->getType();
+		if ( tp != E_P_DEFAULT ) {
+			if ( !(m_currentParser->isTokenValid()) ) {
+				string errorMsg = getstrParserType(tp);
+				errorMsg += "\"";
+				errorMsg += m_currentParser->getVisitedStr();
+				errorMsg += "\" is invalid";
+				m_currentParser->throwErrMsg(&m_pInfo, errorMsg);
+			}
+		}
+	}
+}

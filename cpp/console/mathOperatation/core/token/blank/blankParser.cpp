@@ -42,7 +42,7 @@ E_PaserType  BlankParser::appendContent(ParsedCharInfo* pInfo) // override
 		m_alreadyTravelsaledString += curCh;
 		m_endInfo = pInfo->position;
 		if ( pInfo->isLastChar ) {
-			m_switchFlag = E_TOKEN_TERMINATE_TO_DEFAULT_RE_PARSE;
+			m_switchFlag = E_TOKEN_TERMINATE_TO_DEFAULT;
 			return E_P_DEFAULT;
 		}
 	} else {

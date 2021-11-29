@@ -74,24 +74,27 @@ E_PaserType  DecimalParser::appendContent(ParsedCharInfo* pInfo) // override
 			//
 			if ( inSideCharInfo->isNumber() ) {
 				m_alreadyTravelsaledString += curCh;
+				m_endInfo = pInfo->position;
 				if ( firstCh == '0' ) {
 					m_switchFlag = E_TOKEN_CONVERT_TO_OTHER;
 					return E_P_OCTAL;
 				} else {
 					// [1-9] + [0-9]   
 					// e.g.   21    20
-					m_endInfo = pInfo->position;
+					// Valid
 				}
 			} else if ( is_dot(curCh) || is_eE(curCh)  ) {
 				// 0.   [0-9].      or    [0-9]e    or  [0-9]E
 				//      [0-9]f      [0-9]F
 				m_alreadyTravelsaledString += curCh;
+				m_endInfo = pInfo->position;
 				// m_endInfo = pInfo->position;
 				m_switchFlag = E_TOKEN_CONVERT_TO_OTHER;
 				return E_P_FLOAT;
 			} else if ( is_xX(curCh) ) {
 				// 0x or 0X
 				m_alreadyTravelsaledString += curCh;
+				m_endInfo = pInfo->position;
 				if ( firstCh == '0' ) {
 					m_switchFlag = E_TOKEN_CONVERT_TO_OTHER;
 					return E_P_HEX;
@@ -123,6 +126,7 @@ E_PaserType  DecimalParser::appendContent(ParsedCharInfo* pInfo) // override
 					m_endInfo = pInfo->position;
 				} else if ( is_dot(curCh) || is_eE(curCh)  ) {
 					m_alreadyTravelsaledString += curCh;
+					m_endInfo = pInfo->position;
 					m_switchFlag = E_TOKEN_CONVERT_TO_OTHER;
 					return E_P_FLOAT;
 				} else if ( is_xX(curCh) ) {
@@ -159,6 +163,7 @@ void DecimalParser::update_uU_lLCnt(char ch, ParsedCharInfo* pInfo)
 {
 	if ( ch == 'u' ) {
 		m_alreadyTravelsaledString += ch;
+		m_endInfo = pInfo->position;
 
 		if ( m_UCnt > 0 ) {
 			//  throw 'U' already existed
@@ -174,8 +179,9 @@ void DecimalParser::update_uU_lLCnt(char ch, ParsedCharInfo* pInfo)
 			// u.cnt == 1
 		}
 	} else if ( ch == 'U' ) {
-
 		m_alreadyTravelsaledString += ch;
+		m_endInfo = pInfo->position;
+
 		if ( m_uCnt > 0 ) {
 			// throw 'u' already existed
 			throwErrMsg(pInfo, " 2 u/U(s) is not allowed ");
@@ -194,6 +200,8 @@ void DecimalParser::update_uU_lLCnt(char ch, ParsedCharInfo* pInfo)
 		if ( m_LCnt > 0 ) {
 			//  throw      'L' already existed
 			m_alreadyTravelsaledString += ch;
+			m_endInfo = pInfo->position;
+
 			throwErrMsg(pInfo, " 'L' is already existed , 'l' is not  allowed ");
 		} else {
 			// L.cnt == 0
@@ -207,20 +215,25 @@ void DecimalParser::update_uU_lLCnt(char ch, ParsedCharInfo* pInfo)
 			++m_lCnt;
 			if ( m_lCnt > 2 ) {
 				m_alreadyTravelsaledString += ch;
+				m_endInfo = pInfo->position;
+
 				// throw     l.cnt > 2
 				throwErrMsg(pInfo, "more than 2 l(s) is not allowed ");
 			} else if ( m_lCnt == 2 ) {
 				// l.cnt <=2 : OK
 				if ( isLast_uU ) {
 					m_alreadyTravelsaledString += ch;
+					m_endInfo = pInfo->position;
 					//  throw ...   "lul"  is not allowed
 					throwErrMsg(pInfo, " 'lul' is not allowed ");
 				} else {
 					m_alreadyTravelsaledString += ch;
+					m_endInfo = pInfo->position;
 				}
 			} else {
 				// == 1
 				m_alreadyTravelsaledString += ch;
+				m_endInfo = pInfo->position;
 			}
 		}
 	} else if ( ch == 'L' ) {
@@ -234,20 +247,25 @@ void DecimalParser::update_uU_lLCnt(char ch, ParsedCharInfo* pInfo)
 		++m_LCnt;
 		if ( m_LCnt > 2 ) {
 			m_alreadyTravelsaledString += ch;
+			m_endInfo = pInfo->position;
 			// throw     L.cnt > 2
 			throwErrMsg(pInfo,  "more than 2 L(s) is not allowed "); 
 		} else if ( m_LCnt == 2 ) {
 			// L.cnt == 2
 			if ( isLast_uU ) {
 				m_alreadyTravelsaledString += ch;
+				m_endInfo = pInfo->position;
 				//  throw ...   "LuL"  is not allowed
 				throwErrMsg(pInfo, " 'LuL' is not allowed ");
 			} else {
 				m_alreadyTravelsaledString += ch;
+				m_endInfo = pInfo->position;
 			}
 		} else {
 			// L.cnt == 1
 			m_alreadyTravelsaledString += ch;
+			m_endInfo = pInfo->position;
+
 			if ( m_lCnt > 0 ) {
 				throwErrMsg(pInfo, " 'l' is already existed , 'L' is not  allowed ");
 			} 
@@ -286,6 +304,39 @@ bool DecimalParser::isSuffixExisted()
 {
 	return m_uCnt>0 || m_UCnt>0 || m_lCnt>0 || m_LCnt>0;
 }
+
+
+// virtual 
+bool DecimalParser::isTokenValid() // override
+{
+	int prefixNumCnt = 0;
+	int suffixNumCnt = 0;
+	int otherCnt = 0;
+	bool suffixExisted = false;
+	int sz = static_cast<int>( m_alreadyTravelsaledString.size() );
+
+	for( int i = 0; i < sz; ++i)
+	{
+		auto ch =  m_alreadyTravelsaledString.at(i);
+		if ( ch >='0' && ch <='9' ) {
+			if ( suffixExisted ) {
+				++suffixNumCnt;
+			} else {
+				++prefixNumCnt;
+			}
+		} else if ( is_uU_lL(ch) ) {
+			suffixExisted = true;
+		} else {
+			++otherCnt;
+		}
+	}
+	
+
+	return ( prefixNumCnt>0 
+			 && suffixExisted==0 
+			 && otherCnt == 0    );
+}
+
 
 // bool DecimalParser::is_fF(char ch)
 // {

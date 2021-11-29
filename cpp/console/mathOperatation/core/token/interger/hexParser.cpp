@@ -74,6 +74,7 @@ E_PaserType HexParser::appendContent(ParsedCharInfo* pInfo) // override
 		} else {
 			
 			m_alreadyTravelsaledString += curCh;
+			m_endInfo = pInfo->position;
 		}
 	} else {
 		// sz >= 3
@@ -97,6 +98,7 @@ E_PaserType HexParser::appendContent(ParsedCharInfo* pInfo) // override
 			} else {
 				if ( inSideCharInfo->isHexNumber()  ) {
 					m_alreadyTravelsaledString += curCh;
+					m_endInfo = pInfo->position;
 				} else {
 					// u/U  l/L
 					update_uU_lLCnt(curCh, pInfo);

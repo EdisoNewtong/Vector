@@ -58,15 +58,17 @@ public:
 	CharBaseInfo* getInsideCharSetBaseInfo(char ch);
 	CharBaseInfo* commonCheckWithException(char ch, ParsedCharInfo* pInfo);
 
-	void transferToken(TokenParserBase* pBase);
+	void transferToken(TokenParserBase* pBase, ParsedCharInfo* pInfo);
 	E_PaserType getType();
 	std::string getToken();
+	std::string getVisitedStr();
 	void markBeginTag(const PosInfo& pInfo);
 	E_TERMINAL_STATUS getSwitchFlag();
+
+	void throwErrMsg(ParsedCharInfo* pInfo, const std::string& errMsg);
 protected:
 	std::string genPositionCharStr(ParsedCharInfo* pInfo);
 
-	void throwErrMsg(ParsedCharInfo* pInfo, const std::string& errMsg);
 
 protected:
 	std::unordered_map<char, CharBaseInfo*> m_AllAvalibleCharacters;

@@ -40,7 +40,6 @@ E_PaserType SingleLineCommentParser::appendContent(ParsedCharInfo* pInfo) // ove
 		m_endInfo = pInfo->position;
 
 		m_switchFlag = E_TOKEN_TERMINATE_TO_DEFAULT;
-
 		return E_P_DEFAULT;	
 	} else {
 		// curCh != '\n'
@@ -63,10 +62,10 @@ E_PaserType SingleLineCommentParser::appendContent(ParsedCharInfo* pInfo) // ove
 			m_alreadyTravelsaledString += curCh;
 			m_endInfo = pInfo->position;
 
-			if ( pInfo->isLastChar ) {
-				m_switchFlag = E_TOKEN_TERMINATE_TO_DEFAULT;
-				return E_P_DEFAULT;	
-			}
+			// if ( pInfo->isLastChar ) {
+			// 	m_switchFlag = E_TOKEN_TERMINATE_TO_DEFAULT;
+			// 	return E_P_DEFAULT;	
+			// }
 		}
 	}
 

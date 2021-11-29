@@ -130,14 +130,14 @@ CharBaseInfo* TokenParserBase::getInsideCharSetBaseInfo(char ch)
 
 
 
-void TokenParserBase::transferToken(TokenParserBase* pNewParser)
+void TokenParserBase::transferToken(TokenParserBase* pNewParser, ParsedCharInfo* pInfo)
 {
 	pNewParser->m_alreadyTravelsaledString = this->m_alreadyTravelsaledString;
-
 	this->reset();
 
-	// Set Begin Flag
+	// Set Begin Flag and End Flag
 	pNewParser->m_beginInfo = this->m_beginInfo;
+	pNewParser->m_endInfo   = pInfo->position;
 }
 
 
@@ -147,7 +147,12 @@ E_PaserType TokenParserBase::getType()
 }
 
 
-std::string TokenParserBase::getToken()
+string TokenParserBase::getVisitedStr()
+{
+	return m_alreadyTravelsaledString;
+}
+
+string TokenParserBase::getToken()
 {
 	return m_token;
 }

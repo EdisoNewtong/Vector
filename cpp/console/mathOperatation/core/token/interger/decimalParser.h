@@ -14,6 +14,7 @@ public:
 
 	virtual void init() override;
 	virtual E_PaserType appendContent(ParsedCharInfo* pInfo) override;
+	virtual bool isTokenValid() override;
 
 	virtual void reset() override;
 protected:

@@ -113,7 +113,7 @@ E_PaserType OperatorParser::appendContent(ParsedCharInfo* pInfo) // override
 		} else {
 			// Rest possibility is valid
 		}
-	} 
+	}
 
 	return m_type;	
 }
@@ -122,6 +122,10 @@ E_PaserType OperatorParser::appendContent(ParsedCharInfo* pInfo) // override
 TokenInfo* OperatorParser::generateToken() // override
 {
 	auto it = m_opMap.find( m_alreadyTravelsaledString.at(0) );
+	if ( it == m_opMap.end() ) { 
+		return nullptr; 
+	}
+
 	auto retInfo = new TokenInfo(E_TOKEN_OPERATOR, it->second);
 	m_token = m_alreadyTravelsaledString;
 	retInfo->setDetail(m_token);

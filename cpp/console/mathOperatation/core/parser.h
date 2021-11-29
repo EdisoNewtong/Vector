@@ -30,6 +30,7 @@ protected:
 	  bool checkPreviousTokenIsValid();
 
 	  static std::string getstrParserType(E_PaserType tp);
+	  void checkEndLogic();
 	  
 protected:
 	  const char* m_buf;

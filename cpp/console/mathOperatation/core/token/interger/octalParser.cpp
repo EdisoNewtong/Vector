@@ -78,6 +78,7 @@ E_PaserType  OctalParser::appendContent(ParsedCharInfo* pInfo) // override
 				throwErrMsg(pInfo,  " Can't append Oct-Code after suffix u/U l/L");
 			} else {
 				m_alreadyTravelsaledString += curCh;
+				m_endInfo = pInfo->position;
 			}
 		} else if ( is_dot(curCh) || is_eE(curCh) ) {
 			if ( isSuffixExisted() ) {
@@ -86,6 +87,7 @@ E_PaserType  OctalParser::appendContent(ParsedCharInfo* pInfo) // override
 			} else {
 
 				m_alreadyTravelsaledString += curCh;
+				m_endInfo = pInfo->position;
 				m_switchFlag = E_TOKEN_CONVERT_TO_OTHER;
 				return E_P_FLOAT;
 			}
