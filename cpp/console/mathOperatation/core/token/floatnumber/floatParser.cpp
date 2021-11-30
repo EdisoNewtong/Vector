@@ -259,7 +259,7 @@ E_PaserType  FloatParser::appendContent(ParsedCharInfo* pInfo) // override
 						m_endInfo = pInfo->position;
 					} else if ( is_dot(curCh) ) {
 						// 1.2.
-						// TODO : throw
+						//  throw
 						throwErrMsg(pInfo, " '.'s = 1 'e/E's = 0,  append '.'   [0-9].[0-9].   is not allowed");
 					} else if ( is_fF(curCh) ) {
 						m_alreadyTravelsaledString += curCh;

@@ -80,8 +80,7 @@ E_PaserType  DecimalParser::appendContent(ParsedCharInfo* pInfo) // override
 					return E_P_OCTAL;
 				} else {
 					// [1-9] + [0-9]   
-					// e.g.   21    20
-					// Valid
+					// e.g.   "2" + "1" = "21"     Valid
 				}
 			} else if ( is_dot(curCh) || is_eE(curCh)  ) {
 				// 0.   [0-9].      or    [0-9]e    or  [0-9]E

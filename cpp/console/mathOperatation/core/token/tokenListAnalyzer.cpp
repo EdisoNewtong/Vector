@@ -46,113 +46,143 @@ void TokenListAnalyzer::pushToken(TokenInfo* pToken)
 	static const string SC_RIGHT(" ) ");
 
 	judgeTokenIsPositiveOrNegativeAndReset(pToken);
+
+	if ( pToken == nullptr ) {
+		cout << "[ERROR] : Pushed Token == nullptr" << endl;
+		assert(false);
+	}
+
+	//
+	// pToken != nullptr
+	//
 	m_tokenList.push_back( pToken );
 
-	if ( pToken != nullptr ) {
-		auto curTp = pToken->getType();
-		if ( curTp == E_TOKEN_OPERATOR ) {
-			curTp = pToken->getSubType();
-		}
-		auto curTokenType = getTokenName(curTp);
+	auto curTp = pToken->getType();
+	if ( curTp == E_TOKEN_OPERATOR ) {
+		curTp = pToken->getSubType();
+	}
 
-		if ( !(curTp == E_TOKEN_BLANK || curTp == E_TOKEN_COMMENT_TYPE) ) {
-			int hasSkipBlank = 0;
-			auto previousValidToken = getPreviousToken(true, &hasSkipBlank, true);
-			if ( previousValidToken != nullptr ) {
-				auto previousType = previousValidToken->getType();
-				if ( previousType == E_TOKEN_OPERATOR ) {
-					previousType = previousValidToken->getSubType();
-				}
-				auto previousTokenType = getTokenName(previousType);
+	const auto& endPos = pToken->getEndPos();
+	auto curTokenType = getTokenName(curTp);
 
-                auto key = genFlag(previousType, curTp);
-				auto foundIt = m_banPickCfgMap.find(key);
-				if ( foundIt != m_banPickCfgMap.end() ) {
-					auto banPickFlag = foundIt->second;
+	if ( !(curTp == E_TOKEN_BLANK || curTp == E_TOKEN_COMMENT_TYPE) ) {
+		int hasSkipBlank = 0;
+		auto previousValidToken = getPreviousToken(true, &hasSkipBlank, true);
+		if ( previousValidToken != nullptr ) {
+			auto previousType = previousValidToken->getType();
+			if ( previousType == E_TOKEN_OPERATOR ) {
+				previousType = previousValidToken->getSubType();
+			}
+			auto previousTokenType = getTokenName(previousType);
 
-					if ( banPickFlag == 0 ) {
-						// Not Allowed at all
-						auto detail =   previousTokenType 
-							          + SC_LEFT + previousValidToken->getDetail() + SC_RIGHT 
-									  + string(" Can't located in front of Type   ") + curTokenType
-							          + SC_LEFT + pToken->getDetail() + SC_RIGHT;
+			auto key = genFlag(previousType, curTp);
+			auto foundIt = m_banPickCfgMap.find(key);
+			if ( foundIt != m_banPickCfgMap.end() ) {
+				auto banPickFlag = foundIt->second;
+
+				if ( banPickFlag == 0 ) {
+					// Not Allowed at all
+					string detail;
+					detail += "@";
+					detail += to_string(endPos.nLine);
+					detail += ":";
+					detail += to_string(endPos.nCol);
+					detail += ", charIdx = ";
+					detail += to_string( static_cast<int>(endPos.nCharIdx) );
+					detail += ", ";
+					detail +=   (previousTokenType 
+								  + SC_LEFT + previousValidToken->getDetail() + SC_RIGHT 
+								  + string(" Can't located in front of Type   ") + curTokenType
+								  + SC_LEFT + pToken->getDetail() + SC_RIGHT);
+
+					ParserException e(E_TOKEN_LOGIC_INVALID);
+					e.setDetail( detail );
+					throw e;
+				} else if ( banPickFlag == 1 ) {
+					// No flag whose value is (0,1)
+				} else if ( banPickFlag == 2 ) {
+					//  banPickFlag = 10(2) = 2(10)
+					if ( hasSkipBlank == 1 ) {
+						// Valid
+					} else {
+						// continuously token next to previous is not valid
+						// auto detail = previousTokenType + string(" Can't located <No-Skip> in front of Type   ") + curTokenType;
+						string detail;
+						detail += "@";
+						detail += to_string(endPos.nLine);
+						detail += ":";
+						detail += to_string(endPos.nCol);
+						detail += ", charIdx = ";
+						detail += to_string( static_cast<int>(endPos.nCharIdx) );
+						detail += ", ";
+						detail +=  (previousTokenType 
+									 + SC_LEFT + previousValidToken->getDetail() + SC_RIGHT 
+									 + string(" Can't located <No-Skip> in front of Type   ") + curTokenType
+									 + SC_LEFT + pToken->getDetail() + SC_RIGHT);
 
 						ParserException e(E_TOKEN_LOGIC_INVALID);
 						e.setDetail( detail );
 						throw e;
-					} else if ( banPickFlag == 1 ) {
-						// No flag whose value is (0,1)
-					} else if ( banPickFlag == 2 ) {
-						//  banPickFlag = 10(2) = 2(10)
-						if ( hasSkipBlank == 1 ) {
-							// Valid
-						} else {
-							// continuously token next to previous is not valid
-							// auto detail = previousTokenType + string(" Can't located <No-Skip> in front of Type   ") + curTokenType;
-							auto detail =   previousTokenType 
-							              + SC_LEFT + previousValidToken->getDetail() + SC_RIGHT 
-									      + string(" Can't located <No-Skip> in front of Type   ") + curTokenType
-							              + SC_LEFT + pToken->getDetail() + SC_RIGHT;
-
-							ParserException e(E_TOKEN_LOGIC_INVALID);
-							e.setDetail( detail );
-							throw e;
-						}
-					} else {
-						// banPickFlag == 3u,  both is OK
 					}
-				} else { 
-					cout << "[ERROR] : Can't find key : " << previousTokenType << " After " <<  curTokenType <<  endl;
-					assert(false);
-				}
-			} else {
-				// previousValidToken == nullptr
-				// pToken is the 1st pushed token
-				//     int  / float   / varible / semicolon /  : All Valid
-				//     123; /  3.5f;  /   nCnt  /    ;      /
-				//  /* ... */ : 1st is OK
-				//  // ...    : 1st is OK
-				/*
-
-				    Operator is partially valid
-					Valid list include : +    -    ~     ( 
-
-				*/
-				if (    curTp == E_TOKEN_BLANK 
-					 || curTp == E_TOKEN_COMMENT_TYPE
-					 ||	curTp == E_TOKEN_INTEGER_NUMBER 
-					 || curTp == E_TOKEN_FLOAT_NUMBER 
-					 || curTp == E_TOKEN_VARIBLE
-					 || curTp == E_TOKEN_SEMICOLON
-					 ////////////////////////////////////////////////
-					 //  Special Operator 
-					 || curTp == E_TOKEN_OP_ADD
-					 || curTp == E_TOKEN_OP_MINUS
-					 || curTp == E_TOKEN_OP_BIT_NOT
-					 || curTp == E_TOKEN_OP_OPEN_PARENTHESES 
-					 // 
-					 ////////////////////////////////////////////////
-				 ) 
-				{
-					// 1st pushed is Valid
 				} else {
-					ParserException e(E_TOKEN_LOGIC_INVALID);
-					string detail = curTokenType 
-							        + SC_LEFT + pToken->getDetail() + SC_RIGHT 
-						            + string(" Can't be pushed at the 1st position");
-
-					e.setDetail( detail );
-					throw e;
+					// banPickFlag == 3u,  both is OK
 				}
+			} else { 
+				cout << "[ERROR] : Can't find key : " << previousTokenType << " After " <<  curTokenType <<  endl;
+				assert(false);
+			}
+		} else {
+			// previousValidToken == nullptr
+			// pToken is the 1st pushed token
+			//     int  / float   / varible / semicolon /  : All Valid
+			//     123; /  3.5f;  /   nCnt  /    ;      /
+			//  /* ... */ : 1st is OK
+			//  // ...    : 1st is OK
+			/*
+
+				Operator is partially valid
+				Valid list include : +    -    ~     ( 
+
+			*/
+			if (    curTp == E_TOKEN_BLANK 
+				 || curTp == E_TOKEN_COMMENT_TYPE
+				 ||	curTp == E_TOKEN_INTEGER_NUMBER 
+				 || curTp == E_TOKEN_FLOAT_NUMBER 
+				 || curTp == E_TOKEN_VARIBLE
+				 || curTp == E_TOKEN_SEMICOLON
+				 ////////////////////////////////////////////////
+				 //  Special Operator 
+				 || curTp == E_TOKEN_OP_ADD
+				 || curTp == E_TOKEN_OP_MINUS
+				 || curTp == E_TOKEN_OP_BIT_NOT
+				 || curTp == E_TOKEN_OP_OPEN_PARENTHESES 
+				 // 
+				 ////////////////////////////////////////////////
+			 ) 
+			{
+				// 1st pushed is Valid
+			} else {
+				ParserException e(E_TOKEN_LOGIC_INVALID);
+
+				string detail;
+				detail += "@";
+				detail += to_string(endPos.nLine);
+				detail += ":";
+				detail += to_string(endPos.nCol);
+				detail += ", charIdx = ";
+				detail += to_string( static_cast<int>(endPos.nCharIdx) );
+				detail += ", ";
+				detail += (curTokenType 
+							+ SC_LEFT + pToken->getDetail() + SC_RIGHT 
+							+ string(" Can't be pushed at the 1st position"));
+
+				e.setDetail( detail );
+				throw e;
 			}
 		}
-
-		// tp == E_TOKEN_BLANK || tp == E_TOKEN_COMMENT_TYPE  is always valid no matter  previous token is which type
-
-	} else {
-		cout << "[ERROR] : Pushed Token == nullptr" << endl;
-		assert(false);
 	}
+
+	// tp == E_TOKEN_BLANK || tp == E_TOKEN_COMMENT_TYPE  is always valid no matter  previous token is which type
 }
 
 

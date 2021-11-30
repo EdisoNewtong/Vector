@@ -5,6 +5,8 @@ TokenInfo::TokenInfo(E_TokenType tp, E_TokenType subtype)
 	: m_type(tp)
 	, m_subType(subtype)
 	, m_strSequence("")
+	, m_beginPos()
+	, m_endPos()
 {
 
 }
@@ -43,5 +45,23 @@ std::string TokenInfo::getDetail()
 void TokenInfo::setDetail(const std::string& token)
 {
 	m_strSequence = token;
+}
+
+
+void TokenInfo::setPosInfo(const PosInfo& begPos, const PosInfo& endPos)
+{
+	m_beginPos = begPos;
+	m_endPos   = endPos;
+}
+
+
+const PosInfo& TokenInfo::getBeginPos() const
+{
+	return m_beginPos;
+}
+
+const PosInfo& TokenInfo::getEndPos() const
+{
+	return m_endPos;
 }
 

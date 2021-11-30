@@ -20,13 +20,19 @@ static auto bPrintFileLengthFlag = true;
 
 int main(int argc, char* argv[], char* env[])
 {
+	TypeUtil::init();
+	CharUtil::init();
+	TokenParserMgr::init();
+
 	Parser p;
+
 	if ( argc < 3 ) {
 		cout << "[ERROR] : arglist.count < 3" << endl;
 		cout << p.getUserManual() << endl;
 		cout << endl;
 		return -1;
 	}
+
 
 	//
 	// check file is existed or not
@@ -47,7 +53,8 @@ int main(int argc, char* argv[], char* env[])
 	if ( bPrintFileLengthFlag ) {
 		cout << "==================================================" << endl;
 		cout << "file.length = " << filelen << " byte(s)" << endl;
-		cout << "==================================================" << endl;
+		cout << "==================================================" << endl
+			 << endl;
 	}
 
 	if ( filelen == 0 ) {
@@ -56,9 +63,6 @@ int main(int argc, char* argv[], char* env[])
 		return 0;
 	}
 
-	TypeUtil::init();
-	CharUtil::init();
-	TokenParserMgr::init();
 
 	list<string> strArgList;
 	for( int i = 1; i <= (argc-2); ++i ) {

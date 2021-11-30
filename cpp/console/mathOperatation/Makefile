@@ -40,7 +40,7 @@ build/typeUtil.o:core/util/typeUtil.cpp  core/util/typeUtil.h
 build/tokenParserBase.o:core/token/tokenParserBase.cpp core/token/tokenParserBase.h core/commonEnum.h core/parserException.h core/parsedCharInfo.h
 	g++   $(COMPILE_OPT)   $(INC_PATH)  -c -o build/tokenParserBase.o  core/token/tokenParserBase.cpp
 
-build/tokenInfo.o:core/token/tokenInfo.cpp core/token/tokenInfo.h core/commonEnum.h
+build/tokenInfo.o:core/token/tokenInfo.cpp core/token/tokenInfo.h core/commonEnum.h  core/parsedCharInfo.h
 	g++   $(COMPILE_OPT)   $(INC_PATH)  -c -o build/tokenInfo.o  core/token/tokenInfo.cpp
 
 #

@@ -73,11 +73,13 @@ E_PaserType OperatorParser::appendContent(ParsedCharInfo* pInfo) // override
 			if ( curCh == '/' ) {
 				//   single-line comment <Start>   "//"
 				m_alreadyTravelsaledString += curCh;      // m_alreadyTravelsaledString == "//"
+				m_endInfo = pInfo->position;
 				m_switchFlag = E_TOKEN_CONVERT_TO_OTHER;
 				return E_P_SINGLE_LINE_COMMENT;
 			} else if ( curCh == '*' ) {
 				//   multi-line comment <Start>    "/*"
 				m_alreadyTravelsaledString += curCh;      // m_alreadyTravelsaledString == "/*"
+				m_endInfo = pInfo->position;
 				m_switchFlag = E_TOKEN_CONVERT_TO_OTHER;
 				return E_P_MULTI_LINE_COMMENT;
 			} else {
@@ -93,10 +95,11 @@ E_PaserType OperatorParser::appendContent(ParsedCharInfo* pInfo) // override
 			if ( curCh == '<' ) {
 				//     "<<"   , Meet Terminal Condition
 				m_alreadyTravelsaledString += curCh;
+				m_endInfo = pInfo->position;
 				m_switchFlag = E_TOKEN_TERMINATE_TO_DEFAULT;
 				return E_P_DEFAULT;
 			} else {
-				// TODO : throw  exception
+				// throw  exception
 				string errMsg;
 				throwErrMsg(pInfo," curCh != '<' is not allowed when previous char is '<' ");
 			}
@@ -104,10 +107,11 @@ E_PaserType OperatorParser::appendContent(ParsedCharInfo* pInfo) // override
 			if ( curCh == '>' ) {
 				//     ">>"   ,  Meet Terminal Condition
 				m_alreadyTravelsaledString += curCh;
+				m_endInfo = pInfo->position;
 				m_switchFlag = E_TOKEN_TERMINATE_TO_DEFAULT;
 				return E_P_DEFAULT;
 			} else {
-				// TODO : throw  exception
+				//  throw  exception
 				throwErrMsg(pInfo," curCh != '>' is not allowed when previous char is '>' ");
 			}
 		} else {
@@ -128,6 +132,7 @@ TokenInfo* OperatorParser::generateToken() // override
 
 	auto retInfo = new TokenInfo(E_TOKEN_OPERATOR, it->second);
 	m_token = m_alreadyTravelsaledString;
+	retInfo->setPosInfo( m_beginInfo, m_endInfo);
 	retInfo->setDetail(m_token);
 	return  retInfo;
 }

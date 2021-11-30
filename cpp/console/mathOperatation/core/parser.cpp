@@ -23,6 +23,8 @@ Parser::Parser()
 	, m_optKeyWord_2()
 {
 
+    m_defaultParser = TokenParserMgr::getParserByType(E_P_DEFAULT); // set default parser
+	m_currentParser = m_defaultParser;                              // set current parser
 
 	prepareOptionKeyWord();
 }
@@ -45,10 +47,6 @@ void Parser::prepareOptionKeyWord()
 
 bool Parser::analyzeOptionArgs(const std::list<string>& argList, string& errorMsg)
 {
-
-    m_defaultParser = TokenParserMgr::getParserByType(E_P_DEFAULT); // set default parser
-	m_currentParser = m_defaultParser;                              // set current parser
-
 	auto bret = true;
 
 	for ( const auto& sOption : argList ) 
@@ -153,8 +151,6 @@ int Parser::doParse()
 			case TokenParserBase::E_TOKEN_TERMINATE_TO_DEFAULT:
 				{
 					// Other -> Default
-					checkEndLogic();
-
 					m_TokenListAnalyzer.pushToken( m_currentParser->generateToken() );
 				}
 				break;
@@ -226,16 +222,10 @@ int Parser::doParse()
 	// Endless Logic Check
 	//
 	if ( isLastCharChanged ) {
-		switch ( lastChangeStatus )
+		if (   lastChangeStatus == TokenParserBase::E_TOKEN_TERMINATE_TO_DEFAULT_RE_PARSE 
+			|| lastChangeStatus == TokenParserBase::E_TOKEN_CONVERT_TO_OTHER ) 
 		{
-		case TokenParserBase::E_TOKEN_TERMINATE_TO_DEFAULT_RE_PARSE:
-		case TokenParserBase::E_TOKEN_CONVERT_TO_OTHER:
-			{
-				checkEndLogic();
-			}
-			break;
-		default:
-			break;
+			checkEndLogic();
 		}
 	} else {
 		checkEndLogic();
@@ -322,7 +312,7 @@ void Parser::checkEndLogic()
 		if ( tp != E_P_DEFAULT ) {
 			if ( !(m_currentParser->isTokenValid()) ) {
 				string errorMsg = getstrParserType(tp);
-				errorMsg += "\"";
+				errorMsg += ", \"";
 				errorMsg += m_currentParser->getVisitedStr();
 				errorMsg += "\" is invalid";
 				m_currentParser->throwErrMsg(&m_pInfo, errorMsg);

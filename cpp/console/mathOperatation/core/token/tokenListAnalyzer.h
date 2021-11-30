@@ -3,8 +3,8 @@
 
 #include <unordered_map>
 #include <list>
+#include "parsedCharInfo.h"
 #include "tokenInfo.h"
-#include "commonEnum.h"
 
 class TokenListAnalyzer
 {

@@ -67,6 +67,7 @@ E_PaserType  TokenParserBase::appendContent(ParsedCharInfo* pInfo) // override;
 	if ( pInfo->baseInfo != nullptr ) {
 		m_beginInfo = pInfo->position;
 		m_alreadyTravelsaledString += ch;
+		m_endInfo = pInfo->position;
 
 		E_PaserType nextParserType =  m_type;
 		if ( pInfo->baseInfo->isBlank() ) {
@@ -105,6 +106,7 @@ TokenInfo* TokenParserBase::generateToken()
 	auto pRetToken = new TokenInfo( m_tokenType , m_tokenSubType);
 	m_token = m_alreadyTravelsaledString;
 	pRetToken->setDetail( m_token );
+	pRetToken->setPosInfo( m_beginInfo, m_endInfo);
 	return pRetToken;
 }
 
