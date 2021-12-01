@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "parser.h"
-
+#include "parserOptions.h"
 #include "tokenParserMgr.h"
 
 
@@ -10,67 +10,22 @@ using namespace std;
 Parser::Parser()
 	: m_buf(nullptr)
 	, m_size(0)
-	, m_debugOption(0)
-	, m_flag(0)
-    // Parser
+    // Token Parser Part
 	, m_defaultParser( nullptr )
 	, m_currentParser( nullptr )
 	, m_currentPaserType( E_P_DEFAULT )
 	, m_pInfo()
-	, m_optKeyWordprefix_1()
-	, m_optKeyWord_1()
-	, m_optKeyWordprefix_2()
-	, m_optKeyWord_2()
 {
 
     m_defaultParser = TokenParserMgr::getParserByType(E_P_DEFAULT); // set default parser
 	m_currentParser = m_defaultParser;                              // set current parser
 
-	prepareOptionKeyWord();
 }
 
 // virtual 
 Parser::~Parser()
 {
 }
-
-
-void Parser::prepareOptionKeyWord()
-{
-	  m_optKeyWordprefix_1 = "--option=";
-	  m_optKeyWord_1 = "--option=<number>";
-	  m_optKeyWordprefix_2 = "--flags=";
-	  m_optKeyWord_2 = "--flags=<number>";
-}
-
-
-
-bool Parser::analyzeOptionArgs(const std::list<string>& argList, string& errorMsg)
-{
-	auto bret = true;
-
-	for ( const auto& sOption : argList ) 
-	{
-		auto pos1 = sOption.find(m_optKeyWordprefix_1);
-		auto pos2 = sOption.find(m_optKeyWordprefix_2);
-
-		if ( pos1 != string::npos ) {
-			// set debug option
-			string optValue = sOption.substr( pos1 + m_optKeyWordprefix_1.size() );
-			m_debugOption = atoi( optValue.c_str() );
-		} else if ( pos2 != string::npos ) {
-			string flagValue = sOption.substr( pos2 + m_optKeyWordprefix_2.size() );
-			m_flag = atoi( flagValue.c_str() );
-		} else {
-			bret = false;
-			errorMsg = sOption;
-			break;
-		}
-	}
-
-	return bret;
-}
-
 
 
 void Parser::setContent(const char* buf, size_t sz)
@@ -128,6 +83,10 @@ void Parser::processLineInfo(char ch, size_t idx)
 
 int Parser::doParse()
 {
+	auto argsDbgOption = ParserOptions::getDebugOption();
+	auto argsFlag      = ParserOptions::getFlag();        
+	(void)argsFlag;
+
 	size_t idx;
 
 	auto isLastCharChanged = false;
@@ -141,7 +100,7 @@ int Parser::doParse()
 
 		auto nextParserType = m_currentParser->appendContent(&m_pInfo);
 		if ( nextParserType != m_currentPaserType ) {
-			if ( m_debugOption == 1 ) {
+			if ( argsDbgOption >= 2 ) {
 				cout << "[Changed] : " << getstrParserType(m_currentPaserType) << " -> " << getstrParserType(nextParserType) << " , " <<  m_pInfo.position.getLineInfo() << endl;
 			}
 
@@ -171,8 +130,8 @@ int Parser::doParse()
 					auto bEndFlag = newParser->isEnd(&m_pInfo);
 					if ( bEndFlag ) {
 						// Core return to default Parser
-						m_TokenListAnalyzer.pushToken( newParser->generateToken() );
-						if ( m_debugOption == 1 ) {
+						pushRet = m_TokenListAnalyzer.pushToken( newParser->generateToken() );
+						if ( argsDbgOption >= 2 ) {
 							cout << "  [Inner Changed] : " << getstrParserType(nextParserType2) << " -> " << getstrParserType(E_P_DEFAULT) << " , " <<  m_pInfo.position.getLineInfo() << endl;
 						}
 						nextParserType = E_P_DEFAULT;
@@ -191,7 +150,7 @@ int Parser::doParse()
 					if ( bEndFlag ) {
 						// Core return to default Parser
 						pushRet = m_TokenListAnalyzer.pushToken( newParser->generateToken() );
-						if ( m_debugOption == 1 ) {
+						if (  argsDbgOption >= 2 ) {
 							cout << "  [Inner Changed] : " << getstrParserType(nextParserType) << " -> " << getstrParserType(E_P_DEFAULT) << " , " <<  m_pInfo.position.getLineInfo() << endl;
 						}
 						nextParserType = E_P_DEFAULT;
@@ -285,6 +244,9 @@ string Parser::getstrParserType(E_PaserType tp)
 	case E_P_BLANK:
 		retStr = "E_P_BLANK";
 		break;
+	case E_P_ENDLESS_SEMICOLON:
+		retStr = "E_P_ENDLESS_SEMICOLON";
+		break;
 	default:
 		retStr = "E_P_UNKNOWN ???";
 		break;
@@ -294,22 +256,7 @@ string Parser::getstrParserType(E_PaserType tp)
 }
 
 
-string Parser::getUserManual()
-{
-	string strUserManul;
-	strUserManul += "==================================================\n";
-	strUserManul += "Usage : \n";
-	strUserManul += "\t<programName> ";
-	strUserManul += m_optKeyWord_1;
-	strUserManul += "  ";
-	strUserManul += m_optKeyWord_2;
 
-	strUserManul += "   ";
-	strUserManul += "<src-FileName>\n";
-	strUserManul += "==================================================\n";
-
-	return strUserManul;
-}
 
 
 void Parser::checkEndLogic()

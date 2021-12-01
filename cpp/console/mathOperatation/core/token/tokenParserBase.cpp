@@ -87,7 +87,7 @@ E_PaserType  TokenParserBase::appendContent(ParsedCharInfo* pInfo) // override;
 				nextParserType = E_P_FLOAT;
 			} else if ( ch == ';' ) {
 				//    ;
-				nextParserType = E_P_ENDLESEE_SEMICOLON;
+				nextParserType = E_P_ENDLESS_SEMICOLON;
 			}
 		}
 

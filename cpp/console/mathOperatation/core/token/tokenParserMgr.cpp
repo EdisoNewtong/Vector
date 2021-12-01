@@ -50,7 +50,7 @@ void TokenParserMgr::init()
     //
  	s_parserMap.insert( make_pair(enumCvt(E_P_BLANK),  new BlankParser(E_P_BLANK) ) );
 	// 
- 	s_parserMap.insert( make_pair(enumCvt(E_P_ENDLESEE_SEMICOLON),  new ExpEvaluation(E_P_ENDLESEE_SEMICOLON) ) );
+ 	s_parserMap.insert( make_pair(enumCvt(E_P_ENDLESS_SEMICOLON),  new ExpEvaluation(E_P_ENDLESS_SEMICOLON) ) );
 
 	//
 	// init

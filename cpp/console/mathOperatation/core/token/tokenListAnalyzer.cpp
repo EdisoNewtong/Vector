@@ -1,5 +1,6 @@
 #include <cassert>
 #include <iostream>
+#include "parserOptions.h"
 #include "tokenListAnalyzer.h"
 #include "parserException.h"
 using namespace std;
@@ -78,7 +79,7 @@ int TokenListAnalyzer::pushToken(TokenInfo* pToken)
 		{
 			if ( curTp == E_TOKEN_OP_CLOSE_PARENTHESES ) {
 				// special ')'
-				if ( !hasMathedOpenParentheseBefore() ) {
+				if ( !hasMatchedOpenParentheseBefore() ) {
 					// TODO : throw
 				} else {
 					// pop previous element until '('
@@ -1030,11 +1031,47 @@ string  TokenListAnalyzer::getTokenName(E_TokenType tp)
 	return ret;
 }
 
+void TokenListAnalyzer::expValidCheck()
+{
+	if ( !hasMatchedOpenParentheseBefore() ) {
+		// TODO : throw
+	}
+
+	// pop rest   operator
+	for( auto rit = m_operatorStack.crbegin(); rit != m_operatorStack.crend(); ++rit )
+	{
+		auto pToken = rit->first;
+		m_evaluateSuffixExpression.push_back(pToken);
+	}
+	m_operatorStack.clear();
+}
 
 
 int  TokenListAnalyzer::evaluateExp()
 {
+	auto flag = ParserOptions::getFlag();
+	expValidCheck();
+
+	if ( flag == 1 ) {
+		auto idx = 1;
+		for(auto it =  m_evaluateSuffixExpression.cbegin(); it!= m_evaluateSuffixExpression.cend(); ++it, ++idx )
+		{
+			auto pToken = *it;
+			if ( pToken != nullptr ) {
+				const auto& begPos = pToken->getBeginPos();
+				const auto& endPos = pToken->getEndPos();
+				cout << "[INFO] " << idx << ". " << pToken->getDetail()
+					              << ", " <<  begPos.nLine << ":" << begPos.nCol
+								  << " ~ "<<  endPos.nLine << ":" << endPos.nCol
+								  << endl;
+			} else {
+				cout << "[ERROR] "<< idx << ". exp.element == nullptr" << endl;
+			}
+		}
+	}
+	
 	// TODO : ???
+
 	return 0;
 }
 
@@ -1054,13 +1091,13 @@ bool TokenListAnalyzer::isOperatorType(E_TokenType tp)
 	return (curIdx > begIdx   &&   curIdx <= endIdx);
 }
 
-bool TokenListAnalyzer::hasMathedOpenParentheseBefore()
+bool TokenListAnalyzer::hasMatchedOpenParentheseBefore()
 {
 	auto foundBefore = false;
 	for( auto rit = m_operatorStack.crbegin(); rit != m_operatorStack.crend(); ++rit )
 	{
 		auto pOperatorInfo = rit->second;
-		if ( pOperatorInfo != nullptr && ( pOperatorInfo->getChar() == ')' ) ) {
+		if ( pOperatorInfo != nullptr && ( pOperatorInfo->getChar() == '(' ) ) {
 			foundBefore = true;
 			break;
 		}
@@ -1129,9 +1166,11 @@ void TokenListAnalyzer::tryPopPreviousOperatorLowerPriority(TokenInfo* pCurrentT
 							//
 							if ( currentOpIsLeft2Right ) {
 								m_operatorStack.erase( (++rit).base() );
-								m_evaluateSuffixExpression.push_back( pritToken );
+								m_evaluateSuffixExpression.push_back( pritToken ); // push erased element from  m_operatorStack
+								m_operatorStack.push_back( make_pair(pCurrentToken,pCurrentOperInfo)  );
 							} else {
-								m_evaluateSuffixExpression.push_back( pritToken );
+								m_operatorStack.push_back( make_pair(pCurrentToken,pCurrentOperInfo)  );
+								// m_evaluateSuffixExpression.push_back( pCurrentToken );
 							}
 							//
 							///////////////////////////////////////////////////////////
@@ -1155,8 +1194,10 @@ OperatorBaseInfo* TokenListAnalyzer::token2Op(TokenInfo* pToken)
 		assert(false);
 	}
 
+	auto subTp = pToken->getSubType();
+
 	CharBaseInfo* charInfo = nullptr;
-	switch( tp )
+	switch( subTp )
 	{
 	case E_TOKEN_OP_OPEN_PARENTHESES: // = 8,  // (
 		charInfo = CharUtil::getCharBaseInfo('(');
@@ -1246,6 +1287,5 @@ void TokenListAnalyzer::popUtilOpenParenthese()
 			}
 		}
 	}
-
 }
 

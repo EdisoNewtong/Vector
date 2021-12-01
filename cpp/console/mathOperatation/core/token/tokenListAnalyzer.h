@@ -17,6 +17,7 @@ public:
 	// bool checkParserIsValid(E_PaserType tp);
 	int pushToken(TokenInfo* pToken);
 
+	void expValidCheck();
 	int  evaluateExp();
 	void clearEvaluateList();
 protected:
@@ -26,13 +27,13 @@ protected:
 	std::list<TokenInfo*> m_evaluateSuffixExpression;
 	std::list< std::pair<TokenInfo*, OperatorBaseInfo*> > m_operatorStack;
 
-
 	TokenInfo* getPreviousToken(bool needSkipBlankComment, int* pHasSkipBlankComment, bool needBack2LastButOne);
 	void judgeTokenIsPositiveOrNegativeAndReset(TokenInfo* pToken);
-	bool hasMathedOpenParentheseBefore();
-	OperatorBaseInfo* token2Op(TokenInfo* pToken);
+	bool hasMatchedOpenParentheseBefore();
 	void tryPopPreviousOperatorLowerPriority(TokenInfo* pToken);
 	void popUtilOpenParenthese();
+
+	OperatorBaseInfo* token2Op(TokenInfo* pToken);
 
 	void initBanPickCfg();
 

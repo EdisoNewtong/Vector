@@ -312,7 +312,7 @@ void CharUtil::init()
 
 	the_ch = '=';
     meta = OperatorBaseInfo::S_Right2Left_FLAG | OperatorBaseInfo::S_BINARY_OP_FLAG | 16U;
-	OperatorBaseInfo* equalInfo = new OperatorBaseInfo( the_ch, 0);
+	OperatorBaseInfo* equalInfo = new OperatorBaseInfo( the_ch, meta);
 	s_allCharSetMap.insert( make_pair(the_ch, new CharBaseInfo(the_ch, equalInfo) ) );
 
 	// +a

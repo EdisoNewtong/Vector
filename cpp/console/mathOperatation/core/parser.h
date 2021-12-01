@@ -1,7 +1,6 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-#include <list>
 #include <unordered_map>
 #include <string>
 #include "commonEnum.h"
@@ -17,14 +16,10 @@ public:
       Parser();
       virtual ~Parser();
 
-	  bool analyzeOptionArgs(const std::list<std::string>& argList, std::string& errorMsg);
-	  std::string getUserManual();
-
 	  void setContent(const char* buf, size_t sz);
 	  int doParse();
 
 protected:
-	  void prepareOptionKeyWord();
 
 	  void processLineInfo(char ch, size_t idx);
 	  bool checkPreviousTokenIsValid();
@@ -35,8 +30,6 @@ protected:
 protected:
 	  const char* m_buf;
       size_t m_size;
-	  int    m_debugOption;
-	  int    m_flag;
 
       TokenParserBase* m_defaultParser;    // default
 	  TokenParserBase* m_currentParser;    // current
@@ -45,11 +38,6 @@ protected:
 	  TokenListAnalyzer m_TokenListAnalyzer;
 
 	  ParsedCharInfo       m_pInfo;
-private:
-	  std::string m_optKeyWordprefix_1;
-	  std::string m_optKeyWord_1;
-	  std::string m_optKeyWordprefix_2;
-	  std::string m_optKeyWord_2;
 };
 
 

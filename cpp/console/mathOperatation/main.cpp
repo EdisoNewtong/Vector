@@ -7,6 +7,7 @@
 #include <exception>
 
 #include "parser.h"
+#include "parserOptions.h"
 #include "parserException.h"
 #include "charUtil.h"
 #include "typeUtil.h"
@@ -28,7 +29,7 @@ int main(int argc, char* argv[], char* env[])
 
 	if ( argc < 3 ) {
 		cout << "[ERROR] : arglist.count < 3" << endl;
-		cout << p.getUserManual() << endl;
+		cout << ParserOptions::getUserManual() << endl;
 		cout << endl;
 		return -1;
 	}
@@ -72,7 +73,7 @@ int main(int argc, char* argv[], char* env[])
 
 	string errorMsg;
 	char* filebuf = nullptr;
-	auto anaRet = p.analyzeOptionArgs(strArgList, errorMsg);
+	auto anaRet = ParserOptions::analyzeOptionArgs(strArgList, errorMsg);
 
 	if ( anaRet ) {
 		try {
@@ -105,7 +106,7 @@ int main(int argc, char* argv[], char* env[])
 		}
 	} else {
 		cout << "[ERROR] : Invalid arguments => \" " << errorMsg << "\" " << endl;
-		cout << p.getUserManual() << endl << endl;
+		cout << ParserOptions::getUserManual() << endl << endl;
 	}
 
 	//

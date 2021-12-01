@@ -31,7 +31,7 @@ enum E_PaserType
   //
   E_P_BLANK = 10,
   //
-  E_P_ENDLESEE_SEMICOLON = 11, // To Do Calculation
+  E_P_ENDLESS_SEMICOLON = 11, // To Do Calculation
 
 };
 
