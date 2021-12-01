@@ -7,6 +7,8 @@ using namespace std;
 TokenListAnalyzer::TokenListAnalyzer()
 	: m_tokenList()
 	, m_banPickCfgMap()
+	, m_evaluateSuffixExpression()
+	, m_operatorStack()
 {
 	m_tokenList.clear();
 
@@ -34,13 +36,13 @@ bool TokenListAnalyzer::isListEmpty()
 
 
 
-bool TokenListAnalyzer::checkParserIsValid(E_PaserType tp)
-{
-	(void)tp;
-	return true;
-}
+// bool TokenListAnalyzer::checkParserIsValid(E_PaserType tp)
+// {
+// 	(void)tp;
+// 	return true;
+// }
 
-void TokenListAnalyzer::pushToken(TokenInfo* pToken)
+int TokenListAnalyzer::pushToken(TokenInfo* pToken)
 {
 	static const string SC_LEFT(" ( ");
 	static const string SC_RIGHT(" ) ");
@@ -66,6 +68,35 @@ void TokenListAnalyzer::pushToken(TokenInfo* pToken)
 	auto curTokenType = getTokenName(curTp);
 
 	if ( !(curTp == E_TOKEN_BLANK || curTp == E_TOKEN_COMMENT_TYPE) ) {
+		if (    curTp == E_TOKEN_INTEGER_NUMBER 
+			 || curTp == E_TOKEN_FLOAT_NUMBER
+			 || curTp == E_TOKEN_VARIBLE )
+		{
+			m_evaluateSuffixExpression.push_back( pToken );
+		}
+		else if ( isOperatorType(curTp) ) 
+		{
+			if ( curTp == E_TOKEN_OP_CLOSE_PARENTHESES ) {
+				// special ')'
+				if ( !hasMathedOpenParentheseBefore() ) {
+					// TODO : throw
+				} else {
+					// pop previous element until '('
+					popUtilOpenParenthese();
+				}
+			} else {
+				auto pOperInfo = token2Op(pToken);
+				if ( pOperInfo == nullptr ) {
+					cout << "[ERROR] : Can't found OperatorBaseInfo about " << getTokenName(pToken->getSubType()) << endl;
+					assert(false);
+				}
+
+				tryPopPreviousOperatorLowerPriority(pToken);
+			}
+		}
+
+
+
 		int hasSkipBlank = 0;
 		auto previousValidToken = getPreviousToken(true, &hasSkipBlank, true);
 		if ( previousValidToken != nullptr ) {
@@ -158,7 +189,7 @@ void TokenListAnalyzer::pushToken(TokenInfo* pToken)
 				 || curTp == E_TOKEN_OP_OPEN_PARENTHESES 
 				 // 
 				 ////////////////////////////////////////////////
-			 ) 
+			) 
 			{
 				// 1st pushed is Valid
 			} else {
@@ -183,6 +214,8 @@ void TokenListAnalyzer::pushToken(TokenInfo* pToken)
 	}
 
 	// tp == E_TOKEN_BLANK || tp == E_TOKEN_COMMENT_TYPE  is always valid no matter  previous token is which type
+	int ret = (curTp == E_TOKEN_SEMICOLON ? 1 : 0);
+	return ret;
 }
 
 
@@ -875,11 +908,11 @@ void TokenListAnalyzer::judgeTokenIsPositiveOrNegativeAndReset(TokenInfo* pToken
 			pToken->resetSubType( (subTp == E_TOKEN_OP_ADD) ? E_TOKEN_OP_POSITIVE : E_TOKEN_OP_NEGATIVE );
 		} else {
 			auto previousTp = pPreviousInfo->getType();
-			auto previousSubTp = pPreviousInfo->getSubType();
 			if ( previousTp == E_TOKEN_INTEGER_NUMBER || previousTp == E_TOKEN_FLOAT_NUMBER || previousTp == E_TOKEN_VARIBLE ) {
 				// keep it as  add/minus   rather than   positive/negative
 			} else {
 				if ( previousTp == E_TOKEN_OPERATOR ) {
+					auto previousSubTp = pPreviousInfo->getSubType();
 					/*
 					switch ( previousSubTp )
 					{
@@ -995,5 +1028,224 @@ string  TokenListAnalyzer::getTokenName(E_TokenType tp)
 	}
 
 	return ret;
+}
+
+
+
+int  TokenListAnalyzer::evaluateExp()
+{
+	// TODO : ???
+	return 0;
+}
+
+void TokenListAnalyzer::clearEvaluateList()
+{
+	m_evaluateSuffixExpression.clear();
+	m_operatorStack.clear();
+}
+
+
+bool TokenListAnalyzer::isOperatorType(E_TokenType tp)
+{
+	int curIdx = static_cast<int>(tp);
+	int begIdx = static_cast<int>(E_TOKEN_OP_BEGIN);
+	int endIdx = static_cast<int>(E_TOKEN_OP_END);
+
+	return (curIdx > begIdx   &&   curIdx <= endIdx);
+}
+
+bool TokenListAnalyzer::hasMathedOpenParentheseBefore()
+{
+	auto foundBefore = false;
+	for( auto rit = m_operatorStack.crbegin(); rit != m_operatorStack.crend(); ++rit )
+	{
+		auto pOperatorInfo = rit->second;
+		if ( pOperatorInfo != nullptr && ( pOperatorInfo->getChar() == ')' ) ) {
+			foundBefore = true;
+			break;
+		}
+	}
+	return foundBefore;
+}
+
+
+void TokenListAnalyzer::tryPopPreviousOperatorLowerPriority(TokenInfo* pCurrentToken)
+{
+	auto pCurrentOperInfo = token2Op(pCurrentToken);
+	if ( m_operatorStack.empty() ) {
+		m_operatorStack.push_back( make_pair(pCurrentToken, pCurrentOperInfo) );
+		return;
+	}
+
+	// operator stack is <Not> empty()
+	auto pr = m_operatorStack.back();
+	auto pLastToken = pr.first;
+	auto pLastOperInfo = pr.second;
+
+	auto lastOperPriority = pLastOperInfo->getPriority();
+	auto currentOpPriority = pCurrentOperInfo->getPriority();
+	auto currentOpIsLeft2Right = pCurrentOperInfo->isLeft2Right();
+
+	if ( pCurrentToken->getSubType() == E_TOKEN_OP_OPEN_PARENTHESES ) {
+		// Special operator '('
+		m_operatorStack.push_back( make_pair(pCurrentToken, pCurrentOperInfo) );
+	} else {
+		// != '('
+		if ( lastOperPriority > currentOpPriority ) {
+			m_operatorStack.push_back( make_pair(pCurrentToken, pCurrentOperInfo) );
+		} else if ( lastOperPriority == currentOpPriority ) {
+			if ( currentOpIsLeft2Right ) {
+				m_evaluateSuffixExpression.push_back( pLastToken );
+
+				m_operatorStack.pop_back();
+				m_operatorStack.push_back( make_pair(pCurrentToken, pCurrentOperInfo) );
+			} else {
+				m_operatorStack.push_back( make_pair(pCurrentToken, pCurrentOperInfo) );
+			}
+		} else {
+			// lastOperPriority < currentOpPriority 
+			if ( pLastToken->getSubType() == E_TOKEN_OP_OPEN_PARENTHESES ) {
+				m_operatorStack.push_back( make_pair(pCurrentToken, pCurrentOperInfo) );
+			} else {
+				for ( auto rit = m_operatorStack.rbegin(); rit != m_operatorStack.rend(); )
+				{
+					auto pritToken = rit->first;
+					auto pOperBaseInfo = rit->second;
+					if ( pritToken->getSubType() == E_TOKEN_OP_OPEN_PARENTHESES ) {
+						// Special , core core core   : '('
+						m_operatorStack.push_back( make_pair(pCurrentToken, pCurrentOperInfo) );
+						break;
+					} else {
+						auto lastPri = pOperBaseInfo->getPriority();
+						if ( lastPri < currentOpPriority ) {
+							// Do Not Apply  
+							// //               ++rit; 
+							// again
+							// move stack top into Suffix-Exp-List
+							m_operatorStack.erase( (++rit).base() );
+							m_evaluateSuffixExpression.push_back( pritToken );
+						} else if ( lastPri == currentOpPriority ) {
+							///////////////////////////////////////////////////////////
+							//
+							if ( currentOpIsLeft2Right ) {
+								m_operatorStack.erase( (++rit).base() );
+								m_evaluateSuffixExpression.push_back( pritToken );
+							} else {
+								m_evaluateSuffixExpression.push_back( pritToken );
+							}
+							//
+							///////////////////////////////////////////////////////////
+						} else {
+							// lastPri > currentOpPriority
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
+
+}
+
+OperatorBaseInfo* TokenListAnalyzer::token2Op(TokenInfo* pToken)
+{
+	auto tp = pToken->getType();
+	if ( tp != E_TOKEN_OPERATOR ) {
+		cout << "tp != E_TOKEN_OPERATOR , tp = " << getTokenName(tp) << endl;
+		assert(false);
+	}
+
+	CharBaseInfo* charInfo = nullptr;
+	switch( tp )
+	{
+	case E_TOKEN_OP_OPEN_PARENTHESES: // = 8,  // (
+		charInfo = CharUtil::getCharBaseInfo('(');
+		break;
+	case E_TOKEN_OP_CLOSE_PARENTHESES: // = 9, // )
+		charInfo = CharUtil::getCharBaseInfo(')');
+		break;
+	case E_TOKEN_OP_ADD: // = 10,       // +
+		charInfo = CharUtil::getCharBaseInfo('+');
+		break;
+	case E_TOKEN_OP_POSITIVE: // = 11,     // +3
+		charInfo = CharUtil::getPositiveCharInfo();
+		break;
+	case E_TOKEN_OP_MINUS: // = 12,             // -
+		charInfo = CharUtil::getCharBaseInfo('-');
+		break;
+	case E_TOKEN_OP_NEGATIVE: // = 13,     // -3
+		charInfo = CharUtil::getNegativeCharInfo();
+		break;
+	case E_TOKEN_OP_MULTIPLY: // = 14,          // *
+		charInfo = CharUtil::getCharBaseInfo('*');
+		break;
+	case E_TOKEN_OP_DIVIDE: // = 15,            // /
+		charInfo = CharUtil::getCharBaseInfo('/');
+		break;
+	case E_TOKEN_OP_MOD: // = 16,               // %
+		charInfo = CharUtil::getCharBaseInfo('%');
+		break;
+	case E_TOKEN_OP_BIT_AND: // = 17,           // &
+		charInfo = CharUtil::getCharBaseInfo('&');
+		break;
+	case E_TOKEN_OP_BIT_OR: // = 18,            // |
+		charInfo = CharUtil::getCharBaseInfo('|');
+		break;
+	case E_TOKEN_OP_BIT_XOR: // = 19,           // ^
+		charInfo = CharUtil::getCharBaseInfo('^');
+		break;
+	case E_TOKEN_OP_BIT_NOT: // = 20,           // ~
+		charInfo = CharUtil::getCharBaseInfo('~');
+		break;
+	case E_TOKEN_OP_BIT_LEFT_SHIFT: // = 21,    // <<
+		charInfo = CharUtil::getCharBaseInfo('<');
+		break;
+	case E_TOKEN_OP_BIT_RIGHT_SHIFT: // = 22,   // >>
+		charInfo = CharUtil::getCharBaseInfo('>');
+		break;
+	case E_TOKEN_OP_ASSIGNMENT: // = 23,        // =
+		charInfo = CharUtil::getCharBaseInfo('=');
+		break;
+	default:
+		break;
+	}
+
+	OperatorBaseInfo* pRetInfo = nullptr;
+	if ( charInfo != nullptr ) {
+		pRetInfo = charInfo->getOpInfo();
+	}
+	return pRetInfo;
+}
+
+
+
+void TokenListAnalyzer::popUtilOpenParenthese()
+{
+	//
+	// pop ')' which is pushed just now
+	//
+
+	auto lastElement = m_operatorStack.back();
+	if ( lastElement.first != nullptr &&  (lastElement.first)->getSubType() == E_TOKEN_OP_OPEN_PARENTHESES ) {
+		// TODO : throw   empty content inside   ()
+	} else {
+		for( auto rit = m_operatorStack.crbegin(); rit != m_operatorStack.crend();  )
+		{
+			auto pOpToken  = rit->first;
+			if ( pOpToken != nullptr ) {
+				if ( pOpToken->getSubType() == E_TOKEN_OP_OPEN_PARENTHESES ) {
+					// pop '('
+					m_operatorStack.erase( (++rit).base() );
+					break;
+				} else {
+					m_operatorStack.erase( (++rit).base() );
+					m_evaluateSuffixExpression.push_back( pOpToken );
+				}
+			} else {
+				++rit;
+			}
+		}
+	}
+
 }
 

@@ -91,7 +91,7 @@ E_PaserType  FloatParser::appendContent(ParsedCharInfo* pInfo) // override
 				// throw
 				string errMsg = "Can't append '";
 				errMsg += curCh;
-				errMsg += "' when after 1st  '.' (only 1 size)  ";
+				errMsg += "' (a non-number char) when after 1st  '.' (only 1 size)  ";
 				throwErrMsg(pInfo, errMsg);
 			}
 		} else if ( sz == 2 ) {

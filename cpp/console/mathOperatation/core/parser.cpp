@@ -145,13 +145,14 @@ int Parser::doParse()
 				cout << "[Changed] : " << getstrParserType(m_currentPaserType) << " -> " << getstrParserType(nextParserType) << " , " <<  m_pInfo.position.getLineInfo() << endl;
 			}
 
+			auto pushRet = 0;
 			auto switchFlag = m_currentParser->getSwitchFlag();
 			switch( switchFlag )
 			{
 			case TokenParserBase::E_TOKEN_TERMINATE_TO_DEFAULT:
 				{
 					// Other -> Default
-					m_TokenListAnalyzer.pushToken( m_currentParser->generateToken() );
+					pushRet = m_TokenListAnalyzer.pushToken( m_currentParser->generateToken() );
 				}
 				break;
 			case TokenParserBase::E_TOKEN_TERMINATE_TO_DEFAULT_RE_PARSE:
@@ -159,7 +160,7 @@ int Parser::doParse()
 					// push previous terminated Token
 					checkEndLogic();
 
-					m_TokenListAnalyzer.pushToken( m_currentParser->generateToken() );
+					pushRet = m_TokenListAnalyzer.pushToken( m_currentParser->generateToken() );
 					m_currentParser->reset();
 
 					auto next_MiddleParser = TokenParserMgr::getParserByType(nextParserType);
@@ -189,7 +190,7 @@ int Parser::doParse()
 					auto bEndFlag = newParser->isEnd(&m_pInfo);
 					if ( bEndFlag ) {
 						// Core return to default Parser
-						m_TokenListAnalyzer.pushToken( newParser->generateToken() );
+						pushRet = m_TokenListAnalyzer.pushToken( newParser->generateToken() );
 						if ( m_debugOption == 1 ) {
 							cout << "  [Inner Changed] : " << getstrParserType(nextParserType) << " -> " << getstrParserType(E_P_DEFAULT) << " , " <<  m_pInfo.position.getLineInfo() << endl;
 						}
@@ -200,6 +201,12 @@ int Parser::doParse()
 			default:
 				break;
 			}
+
+			if ( pushRet == 1 ) {
+				m_TokenListAnalyzer.evaluateExp();
+				m_TokenListAnalyzer.clearEvaluateList();
+			}
+
 
 			if ( m_pInfo.isLastChar ) {
 				isLastCharChanged = true;

@@ -216,7 +216,7 @@ void CharUtil::init()
 	/*
 	   Operator            Precedence                  Description
 	---------------------------------------------------------------------------------------
-	    ( )                 2                          Left-to-Right
+	    ( )                 2                          Right-to-Left
 	---------------------------------------------------------------------------------------
 		+a   -a             3                          Right-to-Left
 		~a                  3
@@ -301,12 +301,12 @@ void CharUtil::init()
 	s_allCharSetMap.insert( make_pair(the_ch, new CharBaseInfo(the_ch, bitRightShiftInfo) ) );
 
 	the_ch = '(';
-    meta = 0U | 0U | 2U;
+    meta = OperatorBaseInfo::S_Right2Left_FLAG | 0U | 2U;
 	OperatorBaseInfo* openParentheseInfo = new OperatorBaseInfo( the_ch, meta);
 	s_allCharSetMap.insert( make_pair(the_ch, new CharBaseInfo(the_ch, openParentheseInfo) ) );
 
 	the_ch = ')';
-    meta = 0U | 0U | 2U;
+    meta = OperatorBaseInfo::S_Right2Left_FLAG | 0U | 2U;
 	OperatorBaseInfo* closeParentheseInfo = new OperatorBaseInfo( the_ch, meta);
 	s_allCharSetMap.insert( make_pair(the_ch, new CharBaseInfo(the_ch, closeParentheseInfo) ) );
 
