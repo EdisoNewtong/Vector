@@ -43,7 +43,6 @@ protected:
 	unsigned int genFlag(E_TokenType frontToken, E_TokenType genToken);
 	unsigned int genBanPickMask(unsigned int noContinuedFlag, unsigned int continuedFlag);
 
-	std::string  getTokenName(E_TokenType tp);
 	bool isOperatorType(E_TokenType tp);
 
 

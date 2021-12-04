@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "parser.h"
+#include "enum2name.h"
 #include "parserOptions.h"
 #include "tokenParserMgr.h"
 
@@ -101,7 +102,7 @@ int Parser::doParse()
 		auto nextParserType = m_currentParser->appendContent(&m_pInfo);
 		if ( nextParserType != m_currentPaserType ) {
 			if ( argsDbgOption >= 2 ) {
-				cout << "[Changed] : " << getstrParserType(m_currentPaserType) << " -> " << getstrParserType(nextParserType) << " , " <<  m_pInfo.position.getLineInfo() << endl;
+				cout << "[Changed] : " << Enum2Name::getParserName(m_currentPaserType) << " -> " << Enum2Name::getParserName(nextParserType) << " , " <<  m_pInfo.position.getLineInfo() << endl;
 			}
 
 			auto pushRet = 0;
@@ -132,7 +133,7 @@ int Parser::doParse()
 						// Core return to default Parser
 						pushRet = m_TokenListAnalyzer.pushToken( newParser->generateToken() );
 						if ( argsDbgOption >= 2 ) {
-							cout << "  [Inner Changed] : " << getstrParserType(nextParserType2) << " -> " << getstrParserType(E_P_DEFAULT) << " , " <<  m_pInfo.position.getLineInfo() << endl;
+							cout << "  [Inner Changed] : " << Enum2Name::getParserName(nextParserType2) << " -> " << Enum2Name::getParserName(E_P_DEFAULT) << " , " <<  m_pInfo.position.getLineInfo() << endl;
 						}
 						nextParserType = E_P_DEFAULT;
 					} else {
@@ -151,7 +152,7 @@ int Parser::doParse()
 						// Core return to default Parser
 						pushRet = m_TokenListAnalyzer.pushToken( newParser->generateToken() );
 						if (  argsDbgOption >= 2 ) {
-							cout << "  [Inner Changed] : " << getstrParserType(nextParserType) << " -> " << getstrParserType(E_P_DEFAULT) << " , " <<  m_pInfo.position.getLineInfo() << endl;
+							cout << "  [Inner Changed] : " <<  Enum2Name::getParserName(nextParserType) << " -> " << Enum2Name::getParserName(E_P_DEFAULT) << " , " <<  m_pInfo.position.getLineInfo() << endl;
 						}
 						nextParserType = E_P_DEFAULT;
 					} 
@@ -207,56 +208,6 @@ bool Parser::checkPreviousTokenIsValid()
 }
 
 
-// static 
-string Parser::getstrParserType(E_PaserType tp)
-{
-	string retStr;
-
-	switch( tp ) 
-	{
-	case E_P_DEFAULT:
-		retStr = "E_P_DEFAULT";
-		break;
-	case E_P_DECIMAL:
-		retStr = "E_P_DECIMAL";
-		break;
-	case E_P_OCTAL:
-		retStr = "E_P_OCTAL";
-		break;
-	case E_P_HEX:
-		retStr = "E_P_HEX";
-		break;
-	case E_P_FLOAT:
-		retStr = "E_P_FLOAT";
-		break;
-	case E_P_VARIBLE:
-		retStr = "E_P_VARIBLE";
-		break;
-	case E_P_OPERATOR:
-		retStr = "E_P_OPERATOR";
-		break;
-	case E_P_SINGLE_LINE_COMMENT:
-		retStr = "E_P_SINGLE_LINE_COMMENT";
-		break;
-	case E_P_MULTI_LINE_COMMENT:
-		retStr = "E_P_MULTI_LINE_COMMENT";
-		break;
-	case E_P_BLANK:
-		retStr = "E_P_BLANK";
-		break;
-	case E_P_ENDLESS_SEMICOLON:
-		retStr = "E_P_ENDLESS_SEMICOLON";
-		break;
-	default:
-		retStr = "E_P_UNKNOWN ???";
-		break;
-	}
-
-	return retStr;
-}
-
-
-
 
 
 void Parser::checkEndLogic()
@@ -265,7 +216,7 @@ void Parser::checkEndLogic()
 		auto tp = m_currentParser->getType();
 		if ( tp != E_P_DEFAULT ) {
 			if ( !(m_currentParser->isTokenValid()) ) {
-				string errorMsg = getstrParserType(tp);
+				string errorMsg = Enum2Name::getParserName(tp);
 				errorMsg += ", \"";
 				errorMsg += m_currentParser->getVisitedStr();
 				errorMsg += "\" is invalid";

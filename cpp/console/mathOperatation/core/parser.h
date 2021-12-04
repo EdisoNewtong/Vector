@@ -24,7 +24,6 @@ protected:
 	  void processLineInfo(char ch, size_t idx);
 	  bool checkPreviousTokenIsValid();
 
-	  static std::string getstrParserType(E_PaserType tp);
 	  void checkEndLogic();
 	  
 protected:

@@ -4,6 +4,7 @@
 #include "parserOptions.h"
 #include "tokenListAnalyzer.h"
 #include "parserException.h"
+#include "enum2name.h"
 using namespace std;
 
 TokenListAnalyzer::TokenListAnalyzer()
@@ -68,7 +69,7 @@ int TokenListAnalyzer::pushToken(TokenInfo* pToken)
 	}
 
 	const auto& endPos = pToken->getEndPos();
-	auto curTokenType = getTokenName(curTp);
+	auto curTokenType = Enum2Name::getTokenName(curTp);
 
 	if ( !(curTp == E_TOKEN_BLANK || curTp == E_TOKEN_COMMENT_TYPE) ) {
 		if (    curTp == E_TOKEN_INTEGER_NUMBER 
@@ -90,7 +91,7 @@ int TokenListAnalyzer::pushToken(TokenInfo* pToken)
 			} else {
 				auto pOperInfo = token2Op(pToken);
 				if ( pOperInfo == nullptr ) {
-					cout << "[ERROR] : Can't found OperatorBaseInfo about " << getTokenName(pToken->getSubType()) << endl;
+					cout << "[ERROR] : Can't found OperatorBaseInfo about " << Enum2Name::getTokenName(pToken->getSubType()) << endl;
 					assert(false);
 				}
 
@@ -107,7 +108,7 @@ int TokenListAnalyzer::pushToken(TokenInfo* pToken)
 			if ( previousType == E_TOKEN_OPERATOR ) {
 				previousType = previousValidToken->getSubType();
 			}
-			auto previousTokenType = getTokenName(previousType);
+			auto previousTokenType = Enum2Name::getTokenName(previousType);
 
 			auto key = genFlag(previousType, curTp);
 			auto foundIt = m_banPickCfgMap.find(key);
@@ -218,9 +219,7 @@ int TokenListAnalyzer::pushToken(TokenInfo* pToken)
 
 	// tp == E_TOKEN_BLANK || tp == E_TOKEN_COMMENT_TYPE  is always valid no matter  previous token is which type
 	int ret = (curTp == E_TOKEN_SEMICOLON ? 1 : 0);
-	if ( ret == 1 ) {
-		m_lastSemicolonPosition = m_tokenList.size() - m_lastSemicolonPosition;
-	}
+
 	return ret;
 }
 
@@ -899,7 +898,7 @@ void TokenListAnalyzer::judgeTokenIsPositiveOrNegativeAndReset(TokenInfo* pToken
 	}
 
 	int skipFlag = 0;
-	TokenInfo* pPreviousInfo = getPreviousToken(true,&skipFlag, false);
+	TokenInfo* pPreviousInfo = getPreviousToken(true, &skipFlag, false);
 
 	//
 	// pPreviousInfo != nullptr
@@ -957,85 +956,6 @@ void TokenListAnalyzer::judgeTokenIsPositiveOrNegativeAndReset(TokenInfo* pToken
 
 
 
-string  TokenListAnalyzer::getTokenName(E_TokenType tp)
-{
-	string ret;
-	switch( tp )
-	{
-	case E_TOKEN_UNKNOWN:
-		ret = "E_TOKEN_UNKNOWN";
-		break;
-	case E_TOKEN_BLANK:
-		ret = "E_TOKEN_BLANK";
-		break;
-	case E_TOKEN_COMMENT_TYPE:
-		ret = "E_TOKEN_COMMENT_TYPE";
-		break;
-	case E_TOKEN_INTEGER_NUMBER:
-		ret = "E_TOKEN_INTEGER_NUMBER";
-		break;
-	case E_TOKEN_FLOAT_NUMBER:
-		ret = "E_TOKEN_FLOAT_NUMBER";
-		break;
-	case E_TOKEN_VARIBLE:
-		ret = "E_TOKEN_VARIBLE";
-		break;
-	case E_TOKEN_OP_OPEN_PARENTHESES: // = 8,  // (
-		ret = "'('";
-		break;
-	case E_TOKEN_OP_CLOSE_PARENTHESES: // = 9, // )
-		ret = "')'";
-		break;
-	case E_TOKEN_OP_ADD: // = 10,       // +
-		ret = "'+'";
-		break;
-	case E_TOKEN_OP_POSITIVE: // = 11,     // +3
-		ret = "'+' positive ";
-		break;
-	case E_TOKEN_OP_MINUS: // = 12,             // -
-		ret = "'-'";
-		break;
-	case E_TOKEN_OP_NEGATIVE: // = 13,     // -3
-		ret = "'-' negative";
-		break;
-	case E_TOKEN_OP_MULTIPLY: // = 14,          // *
-		ret = "'*'";
-		break;
-	case E_TOKEN_OP_DIVIDE: // = 15,            // /
-		ret = "'/'";
-		break;
-	case E_TOKEN_OP_MOD: // = 16,               // %
-		ret = "'%'";
-		break;
-	case E_TOKEN_OP_BIT_AND: // = 17,           // &
-		ret = "'&'";
-		break;
-	case E_TOKEN_OP_BIT_OR: // = 18,            // |
-		ret = "'|'";
-		break;
-	case E_TOKEN_OP_BIT_XOR: // = 19,           // ^
-		ret = "'^'";
-		break;
-	case E_TOKEN_OP_BIT_NOT: // = 20,           // ~
-		ret = "'~'";
-		break;
-	case E_TOKEN_OP_BIT_LEFT_SHIFT: // = 21,    // <<
-		ret = "'<<'";
-		break;
-	case E_TOKEN_OP_BIT_RIGHT_SHIFT: // = 22,   // >>
-		ret = "'>>'";
-		break;
-	case E_TOKEN_OP_ASSIGNMENT: // = 23,        // =
-		ret = "'='";
-		break;
-	default:
-		ret = "In switch-case default part :  E_TOKEN_UNKNOWN";
-		break;
-	}
-
-	return ret;
-}
-
 void TokenListAnalyzer::expValidCheck()
 {
 	if ( !hasMatchedOpenParentheseBefore() ) {
@@ -1057,7 +977,7 @@ int  TokenListAnalyzer::evaluateExp()
 	auto flag = ParserOptions::getFlag();
 	expValidCheck();
 
-	auto it_beg =  m_evaluateSuffixExpression.begin();
+	auto it_beg =  m_tokenList.begin();
 	std::advance(it_beg, m_lastSemicolonPosition);
 
 	if ( flag == 1 ) {
@@ -1068,7 +988,7 @@ int  TokenListAnalyzer::evaluateExp()
 			if ( pToken != nullptr ) {
 				const auto& begPos = pToken->getBeginPos();
 				const auto& endPos = pToken->getEndPos();
-				cout << "[INFO] " << idx << ". " << pToken->getDetail()
+				cout << "[DEBUG] " << idx << ". '" << pToken->getDetail() << "'"
 					              << ", " <<  begPos.nLine << ":" << begPos.nCol
 								  << " ~ "<<  endPos.nLine << ":" << endPos.nCol
 								  << endl;
@@ -1213,7 +1133,7 @@ OperatorBaseInfo* TokenListAnalyzer::token2Op(TokenInfo* pToken)
 {
 	auto tp = pToken->getType();
 	if ( tp != E_TOKEN_OPERATOR ) {
-		cout << "tp != E_TOKEN_OPERATOR , tp = " << getTokenName(tp) << endl;
+		cout << "tp != E_TOKEN_OPERATOR , tp = " << Enum2Name::getTokenName(tp) << endl;
 		assert(false);
 	}
 

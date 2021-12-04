@@ -6,7 +6,7 @@ COMPILE_OPT  :=  -Wall  -std=c++11
 #
 #COMPILE_OPT :=  -Wall  -std=c++11   -DUSE_INT_INSTEAD_OF_ENUM
 
-main:build/parser.o build/parserOptions.o build/parsedCharInfo.o build/parserException.o  build/keywordList.o build/typeUtil.o build/charUtil.o build/tokenInfo.o  build/decimalParser.o build/octalParser.o build/hexParser.o build/floatParser.o build/varibleParser.o  build/tokenParserBase.o build/blankParser.o build/singleLineCommentParser.o build/multiLineCommentParser.o build/operatorParser.o  build/expevaluation.o build/tokenParserMgr.o  build/tokenListAnalyzer.o  build/main.o
+main:build/parser.o build/parserOptions.o build/parsedCharInfo.o build/parserException.o  build/keywordList.o build/typeUtil.o build/enum2name.o build/charUtil.o build/tokenInfo.o  build/decimalParser.o build/octalParser.o build/hexParser.o build/floatParser.o build/varibleParser.o  build/tokenParserBase.o build/blankParser.o build/singleLineCommentParser.o build/multiLineCommentParser.o build/operatorParser.o  build/expevaluation.o build/tokenParserMgr.o  build/tokenListAnalyzer.o  build/main.o
 	g++   $(COMPILE_OPT) -o main build/*.o
 
 
@@ -19,7 +19,7 @@ build/parserOptions.o:core/parserOptions.cpp  core/parserOptions.h
 	g++   $(COMPILE_OPT)   $(INC_PATH)   -c -o build/parserOptions.o core/parserOptions.cpp
 
 
-build/parser.o:core/parser.cpp core/parser.h core/parserOptions.h core/commonEnum.h core/token/tokenParserBase.h  core/token/tokenParserMgr.h  core/token/tokenListAnalyzer.h
+build/parser.o:core/parser.cpp core/parser.h core/parserOptions.h core/commonEnum.h core/token/tokenParserBase.h  core/token/tokenParserMgr.h  core/token/tokenListAnalyzer.h core/util/enum2name.h
 	g++   $(COMPILE_OPT)   $(INC_PATH)   -c -o build/parser.o core/parser.cpp
 
 build/parsedCharInfo.o:core/parsedCharInfo.cpp core/parsedCharInfo.h core/util/charUtil.h
@@ -38,6 +38,9 @@ build/charUtil.o:core/util/charUtil.cpp  core/util/charUtil.h
 build/typeUtil.o:core/util/typeUtil.cpp  core/util/typeUtil.h
 	g++   $(COMPILE_OPT)   $(INC_PATH)   -c -o build/typeUtil.o  core/util/typeUtil.cpp
 
+
+build/enum2name.o:core/util/enum2name.cpp  core/util/enum2name.h
+	g++   $(COMPILE_OPT)   $(INC_PATH)   -c -o build/enum2name.o  core/util/enum2name.cpp
 
 #
 # Base Part
