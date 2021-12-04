@@ -1,5 +1,6 @@
 #include <cassert>
 #include <iostream>
+#include <iterator>
 #include "parserOptions.h"
 #include "tokenListAnalyzer.h"
 #include "parserException.h"
@@ -10,6 +11,7 @@ TokenListAnalyzer::TokenListAnalyzer()
 	, m_banPickCfgMap()
 	, m_evaluateSuffixExpression()
 	, m_operatorStack()
+	, m_lastSemicolonPosition(0)
 {
 	m_tokenList.clear();
 
@@ -216,6 +218,9 @@ int TokenListAnalyzer::pushToken(TokenInfo* pToken)
 
 	// tp == E_TOKEN_BLANK || tp == E_TOKEN_COMMENT_TYPE  is always valid no matter  previous token is which type
 	int ret = (curTp == E_TOKEN_SEMICOLON ? 1 : 0);
+	if ( ret == 1 ) {
+		m_lastSemicolonPosition = m_tokenList.size() - m_lastSemicolonPosition;
+	}
 	return ret;
 }
 
@@ -1052,9 +1057,12 @@ int  TokenListAnalyzer::evaluateExp()
 	auto flag = ParserOptions::getFlag();
 	expValidCheck();
 
+	auto it_beg =  m_evaluateSuffixExpression.begin();
+	std::advance(it_beg, m_lastSemicolonPosition);
+
 	if ( flag == 1 ) {
 		auto idx = 1;
-		for(auto it =  m_evaluateSuffixExpression.cbegin(); it!= m_evaluateSuffixExpression.cend(); ++it, ++idx )
+		for( auto it =  it_beg; it!= m_evaluateSuffixExpression.end(); ++it, ++idx )
 		{
 			auto pToken = *it;
 			if ( pToken != nullptr ) {
@@ -1071,6 +1079,21 @@ int  TokenListAnalyzer::evaluateExp()
 	}
 	
 	// TODO : ???
+	
+
+	/*
+
+	     0   1   2   3     4    5   6    7    8   9    10    11
+	     a   =   b   ;     b    =   c    ;    d   =    e      ;
+		             4                   8                   12
+
+		 1. pos = 4;
+		 2. pos = 8;
+	     
+	*/
+	// After Done , move iterator 
+	// m_lastSemicolonPosition = m_tokenList.size() - m_lastSemicolonPosition;
+	m_lastSemicolonPosition = static_cast<int>( m_tokenList.size() );
 
 	return 0;
 }

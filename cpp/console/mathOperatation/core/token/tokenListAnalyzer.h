@@ -27,6 +27,9 @@ protected:
 	std::list<TokenInfo*> m_evaluateSuffixExpression;
 	std::list< std::pair<TokenInfo*, OperatorBaseInfo*> > m_operatorStack;
 
+	int m_lastSemicolonPosition;
+
+
 	TokenInfo* getPreviousToken(bool needSkipBlankComment, int* pHasSkipBlankComment, bool needBack2LastButOne);
 	void judgeTokenIsPositiveOrNegativeAndReset(TokenInfo* pToken);
 	bool hasMatchedOpenParentheseBefore();
@@ -42,6 +45,8 @@ protected:
 
 	std::string  getTokenName(E_TokenType tp);
 	bool isOperatorType(E_TokenType tp);
+
+
 };
 
 #endif
