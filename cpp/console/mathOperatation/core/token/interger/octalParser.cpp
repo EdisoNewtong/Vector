@@ -48,6 +48,7 @@ void OctalParser::init() // override
 
 	m_tokenType = E_TOKEN_INTEGER_NUMBER;
 	m_tokenSubType = E_TOKEN_OCTAL_NUMBER;
+
     m_exceptionCode = E_OCT_INVALID_FORMAT;
 	m_parserName = "OctalParser";
 

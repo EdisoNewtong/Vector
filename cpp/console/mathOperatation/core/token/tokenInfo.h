@@ -16,17 +16,23 @@ public:
 	E_TokenType getSubType();
 	void        resetSubType(E_TokenType tp);
 
+
 	std::string getDetail();
 	void setDetail(const std::string& token);
 
 	void setPosInfo(const PosInfo& begPos, const PosInfo& endPos);
+
+	void setAsTmpMiddleExp();
+	bool isTmpMiddleExp();
 
 	const PosInfo& getBeginPos() const;
 	const PosInfo& getEndPos() const;
 protected:
 	E_TokenType m_type;
 	E_TokenType m_subType;
+	
 	std::string m_strSequence;
+	bool        m_isTmpMiddleExp;
 
 	PosInfo m_beginPos;
 	PosInfo m_endPos;

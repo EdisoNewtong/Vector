@@ -5,6 +5,7 @@ TokenInfo::TokenInfo(E_TokenType tp, E_TokenType subtype)
 	: m_type(tp)
 	, m_subType(subtype)
 	, m_strSequence("")
+	, m_isTmpMiddleExp(false)
 	, m_beginPos()
 	, m_endPos()
 {
@@ -64,4 +65,17 @@ const PosInfo& TokenInfo::getEndPos() const
 {
 	return m_endPos;
 }
+
+void TokenInfo::setAsTmpMiddleExp()
+{
+	m_isTmpMiddleExp = true;
+}
+
+
+bool TokenInfo::isTmpMiddleExp()
+{
+	return m_isTmpMiddleExp;
+}
+
+
 

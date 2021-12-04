@@ -19,8 +19,9 @@ public:
 
 	// util function
 	bool isFloatFamily();
-	bool isIntegerFamily();
 
+	bool isSmallIntegerType();
+	bool isIntegerFamily();
 protected:
 	unsigned int m_level;
 	size_t   m_bytes;
@@ -35,6 +36,7 @@ public:
 	static void init();
 	static void finalize();
 	static TypeBaseInfo* getTypeInfo(E_DataType dtype);
+	E_DataType doIntegerPromotion(E_DataType dtype, bool& changedFlag);
 protected:
 
 #ifdef USE_INT_INSTEAD_OF_ENUM

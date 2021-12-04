@@ -69,6 +69,12 @@ bool TypeBaseInfo::isIntegerFamily()
 	return m_type >= E_TP_U_CHAR && m_type <= E_TP_S_LONG_LONG;
 }
 
+bool TypeBaseInfo::isSmallIntegerType()
+{
+	return m_type >= E_TP_U_CHAR && m_type <= E_TP_S_SHORT;
+}
+
+
 
 
 
@@ -144,6 +150,34 @@ TypeBaseInfo* TypeUtil::getTypeInfo(E_DataType dtype)
 		return nullptr;
 	}
 }
+
+
+E_DataType TypeUtil::doIntegerPromotion(E_DataType oldtp, bool& changedFlag)
+{
+	auto pBaseInfo = getTypeInfo(oldtp);
+	if ( pBaseInfo == nullptr ) {
+		changedFlag = false;
+		return oldtp;
+	}
+
+	// pBaseInfo != nullptr
+	if ( pBaseInfo->isSmallIntegerType()  ) {
+		auto newtp = oldtp;
+		changedFlag = true;
+		if ( oldtp == E_TP_S_CHAR || oldtp == E_TP_S_SHORT ) {
+			newtp =  E_TP_S_INT; // signed int
+		} else {
+			// unsigned char /  unsigned short
+			newtp = E_TP_S_INT;
+		}
+		return newtp;
+	} else {
+		changedFlag = false;
+		return oldtp;
+	}
+
+}
+
 
 //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

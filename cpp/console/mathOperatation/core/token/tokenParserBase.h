@@ -50,7 +50,9 @@ public:
 
 	virtual void init();
 	virtual E_PaserType appendContent(ParsedCharInfo* pInfo);
+
 	virtual TokenInfo* generateToken();
+
 	virtual void reset();
 	virtual bool isEnd(ParsedCharInfo* pInfo);
 	virtual bool isTokenValid();

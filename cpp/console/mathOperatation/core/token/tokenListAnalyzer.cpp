@@ -12,6 +12,7 @@ TokenListAnalyzer::TokenListAnalyzer()
 	, m_banPickCfgMap()
 	, m_evaluateSuffixExpression()
 	, m_operatorStack()
+	, m_tmpMiddleValue()
 	, m_lastSemicolonPosition(0)
 {
 	m_tokenList.clear();
@@ -29,6 +30,15 @@ TokenListAnalyzer::~TokenListAnalyzer()
 		}
 	}
 	m_tokenList.clear();
+
+	// 
+	for( auto it = m_tmpMiddleValue.begin(); it != m_tmpMiddleValue.end(); ++it )
+	{
+		if ( *it != nullptr ) {
+			delete (*it);
+		}
+	}
+	m_tmpMiddleValue.clear();
 
 }
 
@@ -990,8 +1000,21 @@ int  TokenListAnalyzer::evaluateExp()
 				const auto& endPos = pToken->getEndPos();
 				cout << "[DEBUG] " << idx << ". '" << pToken->getDetail() << "'"
 					              << ", " <<  begPos.nLine << ":" << begPos.nCol
-								  << " ~ "<<  endPos.nLine << ":" << endPos.nCol
-								  << endl;
+								  << " ~ "<<  endPos.nLine << ":" << endPos.nCol;
+
+				auto subType = pToken->getSubType();
+				if (    subType == E_TOKEN_OP_POSITIVE 
+					 || subType == E_TOKEN_OP_ADD 
+					 || subType == E_TOKEN_OP_MINUS )
+				{
+					cout << " => '+' (Positive)";
+				} else if ( subType == E_TOKEN_OP_NEGATIVE ) {
+					cout << " => '-' (Negative)";
+				} else if ( subType == E_TOKEN_OP_ADD ) {
+					cout << " => '+' (Add)";
+				} else if ( subType == E_TOKEN_OP_MINUS ) {
+					cout << " => '-' (Minus)";
+				}
 			} else {
 				cout << "[ERROR] "<< idx << ". exp.element == nullptr" << endl;
 			}
@@ -1014,6 +1037,7 @@ int  TokenListAnalyzer::evaluateExp()
 	// After Done , move iterator 
 	// m_lastSemicolonPosition = m_tokenList.size() - m_lastSemicolonPosition;
 	// m_lastSemicolonPosition = static_cast<int>( m_tokenList.size() );
+
 
 	return 0;
 }
@@ -1230,5 +1254,153 @@ void TokenListAnalyzer::popUtilOpenParenthese()
 			}
 		}
 	}
+}
+
+void TokenListAnalyzer::generateTmpMiddleBinaryToken(TokenInfo* left, TokenInfo* op, TokenInfo* right)
+{
+	TokenInfo* tmpMiddleToken = nullptr;
+	auto subTp = op->getSubType();
+
+	switch( subTp )
+	{
+	case E_TOKEN_OP_ADD:
+		doAdd(left,right);
+		break;
+	case E_TOKEN_OP_MINUS:
+		doMinus(left,right);
+		break;
+	case E_TOKEN_OP_MULTIPLY:
+		doMultiply(left,right);
+		break;
+	case E_TOKEN_OP_DIVIDE:
+		doDivide(left,right);
+		break;
+	case E_TOKEN_OP_MOD:
+		doMod(left,right);
+		break;
+	case E_TOKEN_OP_BIT_AND:
+		doBitAnd(left,right);
+		break;
+	case E_TOKEN_OP_BIT_OR:
+		doBitOr(left,right);
+		break;
+	case E_TOKEN_OP_BIT_XOR:
+		doBitXor(left,right);
+		break;
+	case E_TOKEN_OP_BIT_LEFT_SHIFT:
+		doBitLeftShift(left,right);
+		break;
+	case E_TOKEN_OP_BIT_RIGHT_SHIFT:
+		doBitRightShift(left,right);
+		break;
+	case E_TOKEN_OP_ASSIGNMENT:
+		doAssignment(left,right);
+		break;
+	default:
+		break;
+	}
+
+	m_tmpMiddleValue.push_back( tmpMiddleToken );
+}
+
+void TokenListAnalyzer::generateTmpMiddleUnaryToken(TokenInfo* op, TokenInfo* right)
+{
+	TokenInfo* tmpMiddleToken = nullptr;
+	auto subTp = op->getSubType();
+
+	switch( subTp )
+	{
+	case E_TOKEN_OP_POSITIVE:
+		doPositive(right);
+		break;
+	case E_TOKEN_OP_NEGATIVE:
+		doNegative(right);
+		break;
+	case E_TOKEN_OP_BIT_NOT:
+		doBitNot(right);
+		break;
+	default:
+		break;
+	}
+
+	m_tmpMiddleValue.push_back( tmpMiddleToken );
+
+}
+
+
+
+
+/*
+     
+*/
+// a+b
+void TokenListAnalyzer::doAdd(TokenInfo* left,  TokenInfo* right)
+{
+	
+}
+
+// a-b
+void TokenListAnalyzer::doMinus(TokenInfo* left,  TokenInfo* right)
+{
+}
+
+// a*b
+void TokenListAnalyzer::doMultiply(TokenInfo* left,  TokenInfo* right)
+{
+}
+
+// a/b
+void TokenListAnalyzer::doDivide(TokenInfo* left,  TokenInfo* right)
+{
+}
+
+// a%b
+void TokenListAnalyzer::doMod(TokenInfo* left,  TokenInfo* right)
+{
+}
+
+// a&b
+void TokenListAnalyzer::doBitAnd(TokenInfo* left,  TokenInfo* right)
+{
+}
+
+// a|b
+void TokenListAnalyzer::doBitOr(TokenInfo* left,  TokenInfo* right)
+{
+}
+
+// a^b
+void TokenListAnalyzer::doBitXor(TokenInfo* left, TokenInfo* right)
+{
+}
+
+// a<<b
+void TokenListAnalyzer::doBitLeftShift(TokenInfo* left,  TokenInfo* right)
+{
+}
+
+// a>>b
+void TokenListAnalyzer::doBitRightShift(TokenInfo* left,  TokenInfo* right)
+{
+}
+
+// a=b
+void TokenListAnalyzer::doAssignment(TokenInfo* left,  TokenInfo* right)
+{
+}
+
+// (+a)
+void TokenListAnalyzer::doPositive(TokenInfo* token)
+{
+}
+
+// (-a)
+void TokenListAnalyzer::doNegative(TokenInfo* token)
+{
+}
+
+// ~a
+void TokenListAnalyzer::doBitNot(TokenInfo* token)
+{
 }
 
