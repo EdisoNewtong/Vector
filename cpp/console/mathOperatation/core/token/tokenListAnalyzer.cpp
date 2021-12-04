@@ -977,12 +977,12 @@ int  TokenListAnalyzer::evaluateExp()
 	auto flag = ParserOptions::getFlag();
 	expValidCheck();
 
-	auto it_beg =  m_tokenList.begin();
-	std::advance(it_beg, m_lastSemicolonPosition);
+	// auto it_beg =  m_tokenList.begin();
+	// std::advance(it_beg, m_lastSemicolonPosition);
 
 	if ( flag == 1 ) {
 		auto idx = 1;
-		for( auto it =  it_beg; it!= m_evaluateSuffixExpression.end(); ++it, ++idx )
+		for( auto it =  m_evaluateSuffixExpression.begin(); it!= m_evaluateSuffixExpression.end(); ++it, ++idx )
 		{
 			auto pToken = *it;
 			if ( pToken != nullptr ) {
@@ -1013,7 +1013,7 @@ int  TokenListAnalyzer::evaluateExp()
 	*/
 	// After Done , move iterator 
 	// m_lastSemicolonPosition = m_tokenList.size() - m_lastSemicolonPosition;
-	m_lastSemicolonPosition = static_cast<int>( m_tokenList.size() );
+	// m_lastSemicolonPosition = static_cast<int>( m_tokenList.size() );
 
 	return 0;
 }
