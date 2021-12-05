@@ -1102,15 +1102,13 @@ void TokenListAnalyzer::tryPopPreviousOperatorLowerPriority(TokenInfo* pCurrentT
 				//
 				// Try to find the 1st operator whose priority is 
 				//
-				auto hasProcessed = false;
 				for ( auto rit = m_operatorStack.rbegin(); rit != m_operatorStack.rend(); )
 				{
 					auto pritToken = rit->first;
 					auto pOperBaseInfo = rit->second;
 					if ( pritToken->getSubType() == E_TOKEN_OP_OPEN_PARENTHESES ) {
-						// Special , core core core   : '('
-						hasProcessed = true;
-						m_operatorStack.push_back( make_pair(pCurrentToken, pCurrentOperInfo) );
+						// Special , core core core   : '(' 
+						//     =>  then break
 						break;
 					} else {
 						auto lastPri = pOperBaseInfo->getPriority();
@@ -1129,8 +1127,6 @@ void TokenListAnalyzer::tryPopPreviousOperatorLowerPriority(TokenInfo* pCurrentT
 								m_evaluateSuffixExpression.push_back( pritToken ); // push erased element from  m_operatorStack
 							} else {
 								// from Right 2 Left
-								hasProcessed = true;
-								m_operatorStack.push_back( make_pair(pCurrentToken,pCurrentOperInfo)  );
 								break;
 							}
 							//
@@ -1142,9 +1138,7 @@ void TokenListAnalyzer::tryPopPreviousOperatorLowerPriority(TokenInfo* pCurrentT
 					}
 				}
 
-				if ( !hasProcessed ) {
-					m_operatorStack.push_back( make_pair(pCurrentToken,pCurrentOperInfo)  );
-				}
+				m_operatorStack.push_back( make_pair(pCurrentToken,pCurrentOperInfo)  );
 			}
 		}
 	}
