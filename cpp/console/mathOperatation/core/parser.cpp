@@ -102,7 +102,7 @@ int Parser::doParse()
 		auto nextParserType = m_currentParser->appendContent(&m_pInfo);
 		if ( nextParserType != m_currentPaserType ) {
 			if ( argsDbgOption >= 2 ) {
-				cout << "[Changed] : " << Enum2Name::getParserName(m_currentPaserType) << " -> " << Enum2Name::getParserName(nextParserType) << " , " <<  m_pInfo.position.getLineInfo() << endl;
+				cout << "[Changed] : " << Enum2Name::getParserName(m_currentPaserType) << " -> " << Enum2Name::getParserName(nextParserType) << " , " <<  m_pInfo.position.getPosStr() << endl;
 			}
 
 			auto pushRet = 0;
@@ -133,7 +133,7 @@ int Parser::doParse()
 						// Core return to default Parser
 						pushRet = m_TokenListAnalyzer.pushToken( newParser->generateToken() );
 						if ( argsDbgOption >= 2 ) {
-							cout << "  [Inner Changed] : " << Enum2Name::getParserName(nextParserType2) << " -> " << Enum2Name::getParserName(E_P_DEFAULT) << " , " <<  m_pInfo.position.getLineInfo() << endl;
+							cout << "  [Inner Changed] : " << Enum2Name::getParserName(nextParserType2) << " -> " << Enum2Name::getParserName(E_P_DEFAULT) << " , " <<  m_pInfo.position.getPosStr() << endl;
 						}
 						nextParserType = E_P_DEFAULT;
 					} else {
@@ -152,7 +152,7 @@ int Parser::doParse()
 						// Core return to default Parser
 						pushRet = m_TokenListAnalyzer.pushToken( newParser->generateToken() );
 						if (  argsDbgOption >= 2 ) {
-							cout << "  [Inner Changed] : " <<  Enum2Name::getParserName(nextParserType) << " -> " << Enum2Name::getParserName(E_P_DEFAULT) << " , " <<  m_pInfo.position.getLineInfo() << endl;
+							cout << "  [Inner Changed] : " <<  Enum2Name::getParserName(nextParserType) << " -> " << Enum2Name::getParserName(E_P_DEFAULT) << " , " <<  m_pInfo.position.getPosStr() << endl;
 						}
 						nextParserType = E_P_DEFAULT;
 					} 

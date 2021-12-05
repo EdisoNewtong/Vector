@@ -189,12 +189,7 @@ string TokenParserBase::genPositionCharStr(ParsedCharInfo* pInfo)
 		retstr += "@";
 		retstr += m_parserName;
 		retstr += " , ";
-		retstr += "@";
-		retstr += to_string(pInfo->position.nLine);
-		retstr += ":";
-		retstr += to_string(pInfo->position.nCol);
-		retstr += ", charIdx = ";
-		retstr += to_string( static_cast<int>(pInfo->position.nCharIdx) );
+		retstr += pInfo->position.getPosStr();
 		retstr += ", retCh = ";
 
 		//

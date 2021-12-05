@@ -3,14 +3,19 @@
 using namespace std;
 
 
-std::string PosInfo::getLineInfo()
+string PosInfo::getPosStr(int withCharIdx /* = 1 */) const
 {
 	string s("@");
 	s += to_string(nLine);
 	s += ":";
 	s += to_string(nCol);
+
+	if ( withCharIdx == 1 ) {
+		s += ", charIdx = ";
+		s += to_string( static_cast<int>(nCharIdx) );
+	}
+
 	s += " ";
-	s += to_string(nCharIdx);
 	return s;
 }
 

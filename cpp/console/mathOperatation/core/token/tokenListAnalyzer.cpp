@@ -128,12 +128,7 @@ int TokenListAnalyzer::pushToken(TokenInfo* pToken)
 				if ( banPickFlag == 0 ) {
 					// Not Allowed at all
 					string detail;
-					detail += "@";
-					detail += to_string(endPos.nLine);
-					detail += ":";
-					detail += to_string(endPos.nCol);
-					detail += ", charIdx = ";
-					detail += to_string( static_cast<int>(endPos.nCharIdx) );
+					detail += endPos.getPosStr();
 					detail += ", ";
 					detail +=   (previousTokenType 
 								  + SC_LEFT + previousValidToken->getDetail() + SC_RIGHT 
@@ -153,12 +148,7 @@ int TokenListAnalyzer::pushToken(TokenInfo* pToken)
 						// continuously token next to previous is not valid
 						// auto detail = previousTokenType + string(" Can't located <No-Skip> in front of Type   ") + curTokenType;
 						string detail;
-						detail += "@";
-						detail += to_string(endPos.nLine);
-						detail += ":";
-						detail += to_string(endPos.nCol);
-						detail += ", charIdx = ";
-						detail += to_string( static_cast<int>(endPos.nCharIdx) );
+						detail += endPos.getPosStr();
 						detail += ", ";
 						detail +=  (previousTokenType 
 									 + SC_LEFT + previousValidToken->getDetail() + SC_RIGHT 
@@ -210,12 +200,7 @@ int TokenListAnalyzer::pushToken(TokenInfo* pToken)
 				ParserException e(E_TOKEN_LOGIC_INVALID);
 
 				string detail;
-				detail += "@";
-				detail += to_string(endPos.nLine);
-				detail += ":";
-				detail += to_string(endPos.nCol);
-				detail += ", charIdx = ";
-				detail += to_string( static_cast<int>(endPos.nCharIdx) );
+				detail += endPos.getPosStr();
 				detail += ", ";
 				detail += (curTokenType 
 							+ SC_LEFT + pToken->getDetail() + SC_RIGHT 
@@ -999,8 +984,8 @@ int  TokenListAnalyzer::evaluateExp()
 				const auto& begPos = pToken->getBeginPos();
 				const auto& endPos = pToken->getEndPos();
 				cout << "[DEBUG] " << idx << ". '" << pToken->getDetail() << "'"
-					              << ", " <<  begPos.nLine << ":" << begPos.nCol
-								  << " ~ "<<  endPos.nLine << ":" << endPos.nCol;
+					               << ", " <<  begPos.getPosStr(0)
+								   << " ~ "<<  endPos.getPosStr(0);
 
 				auto subType = pToken->getSubType();
 				if (    subType == E_TOKEN_OP_POSITIVE 

@@ -11,7 +11,8 @@ struct PosInfo
 	int  nCol;
 
 	size_t nCharIdx;
-	std::string getLineInfo();
+
+	std::string getPosStr(int withCharIdx = 1) const;
 };
 
 struct ParsedCharInfo

@@ -40,48 +40,6 @@ ParserException::ParserException(const  ParserException& r)
 
 void ParserException::setDetail(const string& detail)
 {
-/*
-
-string info;
-if ( ch >= 0 ) {
-	// < 32
-	if ( ch < 32 ) {
-		if ( ch == '\t' ) {
-			info += "'\\t'";
-		} else if ( ch == '\r' ) {
-			info += "'\\r'";
-		} else if ( ch == '\n' ) {
-			info += "'\\n'";
-		} else {
-			info += " ? , code = ";  
-			info += std::to_string( static_cast<int>(ch & 0xFFU) );
-		}
-	} else {
-		if ( ch == 32 ) {
-			info += "' '";
-		} else {
-			info += "'";
-			info += ch;
-			info += "'";
-		}
-	}
-} else {
-	// < 0
-	info += " ? , code = ";  
-	info += std::to_string( static_cast<int>(ch & 0xFFU) );
-}
-
-info += "  | index = ";
-info += std::to_string(pInfo->position.nCharIdx);
-info += " @Line ";
-info += std::to_string(pInfo->position.nLine);
-info += ":";
-info += std::to_string(pInfo->position.nCol);
-
-e.setDetail(info);
-
-
-*/
 	m_exceptionDetail = detail;
 }
 
