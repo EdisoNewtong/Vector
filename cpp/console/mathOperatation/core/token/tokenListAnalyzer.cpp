@@ -1088,6 +1088,7 @@ void TokenListAnalyzer::tryPopPreviousOperatorLowerPriority(TokenInfo* pCurrentT
 	auto pLastOperInfo = pr.second;
 
 	auto lastOperPriority = pLastOperInfo->getPriority();
+
 	auto currentOpPriority = pCurrentOperInfo->getPriority();
 	auto currentOpIsLeft2Right = pCurrentOperInfo->isLeft2Right();
 
@@ -1095,29 +1096,35 @@ void TokenListAnalyzer::tryPopPreviousOperatorLowerPriority(TokenInfo* pCurrentT
 		// Special operator '('
 		m_operatorStack.push_back( make_pair(pCurrentToken, pCurrentOperInfo) );
 	} else {
-		// != '('
-		if ( lastOperPriority > currentOpPriority ) {
+		//   currentOp  !=  '('
+		if ( currentOpPriority < lastOperPriority ) {
 			m_operatorStack.push_back( make_pair(pCurrentToken, pCurrentOperInfo) );
-		} else if ( lastOperPriority == currentOpPriority ) {
+		} else if ( currentOpPriority == lastOperPriority ) {
 			if ( currentOpIsLeft2Right ) {
 				m_evaluateSuffixExpression.push_back( pLastToken );
 
 				m_operatorStack.pop_back();
 				m_operatorStack.push_back( make_pair(pCurrentToken, pCurrentOperInfo) );
 			} else {
+				// from Right 2 Left
 				m_operatorStack.push_back( make_pair(pCurrentToken, pCurrentOperInfo) );
 			}
 		} else {
-			// lastOperPriority < currentOpPriority 
+			// currentOpPriority > lastOperPriority 
 			if ( pLastToken->getSubType() == E_TOKEN_OP_OPEN_PARENTHESES ) {
 				m_operatorStack.push_back( make_pair(pCurrentToken, pCurrentOperInfo) );
 			} else {
+				//
+				// Try to find the 1st operator whose priority is 
+				//
+				auto hasProcessed = false;
 				for ( auto rit = m_operatorStack.rbegin(); rit != m_operatorStack.rend(); )
 				{
 					auto pritToken = rit->first;
 					auto pOperBaseInfo = rit->second;
 					if ( pritToken->getSubType() == E_TOKEN_OP_OPEN_PARENTHESES ) {
 						// Special , core core core   : '('
+						hasProcessed = true;
 						m_operatorStack.push_back( make_pair(pCurrentToken, pCurrentOperInfo) );
 						break;
 					} else {
@@ -1129,17 +1136,17 @@ void TokenListAnalyzer::tryPopPreviousOperatorLowerPriority(TokenInfo* pCurrentT
 							// move stack top into Suffix-Exp-List
 							m_operatorStack.erase( (++rit).base() );
 							m_evaluateSuffixExpression.push_back( pritToken );
-							m_operatorStack.push_back( make_pair(pCurrentToken,pCurrentOperInfo)  );
 						} else if ( lastPri == currentOpPriority ) {
 							///////////////////////////////////////////////////////////
 							//
 							if ( currentOpIsLeft2Right ) {
 								m_operatorStack.erase( (++rit).base() );
 								m_evaluateSuffixExpression.push_back( pritToken ); // push erased element from  m_operatorStack
-								m_operatorStack.push_back( make_pair(pCurrentToken,pCurrentOperInfo)  );
 							} else {
+								// from Right 2 Left
+								hasProcessed = true;
 								m_operatorStack.push_back( make_pair(pCurrentToken,pCurrentOperInfo)  );
-								// m_evaluateSuffixExpression.push_back( pCurrentToken );
+								break;
 							}
 							//
 							///////////////////////////////////////////////////////////
@@ -1148,6 +1155,10 @@ void TokenListAnalyzer::tryPopPreviousOperatorLowerPriority(TokenInfo* pCurrentT
 							break;
 						}
 					}
+				}
+
+				if ( !hasProcessed ) {
+					m_operatorStack.push_back( make_pair(pCurrentToken,pCurrentOperInfo)  );
 				}
 			}
 		}
