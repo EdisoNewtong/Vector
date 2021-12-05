@@ -317,7 +317,7 @@ void CharUtil::init()
 
 	// +a
 	meta = OperatorBaseInfo::S_Right2Left_FLAG | OperatorBaseInfo::S_UNARY_OP_FLAG | 3U;
-	OperatorBaseInfo* positiveOpInfo = new OperatorBaseInfo('+' , 0);
+	OperatorBaseInfo* positiveOpInfo = new OperatorBaseInfo('+' , meta);
 	CharUtil::s_positiveCharInfo = new CharBaseInfo('+', positiveOpInfo);
 
 	// -a

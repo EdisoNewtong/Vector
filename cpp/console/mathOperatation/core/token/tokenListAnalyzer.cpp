@@ -1015,6 +1015,7 @@ int  TokenListAnalyzer::evaluateExp()
 				} else if ( subType == E_TOKEN_OP_MINUS ) {
 					cout << " => '-' (Minus)";
 				}
+				cout << endl;
 			} else {
 				cout << "[ERROR] "<< idx << ". exp.element == nullptr" << endl;
 			}
@@ -1128,6 +1129,7 @@ void TokenListAnalyzer::tryPopPreviousOperatorLowerPriority(TokenInfo* pCurrentT
 							// move stack top into Suffix-Exp-List
 							m_operatorStack.erase( (++rit).base() );
 							m_evaluateSuffixExpression.push_back( pritToken );
+							m_operatorStack.push_back( make_pair(pCurrentToken,pCurrentOperInfo)  );
 						} else if ( lastPri == currentOpPriority ) {
 							///////////////////////////////////////////////////////////
 							//
