@@ -394,3 +394,12 @@ e.g.
       /*    GET_OPCODE(*previous)                                                       */
       if ( (((OpCode)(((*previous)>>0) & ((~((~(Instruction)0)<<6))<<0)))) == OP_LOADNIL ) {
 
+
+
+==================================================
+| save_and_next(ls); |
+==================================================
+#define save_and_next(ls) (save(ls, ls->current), next(ls))                       // llex.c:48
+#define next(ls) (ls->current = zgetc(ls->z))                                     // llex.c:28
+#define zgetc(z)  (((z)->n--)>0 ?  char2int(*(z)->p++) : luaZ_fill(z))            // lzio.h:22
+#define char2int(c)	cast(int, cast(unsigned char, (c)))                           // lzio.h:20
