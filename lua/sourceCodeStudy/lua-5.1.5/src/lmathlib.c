@@ -147,13 +147,13 @@ static int math_exp (lua_State *L) {
 
 
 static int math_deg (lua_State *L) {
-  lua_pushnumber(L, luaL_checknumber(L, 1)/((3.14159265358979323846)/180.0));
+  lua_pushnumber(L, luaL_checknumber(L, 1) / RADIANS_PER_DEGREE );
   return 1;
 }
 
 
 static int math_rad (lua_State *L) {
-  lua_pushnumber(L, luaL_checknumber(L, 1)*((3.14159265358979323846)/180.0));
+  lua_pushnumber(L, luaL_checknumber(L, 1) * RADIANS_PER_DEGREE );
   return 1;
 }
 
@@ -167,6 +167,7 @@ static int math_frexp (lua_State *L) {
 
 
 static int math_ldexp (lua_State *L) {
+  /*                                                    luaL_checkint(L, 2)))          */
   lua_pushnumber(L, ldexp(luaL_checknumber(L, 1), ((int)luaL_checkinteger(L, (2)))));
   return 1;
 }
@@ -205,7 +206,8 @@ static int math_max (lua_State *L) {
 static int math_random (lua_State *L) {
   /* the `%' avoids the (rare) case of r==1, and is needed also because on
      some systems (SunOS!) `rand()' may return a value larger than RAND_MAX */
-  lua_Number r = (lua_Number)(rand()%2147483647) / (lua_Number)2147483647;
+  /*                                   RAND_MAX    2147483647             */
+  lua_Number r = (lua_Number)(rand() % RAND_MAX ) / (lua_Number)RAND_MAX;
   switch (lua_gettop(L)) { /* check number of arguments */
     case 0: { /* no arguments */
       lua_pushnumber(L, r); /* Number between 0 and 1 */
@@ -213,14 +215,18 @@ static int math_random (lua_State *L) {
     }
     case 1: { /* only upper limit */
       int u = ((int)luaL_checkinteger(L, (1)));
-      ((void)((1<=u) || luaL_argerror(L, (1), ("interval is empty"))));
+      /* luaL_argcheck(L, 1<=u, 1, "interval is empty"); */
+      ( (void)( (1<=u) || luaL_argerror(L, 1, "interval is empty") ) );
       lua_pushnumber(L, floor(r*u)+1); /* int between 1 and `u' */
       break;
     }
     case 2: { /* lower and upper limits */
-      int l = ((int)luaL_checkinteger(L, (1)));
-      int u = ((int)luaL_checkinteger(L, (2)));
-      ((void)((l<=u) || luaL_argerror(L, (2), ("interval is empty"))));
+      /*            luaL_checkint(L, 1);    */
+      int l = ((int)luaL_checkinteger(L, 1));
+      /*            luaL_checkint(L, 2);    */
+      int u = ((int)luaL_checkinteger(L, 2));
+      /* luaL_argcheck(L, l<=u, 2, "interval is empty"); */
+      ( (void)( (l<=u) || luaL_argerror(L, 2, "interval is empty") ) );
       lua_pushnumber(L, floor(r*(u-l+1))+l); /* int between `l' and `u' */
       break;
     }
@@ -233,7 +239,8 @@ static int math_random (lua_State *L) {
 
 
 static int math_randomseed (lua_State *L) {
-  srand(((int)luaL_checkinteger(L, (1))));
+  /*     luaL_checkint(L, 1)             */
+  srand( (int)luaL_checkinteger(L, 1) );
   return 0;
 }
 
@@ -267,7 +274,7 @@ static const luaL_Reg mathlib[] = {
   {"sqrt", math_sqrt},
   {"tanh", math_tanh},
   {"tan", math_tan},
-  {((void *)0), ((void *)0)}
+  { NULL, NULL }
 };
 
 
@@ -275,13 +282,18 @@ static const luaL_Reg mathlib[] = {
 ** Open math library
 */
 extern int luaopen_math (lua_State *L) {
+  /*               LUA_MATHLIBNAME   "math"   */
   luaL_register(L, "math", mathlib);
-  lua_pushnumber(L, (3.14159265358979323846));
+  lua_pushnumber(L, PI);
   lua_setfield(L, -2, "pi");
-  lua_pushnumber(L, (__builtin_huge_val()));
+  /*                HUGE_VAL (__builtin_huge_val()) */
+  lua_pushnumber(L, HUGE_VAL);
   lua_setfield(L, -2, "huge");
+
+#if defined(LUA_COMPAT_MOD)
   lua_getfield(L, -1, "fmod");
   lua_setfield(L, -2, "mod");
+#endif
   return 1;
 }
 
