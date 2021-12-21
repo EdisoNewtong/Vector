@@ -41,7 +41,8 @@ int luaO_int2fb (unsigned int x) {
   if (x < 8) {
     return x;
   } else {
-    return ((e+1) << 3) | (((int)((x))) - 8);
+	/* ((int)((x))) */
+    return ((e+1) << 3) | (cast_int(x) - 8);
   }
 }
 
@@ -79,26 +80,32 @@ int luaO_log2 (unsigned int x) {
 
 
 int luaO_rawequalObj (const TValue *t1, const TValue *t2) {
-  if (((t1)->tt) != ((t2)->tt)) {
+  /* ( t1->tt   != t2->tt   ) */
+  if (ttype(t1) != ttype(t2)) { 
       return 0;
   } else {
-    switch (((t1)->tt))
+    switch (ttype(t1))
     {
-      case 0: {
+      case LUA_TNIL: {
         return 1;
       }
-      case 3: {
-        return ((((t1)->value.n))==(((t2)->value.n)));
+      case LUA_TNUMBER: {
+        /*                t1->value.n == t2->value.n; */
+        return luai_numeq(nvalue(t1), nvalue(t2));
       }
-      case 1: {
-        return ((t1)->value.b) == ((t2)->value.b); /* boolean true must be 1 !! */
+      case LUA_TBOOLEAN: {
+        /*     ((t1)->value.b) == ((t2)->value.b);   */
+        return bvalue(t1) == bvalue(t2);   /* boolean true must be 1 !! */
       }
-      case 2: {
-        return ((t1)->value.p) == ((t2)->value.p);
+      case LUA_TLIGHTUSERDATA: {
+        /*    t1->value.p == t2->value.p; */
+        return pvalue(t1) == pvalue(t2);
       }
       default: {
+        /* lua_assert(iscollectable(t1)); */
         ((void)0);
-        return ((t1)->value.gc) == ((t2)->value.gc);
+        /*    t1->value.gc == t2->value.gc; */
+        return gcvalue(t1) == gcvalue(t2);
       }
     }
   }
@@ -107,17 +114,19 @@ int luaO_rawequalObj (const TValue *t1, const TValue *t2) {
 
 int luaO_str2d (const char *s, lua_Number *result) {
   char *endptr;
-  *result = strtod((s), (&endptr));
+  /*        strtod((s), (&endptr)); */
+  *result = lua_str2number(s, &endptr);
   if (endptr == s) {
     return 0; /* conversion failed */
   }
   if (*endptr == 'x' || *endptr == 'X') { /* maybe an hexadecimal constant? */
-    *result = ((lua_Number)((strtoul(s, &endptr, 16))));
+    /*        (lua_Number)( strtoul(s, &endptr, 16) );   */
+    *result = cast_num(strtoul(s, &endptr, 16));
   }
   if (*endptr == '\0') {
     return 1; /* most common case */
   }
-  while (((*__ctype_b_loc ())[(int) ((((unsigned char)(*endptr))))] & (unsigned short int) _ISspace)) {
+  while (isspace( cast(unsigned char, *endptr) ) ) {
     endptr++;
   }
   if (*endptr != '\0') {
@@ -128,8 +137,23 @@ int luaO_str2d (const char *s, lua_Number *result) {
 
 
 static void pushstr (lua_State *L, const char *str) {
-  { TValue *i_o=(L->top); i_o->value.gc=((GCObject *)(((luaS_newlstr(L, str, strlen(str)))))); i_o->tt=4; ((void)0); };
-  {if ((char *)L->stack_last - (char *)L->top <= (1)*(int)sizeof(TValue)) luaD_growstack(L, 1); else ((void)0);; L->top++;};
+  /* setsvalue2s(L, L->top, luaS_new(L, str)); */
+  { 
+       TValue *i_o = L->top; 
+       i_o->value.gc = (GCObject *)( luaS_newlstr(L, str, strlen(str)) ); 
+       i_o->tt = LUA_TSTRING; 
+       ((void)0); 
+  }; 
+
+  /* incr_top(L); */
+  {
+      if ((char *)L->stack_last - (char *)L->top <= (1)*(int)sizeof(TValue)) { 
+          luaD_growstack(L, 1);
+      } else { 
+          ((void)0);;
+      }
+      L->top++;
+  };
 }
 
 
@@ -139,15 +163,32 @@ const char *luaO_pushvfstring (lua_State *L, const char *fmt, va_list argp) {
   pushstr(L, "");
   for (;;) {
     const char *e = strchr(fmt, '%');
-    if (e == ((void *)0)) {
+    if (e == NULL) {
       break;
     }
-    { TValue *i_o=(L->top); i_o->value.gc=((GCObject *)((luaS_newlstr(L, fmt, e-fmt)))); i_o->tt=4; ((void)0); };
-    {if ((char *)L->stack_last - (char *)L->top <= (1)*(int)sizeof(TValue)) luaD_growstack(L, 1); else ((void)0);; L->top++;};
+
+    /* setsvalue2s(L, L->top, luaS_newlstr(L, fmt, e-fmt)); */
+    { 
+        TValue *i_o = L->top; 
+        i_o->value.gc = (GCObject *)( luaS_newlstr(L, fmt, e-fmt) ); 
+        i_o->tt = LUA_TSTRING; 
+        ((void)0); 
+    };
+
+    /* incr_top(L); */
+    {
+        if ((char *)L->stack_last - (char *)L->top <= (1)*(int)sizeof(TValue)) { 
+            luaD_growstack(L, 1); 
+        } else { 
+            ((void)0);; 
+        }
+        L->top++;
+    };
+
     switch (*(e+1)) {
       case 's': {
-        const char *s = __builtin_va_arg(argp,char *);
-        if (s == ((void *)0)) {
+        const char *s = va_arg(argp, char *);
+        if (s == NULL) {
           s = "(null)";
         }
         pushstr(L, s);
@@ -155,24 +196,54 @@ const char *luaO_pushvfstring (lua_State *L, const char *fmt, va_list argp) {
       }
       case 'c': {
         char buff[2];
-        buff[0] = ((char)(__builtin_va_arg(argp,int)));
+        buff[0] = cast(char, va_arg(argp, int));
         buff[1] = '\0';
         pushstr(L, buff);
         break;
       }
       case 'd': {
-        { TValue *i_o=(L->top); i_o->value.n=(((lua_Number)((__builtin_va_arg(argp,int))))); i_o->tt=3; };
-        {if ((char *)L->stack_last - (char *)L->top <= (1)*(int)sizeof(TValue)) luaD_growstack(L, 1); else ((void)0);; L->top++;};
+        /* setnvalue(L->top, cast_num(va_arg(argp, int))); */
+        { 
+            TValue *i_o = L->top; 
+            i_o->value.n = (lua_Number)(va_arg(argp, int));
+            i_o->tt = LUA_TNUMBER; 
+        };
+
+        /* incr_top(L); */
+        {
+            if ((char *)L->stack_last - (char *)L->top <= (1)*(int)sizeof(TValue)) { 
+                luaD_growstack(L, 1); 
+            } else { 
+                ((void)0);; 
+            }
+            L->top++;
+        };
         break;
       }
       case 'f': {
-        { TValue *i_o=(L->top); i_o->value.n=(((lua_Number)((__builtin_va_arg(argp,l_uacNumber))))); i_o->tt=3; };
-        {if ((char *)L->stack_last - (char *)L->top <= (1)*(int)sizeof(TValue)) luaD_growstack(L, 1); else ((void)0);; L->top++;};
+        /* setnvalue(L->top, cast_num(va_arg(argp, l_uacNumber))); */
+        { 
+            TValue *i_o = L->top; 
+            /* typedef LUAI_UACNUMBER l_uacNumber; */
+            /* #define LUAI_UACNUMBER	double */
+            i_o->value.n = cast_num( va_arg(argp, l_uacNumber) );
+            i_o->tt = LUA_TNUMBER; 
+        };
+
+        /* incr_top(L); */
+        {
+            if ((char *)L->stack_last - (char *)L->top <= (1)*(int)sizeof(TValue)) { 
+                luaD_growstack(L, 1); 
+            } else { 
+                ((void)0);; 
+            }
+            L->top++;
+        };
         break;
       }
       case 'p': {
         char buff[4*sizeof(void *) + 8]; /* should be enough space for a `%p' */
-        sprintf(buff, "%p", __builtin_va_arg(argp,void *));
+        sprintf(buff, "%p", va_arg(argp, void *));
         pushstr(L, buff);
         break;
       }
@@ -193,8 +264,10 @@ const char *luaO_pushvfstring (lua_State *L, const char *fmt, va_list argp) {
     fmt = e+2;
   }
   pushstr(L, fmt);
-  luaV_concat(L, n+1, ((int)((L->top - L->base))) - 1);
+  /*                   cast_int(L->top - L->base)     */
+  luaV_concat(L, n+1, (int)(L->top - L->base) - 1);
   L->top -= n;
+  /*      svalue(L->top - 1); */
   return ((const char *)(((&(L->top - 1)->value.gc->ts)) + 1));
 }
 
@@ -202,9 +275,9 @@ const char *luaO_pushvfstring (lua_State *L, const char *fmt, va_list argp) {
 const char *luaO_pushfstring (lua_State *L, const char *fmt, ...) {
   const char *msg;
   va_list argp;
-  __builtin_va_start(argp,fmt);
+  va_start(argp, fmt);
   msg = luaO_pushvfstring(L, fmt, argp);
-  __builtin_va_end(argp);
+  va_end(argp);
   return msg;
 }
 
