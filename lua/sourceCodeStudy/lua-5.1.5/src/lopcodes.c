@@ -13,7 +13,8 @@
 
 /* ORDER OP */
 
-const char *const luaP_opnames[(((int)(OP_VARARG)) + 1)+1] = {
+/*                             NUM_OPCODES       (((int)(OP_VARARG)) + 1)     */
+const char *const luaP_opnames[NUM_OPCODES+1] = {
   "MOVE",
   "LOADK",
   "LOADBOOL",
@@ -52,7 +53,7 @@ const char *const luaP_opnames[(((int)(OP_VARARG)) + 1)+1] = {
   "CLOSE",
   "CLOSURE",
   "VARARG",
-  ((void *)0)
+  NULL
 };
 
 
