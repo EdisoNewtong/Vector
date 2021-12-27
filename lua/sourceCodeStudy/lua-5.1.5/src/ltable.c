@@ -586,15 +586,8 @@ static TValue *newkey (lua_State *L, Table *t, const TValue *key) {
   }
   /* gkey(mp)->value       = key->value;          gkey(mp)->tt = key->tt; */
   (&(mp)->i_key.nk)->value = key->value; (&(mp)->i_key.nk)->tt = key->tt;
-  /* luaC_barriert(L, t, key); */
-  /* { if (((((key)->tt) >= 4) && (((((key)->value.gc))->gch.marked) & ((((1<<(0)) | (1<<(1))))))) && ((((((GCObject *)((t)))))->gch.marked) & ((1<<(2))))) luaC_barrierback(L,t); }; */
-  // { 
-  //     if ( ( (((key)->tt) >= 4) && (((((key)->value.gc))->gch.marked) & ((((1<<(0)) | (1<<(1)))))) ) 
-  //     		&& ((((((GCObject *)((t)))))->gch.marked) & ((1<<(2))))) { 
-  //     	luaC_barrierback(L,t); 
-  //   } 
-  // };
 
+  /* luaC_barriert(L, t, key); */
   { 
     if (
             ( (key->tt >= LUA_TSTRING) && ( (key->value.gc->gch.marked) & ( (1<<0) | (1<<1) ) ) ) 
