@@ -107,7 +107,7 @@ TString *luaS_newlstr (lua_State *L, const char *str, size_t l) {
     h = h ^ ( (h<<5) + (h>>2) + (unsigned char)(str[l1-1]) );
   }
   /*        G(L)                 lmod(h,  G(L)->strt.size)*/
-  for (o = (L->l_G)->strt.hash[ (int)(h & L->l_G->strt.size-1) ];
+  for (o = (L->l_G)->strt.hash[ (int)(h & (L->l_G->strt.size-1)) ];
        o != NULL;
        o = o->gch.next) {
     /*            rawgco2ts(o); */
