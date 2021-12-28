@@ -48,14 +48,18 @@ typedef struct {
 static void LoadBlock(LoadState* S, void* b, size_t size)
 {
   size_t r = luaZ_read(S->Z,b,size);
-  if (r!=0) error(S,"unexpected end");
+  /* IF (r!=0, "unexpected end"); */
+  if (r!=0) { 
+    error(S,"unexpected end");
+  }
 }
 
 
 static int LoadChar(LoadState* S)
 {
   char x;
-  LoadBlock(S,&x,(1)*(sizeof(x)));
+  /* LoadVar(S,x); */
+  LoadBlock(S, &x, 1 * sizeof(x) );
   return x;
 }
 
@@ -63,8 +67,12 @@ static int LoadChar(LoadState* S)
 static int LoadInt(LoadState* S)
 {
   int x;
-  LoadBlock(S,&x,(1)*(sizeof(x)));
-  if (x<0) error(S,"bad integer");
+  /* LoadVar(S,x); */
+  LoadBlock(S, &x, 1 * sizeof(x) );
+  /* IF (x<0, "bad integer"); */
+  if (x<0) { 
+    error(S,"bad integer");
+  }
   return x;
 }
 
@@ -72,7 +80,8 @@ static int LoadInt(LoadState* S)
 static lua_Number LoadNumber(LoadState* S)
 {
   lua_Number x;
-  LoadBlock(S,&x,(1)*(sizeof(x)));
+  /* LoadVar(S,x); */
+  LoadBlock(S, &x, 1 *sizeof(x) );
   return x;
 }
 
@@ -80,9 +89,10 @@ static lua_Number LoadNumber(LoadState* S)
 static TString* LoadString(LoadState* S)
 {
   size_t size;
-  LoadBlock(S,&size,(1)*(sizeof(size)));
+  /* LoadVar(S,size); */
+  LoadBlock(S, &size, 1 * sizeof(size) );
   if (size==0) {
-    return ((void *)0);
+    return NULL;
   } else {
     char* s=luaZ_openspace(S->L,S->b,size);
     LoadBlock(S,s,size);
@@ -94,9 +104,14 @@ static TString* LoadString(LoadState* S)
 static void LoadCode(LoadState* S, Proto* f)
 {
   int n=LoadInt(S);
-  f->code=((Instruction *)(((((size_t)((n)+1)) <= ((size_t)(~(size_t)0)-2)/(sizeof(Instruction))) ? luaM_realloc_(S->L, (((void *)0)), (0)*(sizeof(Instruction)), (n)*(sizeof(Instruction))) : luaM_toobig(S->L))));
+  /*        luaM_newvector(S->L,n,Instruction); */
+  f->code = (Instruction *)(  ( (size_t)(n+1) <= MAX_SIZET/sizeof(Instruction) ) 
+                              ? luaM_realloc_(S->L, NULL, 0 * sizeof(Instruction), n * sizeof(Instruction) ) 
+                              : luaM_toobig(S->L)
+                           );
   f->sizecode=n;
-  LoadBlock(S,f->code,(n)*(sizeof(Instruction)));
+  /* LoadVector(S,f->code,n,sizeof(Instruction)); */
+  LoadBlock(S,f->code, n * sizeof(Instruction) );
 }
 
 
@@ -106,31 +121,53 @@ static void LoadConstants(LoadState* S, Proto* f)
 {
   int i,n;
   n = LoadInt(S);
-  f->k = ((TValue *)(((((size_t)((n)+1)) <= ((size_t)(~(size_t)0)-2)/(sizeof(TValue))) ? luaM_realloc_(S->L, (((void *)0)), (0)*(sizeof(TValue)), (n)*(sizeof(TValue))) : luaM_toobig(S->L))));
+  /*      luaM_newvector(S->L,n,TValue); */
+  f->k = (TValue *)(    ( (size_t)(n+1) <= MAX_SIZET/sizeof(TValue) ) 
+                      ? luaM_realloc_(S->L, NULL, 0 * sizeof(TValue), n * sizeof(TValue) ) 
+                      : luaM_toobig(S->L)
+                    );
   f->sizek = n;
   for (i=0; i<n; i++) {
-    ((&f->k[i])->tt=0);
+    /* setnilvalue(&f->k[i]); */
+    (&f->k[i])->tt = LUA_TNIL;
   }
+
   for (i=0; i<n; i++)
   {
     TValue* o=&f->k[i];
     int t=LoadChar(S);
     switch (t)
     {
-      case 0: {
-        ((o)->tt=0);
+      case LUA_TNIL: { /* 0 */
+        /* setnilvalue(o); */
+        o->tt = LUA_TNIL;
         break;
       }
-      case 1: {
-        { TValue *i_o=(o); i_o->value.b=(LoadChar(S)!=0); i_o->tt=1; };
+      case LUA_TBOOLEAN: { /* 1 */
+        /* setbvalue(o,LoadChar(S)!=0); */
+        { 
+            TValue *i_o = o; 
+            i_o->value.b = (LoadChar(S)!=0); 
+            i_o->tt = LUA_TBOOLEAN; 
+        };
         break;
       }
-      case 3: {
-        { TValue *i_o=(o); i_o->value.n=(LoadNumber(S)); i_o->tt=3; };
+      case LUA_TNUMBER: { /* 3 */
+        { 
+            TValue *i_o = o; 
+            i_o->value.n = LoadNumber(S); 
+            i_o->tt = LUA_TNUMBER; 
+        };
         break;
       }
-      case 4: {
-        { TValue *i_o=(o); i_o->value.gc=((GCObject *)((LoadString(S)))); i_o->tt=4; ((void)0); };
+      case LUA_TSTRING: { /* 4 */
+        /* setsvalue2n(S->L,o,LoadString(S)); */
+        { 
+            TValue *i_o = o; 
+            i_o->value.gc = (GCObject *)(LoadString(S)); 
+            i_o->tt = LUA_TSTRING; 
+            ((void)0); 
+        };
         break;
       }
       default: {
@@ -140,10 +177,14 @@ static void LoadConstants(LoadState* S, Proto* f)
     }
   }
   n = LoadInt(S);
-  f->p = ((Proto* *)(((((size_t)((n)+1)) <= ((size_t)(~(size_t)0)-2)/(sizeof(Proto*))) ? luaM_realloc_(S->L, (((void *)0)), (0)*(sizeof(Proto*)), (n)*(sizeof(Proto*))) : luaM_toobig(S->L))));
+  /*     luaM_newvector(S->L,n,Proto*); */
+  f->p = (Proto* *)(    ( (size_t)(n+1) <= MAX_SIZET/sizeof(Proto*) ) 
+                       ? luaM_realloc_(S->L, NULL, 0 * sizeof(Proto*), n * sizeof(Proto*) ) 
+                       : luaM_toobig(S->L)
+                   );
   f->sizep = n;
   for (i=0; i<n; i++) {
-    f->p[i] = ((void *)0);
+    f->p[i] = NULL;
   }
   for (i=0; i<n; i++) {
     f->p[i]= LoadFunction(S,f->source);
@@ -155,14 +196,23 @@ static void LoadDebug(LoadState* S, Proto* f)
 {
   int i,n;
   n = LoadInt(S);
-  f->lineinfo = ((int *)(((((size_t)((n)+1)) <= ((size_t)(~(size_t)0)-2)/(sizeof(int))) ? luaM_realloc_(S->L, (((void *)0)), (0)*(sizeof(int)), (n)*(sizeof(int))) : luaM_toobig(S->L))));
+  /*             luaM_newvector(S->L,n,int); */
+  f->lineinfo = (int *)(  ( (size_t)(n+1) <= MAX_SIZET/sizeof(int) ) 
+                          ? luaM_realloc_(S->L, NULL, 0 * sizeof(int), n * sizeof(int) ) 
+                          : luaM_toobig(S->L)
+                       );
   f->sizelineinfo = n;
-  LoadBlock(S,f->lineinfo,(n)*(sizeof(int)));
+  /* LoadVector(S,f->lineinfo,n,sizeof(int)); */
+  LoadBlock(S,f->lineinfo,n * sizeof(int) );
   n = LoadInt(S);
-  f->locvars = ((LocVar *)(((((size_t)((n)+1)) <= ((size_t)(~(size_t)0)-2)/(sizeof(LocVar))) ? luaM_realloc_(S->L, (((void *)0)), (0)*(sizeof(LocVar)), (n)*(sizeof(LocVar))) : luaM_toobig(S->L))));
+  /*            luaM_newvector(S->L,n,LocVar); */
+  f->locvars = (LocVar *)(  ( (size_t)(n+1) <= MAX_SIZET/sizeof(LocVar) ) 
+                            ? luaM_realloc_(S->L, NULL, 0 * sizeof(LocVar), n * sizeof(LocVar) ) 
+                            : luaM_toobig(S->L)
+                         );
   f->sizelocvars = n;
   for (i=0; i<n; i++) {
-    f->locvars[i].varname=((void *)0);
+    f->locvars[i].varname=NULL;
   }
   for (i=0; i<n; i++)
   {
@@ -171,10 +221,14 @@ static void LoadDebug(LoadState* S, Proto* f)
     f->locvars[i].endpc = LoadInt(S);
   }
   n = LoadInt(S);
-  f->upvalues = ((TString* *)(((((size_t)((n)+1)) <= ((size_t)(~(size_t)0)-2)/(sizeof(TString*))) ? luaM_realloc_(S->L, (((void *)0)), (0)*(sizeof(TString*)), (n)*(sizeof(TString*))) : luaM_toobig(S->L))));
+  /*             luaM_newvector(S->L,n,TString*); */
+  f->upvalues = (TString* *)(   ((size_t)(n+1) <= MAX_SIZET/sizeof(TString*) ) 
+                              ? luaM_realloc_(S->L, NULL, 0 * sizeof(TString*), n * sizeof(TString*) ) 
+                              : luaM_toobig(S->L)
+                            );
   f->sizeupvalues = n;
   for (i=0; i<n; i++) {
-    f->upvalues[i] = ((void *)0);
+    f->upvalues[i] = NULL;
   }
   for (i=0; i<n; i++) {
     f->upvalues[i] = LoadString(S);
@@ -185,25 +239,48 @@ static void LoadDebug(LoadState* S, Proto* f)
 static Proto* LoadFunction(LoadState* S, TString* p)
 {
   Proto* f;
-  if (++S->L->nCcalls > 200) {
+  /*                             200   LUAI_MAXCCALLS */
+  if (++S->L->nCcalls > LUAI_MAXCCALLS) {
     error(S,"code too deep");
   }
   f = luaF_newproto(S->L);
-  { TValue *i_o=(S->L->top); i_o->value.gc=((GCObject *)((f))); i_o->tt=(8 +1); ((void)0); }; {if ((char *)S->L->stack_last - (char *)S->L->top <= (1)*(int)sizeof(TValue)) luaD_growstack(S->L, 1); else ((void)0);; S->L->top++;};
+  /* setptvalue2s(S->L,S->L->top,f); incr_top(S->L); */
+  { 
+      TValue *i_o = S->L->top; 
+      i_o->value.gc = (GCObject *)(f); 
+      /*         (8       + 1) */
+      i_o->tt = (LAST_TAG + 1); 
+      ((void)0); 
+  }; 
+  {
+      if ((char *)S->L->stack_last - (char *)S->L->top <= 1 * (int)sizeof(TValue) ) { 
+          luaD_growstack(S->L, 1); 
+      } else { 
+          ((void)0);; 
+      }
+      S->L->top++;
+  };
   f->source = LoadString(S);
-  if (f->source == ((void *)0)) {
+  if (f->source == NULL) {
     f->source = p;
   }
   f->linedefined = LoadInt(S);
   f->lastlinedefined = LoadInt(S);
+  /*         LoadByte(S); */
   f->nups = (lu_byte)LoadChar(S);
+  /*             LoadByte(S); */
   f->numparams = (lu_byte)LoadChar(S);
+  /*             LoadByte(S); */
   f->is_vararg = (lu_byte)LoadChar(S);
+  /*                LoadByte(S); */
   f->maxstacksize = (lu_byte)LoadChar(S);
   LoadCode(S,f);
   LoadConstants(S,f);
   LoadDebug(S,f);
-  if (!luaG_checkcode(f)) error(S,"bad code");
+  /* IF (!luaG_checkcode(f), "bad code"); */
+  if ( !luaG_checkcode(f) ) {
+      error(S,"bad code");
+  }
   S->L->top--;
   S->L->nCcalls--;
   return f;
@@ -212,11 +289,18 @@ static Proto* LoadFunction(LoadState* S, TString* p)
 
 static void LoadHeader(LoadState* S)
 {
-  char h[12];
-  char s[12];
+  /*              12     LUAC_HEADERSIZE */
+  char h[LUAC_HEADERSIZE];
+  /*              12     LUAC_HEADERSIZE */
+  char s[LUAC_HEADERSIZE];
   luaU_header(h);
-  LoadBlock(S,s,12);
-  if (memcmp(h,s,12) != 0) error(S,"bad header");
+  /*                    12     LUAC_HEADERSIZE */
+  LoadBlock(S,s,LUAC_HEADERSIZE);
+  /* IF (memcmp(h,s,LUAC_HEADERSIZE) != 0, "bad header"); */
+  /*                    12     LUAC_HEADERSIZE */
+  if ( memcmp(h,s,LUAC_HEADERSIZE) != 0) { 
+      error(S,"bad header");
+  }
 }
 
 
@@ -228,7 +312,8 @@ Proto* luaU_undump (lua_State* L, ZIO* Z, Mbuffer* buff, const char* name)
   LoadState S;
   if (*name=='@' || *name=='=') {
     S.name = name+1;
-  } else if (*name=="\033Lua"[0]) {
+  /*                  "\033Lua"    LUA_SIGNATURE */
+  } else if (*name == LUA_SIGNATURE[0]) {
     S.name = "binary string";
   } else {
     S.name = name;
@@ -237,6 +322,7 @@ Proto* luaU_undump (lua_State* L, ZIO* Z, Mbuffer* buff, const char* name)
   S.Z = Z;
   S.b = buff;
   LoadHeader(&S);
+  /*                      luaS_newliteral(L,"=?") */
   return LoadFunction(&S,(luaS_newlstr(L, "" "=?", (sizeof("=?")/sizeof(char))-1)));
 }
 
@@ -247,16 +333,20 @@ Proto* luaU_undump (lua_State* L, ZIO* Z, Mbuffer* buff, const char* name)
 void luaU_header (char* h)
 {
   int x = 1;
-  memcpy(h,"\033Lua",sizeof("\033Lua")-1);
-  h += sizeof("\033Lua")-1;
-  *h++ = (char)0x51;
-  *h++ = (char)0;
+  /*           "\033Lua"  LUA_SIGNATURE */
+  memcpy(h, LUA_SIGNATURE, sizeof(LUA_SIGNATURE)-1 );
+  /*          "\033Lua"  LUA_SIGNATURE */
+  h += sizeof(LUA_SIGNATURE)-1;
+  /*                0x51  LUAC_VERSION */
+  *h++ = (char)LUAC_VERSION;
+  /*                 0  LUAC_FORMAT */
+  *h++ = (char)LUAC_FORMAT;
   *h++ = (char)*(char*)&x; /* endianness */
   *h++ = (char)sizeof(int);
   *h++ = (char)sizeof(size_t);
   *h++ = (char)sizeof(Instruction);
   *h++ = (char)sizeof(lua_Number);
-  *h++ = (char)(((lua_Number)0.5)==0); /* is lua_Number integral? */
+  *h++ = (char)( ( (lua_Number)0.5) == 0 ); /* is lua_Number integral? */
 }
 
 
