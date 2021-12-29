@@ -445,10 +445,10 @@ endloop:
 static void read_string (LexState *ls, int del, SemInfo *seminfo) {
   /* 
    *
-		#define save_and_next(ls) (save(ls, ls->current), next(ls))                       // llex.c:48
-		#define next(ls) (ls->current = zgetc(ls->z))                                     // llex.c:28
-		#define zgetc(z)  (((z)->n--)>0 ?  char2int(*(z)->p++) : luaZ_fill(z))            // lzio.h:22
-		#define char2int(c)	cast(int, cast(unsigned char, (c)))                           // lzio.h:20
+		#define save_and_next(ls) (save(ls, ls->current), next(ls))                       
+		#define next(ls) (ls->current = zgetc(ls->z))                                     
+		#define zgetc(z)  (((z)->n--)>0 ?  char2int(*(z)->p++) : luaZ_fill(z))            
+		#define char2int(c)	cast(int, cast(unsigned char, (c)))                           
 
          save_and_next(ls);
   */
@@ -472,9 +472,9 @@ static void read_string (LexState *ls, int del, SemInfo *seminfo) {
 
 		/* 
 		 *
-		  	#define next(ls) (ls->current = zgetc(ls->z))                                     // llex.c:28
-		  	#define zgetc(z)  (((z)->n--)>0 ?  char2int(*(z)->p++) : luaZ_fill(z))            // lzio.h:22
-		  	#define char2int(c)	cast(int, cast(unsigned char, (c)))                           // lzio.h:20
+		  	#define next(ls) (ls->current = zgetc(ls->z))                                     
+		  	#define zgetc(z)  (((z)->n--)>0 ?  char2int(*(z)->p++) : luaZ_fill(z))            
+		  	#define char2int(c)	cast(int, cast(unsigned char, (c)))                           
 
             next(ls);  / *   do not save the `\'    * /
 		*/
@@ -512,9 +512,9 @@ static void read_string (LexState *ls, int del, SemInfo *seminfo) {
           case '\r': {
 			 /* 
 			  *
-			 	#define next(ls) (ls->current = zgetc(ls->z))                                     // llex.c:28
-			 	#define zgetc(z)  (((z)->n--)>0 ?  char2int(*(z)->p++) : luaZ_fill(z))            // lzio.h:22
-			 	#define char2int(c)	cast(int, cast(unsigned char, (c)))                           // lzio.h:20
+			 	#define next(ls) (ls->current = zgetc(ls->z))                                     
+			 	#define zgetc(z)  (((z)->n--)>0 ?  char2int(*(z)->p++) : luaZ_fill(z))            
+			 	#define char2int(c)	cast(int, cast(unsigned char, (c)))                           
 
 			 	next(ls);  / *   do not save the `\'         *  /
 			 */
@@ -530,10 +530,10 @@ static void read_string (LexState *ls, int del, SemInfo *seminfo) {
             if ( !isdigit(ls->current) ) {
               /* 
                *
-                	#define save_and_next(ls) (save(ls, ls->current), next(ls))                       // llex.c:48
-                	#define next(ls) (ls->current = zgetc(ls->z))                                     // llex.c:28
-                	#define zgetc(z)  (((z)->n--)>0 ?  char2int(*(z)->p++) : luaZ_fill(z))            // lzio.h:22
-                	#define char2int(c)	cast(int, cast(unsigned char, (c)))                           // lzio.h:20
+                	#define save_and_next(ls) (save(ls, ls->current), next(ls))                       
+                	#define next(ls) (ls->current = zgetc(ls->z))                                     
+                	#define zgetc(z)  (((z)->n--)>0 ?  char2int(*(z)->p++) : luaZ_fill(z))            
+                	#define char2int(c)	cast(int, cast(unsigned char, (c)))                           
 
 
                     save_and_next(ls);
@@ -565,10 +565,10 @@ static void read_string (LexState *ls, int del, SemInfo *seminfo) {
       default: {
         /* 
          *
-          	#define save_and_next(ls) (save(ls, ls->current), next(ls))                       // llex.c:48
-          	#define next(ls) (ls->current = zgetc(ls->z))                                     // llex.c:28
-          	#define zgetc(z)  (((z)->n--)>0 ?  char2int(*(z)->p++) : luaZ_fill(z))            // lzio.h:22
-          	#define char2int(c)	cast(int, cast(unsigned char, (c)))                           // lzio.h:20
+          	#define save_and_next(ls) (save(ls, ls->current), next(ls))                       
+          	#define next(ls) (ls->current = zgetc(ls->z))                                     
+          	#define zgetc(z)  (((z)->n--)>0 ?  char2int(*(z)->p++) : luaZ_fill(z))            
+          	#define char2int(c)	cast(int, cast(unsigned char, (c)))                           
 
 
              save_and_next(ls);
@@ -582,10 +582,10 @@ static void read_string (LexState *ls, int del, SemInfo *seminfo) {
 
   /* 
    *
-  	#define save_and_next(ls) (save(ls, ls->current), next(ls))                       // llex.c:48
-  	#define next(ls) (ls->current = zgetc(ls->z))                                     // llex.c:28
-  	#define zgetc(z)  (((z)->n--)>0 ?  char2int(*(z)->p++) : luaZ_fill(z))            // lzio.h:22
-  	#define char2int(c)	cast(int, cast(unsigned char, (c)))                           // lzio.h:20
+  	#define save_and_next(ls) (save(ls, ls->current), next(ls))                       
+  	#define next(ls) (ls->current = zgetc(ls->z))                                     
+  	#define zgetc(z)  (((z)->n--)>0 ?  char2int(*(z)->p++) : luaZ_fill(z))            
+  	#define char2int(c)	cast(int, cast(unsigned char, (c)))                           
   
   
      save_and_next(ls);
@@ -702,10 +702,10 @@ static int llex (LexState *ls, SemInfo *seminfo) {
       case '.': {
         /* 
          *
-          	#define save_and_next(ls) (save(ls, ls->current), next(ls))                       // llex.c:48
-          	#define next(ls) (ls->current = zgetc(ls->z))                                     // llex.c:28
-          	#define zgetc(z)  (((z)->n--)>0 ?  char2int(*(z)->p++) : luaZ_fill(z))            // lzio.h:22
-          	#define char2int(c)	cast(int, cast(unsigned char, (c)))                           // lzio.h:20
+          	#define save_and_next(ls) (save(ls, ls->current), next(ls))                       
+          	#define next(ls) (ls->current = zgetc(ls->z))                                     
+          	#define zgetc(z)  (((z)->n--)>0 ?  char2int(*(z)->p++) : luaZ_fill(z))            
+          	#define char2int(c)	cast(int, cast(unsigned char, (c)))                           
 
                save_and_next(ls);
         */
@@ -750,10 +750,10 @@ static int llex (LexState *ls, SemInfo *seminfo) {
 
               /* 
                *
-                	#define save_and_next(ls) (save(ls, ls->current), next(ls))                       // llex.c:48
-                	#define next(ls) (ls->current = zgetc(ls->z))                                     // llex.c:28
-                	#define zgetc(z)  (((z)->n--)>0 ?  char2int(*(z)->p++) : luaZ_fill(z))            // lzio.h:22
-                	#define char2int(c)	cast(int, cast(unsigned char, (c)))                           // lzio.h:20
+                	#define save_and_next(ls) (save(ls, ls->current), next(ls))                       
+                	#define next(ls) (ls->current = zgetc(ls->z))                                     
+                	#define zgetc(z)  (((z)->n--)>0 ?  char2int(*(z)->p++) : luaZ_fill(z))            
+                	#define char2int(c)	cast(int, cast(unsigned char, (c)))                           
 
                      save_and_next(ls);
               */
