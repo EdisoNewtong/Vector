@@ -1,0 +1,88 @@
+$ ls src/*.c
+01.  lapi.c
+02.  lauxlib.c
+03.  lbaselib.c
+04.  lcode.c
+05.  ldblib.c
+06.  ldebug.c
+07.  ldo.c
+08.  ldump.c
+09.  lfunc.c
+10.  lgc.c
+11.  linit.c
+12.  liolib.c
+13.  llex.c
+14.  lmathlib.c
+15.  lmem.c
+16.  loadlib.c
+17.  lobject.c
+18.  lopcodes.c
+19.  loslib.c
+20.  lparser.c
+21.  lstate.c
+22.  lstring.c
+23.  lstrlib.c
+24.  ltable.c
+25.  ltablib.c
+26.  ltm.c
+27.  lua.c
+28.  luac.c
+29.  lundump.c
+30.  lvm.c
+31.  lzio.c
+32.  print.c
+
+
+----------------------------------------------------------------------------------------------------
+
+cd src && make linux
+
+make[1]: 进入目录“/home/edison/work/src/github/myrepo/Vector/lua/sourceCodeStudy/lua-5.1.5/src”
+make all MYCFLAGS=-DLUA_USE_LINUX MYLIBS="-Wl,-E -ldl -lreadline -lhistory -lncurses"
+make[2]: 进入目录“/home/edison/work/src/github/myrepo/Vector/lua/sourceCodeStudy/lua-5.1.5/src”
+
+gcc -O2 -Wall -DLUA_USE_LINUX   -c -o lapi.o lapi.c
+gcc -O2 -Wall -DLUA_USE_LINUX   -c -o lcode.o lcode.c
+gcc -O2 -Wall -DLUA_USE_LINUX   -c -o ldebug.o ldebug.c
+gcc -O2 -Wall -DLUA_USE_LINUX   -c -o ldo.o ldo.c
+gcc -O2 -Wall -DLUA_USE_LINUX   -c -o ldump.o ldump.c
+gcc -O2 -Wall -DLUA_USE_LINUX   -c -o lfunc.o lfunc.c
+gcc -O2 -Wall -DLUA_USE_LINUX   -c -o lgc.o lgc.c
+gcc -O2 -Wall -DLUA_USE_LINUX   -c -o llex.o llex.c
+gcc -O2 -Wall -DLUA_USE_LINUX   -c -o lmem.o lmem.c
+gcc -O2 -Wall -DLUA_USE_LINUX   -c -o lobject.o lobject.c
+gcc -O2 -Wall -DLUA_USE_LINUX   -c -o lopcodes.o lopcodes.c
+gcc -O2 -Wall -DLUA_USE_LINUX   -c -o lparser.o lparser.c
+gcc -O2 -Wall -DLUA_USE_LINUX   -c -o lstate.o lstate.c
+gcc -O2 -Wall -DLUA_USE_LINUX   -c -o lstring.o lstring.c
+gcc -O2 -Wall -DLUA_USE_LINUX   -c -o ltable.o ltable.c
+gcc -O2 -Wall -DLUA_USE_LINUX   -c -o ltm.o ltm.c
+gcc -O2 -Wall -DLUA_USE_LINUX   -c -o lundump.o lundump.c
+gcc -O2 -Wall -DLUA_USE_LINUX   -c -o lvm.o lvm.c
+gcc -O2 -Wall -DLUA_USE_LINUX   -c -o lzio.o lzio.c
+gcc -O2 -Wall -DLUA_USE_LINUX   -c -o lauxlib.o lauxlib.c
+gcc -O2 -Wall -DLUA_USE_LINUX   -c -o lbaselib.o lbaselib.c
+gcc -O2 -Wall -DLUA_USE_LINUX   -c -o ldblib.o ldblib.c
+gcc -O2 -Wall -DLUA_USE_LINUX   -c -o liolib.o liolib.c
+gcc -O2 -Wall -DLUA_USE_LINUX   -c -o lmathlib.o lmathlib.c
+gcc -O2 -Wall -DLUA_USE_LINUX   -c -o loslib.o loslib.c
+gcc -O2 -Wall -DLUA_USE_LINUX   -c -o ltablib.o ltablib.c
+gcc -O2 -Wall -DLUA_USE_LINUX   -c -o lstrlib.o lstrlib.c
+gcc -O2 -Wall -DLUA_USE_LINUX   -c -o loadlib.o loadlib.c
+gcc -O2 -Wall -DLUA_USE_LINUX   -c -o linit.o linit.c
+
+ar rcu liblua.a lapi.o lcode.o ldebug.o ldo.o ldump.o lfunc.o lgc.o llex.o lmem.o lobject.o lopcodes.o lparser.o lstate.o lstring.o ltable.o ltm.o lundump.o lvm.o lzio.o lauxlib.o lbaselib.o ldblib.o liolib.o lmathlib.o loslib.o ltablib.o lstrlib.o loadlib.o linit.o	# DLL needs all object files
+ranlib liblua.a
+
+gcc -O2 -Wall -DLUA_USE_LINUX   -c -o lua.o lua.c
+gcc -o lua  lua.o liblua.a -lm -Wl,-E -ldl -lreadline -lhistory -lncurses
+
+gcc -O2 -Wall -DLUA_USE_LINUX   -c -o luac.o luac.c
+gcc -O2 -Wall -DLUA_USE_LINUX   -c -o print.o print.c
+gcc -o luac  luac.o print.o liblua.a -lm -Wl,-E -ldl -lreadline -lhistory -lncurses
+
+make[2]: 离开目录“/home/edison/work/src/github/myrepo/Vector/lua/sourceCodeStudy/lua-5.1.5/src”
+make[1]: 离开目录“/home/edison/work/src/github/myrepo/Vector/lua/sourceCodeStudy/lua-5.1.5/src”
+
+----------------------------------------------------------------------------------------------------
+
