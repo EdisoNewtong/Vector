@@ -78,6 +78,7 @@ set cinkeys-=0#
 
 	nnoremap <C-H> 5zh
 	nnoremap <C-L> 5zl
+    nnoremap <Leader>bo    :browse oldfiles<CR>
 
 	" highlight
 	highlight  StatusLineNC ctermbg=LightGray ctermfg=DarkGrey guibg=LightGray guifg=DarkGrey 
