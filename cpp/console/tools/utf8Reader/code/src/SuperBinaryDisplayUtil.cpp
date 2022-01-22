@@ -778,15 +778,22 @@ bool readFile_V1(const string& filename, FileInfo& fInfo)
     unsigned int u32code = 0;
     
     string singleCharacter;
-    int last_EOF_flag    = 0; // 0: undefined or    the last character is not EOF ,  1:Unix 2:Win 3:Mac , will never be 4(HYBIRD) ,because every line has a specific and unambiguous EOF
+    /////////////////////////////////////////////////////////////////////
+    // last_EOF_flag :
+    // 0: undefined or    the last character is not EOF ,  
+    // 1:Unix 
+    // 2:Win 
+    // 3:Mac , 
+    //          will never be 4(HYBIRD) ,because every line has a specific and unambiguous EOF
+    int last_EOF_flag    = 0; 
     
     int nRow = 1;
     int nCol = 1;
     
-	string hexCode;
 
     for ( size_t idx = 0; idx < szOfFile; ++idx )
     {
+        bool advanceFlag = false;
         if( fInfo.isBomFile && idx < SIZE_BOM ) {
             continue;
         }
@@ -800,7 +807,6 @@ bool readFile_V1(const string& filename, FileInfo& fInfo)
         fmtstr << std::hex << std::uppercase << setw(2) << setfill('0') << code;
 		// Push
 		string* pFmtHexCode = new string(fmtstr.str() );
-		hexCode = *pFmtHexCode;
         fInfo.rawHexVec.push_back(pFmtHexCode);
 
 		int current_EOF_flag = 0;
@@ -828,6 +834,14 @@ bool readFile_V1(const string& filename, FileInfo& fInfo)
 									// so \r\n
 									++idx;	// must skip \n , read next
 									current_EOF_flag = 2;	// Win EOL mode
+
+									advanceFlag = true;
+									// covert it to  Hex-Code and then Push to Array
+									fmtstr.clear();
+									fmtstr.str("");
+									fmtstr << std::hex << std::uppercase << setw(2) << setfill('0') << char2HexCode(G_CHAR_GN.ch, nullptr);
+									fInfo.rawHexVec.push_back( new string( fmtstr.str() ) );
+
 									// treat \r\n as 1 or 2 EOL byte(s) ? 
 									if ( treatEOFAsByte ) {
 										fInfo.characterCount += (treatRNAs1Byte ? 1 : 2);
@@ -925,6 +939,17 @@ bool readFile_V1(const string& filename, FileInfo& fInfo)
 							pMultiBytesCharacter = SingleCharacter::generate_MultiBytes_Character(singleCharacter, u32code, nRow, nCol);
 
 							idx += 1;	// skip the 2nd byte , read the next byte after 2nd byte
+                            
+							////////////////////////////////////////////////////////////////////////
+							advanceFlag = true;
+							
+							fmtstr.clear();
+							fmtstr.str("");
+							fmtstr << std::hex << std::uppercase << setw(2) << setfill('0') << code_2_2;
+							// Push
+							fInfo.rawHexVec.push_back( new string(fmtstr.str() ) );
+							////////////////////////////////////////////////////////////////////////
+
 							nCol += C_N_WIDTH_4_MULTI_BYTES_CHARACTER_USED;
 							++fInfo.characterCount;
 						} else {
@@ -961,6 +986,25 @@ bool readFile_V1(const string& filename, FileInfo& fInfo)
 							pMultiBytesCharacter = SingleCharacter::generate_MultiBytes_Character(singleCharacter, u32code, nRow, nCol);
 
 							idx += 2;
+
+							//////////////////////////////////////////////////////////////////////////////////////////
+							// 
+							advanceFlag = true;
+							
+							fmtstr.clear();
+							fmtstr.str("");
+							fmtstr << std::hex << std::uppercase << setw(2) << setfill('0') << code_next_23[0];
+							// Push
+							fInfo.rawHexVec.push_back( new string(fmtstr.str() ) );
+							
+							fmtstr.clear();
+							fmtstr.str("");
+							fmtstr << std::hex << std::uppercase << setw(2) << setfill('0') << code_next_23[1];
+							// Push
+							fInfo.rawHexVec.push_back( new string(fmtstr.str() ) );
+							
+							//////////////////////////////////////////////////////////////////////////////////////////
+
 							nCol += C_N_WIDTH_4_MULTI_BYTES_CHARACTER_USED;
 							++fInfo.characterCount;
 						} else {
@@ -1002,6 +1046,31 @@ bool readFile_V1(const string& filename, FileInfo& fInfo)
 							pMultiBytesCharacter = SingleCharacter::generate_MultiBytes_Character(singleCharacter, u32code, nRow, nCol);
 
 							idx += 3;
+
+							//////////////////////////////////////////////////////////////////////////////////////////
+							// 
+							advanceFlag = true;
+							
+							fmtstr.clear();
+							fmtstr.str("");
+							fmtstr << std::hex << std::uppercase << setw(2) << setfill('0') << code_next_234[0];
+							// Push
+							fInfo.rawHexVec.push_back( new string(fmtstr.str() ) );
+							
+							fmtstr.clear();
+							fmtstr.str("");
+							fmtstr << std::hex << std::uppercase << setw(2) << setfill('0') << code_next_234[1];
+							// Push
+							fInfo.rawHexVec.push_back( new string(fmtstr.str() ) );
+							
+							fmtstr.clear();
+							fmtstr.str("");
+							fmtstr << std::hex << std::uppercase << setw(2) << setfill('0') << code_next_234[2];
+							// Push
+							fInfo.rawHexVec.push_back( new string(fmtstr.str() ) );
+							
+							//////////////////////////////////////////////////////////////////////////////////////////
+
 							nCol += C_N_WIDTH_4_MULTI_BYTES_CHARACTER_USED;
 							++fInfo.characterCount;
 						} else {
@@ -1028,6 +1097,8 @@ bool readFile_V1(const string& filename, FileInfo& fInfo)
 			last_EOF_flag = current_EOF_flag;
 		}
 
+		(void)advanceFlag;
+
     } // end for
     
     if (  fInfo.isBinary  ) {
@@ -1045,6 +1116,7 @@ bool readFile_V1(const string& filename, FileInfo& fInfo)
 
     return true;
 }
+
 
 
 // stop scanning bytes after a certain bytes has been treat as binary flag
