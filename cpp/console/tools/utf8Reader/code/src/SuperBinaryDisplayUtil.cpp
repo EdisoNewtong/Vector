@@ -1516,30 +1516,36 @@ void printFileInfo(const FileInfo& fileInfo, string& retStr, bool needPrintToCon
          outstr << endl; 
 	 } else {
 		 if ( fileInfo.isBinary ) {
-			 size_t i = 0;
-			 for ( auto hexCode : fileInfo.rawHexVec ) {
-				 if ( hexCode != nullptr ) {
-					 outstr << "| " << (*hexCode) << " ";
-					 ++i;
+			 if ( !fileInfo.rawHexVec.empty() ) {
+				 size_t i = 0;
+				 for ( auto hexCode : fileInfo.rawHexVec ) {
+					 if ( hexCode != nullptr ) {
+						 outstr << "| " << (*hexCode) << " ";
+						 ++i;
 
-					 if ( i!=0   &&  (i % BINARY_WRAP) == 0 ) {
-						 outstr << "| => " << std::dec << (i-BINARY_WRAP+1) << " ~ " << i << endl;
+						 if ( i!=0   &&  (i % BINARY_WRAP) == 0 ) {
+							 outstr << "| => " << std::dec << (i-BINARY_WRAP+1) << " ~ " << i << endl;
+						 }
 					 }
 				 }
-			 }
 
-			 // outstr << "|";
-			 size_t rest = (i % BINARY_WRAP);
-			 if (  rest!= 0 ) {
-				 if ( rest == 1 ) {
-					 outstr << "| => " << std::dec << i;
-				 } else {
-					 outstr << "| => " << std::dec << (i - rest + 1) << " ~ " << i;
+				 // outstr << "|";
+				 size_t rest = (i % BINARY_WRAP);
+				 if (  rest!= 0 ) {
+					 if ( rest == 1 ) {
+						 outstr << "| => " << std::dec << i;
+					 } else {
+						 outstr << "| => " << std::dec << (i - rest + 1) << " ~ " << i;
+					 }
 				 }
-			 }
-			 // otherwise it has already printed at previous for-loop
-			 
-			 outstr << endl;
+				 // otherwise it has already printed at previous for-loop
+				 
+				 outstr << endl;
+			} else {
+				outstr << endl;
+				outstr << "	[INFO] : Raw Hex Vector is empty" << endl;
+				outstr << endl;
+			}
 		} else {
 			if ( fileInfo.isBomFile ) {
 				// Bom Header Part

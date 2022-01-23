@@ -2,7 +2,14 @@
 $ cat /etc/centos-release
 CentOS Linux release 7.9.2009 (Core)
 
-
+/////////////////////////////////////////////////////////////////////
+// switch gcc to the version which support c++20    
+//
+$ scl enable devtoolset-11 bash
+or 
+$ source /opt/rh/devtoolset-11/enable
+/////////////////////////////////////////////////////////////////////
+ 
 
 $ g++ -v
 Using built-in specs.
