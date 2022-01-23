@@ -62,7 +62,7 @@ SingleCharacter::SingleCharacter()
     , unicode32_str("")
     , nRow(0)
     , nCol(0)
-    , nEOF_Flag(0)
+    , nEOL_Flag(0)
     , reserverd_flag(0) 
 { 
     for ( size_t i = 0; i < UTF8_FULL_LEN; ++i ) { 
@@ -112,7 +112,7 @@ SingleCharacter* SingleCharacter::generate_ASCII_Character(char ch, int row, int
 
     pRet->nRow = row; 
     pRet->nCol = col;  
-    pRet->nEOF_Flag = eofFlag; 
+    pRet->nEOL_Flag = eofFlag;
     pRet->reserverd_flag = 0;
 
     return pRet;
@@ -145,7 +145,7 @@ SingleCharacter* SingleCharacter::generate_MultiBytes_Character(const string& di
 
     pRet->nRow = row;
     pRet->nCol = col;
-    pRet->nEOF_Flag = 0; // will never be  \r or \n , so must be 0
+    pRet->nEOL_Flag = 0; // will never be  \r or \n , so must be 0
     pRet->reserverd_flag = 0;
 
     return pRet;
@@ -240,6 +240,7 @@ UTF-8 的编码规则是：
  ****************************************************************************************************
 */
 
+
 // very very old version
 bool readFile_V0(const string& filename, FileInfo& fInfo)
 {
@@ -255,7 +256,7 @@ bool readFile_V0(const string& filename, FileInfo& fInfo)
     fInfo.isValid = true;
     
 
-    // bool treatEOFAsByte = true; (void)
+    // bool treatEOLAsByte = true; (void)
     // bool treatRNAs1Byte = true;
 
     char* fileContentBuf = nullptr;
@@ -315,17 +316,17 @@ bool readFile_V0(const string& filename, FileInfo& fInfo)
     unsigned int u32code = 0;
     
     string singleCharacter;
-    int last_EOF_flag    = 0; // 0: undefined or    the last character is not EOF ,  1:Unix 2:Win 3:Mac , will never be 4(HYBIRD) ,because every line has a specific and unambiguous EOF
+    int last_EOL_flag    = 0; // 0: undefined or    the last character is not EOL ,  1:Unix 2:Win 3:Mac , will never be 4(HYBIRD) ,because every line has a specific and unambiguous EOL
     
     int nRow = 1;
     int nCol = 1;
     
     // isCurrentLetter_line1stLetter : indicate that the current letter is the 1st letter of a new line
     bool isCurrentLetter_line1stLetter = false;
-	string hexCode;
 
     for ( size_t idx = 0; idx < szOfFile; ++idx )
     {
+        bool advanceFlag = false;
         if( fInfo.isBomFile && idx < SIZE_BOM ) {
             continue;
         }
@@ -341,7 +342,6 @@ bool readFile_V0(const string& filename, FileInfo& fInfo)
 
 		// Push
 		string* pFmtHexCode = new string(fmtstr.str() );
-		hexCode = *pFmtHexCode;
         fInfo.rawHexVec.push_back(pFmtHexCode);
         
         if ( !fInfo.isBinary ) {
@@ -370,10 +370,10 @@ bool readFile_V0(const string& filename, FileInfo& fInfo)
                                         // do-nothing
                                     } else {
                                         // End-Line-Mode has been set already
-                                        if ( last_EOF_flag != 0 ) {
+                                        if ( last_EOL_flag != 0 ) {
                                             isCurrentLetter_line1stLetter = true;
                                         } else {
-                                            // last_EOF_flag == 0 ,   do nothing ,  the previous letter is not EOF
+                                            // last_EOL_flag == 0 ,   do nothing ,  the previous letter is not EOL
                                             // maybe  a\t
                                         }
                                     }
@@ -387,7 +387,7 @@ bool readFile_V0(const string& filename, FileInfo& fInfo)
                                     // \n not take into account
                                     if ( fInfo.endlineMode == FileInfo::E_UNKNOWN_ENDLINE ) {
                                         fInfo.endlineMode = FileInfo::E_UNIX;
-                                        current_EOF_flag = 1; // 1 means current is Unix EOF mode
+                                        current_EOF_flag = 1; // 1 means current is Unix EOL mode
                                     } else {
                                         // End-Line-Mode has been set already
                                         // ============= Core conception =============
@@ -401,11 +401,11 @@ bool readFile_V0(const string& filename, FileInfo& fInfo)
                                             fInfo.endlineMode = FileInfo::E_HYBRID;
 											fInfo.hybridLineNo = nRow;
                                         } else {
-                                            // last EOF mode is E_UNIX , keep it 
+                                            // last EOL mode is E_UNIX , keep it
                                         }
                                         
-                                        if( last_EOF_flag != 0 ) {
-                                            // previous is EOF : 
+                                        if( last_EOL_flag != 0 ) {
+                                            // previous is EOL :
                                             // maybe : 
                                             //         \n
                                             //         \n   <== current letter
@@ -415,7 +415,7 @@ bool readFile_V0(const string& filename, FileInfo& fInfo)
                                             /////////////////////////////
                                             isCurrentLetter_line1stLetter = true;
                                         }
-                                        current_EOF_flag = 1; // 1 means current is Unix EOF mode
+                                        current_EOF_flag = 1; // 1 means current is Unix EOL mode
                                     }
                                 }
                                 break;
@@ -431,20 +431,36 @@ bool readFile_V0(const string& filename, FileInfo& fInfo)
                                                 // so 1st \r\n
                                                 fInfo.endlineMode = FileInfo::E_WIN;
                                                 ++idx;  // Skip  \n , next for-loop will pointer to the char next to (\r\n)
-                                                current_EOF_flag = 2;  // 2 means current is Win EOF mode
+
+                                                //////////////////////////////////////////////////
+                                                // 
+                                                advanceFlag = true;
+
+                                                fmtstr.clear();
+                                                fmtstr.str("");
+
+                                                unsigned int tmpcode = (FULL_BITS & ch);
+                                                fmtstr << std::hex << std::uppercase << setw(2) << setfill('0') << tmpcode;
+
+                                                // Push
+                                                fInfo.rawHexVec.push_back( new string(fmtstr.str() ) );
+
+                                                //////////////////////////////////////////////////
+
+                                                current_EOF_flag = 2;  // 2 means current is Win EOL mode
                                             } else {
                                                 // the next letter is not \n , so not  \r\n
                                                 // e.g.
                                                 //          \r
                                                 //          a
                                                 fInfo.endlineMode = FileInfo::E_MAC;
-                                                current_EOF_flag = 3;  // 3 means current is Mac EOF mode
+                                                current_EOF_flag = 3;  // 3 means current is Mac EOL mode
                                             }
                                         } else {
                                             // the current idx is the !!!<Last>!!! letter of the file, 
                                             // a Very-Very-Very Special Logic
                                             fInfo.endlineMode = FileInfo::E_MAC;
-                                            current_EOF_flag = 3; // 3 means current is Mac EOF mode
+                                            current_EOF_flag = 3; // 3 means current is Mac EOL mode
                                         }
                                     } else {
                                         // End-Line-Mode  has been set already
@@ -452,15 +468,15 @@ bool readFile_V0(const string& filename, FileInfo& fInfo)
                                         if ( nextIdx < szOfFile ) {
                                             if ( fileContentBuf[nextIdx] == G_CHAR_GN.ch ) { 
                                                 // \r\n
-                                                // treat as EOF WIN , check is HYBIRD ???
+                                                // treat as EOL WIN , check is HYBIRD ???
                                                 if ( fInfo.endlineMode != FileInfo::E_HYBRID  &&  fInfo.endlineMode != FileInfo::E_WIN ) {
 													fInfo.hybridDetail.first = "\\r\\n";
 													fInfo.hybridDetail.second = (fInfo.endlineMode == FileInfo::E_UNIX ? "\\n" : "\\r"); 
-                                                    // treat as WIN , but previous EOF mode is not win 
+                                                    // treat as WIN , but previous EOL mode is not win
                                                     fInfo.endlineMode = FileInfo::E_HYBRID;
 													fInfo.hybridLineNo = nRow;
                                                 } else {
-                                                    // last EOF mode is E_WIN , keep it
+                                                    // last EOL mode is E_WIN , keep it
                                                 }
 
                                                 // special logic     
@@ -468,14 +484,28 @@ bool readFile_V0(const string& filename, FileInfo& fInfo)
                                                 //       \r\n
                                                 //       \r\n
                                                 // Core , is there some bug ???
-                                                if( last_EOF_flag != 0 ) {
+                                                if( last_EOL_flag != 0 ) {
                                                     isCurrentLetter_line1stLetter = true;
                                                 }
 
                                                 ++idx;  // !!! Do Skip \n !!!, next for-loop will pointer to the char next to (\r\n)
-                                                current_EOF_flag = 2; // 2 means current is Win EOF mode
+
+                                                //////////////////////////////////////////////////
+                                                // 
+                                                advanceFlag = true;
+
+                                                fmtstr.clear();
+                                                fmtstr.str("");
+
+                                                unsigned int tmpcode = (FULL_BITS & ch);
+                                                fmtstr << std::hex << std::uppercase << setw(2) << setfill('0') << tmpcode;
+
+                                                // Push
+                                                fInfo.rawHexVec.push_back( new string(fmtstr.str() ) );
+
+                                                current_EOF_flag = 2; // 2 means current is Win EOL mode
                                             } else {
-                                                // treat as EOF MAC , check is HYBIRD or not
+                                                // treat as EOL MAC , check is HYBIRD or not
                                                 // current is \r , but the next letter is valid but not \n
                                                 if ( fInfo.endlineMode != FileInfo::E_HYBRID &&  fInfo.endlineMode != FileInfo::E_MAC ) {
 													fInfo.hybridDetail.first = "\\r";
@@ -484,13 +514,13 @@ bool readFile_V0(const string& filename, FileInfo& fInfo)
                                                     fInfo.endlineMode = FileInfo::E_HYBRID;
 													fInfo.hybridLineNo = nRow;
                                                 } else {
-                                                    // last EOF mode is E_MAC , keep it
+                                                    // last EOL mode is E_MAC , keep it
                                                 }
 
-                                                if( last_EOF_flag != 0 ) {
+                                                if( last_EOL_flag != 0 ) {
                                                     isCurrentLetter_line1stLetter = true;
                                                 }
-                                                current_EOF_flag = 3; // 3 means current is EOF is Mac
+                                                current_EOF_flag = 3; // 3 means current is EOL is Mac
                                             }
                                         } else {
                                             // \r is the last letter in the file
@@ -502,10 +532,10 @@ bool readFile_V0(const string& filename, FileInfo& fInfo)
 												fInfo.hybridLineNo = nRow;
                                             }
 
-                                            if( last_EOF_flag != 0 ) {
+                                            if( last_EOL_flag != 0 ) {
                                                 isCurrentLetter_line1stLetter = true;
                                             }
-                                            current_EOF_flag = 3; // 3 means current is MAC EOF mode
+                                            current_EOF_flag = 3; // 3 means current is MAC EOL mode
                                         }
                                     }
                                 }
@@ -518,7 +548,7 @@ bool readFile_V0(const string& filename, FileInfo& fInfo)
                             //  current letter is the one that  excurisive [ \t \r \n ]
                             //  tagFlag == E_SPECIAL_CHAR_TAG::E_OTHER    |      32 ~   126 or 127
                             //
-                            if( last_EOF_flag != 0 ) {
+                            if( last_EOL_flag != 0 ) {
                                 isCurrentLetter_line1stLetter = true;
                             }
                         }
@@ -562,7 +592,7 @@ bool readFile_V0(const string& filename, FileInfo& fInfo)
                         fInfo.firstBinaryByte_Col = nCol;
                     }
                     
-                    if( last_EOF_flag != 0 ) {
+                    if( last_EOL_flag != 0 ) {
                         isCurrentLetter_line1stLetter = true;
                     }
                 }
@@ -639,7 +669,7 @@ bool readFile_V0(const string& filename, FileInfo& fInfo)
                 }
 
                 // save as the last EOF flag
-                last_EOF_flag = current_EOF_flag;
+                last_EOL_flag = current_EOF_flag;
             } else {
                 //
                 // nRestBytesForCh!=0   : Multi-Bytes Unicode Character       maybe == 1 or 2 or 3
@@ -682,6 +712,8 @@ bool readFile_V0(const string& filename, FileInfo& fInfo)
         } else {
             // Binary File , do-not do the following  parse
         }
+
+        (void)advanceFlag;
     } // end for
     
     if ( !fInfo.isBinary   &&  nRestBytesForCh > 0 ) {
@@ -705,6 +737,7 @@ bool readFile_V0(const string& filename, FileInfo& fInfo)
     return true;
 }
 
+
 // do <NOT> skip any letter , scan from the head to the tail
 bool readFile_V1(const string& filename, FileInfo& fInfo)
 {
@@ -719,8 +752,8 @@ bool readFile_V1(const string& filename, FileInfo& fInfo)
     }
     fInfo.isValid = true;
     
-	bool treatEOFAsByte = true;
-	bool treatRNAs1Byte = true;
+	bool treatEOLAsByte = true;
+	bool treatRNAs1Byte = true; // treat \r\n as 1 byte rather than 2 bytes
     char* fileContentBuf = nullptr;
     size_t szOfFile = 0;
     file.seekg(0, ios::end);
@@ -779,13 +812,13 @@ bool readFile_V1(const string& filename, FileInfo& fInfo)
     
     string singleCharacter;
     /////////////////////////////////////////////////////////////////////
-    // last_EOF_flag :
+    // last_EOL_flag :
     // 0: undefined or    the last character is not EOF ,  
     // 1:Unix 
     // 2:Win 
     // 3:Mac , 
     //          will never be 4(HYBIRD) ,because every line has a specific and unambiguous EOF
-    int last_EOF_flag    = 0; 
+    int last_EOL_flag    = 0;
     
     int nRow = 1;
     int nCol = 1;
@@ -818,7 +851,7 @@ bool readFile_V1(const string& filename, FileInfo& fInfo)
 				singleCharacter.clear();
 				auto canInputAscii = isCanInputChar(ch);
 				if( canInputAscii ) {
-					if ( last_EOF_flag != 0 ) {
+					if ( last_EOL_flag != 0 ) {
 						++nRow; nCol = 1;
 
                         list<SingleCharacter*>* pNewline = new list<SingleCharacter*>();
@@ -843,20 +876,20 @@ bool readFile_V1(const string& filename, FileInfo& fInfo)
 									fInfo.rawHexVec.push_back( new string( fmtstr.str() ) );
 
 									// treat \r\n as 1 or 2 EOL byte(s) ? 
-									if ( treatEOFAsByte ) {
+									if ( treatEOLAsByte ) {
 										fInfo.characterCount += (treatRNAs1Byte ? 1 : 2);
 									}
 								} else {
 									current_EOF_flag = 3;	// Mac EOL mode
 
-									if ( treatEOFAsByte ) {
+									if ( treatEOLAsByte ) {
 										fInfo.characterCount += 1;
 									}
 								}
 							} else {
 								// \r is the last letter of the file content
 								current_EOF_flag = 3;	// Mac EOL mode and this is the last letter
-								if ( treatEOFAsByte ) {
+								if ( treatEOLAsByte ) {
 									++fInfo.characterCount;
 								}
 							}
@@ -864,7 +897,7 @@ bool readFile_V1(const string& filename, FileInfo& fInfo)
 							// \n
 							current_EOF_flag = 1;	// Unix EOL mode
 
-							if ( treatEOFAsByte ) {
+							if ( treatEOLAsByte ) {
 								++fInfo.characterCount;
 							}
 						}
@@ -906,7 +939,7 @@ bool readFile_V1(const string& filename, FileInfo& fInfo)
 					lead_idx = idx; lead_row = nRow; lead_col = nCol;
 				}
 			} else {
-				if( last_EOF_flag != 0 ) {
+				if( last_EOL_flag != 0 ) {
 					++nRow; nCol = 1;
 
 					list<SingleCharacter*>* pNewline = new list<SingleCharacter*>();
@@ -1094,7 +1127,7 @@ bool readFile_V1(const string& filename, FileInfo& fInfo)
 			}
 
 			// save as the last EOF flag
-			last_EOF_flag = current_EOF_flag;
+			last_EOL_flag = current_EOF_flag;
 		}
 
 		(void)advanceFlag;
@@ -1177,7 +1210,7 @@ bool readFileRapidly(const string& filename, FileInfo& fInfo)
     unsigned int u32code = 0;
     
     string singleCharacter;
-    int last_EOF_flag    = 0; // 0: undefined or    the last character is not EOF ,  1:Unix 2:Win 3:Mac , will never be 4(HYBIRD) ,because every line has a specific and unambiguous EOF
+    int last_EOL_flag    = 0; // 0: undefined or    the last character is not EOF ,  1:Unix 2:Win 3:Mac , will never be 4(HYBIRD) ,because every line has a specific and unambiguous EOF
     
     int nRow = 1;
     int nCol = 1;
@@ -1205,7 +1238,7 @@ bool readFileRapidly(const string& filename, FileInfo& fInfo)
 				break;
 			}
 			
-			if ( last_EOF_flag != 0 ) {
+			if ( last_EOL_flag != 0 ) {
 				++nRow; nCol = 1;
 			}
 
@@ -1245,7 +1278,7 @@ bool readFileRapidly(const string& filename, FileInfo& fInfo)
 			}
 
 		} else {
-			if( last_EOF_flag != 0 ) {
+			if( last_EOL_flag != 0 ) {
 				++nRow; nCol = 1;
 			}
 
@@ -1390,7 +1423,7 @@ bool readFileRapidly(const string& filename, FileInfo& fInfo)
 		}
 
 		// save as the last EOF flag
-		last_EOF_flag = current_EOF_flag;
+		last_EOL_flag = current_EOF_flag;
 
 		if( fInfo.isBinary )  {
 			break;
@@ -1576,7 +1609,7 @@ void printFileInfo(const FileInfo& fileInfo, string& retStr, bool needPrintToCon
 							{
 							case 1:
 								{
-									if( pSingleCharacter->nEOF_Flag == 0 ) {
+									if( pSingleCharacter->nEOL_Flag == 0 ) {
 										// not		\r		\n		\r\n
 										if ( pSingleCharacter->ansi_char == G_CHAR_TAB.ch || pSingleCharacter->ansi_char == G_CHAR_VTAB.ch ||  pSingleCharacter->ansi_char == G_CHAR_GNP.ch ) {
 											outstr << "| " << pSingleCharacter->display_str << " "; // with one 1 space
@@ -1657,7 +1690,7 @@ void printFileInfo(const FileInfo& fileInfo, string& retStr, bool needPrintToCon
 							// bool isWinEOF = false;
 							for ( size_t j = 0; j < pSingleCharacter->nBytes; ++j ) {
 								outstr << "| " << pSingleCharacter->utf8HexAry[j] << " ";
-								// if ( pSingleCharacter->nBytes==1    &&     pSingleCharacter->nEOF_Flag == FileInfo::E_WIN ) {
+								// if ( pSingleCharacter->nBytes==1    &&     pSingleCharacter->nEOL_Flag == FileInfo::E_WIN ) {
 								//     isWinEOF = true;
 								// }
 							}
@@ -1690,7 +1723,7 @@ void printFileInfo(const FileInfo& fileInfo, string& retStr, bool needPrintToCon
 							case 1:
 								{
 									outstr << "| " << pSingleCharacter->unicode32_str << " ";
-									// if( pSingleCharacter->nEOF_Flag == static_cast<int>(FileInfo::E_WIN) ) {
+									// if( pSingleCharacter->nEOL_Flag == static_cast<int>(FileInfo::E_WIN) ) {
 									// 	outstr << "| " << G_CHAR_GN.hexCodeStr << " ";
 									// }
 								}

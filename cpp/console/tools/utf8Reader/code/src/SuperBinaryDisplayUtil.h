@@ -36,7 +36,6 @@ namespace SuperBinaryDisplayUtil
 	const SpecialAnsiChar G_CHAR_GNP = { '\f', static_cast<unsigned int>('\f'),   string("0C"),    string("\\f"),  string("\\f") };		// \r = 13  = <CR>
 
     const int SPECIAL_CHAR_CNT = 3;
-    const int EOF_TYPE_CNT = 3;
 
     const size_t SIZE_BOM = 3;
     const unsigned int utf8_Bom_tag[SIZE_BOM] = { 0xEF, 0xBB, 0xBF };      //  ==>   U+FEFF
@@ -91,7 +90,7 @@ namespace SuperBinaryDisplayUtil
 
         int nRow;
         int nCol;
-        int nEOF_Flag;
+        int nEOL_Flag;
 
         int reserverd_flag; // = 0
     };
@@ -100,7 +99,7 @@ namespace SuperBinaryDisplayUtil
     {
         enum E_ENDLINE_MODE {
             E_UNKNOWN_ENDLINE = 0,
-            E_UNIX = 1, E_LINUX = 1,    // \n    Unix and Linux , with the same EOF  End-Of-Line   
+            E_UNIX = 1, E_LINUX = 1,    // \n    Unix and Linux , with the same EOL  End-Of-Line
             E_WIN = 2,  // \r\n
             E_MAC = 3,  // \r
             E_HYBRID = 4,
@@ -117,7 +116,7 @@ namespace SuperBinaryDisplayUtil
         int bytesCount;
         int characterCount;
         int lineCnt;			// 行数
-		int hybridLineNo;	// 多重 EOF，初次被确定为 hybrid 形式的那一行
+		int hybridLineNo;	// 多重 EOL，初次被确定为 hybrid 形式的那一行
 		pair<string,string> hybridDetail; // former and later
         E_ENDLINE_MODE endlineMode;
         
