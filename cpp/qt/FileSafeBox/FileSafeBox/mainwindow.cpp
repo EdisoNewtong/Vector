@@ -8,6 +8,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "MyWidget.h"
+#include "my_encrypt.h"
+#include "my_decrypt.h"
 
 // static 
 // const int  QMainWindow::SC_TOTAL_CNT = 4;
@@ -108,6 +110,12 @@ void MainWindow::setPosAndSize(const QSize& sz)
 
 void MainWindow::onMouseEnterWidget(MyWidget* w)
 {
+    char ch1 = 'a';
+    char newChar = encryptUtil::enc1(ch1);
+    char backtoOriginChar = decryptUtil::dec1(newChar);
+    Q_UNUSED(backtoOriginChar)
+
+
 	if( w!=nullptr) {
 		int idx = -1;
 		if( w == m_lt ) {

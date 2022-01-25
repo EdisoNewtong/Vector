@@ -1,3 +1,0 @@
-This line is Win         end-line (\r\n) |
-This line is Unix(Linux) end-line (\n)    |
-This line is Mac         end-line (\r)    |Last line
