@@ -215,7 +215,7 @@ QString MainWindow::calcQString(const QString& content)
         }
     }
 
-    retstr += QString("\t size() = %1 QChar(s), character(s) = %2 \n").arg(content.size()).arg(characterCnt);
+    retstr += QString("size() = %1 QChar(s), character(s) = %2 \n").arg(content.size()).arg(characterCnt);
     retstr += inner;
 
     return retstr;
@@ -327,7 +327,7 @@ QString MainWindow::auxOutput(const QString& singleCh, unsigned int u32code)
     retstr += " utf-8 : \"";
     for ( int i = 0; i < ba.size(); ++i ) {
         char ch = ba[i];
-        int code = static_cast<int>(0xFFU & ch);
+        int code = static_cast<int>(0xFF & ch);
 
         QByteArray chba;
         chba.setNum(code,16);

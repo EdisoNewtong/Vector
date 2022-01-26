@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Binary File Editor</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <widget class="myhexeditor" name="textEdit">
@@ -44,6 +44,15 @@
          </color>
         </brush>
        </colorrole>
+       <colorrole role="PlaceholderText">
+        <brush brushstyle="NoBrush">
+         <color alpha="128">
+          <red>33</red>
+          <green>255</green>
+          <blue>6</blue>
+         </color>
+        </brush>
+       </colorrole>
       </active>
       <inactive>
        <colorrole role="Text">
@@ -64,6 +73,15 @@
          </color>
         </brush>
        </colorrole>
+       <colorrole role="PlaceholderText">
+        <brush brushstyle="NoBrush">
+         <color alpha="128">
+          <red>33</red>
+          <green>255</green>
+          <blue>6</blue>
+         </color>
+        </brush>
+       </colorrole>
       </inactive>
       <disabled>
        <colorrole role="Text">
@@ -81,6 +99,15 @@
           <red>237</red>
           <green>237</green>
           <blue>237</blue>
+         </color>
+        </brush>
+       </colorrole>
+       <colorrole role="PlaceholderText">
+        <brush brushstyle="NoBrush">
+         <color alpha="128">
+          <red>33</red>
+          <green>255</green>
+          <blue>6</blue>
          </color>
         </brush>
        </colorrole>
