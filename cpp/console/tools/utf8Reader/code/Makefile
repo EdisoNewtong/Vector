@@ -1,9 +1,9 @@
 #!/bin/bash
 
 MYFLAG :=  -std=c++11   -Wall  -O3
-BINNAME := utf8Reader
+BINNAME := utf8reader
 
-utf8Reader:src/SuperBinaryDisplayUtil.cpp src/SuperBinaryDisplayUtil.h src/$(BINNAME).cpp
+utf8reader:src/SuperBinaryDisplayUtil.cpp src/SuperBinaryDisplayUtil.h src/$(BINNAME).cpp
 	g++  $(MYFLAG)   -o   build/SuperBinaryDisplayUtil.o  -c src/SuperBinaryDisplayUtil.cpp
 	g++  $(MYFLAG)   -o   build/$(BINNAME).o  -c src/$(BINNAME).cpp
 	g++  $(MYFLAG) build/*.o   -o   build/$(BINNAME)
