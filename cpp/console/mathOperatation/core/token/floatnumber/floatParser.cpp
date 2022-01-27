@@ -405,7 +405,7 @@ bool FloatParser::isTokenValid() // override
 			numIdxVec.push_back(i);
 		} else if ( is_dot(ch) ) {
 			dotIdxVec.push_back(i);
-			if ( dotIdxVec.size() >= 2U ) {
+			if ( dotIdxVec.size() >= 2 ) {
 				invalidFlag = true;
 				break;
 			}
@@ -417,19 +417,19 @@ bool FloatParser::isTokenValid() // override
 			}
 		} else if ( is_positiveSign(ch) ) {
 			positiveIdxVec.push_back(i);
-			if ( positiveIdxVec.size() >= 2U ) {
+			if ( positiveIdxVec.size() >= 2 ) {
 				invalidFlag = true;
 				break;
 			}
 		} else if ( is_negativeSign(ch) ) {
 			negativeIdxVec.push_back(i);
-			if ( negativeIdxVec.size() >= 2U ) {
+			if ( negativeIdxVec.size() >= 2 ) {
 				invalidFlag = true;
 				break;
 			}
 		} else if ( is_fF(ch) ) {
 			fFIdxVec.push_back(i);
-			if ( fFIdxVec.size() >= 2U ) {
+			if ( fFIdxVec.size() >= 2 ) {
 				invalidFlag = true;
 				break;
 			}
@@ -493,21 +493,23 @@ bool FloatParser::isTokenValid() // override
 		// positiveIdxVec   negativeIdxVec
 		if ( !positiveIdxVec.empty() && !negativeIdxVec.empty() ) {
 			return false;
-		} else if ( positiveIdxVec.empty() ) {
-			// negativeIdxVec is not empty
-			int neIdx = static_cast<int>(negativeIdxVec.at(0));
-			if ( neIdx != (eEIdx+1) ) {
-				return false;
-			}
-		} else if ( negativeIdxVec.empty() ) {
-			// positiveIdxVec is not empty
-			int poIdx = static_cast<int>(positiveIdxVec.at(0));
-			if ( poIdx != (eEIdx+1) ) {
-				return false;
-			}
+		} else if ( !(positiveIdxVec.empty() && negativeIdxVec.empty()) ) {
+            if ( positiveIdxVec.empty() ) {
+                // negativeIdxVec is not empty
+                int neIdx = static_cast<int>(negativeIdxVec.at(0));
+                if ( neIdx != (eEIdx+1) ) {
+                    return false;
+                }
+            } else {
+                // positiveIdxVec is not empty
+                int poIdx = static_cast<int>(positiveIdxVec.at(0));
+                if ( poIdx != (eEIdx+1) ) {
+                    return false;
+                }
+            }
 		} else {
-			// both is empty
-		}
+            // Both is empty , OK , valid
+        } 
 	} else if ( dotCnt == 1 ) {
 		// dotCnt == 1 && eECnt == 0
 		int dotIdx = dotIdxVec.at(0);

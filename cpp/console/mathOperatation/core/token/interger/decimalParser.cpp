@@ -41,7 +41,8 @@ void DecimalParser::init() // override
 	m_AllAvalibleCharacters.insert( make_pair('l', CharUtil::getCharBaseInfo('l') ) );
 	m_AllAvalibleCharacters.insert( make_pair('L', CharUtil::getCharBaseInfo('L') ) );
 
-	// very special string     1f   123f   334f
+	// very special string :
+	//     1f   123f   334f  is not valid by the c/c++ compiler
 	// m_AllAvalibleCharacters.insert( make_pair('f', CharUtil::getCharBaseInfo('f') ) );
 	// m_AllAvalibleCharacters.insert( make_pair('F', CharUtil::getCharBaseInfo('F') ) );
 
