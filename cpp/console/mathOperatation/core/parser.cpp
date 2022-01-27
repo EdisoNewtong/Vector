@@ -133,7 +133,7 @@ int Parser::doParse()
 						// Core return to default Parser
 						pushRet = m_TokenListAnalyzer.pushToken( newParser->generateToken() );
 						if ( argsDbgOption >= 2 ) {
-							cout << "  [Inner Changed] : " << Enum2Name::getParserName(nextParserType2) << " -> " << Enum2Name::getParserName(E_P_DEFAULT) << " , " <<  m_pInfo.position.getPosStr() << endl;
+							cout << "  [Inner Changed 1] : " << Enum2Name::getParserName(nextParserType2) << " -> " << Enum2Name::getParserName(E_P_DEFAULT) << " , " <<  m_pInfo.position.getPosStr() << endl;
 						}
 						nextParserType = E_P_DEFAULT;
 					} else {
@@ -150,12 +150,12 @@ int Parser::doParse()
 					auto bEndFlag = newParser->isEnd(&m_pInfo);
 					if ( bEndFlag ) {
 						// Core return to default Parser
-						pushRet = m_TokenListAnalyzer.pushToken( newParser->generateToken() );
+						// pushRet = m_TokenListAnalyzer.pushToken( newParser->generateToken() );
 						if (  argsDbgOption >= 2 ) {
-							cout << "  [Inner Changed] : " <<  Enum2Name::getParserName(nextParserType) << " -> " << Enum2Name::getParserName(E_P_DEFAULT) << " , " <<  m_pInfo.position.getPosStr() << endl;
+							cout << "  [Inner Changed 2] : " <<  Enum2Name::getParserName( m_currentPaserType ) << " -> " << Enum2Name::getParserName(nextParserType) << " , " <<  m_pInfo.position.getPosStr() << endl;
 						}
 						nextParserType = E_P_DEFAULT;
-					} 
+					}
 				}
 				break;
 			default:

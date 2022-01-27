@@ -357,8 +357,12 @@ bool FloatParser::isEnd(ParsedCharInfo* pInfo) // override;
 		return m_numberCnt>0;
 	} else {
 		// no f/F @ suffix
+
+        /*
 		return     (m_numberCnt > 0) 
 			    && (m_dotCnt == 1 || m_eECnt== 1);
+        */
+        return false;
 	}
 	
 }
