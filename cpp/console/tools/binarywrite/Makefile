@@ -10,4 +10,4 @@ binarywrite:binarywrite.cpp
 
 .PHONY:clean
 clean:
-	-rm   -Rf  *.o *.dSYM  binarywrite
+	-rm   -Rf  *.o*  *.exe  *.dSYM  binarywrite

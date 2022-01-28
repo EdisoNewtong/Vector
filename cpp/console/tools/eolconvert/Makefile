@@ -10,4 +10,4 @@ eolconvert:eolconvert.cpp
 
 .PHONY:clean
 clean:
-	-rm   -Rf   *.o   *.dSYM   eolconvert 
+	-rm   -Rf   *.o*   *.exe   *.dSYM   eolconvert

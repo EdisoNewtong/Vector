@@ -13,4 +13,4 @@ utf8reader:src/SuperBinaryDisplayUtil.cpp src/SuperBinaryDisplayUtil.h src/$(BIN
 
 .PHONY:clean
 clean:
-	-rm  -Rf  build/*  ./$(BINNAME)
+	-rm  -Rf  build/*  ./$(BINNAME) ./$(BINNAME).exe

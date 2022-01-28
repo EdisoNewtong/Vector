@@ -32,4 +32,4 @@ demo:demo.cpp core/floatNumberConverter.cpp core/floatNumberConverter.h
 
 .PHONY:clean
 clean:
-	-rm    -Rf    *.o   ieee754   demo genCode  genTools *.dSYM
+	-rm    -Rf    *.o*    *.exe    ieee754   demo genCode  genTools *.dSYM
