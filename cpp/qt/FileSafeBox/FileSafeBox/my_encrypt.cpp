@@ -16,12 +16,25 @@ char ende::enc2(const char& byte)
 	unsigned int bit4th = ((ui_code >> 4U)  & 0x1U);
 	unsigned int bit5th = ((ui_code >> 3U)  & 0x1U);
 	if( bit4th ^ bit5th ) {
+        //////////////////////////////////////////////////////////////////
+        //
+        // Core Core Core
+        // ************************************************
+        //    the priority of '&'  is higher than  '|'
+        // ************************************************
+        //  
+        // e.g.
+        //          unsigned int num = 0x10;
+        //          unsigned int result = num |  0x8 & 0x3;   
+        //   // =>  unsigned int result = num | (0x8 & 0x3);
+        //////////////////////////////////////////////////////////////////
 		// swap if
 		if( bit4th != 0) {
-			ret = static_cast<char>( ui_code | (1U<<3U)   &   (~(1U<<4U)) );
+
+			ret = static_cast<char>( ( ui_code | (1 << 3) )     &   (~(1 << 4)) );
 		} else {
 			// bit5th != 0
-			ret = static_cast<char>( ui_code | (1U<<4U)   &   (~(1U<<3U)) );
+			ret = static_cast<char>( ( ui_code | (1 << 4) )     &   (~(1 <<3)) );
 		}
 	} 
 
