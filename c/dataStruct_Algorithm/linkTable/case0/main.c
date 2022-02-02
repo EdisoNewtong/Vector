@@ -1,5 +1,10 @@
 #include <stdio.h>
+#include <stdbool.h> // required by type bool
 #include <stdlib.h>
+
+static int G_cnt = 0;
+// bool is included inside stdbool.h
+static bool G_TraceMemoryChange = true;
 
 typedef struct Node
 {
@@ -12,6 +17,9 @@ typedef struct Node
 Node* utilCreateNode(char content)
 {
     Node* nd = (Node*)malloc( sizeof(Node) );
+    if( G_TraceMemoryChange ) {
+        printf("Create G_cnt = %d\n", ++G_cnt);
+    }
     nd->element = content;
     nd->next = NULL;
 
@@ -29,6 +37,9 @@ void utilReleaseTable(Node* head)
         current->next = NULL;
 
         free(current);
+        if( G_TraceMemoryChange ) {
+            printf("Delete G_cnt = %d\n", --G_cnt);
+        }
         current = next;
     } while ( current != NULL );
 
