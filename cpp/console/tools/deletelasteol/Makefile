@@ -8,4 +8,4 @@ deletelasteol:deletelasteol.cpp
 
 .PHONY:clean
 clean:
-	-rm  -Rf  *.o*  *.exe  deletelasteol *.dSYM
+	-rm  -Rf  *.o*  *.exe  *.dSYM deletelasteol

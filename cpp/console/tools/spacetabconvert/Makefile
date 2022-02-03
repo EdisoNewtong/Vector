@@ -8,4 +8,4 @@ spacetabconvert:spacetabconvert.cpp
 
 .PHONY:clean
 clean:
-	-rm  -Rf   *.o  spacetabconvert *.dSYM
+	-rm  -Rf   *.o*  *.exe  *.dSYM  spacetabconvert

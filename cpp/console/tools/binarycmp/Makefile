@@ -13,4 +13,4 @@ binarycmp:binarycmp.cpp
 
 .PHONY:clean
 clean:
-	-rm   -Rf   *.o*    binarycmp binarycmp.exe  *.dSYM
+	-rm   -Rf   *.o*  *.exe  *.dSYM  binarycmp
