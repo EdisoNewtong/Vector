@@ -33,7 +33,7 @@ protected:
 
 	TokenInfo* getPreviousToken(bool needSkipBlankComment, int* pHasSkipBlankComment, bool needBack2LastButOne);
 	void judgeTokenIsPositiveOrNegativeAndReset(TokenInfo* pToken);
-	bool hasMatchedOpenParentheseBefore();
+	TokenInfo* hasOpenParentheseBefore();
 	void tryPopPreviousOperatorLowerPriority(TokenInfo* pToken);
 	void popUtilOpenParenthese();
 

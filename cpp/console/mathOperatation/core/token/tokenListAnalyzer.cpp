@@ -58,8 +58,9 @@ bool TokenListAnalyzer::isListEmpty()
 
 int TokenListAnalyzer::pushToken(TokenInfo* pToken)
 {
-	static const string SC_LEFT(" ( ");
-	static const string SC_RIGHT(" ) ");
+	// static const string SC_LEFT(" ( ");
+	// static const string SC_RIGHT(" ) ");
+	static const string SC_BLANK("  ");
 
 	judgeTokenIsPositiveOrNegativeAndReset(pToken);
 
@@ -92,8 +93,13 @@ int TokenListAnalyzer::pushToken(TokenInfo* pToken)
 		{
 			if ( curTp == E_TOKEN_OP_CLOSE_PARENTHESES ) {
 				// special ')'
-				if ( !hasMatchedOpenParentheseBefore() ) {
-					// TODO : throw
+                auto previousOpenParentheseToken = hasOpenParentheseBefore();
+				if ( previousOpenParentheseToken == nullptr ) {
+                    ParserException e(E_TOKEN_CLOSE_PARENTHESES_MISMATCHED);
+					string detail;
+					detail += endPos.getPosStr();
+                    e.setDetail( detail );
+                    throw e;
 				} else {
 					// pop previous element until '('
 					popUtilOpenParenthese();
@@ -126,14 +132,14 @@ int TokenListAnalyzer::pushToken(TokenInfo* pToken)
 				auto banPickFlag = foundIt->second;
 
 				if ( banPickFlag == 0 ) {
-					// Not Allowed at all
+					// current operator type is not allowed  ( at ban/pick list)
 					string detail;
 					detail += endPos.getPosStr();
 					detail += ", ";
 					detail +=   (previousTokenType 
-								  + SC_LEFT + previousValidToken->getDetail() + SC_RIGHT 
+								  + SC_BLANK + previousValidToken->getDetail()
 								  + string(" Can't located in front of Type   ") + curTokenType
-								  + SC_LEFT + pToken->getDetail() + SC_RIGHT);
+								  + pToken->getDetail());
 
 					ParserException e(E_TOKEN_LOGIC_INVALID);
 					e.setDetail( detail );
@@ -151,9 +157,9 @@ int TokenListAnalyzer::pushToken(TokenInfo* pToken)
 						detail += endPos.getPosStr();
 						detail += ", ";
 						detail +=  (previousTokenType 
-									 + SC_LEFT + previousValidToken->getDetail() + SC_RIGHT 
+									 + SC_BLANK + previousValidToken->getDetail() 
 									 + string(" Can't located <No-Skip> in front of Type   ") + curTokenType
-									 + SC_LEFT + pToken->getDetail() + SC_RIGHT);
+									 + pToken->getDetail() );
 
 						ParserException e(E_TOKEN_LOGIC_INVALID);
 						e.setDetail( detail );
@@ -203,7 +209,7 @@ int TokenListAnalyzer::pushToken(TokenInfo* pToken)
 				detail += endPos.getPosStr();
 				detail += ", ";
 				detail += (curTokenType 
-							+ SC_LEFT + pToken->getDetail() + SC_RIGHT 
+							+ pToken->getDetail() 
 							+ string(" Can't be pushed at the 1st position"));
 
 				e.setDetail( detail );
@@ -953,8 +959,14 @@ void TokenListAnalyzer::judgeTokenIsPositiveOrNegativeAndReset(TokenInfo* pToken
 
 void TokenListAnalyzer::expValidCheck()
 {
-	if ( !hasMatchedOpenParentheseBefore() ) {
-		// TODO : throw
+    auto pOpenParentheseToken  = hasOpenParentheseBefore();
+	if ( pOpenParentheseToken != nullptr ) {
+        string detail;
+        ParserException e(E_TOKEN_OPEN_PARENTHESES_MISMATCHED);
+	    const auto& endPos = pOpenParentheseToken->getEndPos();
+        detail += endPos.getPosStr();
+        e.setDetail( detail );
+        throw e;
 	}
 
 	// pop rest   operator
@@ -1044,14 +1056,18 @@ bool TokenListAnalyzer::isOperatorType(E_TokenType tp)
 	return (curIdx > begIdx   &&   curIdx <= endIdx);
 }
 
-bool TokenListAnalyzer::hasMatchedOpenParentheseBefore()
+//
+// search the previous '(' in reverse order
+//
+TokenInfo* TokenListAnalyzer::hasOpenParentheseBefore()
 {
-	auto foundBefore = false;
+	TokenInfo* foundBefore = nullptr;
 	for( auto rit = m_operatorStack.crbegin(); rit != m_operatorStack.crend(); ++rit )
 	{
+        TokenInfo* tokenInfo = rit->first;
 		auto pOperatorInfo = rit->second;
 		if ( pOperatorInfo != nullptr && ( pOperatorInfo->getChar() == '(' ) ) {
-			foundBefore = true;
+			foundBefore = tokenInfo;
 			break;
 		}
 	}

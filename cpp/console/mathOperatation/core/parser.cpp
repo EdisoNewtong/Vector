@@ -149,8 +149,8 @@ int Parser::doParse()
 
 					auto bEndFlag = newParser->isEnd(&m_pInfo);
 					if ( bEndFlag ) {
-						// Core return to default Parser
-						// pushRet = m_TokenListAnalyzer.pushToken( newParser->generateToken() );
+						// Core return to default Parser , maybe push ';'
+						pushRet = m_TokenListAnalyzer.pushToken( newParser->generateToken() );
 						if (  argsDbgOption >= 2 ) {
 							cout << "  [Inner Changed 2] : " <<  Enum2Name::getParserName( m_currentPaserType ) << " -> " << Enum2Name::getParserName(nextParserType) << " , " <<  m_pInfo.position.getPosStr() << endl;
 						}

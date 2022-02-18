@@ -23,7 +23,10 @@ ParserException::ParserException(E_ExceptionCode errorCode)
 
 	m_shortInfoMap.insert( make_pair( enumCvt(E_OPERATOR_INVALID_FORMAT), string("Invalid Operator Format") ) );
 	m_shortInfoMap.insert( make_pair( enumCvt(E_VARIBLE_INVALID_FORMAT), string("Invalid Varible Format") ) );
-	m_shortInfoMap.insert( make_pair( enumCvt(E_TOKEN_LOGIC_INVALID), string("Invalid Token Pushing Logic") ) );
+    m_shortInfoMap.insert( make_pair( enumCvt(E_EXP_EVALUATION_INVALID_FORMAT), string("Invalid when pushing ';' ") ) );
+	m_shortInfoMap.insert( make_pair( enumCvt(E_TOKEN_LOGIC_INVALID), string("Invalid Logic when pushing a certain token") ) );
+    m_shortInfoMap.insert( make_pair( enumCvt(E_TOKEN_CLOSE_PARENTHESES_MISMATCHED), string(" ')' Mismatched Close Parenthese ") ) );
+    m_shortInfoMap.insert( make_pair( enumCvt(E_TOKEN_OPEN_PARENTHESES_MISMATCHED), string(" '(' Mismatched Open Parenthese ") ) );
 
 }
 

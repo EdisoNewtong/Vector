@@ -124,6 +124,9 @@ string getTokenName(E_TokenType tp)
 	case E_TOKEN_OP_ASSIGNMENT: // = 23,        // =
 		ret = "'='";
 		break;
+    case E_TOKEN_SEMICOLON: 
+		ret = "';'";
+		break;
 	default:
 		ret = "In switch-case default part :  E_TOKEN_UNKNOWN";
 		break;

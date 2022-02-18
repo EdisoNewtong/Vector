@@ -121,6 +121,16 @@ build/tokenParserMgr.o:core/token/tokenParserMgr.cpp  core/token/tokenParserMgr.
 build/tokenListAnalyzer.o:core/token/tokenListAnalyzer.cpp  core/token/tokenListAnalyzer.h core/commonEnum.h core/token/tokenInfo.h core/util/charUtil.h  core/parsedCharInfo.h
 	g++   $(COMPILE_OPT)   $(INC_PATH)  -c -o build/tokenListAnalyzer.o  core/token/tokenListAnalyzer.cpp
 
+
+
+
+
+
+
+
+####################################################################################################
+####################################################################################################
+####################################################################################################
 .PHONY:clean
 clean:
 	-rm   -Rf  *.o build/*.o  *.exe *.dSYM  main  
