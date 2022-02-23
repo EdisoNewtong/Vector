@@ -6,13 +6,13 @@ COMPILE_OPT  :=  -Wall  -std=c++11
 #
 #COMPILE_OPT :=  -Wall  -std=c++11   -DUSE_INT_INSTEAD_OF_ENUM
 
-main:build/parser.o build/parserOptions.o build/parsedCharInfo.o build/parserException.o  build/keywordList.o build/typeUtil.o build/enum2name.o build/charUtil.o build/tokenInfo.o  build/decimalParser.o build/octalParser.o build/hexParser.o build/floatParser.o build/varibleParser.o  build/tokenParserBase.o build/blankParser.o build/singleLineCommentParser.o build/multiLineCommentParser.o build/operatorParser.o  build/expevaluation.o build/tokenParserMgr.o  build/tokenListAnalyzer.o  build/main.o
-	g++   $(COMPILE_OPT) -o main build/*.o
+mathCalc:build/parser.o build/parserOptions.o build/parsedCharInfo.o build/parserException.o  build/keywordList.o build/typeUtil.o build/enum2name.o build/charUtil.o build/tokenInfo.o  build/decimalParser.o build/octalParser.o build/hexParser.o build/floatParser.o build/varibleParser.o  build/tokenParserBase.o build/blankParser.o build/singleLineCommentParser.o build/multiLineCommentParser.o build/operatorParser.o  build/expevaluation.o build/tokenParserMgr.o  build/tokenListAnalyzer.o  build/mathCalc.o
+	g++   $(COMPILE_OPT) -o mathCalc build/*.o
 
 
 
-build/main.o:main.cpp core/commonEnum.h core/parser.h core/parserOptions.h core/parserException.h core/util/charUtil.h core/util/typeUtil.h core/token/tokenParserMgr.h
-	g++   $(COMPILE_OPT)   $(INC_PATH)   -c -o build/main.o main.cpp
+build/mathCalc.o:mathCalc.cpp core/commonEnum.h core/parser.h core/parserOptions.h core/parserException.h core/util/charUtil.h core/util/typeUtil.h core/token/tokenParserMgr.h
+	g++   $(COMPILE_OPT)   $(INC_PATH)   -c -o build/mathCalc.o mathCalc.cpp
 
 
 build/parserOptions.o:core/parserOptions.cpp  core/parserOptions.h
@@ -133,4 +133,4 @@ build/tokenListAnalyzer.o:core/token/tokenListAnalyzer.cpp  core/token/tokenList
 ####################################################################################################
 .PHONY:clean
 clean:
-	-rm   -Rf  *.o build/*.o  *.exe *.dSYM  main  
+	-rm   -Rf  *.o build/*.o  *.exe *.dSYM  mathCalc  
