@@ -138,7 +138,7 @@ int TokenListAnalyzer::pushToken(TokenInfo* pToken)
 					detail += ", ";
 					detail +=   (previousTokenType 
 								  + SC_BLANK + previousValidToken->getDetail()
-								  + string(" Can't located in front of Type   ") + curTokenType
+								  + string(" Can't located in front of Type   ") + curTokenType + string(" ")
 								  + pToken->getDetail());
 
 					ParserException e(E_TOKEN_LOGIC_INVALID);

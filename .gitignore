@@ -14,6 +14,7 @@ cpp/console/deletelasteol/deletelasteol
 cpp/console/eolconvert/eolconvert
 cpp/console/spacetabconvert/spacetabconvert
 cpp/console/utf8Reader/code/utf8Reader
+cpp/console/mathOperatation/mathCalc
 
 lua/sourceCodeStudy/lua-5.1.5/src/lua
 lua/sourceCodeStudy/lua-5.1.5/src/luac
