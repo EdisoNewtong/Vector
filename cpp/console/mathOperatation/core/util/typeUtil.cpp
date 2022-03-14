@@ -2,6 +2,23 @@
 
 using namespace std;
 
+/*
+####################################################################################################
+
+    char        :  1
+    short       :  2
+    int         :  3
+    long        :  4
+    long long   :  5
+
+----------------------------------------------------------------------------------------------------
+
+    float       :  6
+    double      :  7
+    long double :  8
+
+####################################################################################################
+*/
 TypeBaseInfo::TypeBaseInfo(E_DataType dtype)
 	: m_level(0)
 	, m_bytes(0)
@@ -61,7 +78,7 @@ E_DataType TypeBaseInfo::getType()
 
 bool TypeBaseInfo::isFloatFamily()
 {
-	return m_type == E_TP_FLOAT || m_type == E_TP_DOUBLE ||  m_type == E_TP_LONG_DOUBLE;
+	return m_type >= E_TP_FLOAT;
 }
 
 bool TypeBaseInfo::isIntegerFamily()

@@ -20,8 +20,9 @@ public:
 	// util function
 	bool isFloatFamily();
 
-	bool isSmallIntegerType();
-	bool isIntegerFamily();
+    // char /short
+	bool isSmallIntegerType();  // char /short
+	bool isIntegerFamily();     // char ~ long long
 protected:
 	unsigned int m_level;
 	size_t   m_bytes;
