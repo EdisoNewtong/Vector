@@ -13,6 +13,7 @@ cpp/console/tools/deletelasteol/deletelasteol
 cpp/console/tools/eolconvert/eolconvert
 cpp/console/tools/spacetabconvert/spacetabconvert
 cpp/console/tools/hexstring/hexstring
+cpp/console/tools/intdisplay/intdisplay
 
 lua/sourceCodeStudy/lua-5.1.5/src/lua
 lua/sourceCodeStudy/lua-5.1.5/src/luac
