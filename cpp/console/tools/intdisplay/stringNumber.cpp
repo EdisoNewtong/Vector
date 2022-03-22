@@ -1131,14 +1131,11 @@ string StringNumber::base10_2(const string& input)
         auto pr = cpNumber.devide2();
         cpNumber = pr.first;
         int rest = pr.second;
-        // std::cout << "cpNumber = " << cpNumber.getOriginalStr() << std::endl;
-        // std::cout << "rest = "     << rest << std::endl;
         retstr.insert(0,1, static_cast<int>('0' + rest) );
     } while ( !(cpNumber.m_snumber.size() == 1 && cpNumber.m_snumber.at(0) == '0') );
-    // std::cout << "retstr = "  << retstr << std::endl;
 
+    int len = static_cast<int>(retstr.size());
     if ( bIsNegative ) {
-        int len = static_cast<int>(retstr.size());
 
         int remain = getBinaryPlaceholdZeroCnt(len);
         if ( remain > 0 ) {
@@ -1180,6 +1177,12 @@ string StringNumber::base10_2(const string& input)
             // int newlen = len * 2;
             retstr.insert(0, len, '1');
         }
+    } else {
+        int remain = getBinaryPlaceholdZeroCnt(len);
+        if ( remain > 0 ) {
+            retstr.insert(0, remain, '0');
+        }
+        
     }
 
 
@@ -1260,6 +1263,7 @@ string StringNumber::getDetail()
     static const string inputTitle("Input          : ");
     static const string sperateLine("---------------------------------------");
     static const string binTitle("Binary           : ");
+    static const string nBitTitle("Nth Bit          : ");
     static const string octTitle("Octal            : ");
     static const string de1Title("Decimal unsigned : ");
     static const string de2Title("Decimal   signed : ");
@@ -1326,10 +1330,10 @@ string StringNumber::getDetail()
     ////////////////////////////////////////////////////////////////
     //   "| xxxx xxxx "
     const int nbitsPerHex = 4;
-    string splitLine(12 * nBytes + binTitle.size() + 10, '-');
+    string splitLine(12 * nBytes + nBitTitle.size() + 10, '-');
     detail += (splitLine + endline);
 
-    detail += binTitle;
+    detail += nBitTitle;
     int grpCnt = nBytes * 2;
     for( int grpIdx = 0; grpIdx < grpCnt; ++grpIdx )
     {
@@ -1352,7 +1356,8 @@ string StringNumber::getDetail()
         detail += space;
     }
     detail += (suffixEnd + endline);
-    detail += (string(binTitle.size() ,' '));
+    // detail += (string(binTitle.size() ,' '));
+    detail += binTitle; 
 
 
     for( int grpIdx = 0; grpIdx < grpCnt; ++grpIdx )

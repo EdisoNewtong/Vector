@@ -1,6 +1,6 @@
 #!/bin/bash
 
-buildflag := -g3
+buildflag := -O3
 
 intdisplay:stringNumber.o myException.o charutil.o intdisplay.o
 	g++   -Wall   --std=c++11  $(buildflag)       -o  intdisplay   *.o
