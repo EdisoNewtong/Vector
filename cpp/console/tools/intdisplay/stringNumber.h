@@ -27,9 +27,9 @@ public:
 
     string getOriginalStr() const;
     string getResult() const;
-    int getBase();
+    int getBase() const;
 
-    string getDetail() const;
+    string getDetail();
 
 protected:
     string base2_16(const string& input);

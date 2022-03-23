@@ -527,7 +527,7 @@ string StringNumber::getResult() const
 }
 
 
-int StringNumber::getBase()
+int StringNumber::getBase() const
 {
     return m_base;
 }
