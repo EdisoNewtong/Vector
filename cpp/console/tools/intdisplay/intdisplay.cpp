@@ -261,32 +261,6 @@ int main(int argc, char* argv[], char* env[])
             // string convertResult;
             StringNumber strnumber(inputNumber, formatType);
             cout << strnumber.getDetail() << endl;
-
-            /*
-            string binStr          = strnumber.calcBinary();
-            if ( !isbB(binStr.back()) ) {
-                binStr += "B";
-            }
-
-            string octalStr        = strnumber.calcOctal();
-            if ( octalStr.front() != '0' || octalStr.size() == 1 ) {
-                octalStr = string("0") + octalStr;
-            }
-
-            string unsignedDecimal = strnumber.calcDecimal();
-            string signedDecimal   = strnumber.calcDecimalWithSignedFlag();
-            string hexStr          = strnumber.calcHex();
-            string hexPrefix = hexStr.substr(0,2);
-            if ( hexPrefix != "0x" && hexPrefix != "0X" ) {
-                hexStr = string("0x") + hexStr;
-            }
-            
-            cout << "Binary           : " << binStr          << endl;
-            cout << "Octal            : " << octalStr        << endl;
-            cout << "Decimal unsigned : " << unsignedDecimal << endl;
-            cout << "Decimal   signed : " << signedDecimal   << endl;
-            cout << "Hex              : " << hexStr          << endl;
-            */
         }
 
     }

@@ -25,7 +25,12 @@ public:
     StringNumber operator + (const StringNumber& right);
     StringNumber operator * (const StringNumber& right);
 
-    string getDetail();
+    string getOriginalStr() const;
+    string getResult() const;
+    int getBase();
+
+    string getDetail() const;
+
 protected:
     string base2_16(const string& input);
     string base2_8(const string& input);
@@ -62,7 +67,7 @@ protected:
     string cut0x( const string& input);
 
 
-    string getOriginalStr() const;
+    // string getOriginalStr() const;
 
     string calcBinary();
     string calcOctal();

@@ -4,6 +4,7 @@
 #include "charutil.h"
 
 // #include <iostream>
+#include <limits>
 #include <cmath>
 #include <unordered_map>
 
@@ -518,6 +519,17 @@ void StringNumber::check16()
 string StringNumber::getOriginalStr() const
 {
     return m_orignalStr;
+}
+
+string StringNumber::getResult() const
+{
+    return m_snumber;
+}
+
+
+int StringNumber::getBase()
+{
+    return m_base;
 }
 
 
@@ -1276,6 +1288,7 @@ string StringNumber::getDetail()
     static const string prfixBlankSpace("| ");
     static const string space(" ");
     static const string suffixEnd("|");
+    static const string rangeHyphen(" ~ ");
     // 
     static const string strBin("Binary Type");
     static const string strOct("Octal Type");
@@ -1318,11 +1331,70 @@ string StringNumber::getDetail()
     int nBytes = nBits / s_nBitsPerByte;
     // Add detail
     detail += (leftParathesis + to_string(nBits) + sbits + to_string(nBytes) + sbytes + rightParathesis + endline);
+    string unsignedRange;
+    string   signedRange;
+    if (  nBytes <= static_cast<int>( sizeof(unsigned long long) ) ) {
+        if ( nBytes == 1 ) {
+            int ucharMin = static_cast<int>( numeric_limits<unsigned char>::min() );
+            int ucharMax = static_cast<int>( numeric_limits<unsigned char>::max() );
+            int scharMin = static_cast<int>( numeric_limits<  signed char>::min() );
+            int scharMax = static_cast<int>( numeric_limits<  signed char>::max() );
+            unsignedRange += ( to_string(ucharMin) + rangeHyphen  + to_string(ucharMax));
+              signedRange += ( to_string(scharMin) + rangeHyphen  + to_string(scharMax));
+        } else if ( nBytes == 2 ) {
+            int ushortMin = static_cast<int>( numeric_limits<unsigned short>::min() );
+            int ushortMax = static_cast<int>( numeric_limits<unsigned short>::max() );
+            int sshortMin = static_cast<int>( numeric_limits<  signed short>::min() );
+            int sshortMax = static_cast<int>( numeric_limits<  signed short>::max() );
+            unsignedRange += ( to_string(ushortMin) + rangeHyphen + to_string(ushortMax) );
+              signedRange += ( to_string(sshortMin) + rangeHyphen + to_string(sshortMax) );
+        } else if ( nBytes == 4 ) {
+            unsigned int uintMin = numeric_limits<unsigned int>::min();
+            unsigned int uintMax = numeric_limits<unsigned int>::max();
+              signed int sintMin = numeric_limits<  signed int>::min();
+              signed int sintMax = numeric_limits<  signed int>::max();
+            unsignedRange += ( to_string(uintMin) + rangeHyphen + to_string(uintMax) );
+              signedRange += ( to_string(sintMin) + rangeHyphen + to_string(sintMax) );
+        } else if ( nBytes == 8 ) {
+            unsigned long long ullMin = numeric_limits<unsigned long long>::min();
+            unsigned long long ullMax = numeric_limits<unsigned long long>::max();
+              signed long long sllMin = numeric_limits<  signed long long>::min();
+              signed long long sllMax = numeric_limits<  signed long long>::max();
+            unsignedRange += ( to_string(ullMin) + rangeHyphen + to_string(ullMax) );
+              signedRange += ( to_string(sllMin) + rangeHyphen + to_string(sllMax) );
+        } else {
+            unsignedRange += ( string("???") + rangeHyphen + string("???") );
+              signedRange += ( string("???") + rangeHyphen + string("???") );
+        }
+    } else {
+        int nAllBits = nBytes * s_nBitsPerByte;
 
-    // 
+        StringNumber uMin("0",10);
+        string strumax(nAllBits,'1');
+        strumax += "B";
+        StringNumber uMax( strumax, 2);
+        
+
+        string strSmin = "1";
+        strSmin += string(nAllBits-1, '0');
+        strSmin += "B";
+        StringNumber sMin(strSmin, 2);
+
+        string strSmax = "0";
+        strSmax += string(nAllBits-1, '1');
+        strSmax += "B";
+        StringNumber sMax(strSmax, 2);
+
+            unsignedRange += ( uMin.calcDecimal() + rangeHyphen + uMax.calcDecimal() );
+              signedRange += ( sMin.calcDecimalWithSignedFlag() + rangeHyphen + sMax.calcDecimalWithSignedFlag() );
+
+
+    }
+
     detail += (octTitle + octalStr        + endline);
-    detail += (de1Title + unsignedDecimal + endline);
-    detail += (de2Title + signedDecimal   + endline);
+
+    detail += (de1Title + unsignedDecimal + leftParathesis + unsignedRange + rightParathesis + endline);
+    detail += (de2Title + signedDecimal   + leftParathesis +   signedRange + rightParathesis + endline);
     detail += (hexTitle + hexStr          + endline);
 
 
