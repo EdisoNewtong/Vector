@@ -1275,7 +1275,7 @@ string StringNumber::getDetail()
     static const string inputTitle("Input          : ");
     static const string sperateLine("---------------------------------------");
     static const string binTitle("Binary           : ");
-    static const string nBitTitle("Nth Bit          : ");
+    static const string nBitTitle("N-th Bit         : ");
     static const string octTitle("Octal            : ");
     static const string de1Title("Decimal unsigned : ");
     static const string de2Title("Decimal   signed : ");
@@ -1285,7 +1285,7 @@ string StringNumber::getDetail()
     static const string sbytes(" byte(s) ");
     static const string rightParathesis(" ) ");
     static const string endline("\n");
-    static const string prfixBlankSpace("| ");
+    static const string prefixBlankSpace("| ");
     static const string space(" ");
     static const string suffixEnd("|");
     static const string rangeHyphen(" ~ ");
@@ -1294,6 +1294,12 @@ string StringNumber::getDetail()
     static const string strOct("Octal Type");
     static const string strDec("Decimal Type");
     static const string strHex("Hex Type");
+    // 
+    static const string strChar("<char>");
+    static const string strShort("<short>");
+    static const string strInt( sizeof(int) == 4 ? "<int>" : "<long>");
+    static const string strLongLong("<long long>");
+    static const string strLarger(" >= sizeof(long long) ");
 
     string detail;
     string binStr = calcBinary();  // with 'B' suffix
@@ -1330,7 +1336,20 @@ string StringNumber::getDetail()
     int nBits = static_cast<int>( strcutbB.size() );
     int nBytes = nBits / s_nBitsPerByte;
     // Add detail
-    detail += (leftParathesis + to_string(nBits) + sbits + to_string(nBytes) + sbytes + rightParathesis + endline);
+    string strDataType;
+    if ( nBytes == 1 ) {
+        strDataType = strChar;
+    } else if ( nBytes == 2 ) {
+        strDataType = strShort;
+    } else if ( nBytes == 4 ) {
+        strDataType = strInt;
+    } else if ( nBytes == 8 ) {
+        strDataType = strLongLong;
+    } else {
+        strDataType = strLarger;
+    }
+
+    detail += (leftParathesis + space + strDataType + space + to_string(nBits) + sbits + to_string(nBytes) + sbytes + rightParathesis + endline);
     string unsignedRange;
     string   signedRange;
     if (  nBytes <= static_cast<int>( sizeof(unsigned long long) ) ) {
@@ -1417,7 +1436,7 @@ string StringNumber::getDetail()
 
         auto isEvenNumber = (grpIdx % 2 == 0);
         if ( isEvenNumber ) {
-            detail += prfixBlankSpace;
+            detail += prefixBlankSpace;
         } 
 
         detail += strIdxBit;
@@ -1437,7 +1456,7 @@ string StringNumber::getDetail()
         string part1Hex = strcutbB.substr(grpIdx * nbitsPerHex, nbitsPerHex);
         auto isEvenNumber = (grpIdx % 2 == 0);
         if ( isEvenNumber ) {
-            detail += prfixBlankSpace;
+            detail += prefixBlankSpace;
         } 
 
         detail += part1Hex;
@@ -1456,7 +1475,7 @@ string StringNumber::getDetail()
         string hexCode = hexStr.substr(grpIdx,1);
         auto isEvenNumber = (grpIdx % 2 == 0);
         if ( isEvenNumber ) {
-            detail += prfixBlankSpace;
+            detail += prefixBlankSpace;
         } 
 
         detail += (string(3,' '));
@@ -1464,9 +1483,60 @@ string StringNumber::getDetail()
         detail += space;
     }
     detail += (suffixEnd + endline);
+
+
+    ////////////////////////////////////////////////////////////////
+    // Print Octal Part
+    detail += octTitle;
+    octalStr = cutZero(octalStr);
+    int octLen = static_cast<int>( octalStr.size() );
+
+    int remain = nBits % s_2to8Bit;
+    int calcCnt = 0;
+    for( int i = 0; i < octLen; ++i )
+    {
+        char ch = octalStr.at(i);
+        if ( i == 0 ) {
+            detail += prefixBlankSpace;
+            if ( remain == 1 ) {
+                detail += ch;
+                calcCnt += 1;
+            } else {
+                // remain == 2
+                detail += space;
+                detail += ch;
+
+                calcCnt += 2;
+            }
+        } else {
+            for( int j = 1; j <= s_2to8Bit; ++j )
+            {
+                ++calcCnt;
+
+                if ( j == s_2to8Bit ) {
+                    detail += ch;
+                } else {
+                    detail += space;
+                }
+
+                if ( calcCnt % s_2to16Bit == 0 ) {
+                    if ( calcCnt % s_nBitsPerByte == 0 ) {
+                        detail += space;
+                        if ( i != octLen-1 ) { 
+                            detail += prefixBlankSpace;
+                        } 
+                    } else {
+                        detail += space;
+                    }
+                }
+            }
+        }
+    }
+    detail += (suffixEnd + endline);
+    //
+    ////////////////////////////////////////////////////////////////
+
     detail += (splitLine + endline);
-
-
 
     return detail;
 }
