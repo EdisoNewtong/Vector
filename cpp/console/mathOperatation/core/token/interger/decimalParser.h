@@ -16,7 +16,15 @@ public:
 	virtual E_PaserType appendContent(ParsedCharInfo* pInfo) override;
 	virtual bool isTokenValid() override;
 
+
+	virtual TokenInfo* generateToken() override;
+
 	virtual void reset() override;
+
+    int getuUCnt();
+    int getlLCnt();
+
+    virtual bool checkIsInsideRange();
 protected:
 	unsigned short m_uCnt;
 	unsigned short m_UCnt;
@@ -27,6 +35,7 @@ protected:
 	bool is_eE(char ch);
 	bool is_xX(char ch);
 	bool is_uU_lL(char ch);
+
 
 	// bool is_fF(char ch);
 

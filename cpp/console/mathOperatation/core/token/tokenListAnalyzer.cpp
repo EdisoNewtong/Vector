@@ -12,7 +12,6 @@ TokenListAnalyzer::TokenListAnalyzer()
 	, m_banPickCfgMap()
 	, m_evaluateSuffixExpression()
 	, m_operatorStack()
-	, m_tmpMiddleValue()
 	, m_lastSemicolonPosition(0)
 {
 	m_tokenList.clear();
@@ -31,14 +30,6 @@ TokenListAnalyzer::~TokenListAnalyzer()
 	}
 	m_tokenList.clear();
 
-	// 
-	for( auto it = m_tmpMiddleValue.begin(); it != m_tmpMiddleValue.end(); ++it )
-	{
-		if ( *it != nullptr ) {
-			delete (*it);
-		}
-	}
-	m_tmpMiddleValue.clear();
 
 }
 
@@ -919,28 +910,6 @@ void TokenListAnalyzer::judgeTokenIsPositiveOrNegativeAndReset(TokenInfo* pToken
 			} else {
 				if ( previousTp == E_TOKEN_OPERATOR ) {
 					auto previousSubTp = pPreviousInfo->getSubType();
-					/*
-					switch ( previousSubTp )
-					{
-					case E_TOKEN_OP_ADD:
-					case E_TOKEN_OP_POSITIVE:
-					case E_TOKEN_OP_MINUS:
-					case E_TOKEN_OP_NEGATIVE:
-					case E_TOKEN_OP_MULTIPLY:
-					case E_TOKEN_OP_DIVIDE:
-					case E_TOKEN_OP_MOD:
-					case E_TOKEN_OP_BIT_AND:
-					case E_TOKEN_OP_BIT_OR:
-					case E_TOKEN_OP_BIT_XOR:
-					case E_TOKEN_OP_BIT_NOT:
-					case E_TOKEN_OP_BIT_LEFT_SHIFT:
-					case E_TOKEN_OP_BIT_RIGHT_SHIFT:
-					case E_TOKEN_OP_OPEN_PARENTHESES:
-					case E_TOKEN_OP_OPEN_PARENTHESES:
-						pToken->resetSubType( (subTp == E_TOKEN_OP_ADD) ? E_TOKEN_OP_POSITIVE : E_TOKEN_OP_NEGATIVE );
-						break;
-					}
-					*/
 
 					if ( previousSubTp != E_TOKEN_OP_CLOSE_PARENTHESES ) {
 						pToken->resetSubType( (subTp == E_TOKEN_OP_ADD) ? E_TOKEN_OP_POSITIVE : E_TOKEN_OP_NEGATIVE );
@@ -1000,10 +969,7 @@ int  TokenListAnalyzer::evaluateExp()
 								   << " ~ "<<  endPos.getPosStr(0);
 
 				auto subType = pToken->getSubType();
-				if (    subType == E_TOKEN_OP_POSITIVE 
-					 || subType == E_TOKEN_OP_ADD 
-					 || subType == E_TOKEN_OP_MINUS )
-				{
+				if ( subType == E_TOKEN_OP_POSITIVE ) {
 					cout << " => '+' (Positive)";
 				} else if ( subType == E_TOKEN_OP_NEGATIVE ) {
 					cout << " => '-' (Negative)";
@@ -1011,7 +977,9 @@ int  TokenListAnalyzer::evaluateExp()
 					cout << " => '+' (Add)";
 				} else if ( subType == E_TOKEN_OP_MINUS ) {
 					cout << " => '-' (Minus)";
-				}
+				} else {
+                    cout << Enum2Name::getTokenName(subType) << " ";
+                }
 				cout << endl;
 			} else {
 				cout << "[ERROR] "<< idx << ". exp.element == nullptr" << endl;
@@ -1019,8 +987,65 @@ int  TokenListAnalyzer::evaluateExp()
 		}
 	}
 	
-	// TODO : ???
-	
+	// TODO :  Core Core Core , Key Code
+    int idx = 0;
+    for( auto it =  m_evaluateSuffixExpression.begin(); it!= m_evaluateSuffixExpression.end(); ++idx )
+    {
+        auto bAdvanceFlag = false;
+        auto pToken = *it;
+        if ( pToken != nullptr ) {
+            auto type = pToken->getType();
+            if ( type == E_TOKEN_OPERATOR ) {
+	            auto pCurrentOperInfo = token2Op(pToken);
+                if ( pCurrentOperInfo != nullptr ) {
+                    auto isBinaryOp = pCurrentOperInfo->isBinaryOp();
+                    if ( isBinaryOp ) {
+                        //
+                        // Binary operator
+                        //
+                        assert( idx >=2 );
+                        auto itPrevious1 = prev(it);
+                        auto itPrevious2 = prev(it,2);
+                        TokenInfo* leftOperand = *itPrevious2;
+                        TokenInfo* rightOperand = *itPrevious1;
+
+                        // remove operator , right operand , left operand
+                        ++it;
+                        it = m_evaluateSuffixExpression.erase(itPrevious2, it);
+
+                        if ( leftOperand != nullptr && rightOperand != nullptr ) {
+                            auto binOpRet = generateTmpMiddleBinaryToken(leftOperand, pToken, rightOperand);
+                            it = m_evaluateSuffixExpression.insert(it, binOpRet);
+                            ++it;
+                        }
+                    } else {
+                        //
+                        // Unary operator
+                        //
+                        assert( idx >=1 );
+                        auto itPrevious1 = prev(it);
+                        TokenInfo* singleOperand = *itPrevious1;
+
+                        // remove operator , right operand
+                        ++it;
+                        it = m_evaluateSuffixExpression.erase(itPrevious1, it);
+
+                        if ( singleOperand != nullptr ) {
+                            auto unaryOpRet = generateTmpMiddleUnaryToken( pToken, singleOperand);
+                            it = m_evaluateSuffixExpression.insert(it, unaryOpRet);
+                            ++it;
+                        }
+                    }
+
+                    bAdvanceFlag = true;
+                }
+            }
+        }
+
+        if ( !bAdvanceFlag ) {
+            ++it;
+        }
+    }
 
 	/*
 
@@ -1264,7 +1289,7 @@ void TokenListAnalyzer::popUtilOpenParenthese()
 	}
 }
 
-void TokenListAnalyzer::generateTmpMiddleBinaryToken(TokenInfo* left, TokenInfo* op, TokenInfo* right)
+TokenInfo* TokenListAnalyzer::generateTmpMiddleBinaryToken(TokenInfo* left, TokenInfo* op, TokenInfo* right)
 {
 	TokenInfo* tmpMiddleToken = nullptr;
 	auto subTp = op->getSubType();
@@ -1272,46 +1297,47 @@ void TokenListAnalyzer::generateTmpMiddleBinaryToken(TokenInfo* left, TokenInfo*
 	switch( subTp )
 	{
 	case E_TOKEN_OP_ADD:
-		doAdd(left,right);
+		tmpMiddleToken = doAdd(left,right);
 		break;
 	case E_TOKEN_OP_MINUS:
-		doMinus(left,right);
+		tmpMiddleToken = doMinus(left,right);
 		break;
 	case E_TOKEN_OP_MULTIPLY:
-		doMultiply(left,right);
+		tmpMiddleToken = doMultiply(left,right);
 		break;
 	case E_TOKEN_OP_DIVIDE:
-		doDivide(left,right);
+		tmpMiddleToken = doDivide(left,right);
 		break;
 	case E_TOKEN_OP_MOD:
-		doMod(left,right);
+		tmpMiddleToken = doMod(left,right);
 		break;
 	case E_TOKEN_OP_BIT_AND:
-		doBitAnd(left,right);
+		tmpMiddleToken = doBitAnd(left,right);
 		break;
 	case E_TOKEN_OP_BIT_OR:
-		doBitOr(left,right);
+		tmpMiddleToken = doBitOr(left,right);
 		break;
 	case E_TOKEN_OP_BIT_XOR:
-		doBitXor(left,right);
+		tmpMiddleToken = doBitXor(left,right);
 		break;
 	case E_TOKEN_OP_BIT_LEFT_SHIFT:
-		doBitLeftShift(left,right);
+		tmpMiddleToken = doBitLeftShift(left,right);
 		break;
 	case E_TOKEN_OP_BIT_RIGHT_SHIFT:
-		doBitRightShift(left,right);
+		tmpMiddleToken = doBitRightShift(left,right);
 		break;
 	case E_TOKEN_OP_ASSIGNMENT:
-		doAssignment(left,right);
+		tmpMiddleToken = doAssignment(left,right);
 		break;
 	default:
 		break;
 	}
 
-	m_tmpMiddleValue.push_back( tmpMiddleToken );
+    return tmpMiddleToken;
+
 }
 
-void TokenListAnalyzer::generateTmpMiddleUnaryToken(TokenInfo* op, TokenInfo* right)
+TokenInfo* TokenListAnalyzer::generateTmpMiddleUnaryToken(TokenInfo* op, TokenInfo* right)
 {
 	TokenInfo* tmpMiddleToken = nullptr;
 	auto subTp = op->getSubType();
@@ -1319,96 +1345,150 @@ void TokenListAnalyzer::generateTmpMiddleUnaryToken(TokenInfo* op, TokenInfo* ri
 	switch( subTp )
 	{
 	case E_TOKEN_OP_POSITIVE:
-		doPositive(right);
+		tmpMiddleToken = doPositive(right);
 		break;
 	case E_TOKEN_OP_NEGATIVE:
-		doNegative(right);
+		tmpMiddleToken = doNegative(right);
 		break;
 	case E_TOKEN_OP_BIT_NOT:
-		doBitNot(right);
+		tmpMiddleToken = doBitNot(right);
 		break;
 	default:
 		break;
 	}
 
-	m_tmpMiddleValue.push_back( tmpMiddleToken );
+    return tmpMiddleToken;
 
 }
 
 
+void TokenListAnalyzer::decideFinalExpDataTypeFor2Operands(TokenInfo* left, TokenInfo* op, TokenInfo* right)
+{
+    // auto opType = op->getType();
+    // switch( opType ) 
+    // {
+    // case 
+    // }
+}
 
 
 /*
      
 */
 // a+b
-void TokenListAnalyzer::doAdd(TokenInfo* left,  TokenInfo* right)
+TokenInfo* TokenListAnalyzer::doAdd(TokenInfo* left,  TokenInfo* right)
 {
-	
+    /*
+        E_TokenType getType();
+        E_TokenType getSubType();
+
+    auto lftDt = left->getDataType();
+    auto rgtDt = right->getDataType();
+    */ 
+
+    TokenInfo* tmpMiddleToken = nullptr;
+    return tmpMiddleToken;
 }
 
 // a-b
-void TokenListAnalyzer::doMinus(TokenInfo* left,  TokenInfo* right)
+TokenInfo* TokenListAnalyzer::doMinus(TokenInfo* left,  TokenInfo* right)
 {
+    TokenInfo* tmpMiddleToken = nullptr;
+    return tmpMiddleToken;
 }
 
 // a*b
-void TokenListAnalyzer::doMultiply(TokenInfo* left,  TokenInfo* right)
+TokenInfo* TokenListAnalyzer::doMultiply(TokenInfo* left,  TokenInfo* right)
 {
+    TokenInfo* tmpMiddleToken = nullptr;
+    return tmpMiddleToken;
 }
 
 // a/b
-void TokenListAnalyzer::doDivide(TokenInfo* left,  TokenInfo* right)
+TokenInfo* TokenListAnalyzer::doDivide(TokenInfo* left,  TokenInfo* right)
 {
+    TokenInfo* tmpMiddleToken = nullptr;
+    return tmpMiddleToken;
 }
 
 // a%b
-void TokenListAnalyzer::doMod(TokenInfo* left,  TokenInfo* right)
+TokenInfo* TokenListAnalyzer::doMod(TokenInfo* left,  TokenInfo* right)
 {
+    TokenInfo* tmpMiddleToken = nullptr;
+    return tmpMiddleToken;
 }
 
 // a&b
-void TokenListAnalyzer::doBitAnd(TokenInfo* left,  TokenInfo* right)
+TokenInfo* TokenListAnalyzer::doBitAnd(TokenInfo* left,  TokenInfo* right)
 {
+    TokenInfo* tmpMiddleToken = nullptr;
+    return tmpMiddleToken;
 }
 
 // a|b
-void TokenListAnalyzer::doBitOr(TokenInfo* left,  TokenInfo* right)
+TokenInfo* TokenListAnalyzer::doBitOr(TokenInfo* left,  TokenInfo* right)
 {
+    TokenInfo* tmpMiddleToken = nullptr;
+    return tmpMiddleToken;
 }
 
 // a^b
-void TokenListAnalyzer::doBitXor(TokenInfo* left, TokenInfo* right)
+TokenInfo* TokenListAnalyzer::doBitXor(TokenInfo* left, TokenInfo* right)
 {
+    TokenInfo* tmpMiddleToken = nullptr;
+    return tmpMiddleToken;
 }
 
 // a<<b
-void TokenListAnalyzer::doBitLeftShift(TokenInfo* left,  TokenInfo* right)
+TokenInfo*  TokenListAnalyzer::doBitLeftShift(TokenInfo* left,  TokenInfo* right)
 {
+    TokenInfo* tmpMiddleToken = nullptr;
+    return tmpMiddleToken;
 }
 
 // a>>b
-void TokenListAnalyzer::doBitRightShift(TokenInfo* left,  TokenInfo* right)
+TokenInfo* TokenListAnalyzer::doBitRightShift(TokenInfo* left,  TokenInfo* right)
 {
+    TokenInfo* tmpMiddleToken = nullptr;
+    return tmpMiddleToken;
 }
 
 // a=b
-void TokenListAnalyzer::doAssignment(TokenInfo* left,  TokenInfo* right)
+TokenInfo* TokenListAnalyzer::doAssignment(TokenInfo* left,  TokenInfo* right)
+{
+    TokenInfo* tmpMiddleToken = nullptr;
+    return tmpMiddleToken;
+}
+
+
+
+
+void TokenListAnalyzer::decideFinalExpDataTypeFor1Operands(TokenInfo* right)
 {
 }
 
+
 // (+a)
-void TokenListAnalyzer::doPositive(TokenInfo* token)
+TokenInfo* TokenListAnalyzer::doPositive(TokenInfo* token)
 {
+    TokenInfo* tmpMiddleToken = nullptr;
+    return tmpMiddleToken;
 }
 
 // (-a)
-void TokenListAnalyzer::doNegative(TokenInfo* token)
+TokenInfo* TokenListAnalyzer::doNegative(TokenInfo* token)
 {
+    TokenInfo* tmpMiddleToken = nullptr;
+    return tmpMiddleToken;
 }
 
 // ~a
-void TokenListAnalyzer::doBitNot(TokenInfo* token)
+TokenInfo* TokenListAnalyzer::doBitNot(TokenInfo* token)
 {
+    TokenInfo* tmpMiddleToken = nullptr;
+    return tmpMiddleToken;
 }
+
+
+
 

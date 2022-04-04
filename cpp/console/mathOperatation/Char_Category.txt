@@ -15,7 +15,7 @@ Token Type
    Blank / Comment
    
    Int
-      decimal / octal /hex
+      decimal / octal / hex
    
    Float
    Varible

@@ -224,3 +224,11 @@ bool OctalParser::isTokenValid() // override;
 	return (prefixNumberCnt > 0 && suffixNumberCnt == 0);
 }
 
+
+// virtual 
+bool OctalParser::checkIsInsideRange() // override
+{
+    // TODO
+    return true;
+}
+

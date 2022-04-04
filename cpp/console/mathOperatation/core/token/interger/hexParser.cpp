@@ -184,3 +184,9 @@ bool HexParser::isHexCode(char ch)
 
 
 
+// virtual 
+bool HexParser::checkIsInsideRange() // override
+{
+    // TODO
+    return true;
+}

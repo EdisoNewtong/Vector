@@ -120,12 +120,3 @@ bool SingleLineCommentParser::isTokenValid() // override;
 }
 
 
-// virtual 
-// TokenInfo*  SingleLineCommentParser::generateToken() // override;
-// {
-// 	auto subType = m_tokenType;
-// 	auto pRetToken = new TokenInfo( E_TOKEN_COMMENT_TYPE , subType );
-// 	m_token = m_alreadyTravelsaledString;
-// 	pRetToken->setDetail( m_token );
-// 	return pRetToken;
-// }

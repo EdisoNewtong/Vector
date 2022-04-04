@@ -1,6 +1,8 @@
 #include "decimalParser.h"
 #include "parserException.h"
 
+#include "stringNumber.h"
+
 using namespace std;
 
 DecimalParser::DecimalParser(E_PaserType tp)
@@ -157,6 +159,112 @@ void DecimalParser::reset() // override;
 
 
 
+// virtual 
+TokenInfo* DecimalParser::generateToken() // override;
+{
+    auto baseRet = TokenParserBase::generateToken();
+    if ( baseRet != nullptr ) {
+        E_DataType dt = E_TP_S_INT;
+
+        int uUCnt = getuUCnt();
+        int lLCnt = getlLCnt();
+        int ulTotalCnt = uUCnt + lLCnt;
+
+        int base = 0;
+        if ( m_tokenSubType ==  E_TOKEN_DECIMAL_NUMBER ) {
+            base = 10;
+        } else if ( m_tokenSubType ==  E_TOKEN_OCTAL_NUMBER ) {
+            base = 8;
+        } else if ( m_tokenSubType ==  E_TOKEN_HEX_NUMBER ) {
+            base = 16;
+        } else {
+            base = 10;
+        }
+
+        string copyStr(m_alreadyTravelsaledString);
+        if ( ulTotalCnt > 0 ) {
+            copyStr = copyStr.substr(0, static_cast<int>(copyStr.size() - ulTotalCnt) );
+        }
+
+        StringNumber curNumber(copyStr, base);
+
+        if ( uUCnt > 0 ) {
+            if ( lLCnt == 0 ) {
+                dt = E_TP_U_INT;
+
+                if ( base == 10 ) {
+                    if ( curNumber > StringNumber::s_unsignedIntMax10 ) {
+                        if ( curNumber > StringNumber::s_unsignedLongMax10 ) {
+                            dt = E_TP_U_LONG_LONG;
+                        } else {
+                            dt = E_TP_U_LONG;
+                        }
+                    }
+                } else if ( base == 8 ) {
+                    if ( curNumber > StringNumber::s_unsignedIntMax8 ) {
+                        if ( curNumber > StringNumber::s_unsignedLongMax8  ) {
+                            dt = E_TP_U_LONG_LONG;
+                        } else {
+                            dt = E_TP_U_LONG;
+                        }
+                    }
+                } else if ( base == 16 ) {
+                    if ( curNumber > StringNumber::s_unsignedIntMax16 ) {
+                        if ( curNumber > StringNumber::s_unsignedLongMax16  ) {
+                            dt = E_TP_U_LONG_LONG;
+                        } else {
+                            dt = E_TP_U_LONG;
+                        }
+                    }
+                }
+
+            } else if ( lLCnt == 1 ) {
+                dt = E_TP_U_LONG;
+            } else if ( lLCnt == 2 ) {
+                dt = E_TP_U_LONG_LONG;
+            }
+        } else {
+            // 0 u/U Flag
+            if ( lLCnt == 0 ) {
+                dt = E_TP_S_INT;
+
+                if ( base == 10 ) {
+                    if ( curNumber > StringNumber::s_signedIntMax10 ) {
+                        if ( curNumber > StringNumber::s_signedLongMax10 ) {
+                            dt = E_TP_S_LONG_LONG;
+                        } else {
+                            dt = E_TP_S_LONG;
+                        }
+                    }
+                } else if ( base == 8 ) {
+                    if ( curNumber > StringNumber::s_signedIntMax8  ) {
+                        if ( curNumber > StringNumber::s_signedLongMax8   ) {
+                            dt = E_TP_S_LONG_LONG;
+                        } else {
+                            dt = E_TP_S_LONG;
+                        }
+                    }
+                } else if ( base == 16 ) {
+                    if ( curNumber > StringNumber::s_signedIntMax16  ) {
+                        if ( curNumber > StringNumber::s_signedLongMax16  ) {
+                            dt = E_TP_S_LONG_LONG;
+                        } else {
+                            dt = E_TP_S_LONG;
+                        }
+                    }
+                }
+
+            } else if ( lLCnt == 1 ) {
+                dt = E_TP_S_LONG;
+            } else if ( lLCnt == 2 ) {
+                dt = E_TP_S_LONG_LONG;
+            }
+        }
+
+        baseRet->setDataType(dt);
+    }
+    return baseRet;
+}
 
 
 
@@ -343,4 +451,25 @@ bool DecimalParser::isTokenValid() // override
 // {
 // 	return ch == 'f' || ch == 'F';
 // }
+
+
+
+int DecimalParser::getuUCnt()
+{
+    return static_cast<int>(m_uCnt + m_UCnt);
+}
+
+int DecimalParser::getlLCnt()
+{
+    return static_cast<int>(m_lCnt + m_LCnt);
+}
+
+
+// virtual 
+bool DecimalParser::checkIsInsideRange() // override
+{
+    // TODO 
+    return true;
+}
+
 

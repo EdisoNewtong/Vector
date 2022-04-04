@@ -7,7 +7,7 @@
 #include "commonEnum.h"
 
 
-
+// Varible Data Type    or   fixed literal number
 class TypeBaseInfo
 {
 public:

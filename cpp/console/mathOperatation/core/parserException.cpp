@@ -28,6 +28,12 @@ ParserException::ParserException(E_ExceptionCode errorCode)
     m_shortInfoMap.insert( make_pair( enumCvt(E_TOKEN_CLOSE_PARENTHESES_MISMATCHED), string(" ')' Mismatched Close Parenthese ") ) );
     m_shortInfoMap.insert( make_pair( enumCvt(E_TOKEN_OPEN_PARENTHESES_MISMATCHED), string(" '(' Mismatched Open Parenthese ") ) );
 
+    m_shortInfoMap.insert( make_pair( enumCvt(E_INVALID_NUMBER_BASE), string(" invalid number base ") ) );
+
+    m_shortInfoMap.insert( make_pair( enumCvt(E_INVALID_OCTAL_NUMBER), string(" invalid octal number : ") ) );
+    m_shortInfoMap.insert( make_pair( enumCvt(E_INVALID_DECIMAL_NUMBER), string(" invalid decimal number : ") ) );
+    m_shortInfoMap.insert( make_pair( enumCvt(E_INVALID_HEX_NUMBER), string(" invalid hex number : ") ) );
+
 }
 
 ParserException::ParserException(const  ParserException& r)

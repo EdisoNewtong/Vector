@@ -557,3 +557,10 @@ bool FloatParser::isTokenValid() // override
 	return true;
 }
 
+
+int FloatParser::getfFCnt()
+{
+    return m_fFCnt;
+}
+
+

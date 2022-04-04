@@ -4,7 +4,9 @@
 #include "tokenParserBase.h"
 #include "parserException.h"
 
+
 using namespace std;
+
 
 TokenParserBase::TokenParserBase(E_PaserType tp)
 	: m_alreadyTravelsaledString("")
@@ -103,10 +105,17 @@ E_PaserType  TokenParserBase::appendContent(ParsedCharInfo* pInfo) // override;
 // virtual
 TokenInfo* TokenParserBase::generateToken()
 {
+    // core code
 	auto pRetToken = new TokenInfo( m_tokenType , m_tokenSubType);
 	m_token = m_alreadyTravelsaledString;
 	pRetToken->setDetail( m_token );
 	pRetToken->setPosInfo( m_beginInfo, m_endInfo);
+    if ( m_tokenType == E_TOKEN_INTEGER_NUMBER  ) {
+        // TODO
+    } else if( m_tokenType == E_TOKEN_FLOAT_NUMBER  ) { 
+        // TODO
+    }
+
 	return pRetToken;
 }
 

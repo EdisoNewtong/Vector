@@ -21,21 +21,26 @@ public:
 	void setDetail(const std::string& token);
 
 	void setPosInfo(const PosInfo& begPos, const PosInfo& endPos);
-
-	void setAsTmpMiddleExp();
-	bool isTmpMiddleExp();
-
 	const PosInfo& getBeginPos() const;
 	const PosInfo& getEndPos() const;
+
+    void setDataType(E_DataType tp);
+    E_DataType getDataType();
 protected:
 	E_TokenType m_type;
 	E_TokenType m_subType;
 	
 	std::string m_strSequence;
-	bool        m_isTmpMiddleExp;
+    int         m_uUCnt;      // 'u/U' Count , such as   3u or 3U
+    int         m_lLCnt;      // 'l/L' Count , such as   3l or 3L or 3ll or 3LL
+    int         m_fCnt;       // 'f'   Count , such as   3.0f
 
 	PosInfo m_beginPos;
 	PosInfo m_endPos;
+
+    E_DataType m_dataType;
+    bool        m_hasDoIntergerPromotion;
+    bool        m_hasDoDataTypeConvertion;
 };
 
 #endif

@@ -33,6 +33,7 @@ int main(int argc, char* argv[], char* env[])
 		cout << endl;
 		return -1;
 	}
+    // else   : argc > 3 , argc >=4
 
 
 	//

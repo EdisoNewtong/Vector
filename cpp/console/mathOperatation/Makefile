@@ -6,7 +6,7 @@ COMPILE_OPT  :=  -Wall  -std=c++11
 #
 #COMPILE_OPT :=  -Wall  -std=c++11   -DUSE_INT_INSTEAD_OF_ENUM
 
-mathCalc:build/parser.o build/parserOptions.o build/parsedCharInfo.o build/parserException.o  build/keywordList.o build/typeUtil.o build/enum2name.o build/charUtil.o build/tokenInfo.o  build/decimalParser.o build/octalParser.o build/hexParser.o build/floatParser.o build/varibleParser.o  build/tokenParserBase.o build/blankParser.o build/singleLineCommentParser.o build/multiLineCommentParser.o build/operatorParser.o  build/expevaluation.o build/tokenParserMgr.o  build/tokenListAnalyzer.o  build/mathCalc.o
+mathCalc:build/parser.o build/parserOptions.o build/parsedCharInfo.o build/parserException.o  build/keywordList.o build/typeUtil.o build/enum2name.o build/charUtil.o build/stringNumber.o build/tokenInfo.o  build/decimalParser.o build/octalParser.o build/hexParser.o build/floatParser.o build/varibleParser.o  build/tokenParserBase.o build/blankParser.o build/singleLineCommentParser.o build/multiLineCommentParser.o build/operatorParser.o  build/expevaluation.o build/tokenParserMgr.o  build/tokenListAnalyzer.o  build/mathCalc.o
 	g++   $(COMPILE_OPT) -o mathCalc build/*.o
 
 
@@ -42,10 +42,13 @@ build/typeUtil.o:core/util/typeUtil.cpp  core/util/typeUtil.h
 build/enum2name.o:core/util/enum2name.cpp  core/util/enum2name.h
 	g++   $(COMPILE_OPT)   $(INC_PATH)   -c -o build/enum2name.o  core/util/enum2name.cpp
 
+build/stringNumber.o:core/util/stringNumber.cpp  core/util/stringNumber.h core/commonEnum.h   core/parserException.h
+	g++   $(COMPILE_OPT)   $(INC_PATH)   -c -o build/stringNumber.o  core/util/stringNumber.cpp 
+
 #
 # Base Part
 #
-build/tokenParserBase.o:core/token/tokenParserBase.cpp core/token/tokenParserBase.h core/commonEnum.h core/parserException.h core/parsedCharInfo.h
+build/tokenParserBase.o:core/token/tokenParserBase.cpp core/token/tokenParserBase.h core/commonEnum.h core/parserException.h core/parsedCharInfo.h  core/token/interger/decimalParser.h    core/token/floatnumber/floatParser.h 
 	g++   $(COMPILE_OPT)   $(INC_PATH)  -c -o build/tokenParserBase.o  core/token/tokenParserBase.cpp
 
 build/tokenInfo.o:core/token/tokenInfo.cpp core/token/tokenInfo.h core/commonEnum.h  core/parsedCharInfo.h

@@ -18,6 +18,8 @@ public:
 	virtual void reset() override;
 	virtual bool isEnd(ParsedCharInfo* pInfo) override;
 	virtual bool isTokenValid() override;
+
+    int getfFCnt();
 protected:
 	int m_dotCnt;      // .
 	int m_eECnt;       // e/E

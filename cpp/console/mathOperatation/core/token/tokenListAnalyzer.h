@@ -27,7 +27,6 @@ protected:
 	std::list<TokenInfo*> m_evaluateSuffixExpression;
 	std::list< std::pair<TokenInfo*, OperatorBaseInfo*> > m_operatorStack;
 
-	std::list<TokenInfo*> m_tmpMiddleValue;
 
 	int m_lastSemicolonPosition;
 
@@ -37,23 +36,25 @@ protected:
 	void tryPopPreviousOperatorLowerPriority(TokenInfo* pToken);
 	void popUtilOpenParenthese();
 
-	void generateTmpMiddleBinaryToken(TokenInfo* left, TokenInfo* op, TokenInfo* right);
-	  void doAdd(TokenInfo* left,  TokenInfo* right);
-	  void doMinus(TokenInfo* left,  TokenInfo* right);
-	  void doMultiply(TokenInfo* left,  TokenInfo* right);
-	  void doDivide(TokenInfo* left,  TokenInfo* right);
-	  void doMod(TokenInfo* left,  TokenInfo* right);
-	  void doBitAnd(TokenInfo* left,  TokenInfo* right);
-	  void doBitOr(TokenInfo* left,  TokenInfo* right);
-	  void doBitXor(TokenInfo* left, TokenInfo* right);
-	  void doBitLeftShift(TokenInfo* left,  TokenInfo* right);
-	  void doBitRightShift(TokenInfo* left,  TokenInfo* right);
-	  void doAssignment(TokenInfo* left,  TokenInfo* right);
+    TokenInfo* generateTmpMiddleBinaryToken(TokenInfo* left, TokenInfo* op, TokenInfo* right);
+    void decideFinalExpDataTypeFor2Operands(TokenInfo* left, TokenInfo* op, TokenInfo* right);
+	  TokenInfo* doAdd(TokenInfo* left,  TokenInfo* right);
+	  TokenInfo* doMinus(TokenInfo* left,  TokenInfo* right);
+	  TokenInfo* doMultiply(TokenInfo* left,  TokenInfo* right);
+	  TokenInfo* doDivide(TokenInfo* left,  TokenInfo* right);
+	  TokenInfo* doMod(TokenInfo* left,  TokenInfo* right);
+	  TokenInfo* doBitAnd(TokenInfo* left,  TokenInfo* right);
+	  TokenInfo* doBitOr(TokenInfo* left,  TokenInfo* right);
+	  TokenInfo* doBitXor(TokenInfo* left, TokenInfo* right);
+	  TokenInfo* doBitLeftShift(TokenInfo* left,  TokenInfo* right);
+	  TokenInfo* doBitRightShift(TokenInfo* left,  TokenInfo* right);
+	  TokenInfo* doAssignment(TokenInfo* left,  TokenInfo* right);
 
-	void generateTmpMiddleUnaryToken(TokenInfo* op, TokenInfo* right);
-	  void doPositive(TokenInfo* token);
-	  void doNegative(TokenInfo* token);
-	  void doBitNot(TokenInfo* token);
+	TokenInfo* generateTmpMiddleUnaryToken(TokenInfo* op, TokenInfo* right);
+    void decideFinalExpDataTypeFor1Operands(TokenInfo* right);
+	  TokenInfo* doPositive(TokenInfo* token);
+	  TokenInfo* doNegative(TokenInfo* token);
+	  TokenInfo* doBitNot(TokenInfo* token);
 
 	OperatorBaseInfo* token2Op(TokenInfo* pToken);
 

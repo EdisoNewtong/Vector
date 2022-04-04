@@ -5,9 +5,14 @@ TokenInfo::TokenInfo(E_TokenType tp, E_TokenType subtype)
 	: m_type(tp)
 	, m_subType(subtype)
 	, m_strSequence("")
-	, m_isTmpMiddleExp(false)
+    , m_uUCnt(0)
+    , m_lLCnt(0)
+    , m_fCnt(0)
 	, m_beginPos()
 	, m_endPos()
+    , m_dataType(E_TP_S_INT)
+    , m_hasDoIntergerPromotion(false)
+    , m_hasDoDataTypeConvertion(false)
 {
 
 }
@@ -49,6 +54,22 @@ void TokenInfo::setDetail(const std::string& token)
 }
 
 
+
+void TokenInfo::setDataType(E_DataType tp)
+{
+    m_dataType = tp;
+}
+
+
+E_DataType TokenInfo::getDataType()
+{
+    return m_dataType;
+}
+
+
+
+
+
 void TokenInfo::setPosInfo(const PosInfo& begPos, const PosInfo& endPos)
 {
 	m_beginPos = begPos;
@@ -66,16 +87,6 @@ const PosInfo& TokenInfo::getEndPos() const
 	return m_endPos;
 }
 
-void TokenInfo::setAsTmpMiddleExp()
-{
-	m_isTmpMiddleExp = true;
-}
-
-
-bool TokenInfo::isTmpMiddleExp()
-{
-	return m_isTmpMiddleExp;
-}
 
 
 
