@@ -14,6 +14,7 @@ cpp/console/tools/eolconvert/eolconvert
 cpp/console/tools/spacetabconvert/spacetabconvert
 cpp/console/tools/hexstring/hexstring
 cpp/console/tools/intdisplay/intdisplay
+cpp/console/tools/asciiCodeTable/asciiCodeTable
 
 lua/sourceCodeStudy/lua-5.1.5/src/lua
 lua/sourceCodeStudy/lua-5.1.5/src/luac
