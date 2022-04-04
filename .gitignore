@@ -5,6 +5,7 @@
 .DS_Store
 *.o
 main
+main.exe
 build-*
 
 cpp/console/tools/binarycmp/binarycmp
@@ -25,5 +26,8 @@ lua/sourceCodeStudy/xcodeLuaStudy
 
 **/build/*
 *.pro.user
+
+!cpp/console/mathOperatation/build/**
+cpp/console/mathOperatation/build/*.o
 
 
