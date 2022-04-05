@@ -24,7 +24,14 @@ public:
 	const PosInfo& getBeginPos() const;
 	const PosInfo& getEndPos() const;
 
-    void setDataType(E_DataType tp);
+
+    void setDataType1st(E_DataType tp);
+    void doIntergerPromotion(E_DataType tp);
+    void doImplyDataTypeConvertion(E_DataType tp);
+
+    bool hasDoIntergerPromotion();
+    bool hasDoImplyDataTypeConvertion();
+
     E_DataType getDataType();
 protected:
 	E_TokenType m_type;
@@ -38,7 +45,13 @@ protected:
 	PosInfo m_beginPos;
 	PosInfo m_endPos;
 
+
+    E_DataType m_dataTypeOriginal;
+    E_DataType m_dataTypeIntPromotion;
+    E_DataType m_dataTypeConvertion;
+
     E_DataType m_dataType;
+
     bool        m_hasDoIntergerPromotion;
     bool        m_hasDoDataTypeConvertion;
 };

@@ -122,13 +122,23 @@ enum E_ExceptionCode
     E_INVALID_DECIMAL_NUMBER = 16,
     E_INVALID_HEX_NUMBER = 17,
 
-    E_DIFFERENT_NUMBER_BASE = 18
+    E_DIFFERENT_NUMBER_BASE = 18,
+
+    E_VARIBLE_NAME_CANNOT_BE_KEYWORD = 19,
+
+    E_VARIBLE_NAME_ALREADY_DECLARED = 20,
+
+
+    E_SWITCH_CASE_DEFAULT_FLOW = 21,
+
 
 };
 
 enum E_DataType
 {
+    E_TP_UNKNOWN,
     //////////////////////////////////////////////////
+    E_TP_CHAR,
 	E_TP_U_CHAR,
 	E_TP_S_CHAR,
 

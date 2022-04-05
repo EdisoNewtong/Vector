@@ -1,5 +1,5 @@
 #include "decimalParser.h"
-#include "parserException.h"
+#include "myException.h"
 
 #include "stringNumber.h"
 
@@ -261,7 +261,7 @@ TokenInfo* DecimalParser::generateToken() // override;
             }
         }
 
-        baseRet->setDataType(dt);
+        baseRet->setDataType1st(dt);
     }
     return baseRet;
 }

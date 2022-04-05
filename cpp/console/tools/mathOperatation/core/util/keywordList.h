@@ -8,8 +8,10 @@ class KeyWordList
 {
 protected:
 	static std::unordered_set<std::string> s_keywordList;
+	static std::unordered_set<std::string> s_typeKeyword;
 public:
 	static bool isKeyWord(const std::string& varName);
+	static bool isTypeKeyWord(const std::string& name);
 };
 
 

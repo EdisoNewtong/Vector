@@ -143,6 +143,9 @@ string getDataType(E_DataType tp)
 
 	switch ( tp )
 	{
+    case E_TP_UNKNOWN:
+		retStr = "unknown type";
+		break;
 	case E_TP_U_CHAR:
 		retStr = "unsigned char";
 		break;

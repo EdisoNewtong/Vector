@@ -3,7 +3,7 @@
 #include <iterator>
 #include "parserOptions.h"
 #include "tokenListAnalyzer.h"
-#include "parserException.h"
+#include "myException.h"
 #include "enum2name.h"
 using namespace std;
 
@@ -86,7 +86,7 @@ int TokenListAnalyzer::pushToken(TokenInfo* pToken)
 				// special ')'
                 auto previousOpenParentheseToken = hasOpenParentheseBefore();
 				if ( previousOpenParentheseToken == nullptr ) {
-                    ParserException e(E_TOKEN_CLOSE_PARENTHESES_MISMATCHED);
+                    MyException e(E_TOKEN_CLOSE_PARENTHESES_MISMATCHED);
 					string detail;
 					detail += endPos.getPosStr();
                     e.setDetail( detail );
@@ -132,7 +132,7 @@ int TokenListAnalyzer::pushToken(TokenInfo* pToken)
 								  + string(" Can't located in front of Type   ") + curTokenType + string(" ")
 								  + pToken->getDetail());
 
-					ParserException e(E_TOKEN_LOGIC_INVALID);
+					MyException e(E_TOKEN_LOGIC_INVALID);
 					e.setDetail( detail );
 					throw e;
 				} else if ( banPickFlag == 1 ) {
@@ -152,7 +152,7 @@ int TokenListAnalyzer::pushToken(TokenInfo* pToken)
 									 + string(" Can't located <No-Skip> in front of Type   ") + curTokenType
 									 + pToken->getDetail() );
 
-						ParserException e(E_TOKEN_LOGIC_INVALID);
+						MyException e(E_TOKEN_LOGIC_INVALID);
 						e.setDetail( detail );
 						throw e;
 					}
@@ -194,7 +194,7 @@ int TokenListAnalyzer::pushToken(TokenInfo* pToken)
 			{
 				// 1st pushed is Valid
 			} else {
-				ParserException e(E_TOKEN_LOGIC_INVALID);
+				MyException e(E_TOKEN_LOGIC_INVALID);
 
 				string detail;
 				detail += endPos.getPosStr();
@@ -931,7 +931,7 @@ void TokenListAnalyzer::expValidCheck()
     auto pOpenParentheseToken  = hasOpenParentheseBefore();
 	if ( pOpenParentheseToken != nullptr ) {
         string detail;
-        ParserException e(E_TOKEN_OPEN_PARENTHESES_MISMATCHED);
+        MyException e(E_TOKEN_OPEN_PARENTHESES_MISMATCHED);
 	    const auto& endPos = pOpenParentheseToken->getEndPos();
         detail += endPos.getPosStr();
         e.setDetail( detail );
@@ -1372,9 +1372,6 @@ void TokenListAnalyzer::decideFinalExpDataTypeFor2Operands(TokenInfo* left, Toke
 }
 
 
-/*
-     
-*/
 // a+b
 TokenInfo* TokenListAnalyzer::doAdd(TokenInfo* left,  TokenInfo* right)
 {
@@ -1382,9 +1379,20 @@ TokenInfo* TokenListAnalyzer::doAdd(TokenInfo* left,  TokenInfo* right)
         E_TokenType getType();
         E_TokenType getSubType();
 
-    auto lftDt = left->getDataType();
-    auto rgtDt = right->getDataType();
-    */ 
+    auto lftDt = left->getType();      // getDataType();
+    auto rgtDt = right->getType();     // getDataType();
+    */
+
+    auto lfttp = left->getType();
+    if ( lfttp == E_TOKEN_VARIBLE ) {
+        
+    }
+
+    auto rgttp = right->getType();
+    if ( rgttp  == E_TOKEN_VARIBLE ) {
+    }
+
+    // E_TOKEN_VARIBLE   ,  E_TOKEN_VARIBLE
 
     TokenInfo* tmpMiddleToken = nullptr;
     return tmpMiddleToken;

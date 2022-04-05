@@ -72,10 +72,30 @@ unordered_set<string> KeyWordList::s_keywordList{
 };
 
 
+unordered_set<string> KeyWordList::s_typeKeyword{
+	"unsigned",
+	"signed",
+
+	"char",
+	"short",
+	"int",
+	"long",
+
+	"float",
+	"double"
+};
+
 
 // static 
 bool KeyWordList::isKeyWord(const string& varName)
 {
 	return s_keywordList.find(varName) != s_keywordList.end();
+}
+
+
+// static
+bool KeyWordList::isTypeKeyWord(const std::string& name)
+{
+	return s_typeKeyword.find(name) != s_typeKeyword.end();
 }
 

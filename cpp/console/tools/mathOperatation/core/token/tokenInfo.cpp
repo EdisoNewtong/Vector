@@ -10,7 +10,10 @@ TokenInfo::TokenInfo(E_TokenType tp, E_TokenType subtype)
     , m_fCnt(0)
 	, m_beginPos()
 	, m_endPos()
-    , m_dataType(E_TP_S_INT)
+    , m_dataTypeOriginal( E_TP_UNKNOWN )
+    , m_dataTypeIntPromotion( E_TP_UNKNOWN )
+    , m_dataTypeConvertion( E_TP_UNKNOWN )
+    , m_dataType( E_TP_UNKNOWN )
     , m_hasDoIntergerPromotion(false)
     , m_hasDoDataTypeConvertion(false)
 {
@@ -55,8 +58,9 @@ void TokenInfo::setDetail(const std::string& token)
 
 
 
-void TokenInfo::setDataType(E_DataType tp)
+void TokenInfo::setDataType1st(E_DataType tp)
 {
+    m_dataTypeOriginal = tp;
     m_dataType = tp;
 }
 
@@ -87,6 +91,32 @@ const PosInfo& TokenInfo::getEndPos() const
 	return m_endPos;
 }
 
+void TokenInfo::doIntergerPromotion(E_DataType tp)
+{
+    m_hasDoIntergerPromotion = true;
+
+    m_dataTypeIntPromotion = tp;
+    m_dataType = m_dataTypeIntPromotion;
+}
+
+void TokenInfo::doImplyDataTypeConvertion(E_DataType tp)
+{
+    m_hasDoDataTypeConvertion = true;
+
+    m_dataTypeConvertion = tp;
+    m_dataType = m_dataTypeConvertion;
+}
+
+
+bool TokenInfo::hasDoIntergerPromotion()
+{
+    return m_hasDoIntergerPromotion;
+}
+
+bool TokenInfo::hasDoImplyDataTypeConvertion()
+{
+    return m_hasDoDataTypeConvertion;
+}
 
 
 

@@ -1,3 +1,4 @@
+#include <limits>
 #include "typeUtil.h"
 
 using namespace std;
@@ -29,7 +30,7 @@ TypeBaseInfo::TypeBaseInfo(E_DataType dtype)
 	    1 == sizeof(char) <= sizeof(short) <= sizeof(int) <= sizeof(long) <= sizeof(long long).
 	*/
 
-	if (        m_type == E_TP_U_CHAR       || m_type == E_TP_S_CHAR )       {
+	if (   m_type == E_TP_CHAR   ||     m_type == E_TP_U_CHAR       || m_type == E_TP_S_CHAR )       {
 		m_level = 1;
 		m_bytes = sizeof(char);
 	} else if ( m_type == E_TP_U_SHORT      || m_type == E_TP_S_SHORT )      {
@@ -83,12 +84,12 @@ bool TypeBaseInfo::isFloatFamily()
 
 bool TypeBaseInfo::isIntegerFamily()
 {
-	return m_type >= E_TP_U_CHAR && m_type <= E_TP_S_LONG_LONG;
+	return m_type >= E_TP_CHAR && m_type <= E_TP_S_LONG_LONG;
 }
 
 bool TypeBaseInfo::isSmallIntegerType()
 {
-	return m_type >= E_TP_U_CHAR && m_type <= E_TP_S_SHORT;
+	return m_type >= E_TP_CHAR && m_type <= E_TP_S_SHORT;
 }
 
 
@@ -116,6 +117,7 @@ bool TypeBaseInfo::isSmallIntegerType()
 void TypeUtil::init()
 {
 	s_typeFamily.clear();
+	s_typeFamily.insert( make_pair(enumCvt(E_TP_CHAR), new TypeBaseInfo(E_TP_CHAR) ) );
 	s_typeFamily.insert( make_pair(enumCvt(E_TP_U_CHAR), new TypeBaseInfo(E_TP_U_CHAR) ) );
 	s_typeFamily.insert( make_pair(enumCvt(E_TP_S_CHAR), new TypeBaseInfo(E_TP_S_CHAR) ) );
 
@@ -177,16 +179,35 @@ E_DataType TypeUtil::doIntegerPromotion(E_DataType oldtp, bool& changedFlag)
 		return oldtp;
 	}
 
+    // else
 	// pBaseInfo != nullptr
 	if ( pBaseInfo->isSmallIntegerType()  ) {
 		auto newtp = oldtp;
 		changedFlag = true;
-		if ( oldtp == E_TP_S_CHAR || oldtp == E_TP_S_SHORT ) {
-			newtp =  E_TP_S_INT; // signed int
-		} else {
-			// unsigned char /  unsigned short
-			newtp = E_TP_S_INT;
-		}
+
+        if ( oldtp == E_TP_CHAR ) {
+            if ( numeric_limits<char>::is_signed ) {
+                oldtp = E_TP_S_CHAR; 
+            } else {
+                oldtp = E_TP_U_CHAR;
+            }
+        } 
+
+        if ( oldtp == E_TP_S_CHAR || oldtp == E_TP_S_SHORT ) {
+            newtp =  E_TP_S_INT; // signed int
+        } else {
+            // unsigned char /  unsigned short
+
+            // maybe 
+            //    sizeof(short) == 2 bytes
+            //    sizeof(int)   == 2 bytes (at least) by C++ Standard 
+            if ( sizeof(short) < sizeof(int) ) {
+                newtp = E_TP_S_INT;
+            } else {
+                newtp = E_TP_U_INT;
+            }
+        }
+        
 		return newtp;
 	} else {
 		changedFlag = false;

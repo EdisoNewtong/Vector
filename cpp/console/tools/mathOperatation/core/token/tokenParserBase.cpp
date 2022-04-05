@@ -2,7 +2,7 @@
 #include <cassert>
 
 #include "tokenParserBase.h"
-#include "parserException.h"
+#include "myException.h"
 
 
 using namespace std;
@@ -110,11 +110,6 @@ TokenInfo* TokenParserBase::generateToken()
 	m_token = m_alreadyTravelsaledString;
 	pRetToken->setDetail( m_token );
 	pRetToken->setPosInfo( m_beginInfo, m_endInfo);
-    if ( m_tokenType == E_TOKEN_INTEGER_NUMBER  ) {
-        // TODO
-    } else if( m_tokenType == E_TOKEN_FLOAT_NUMBER  ) { 
-        // TODO
-    }
 
 	return pRetToken;
 }
@@ -246,7 +241,7 @@ string TokenParserBase::genPositionCharStr(ParsedCharInfo* pInfo)
 
 void TokenParserBase::throwErrMsg(ParsedCharInfo* pInfo, const string& errMsg)
 {
-	ParserException err(m_exceptionCode);
+	MyException err(m_exceptionCode);
 	auto detailstr = genPositionCharStr(pInfo);
 	detailstr += " ==>      \"";
 	detailstr += m_alreadyTravelsaledString;

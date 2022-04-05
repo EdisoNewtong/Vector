@@ -8,10 +8,12 @@
 
 #include "parser.h"
 #include "parserOptions.h"
-#include "parserException.h"
+#include "myException.h"
 #include "charUtil.h"
 #include "typeUtil.h"
 #include "tokenParserMgr.h"
+
+#include "variblePool.h"
 
 using namespace std;
 
@@ -24,6 +26,7 @@ int main(int argc, char* argv[], char* env[])
 	TypeUtil::init();
 	CharUtil::init();
 	TokenParserMgr::init();
+    VariblePool::init();
 
 	Parser p;
 
@@ -98,8 +101,8 @@ int main(int argc, char* argv[], char* env[])
 			cout << "Can't Alloc Array Buffer Memory for file content" << endl;
 		} 
 		*/
-		catch ( const ParserException& e ) {
-			cout << "[ERROR] Parse Failed : " << e.what() << endl;
+		catch ( const MyException& e ) {
+			cout << "[ERROR] Run-time exception : " << e.what() << endl;
 		} catch ( const std::exception& e ) {
 			cout << "[ERROR] Meet a Normal exception => " << e.what() << endl;
 		} catch ( ... ) {
@@ -123,6 +126,7 @@ int main(int argc, char* argv[], char* env[])
 	CharUtil::finalize();
 	TypeUtil::finalize();
 	TokenParserMgr::finalize();
+    VariblePool::finalize();
 
 	return 0;
 }

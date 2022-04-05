@@ -1,7 +1,7 @@
 #include <cctype>
 
 #include "stringNumber.h"
-#include "parserException.h"
+#include "myException.h"
 
 /*
 
@@ -91,7 +91,7 @@ void StringNumber::setData(const string& strnumber, int base)
             processBase16();
         }
     } else {
-        ParserException e(E_INVALID_NUMBER_BASE);
+        MyException e(E_INVALID_NUMBER_BASE);
         e.setDetail( string(" m_base = ") +  to_string(m_base) );
         throw e;
     }
@@ -103,7 +103,7 @@ void StringNumber::setData(const string& strnumber, int base)
 bool StringNumber::operator < (const StringNumber& right)
 {
     if ( this->m_base != right.m_base ) {
-        ParserException e( E_DIFFERENT_NUMBER_BASE );
+        MyException e( E_DIFFERENT_NUMBER_BASE );
         e.setDetail( to_string(this->m_base) + " <--> " + to_string(right.m_base) );
         throw e;
     }
@@ -146,7 +146,7 @@ bool StringNumber::operator < (const StringNumber& right)
 bool StringNumber::operator == (const StringNumber& right)
 {
     if ( this->m_base != right.m_base ) {
-        ParserException e( E_DIFFERENT_NUMBER_BASE );
+        MyException e( E_DIFFERENT_NUMBER_BASE );
         e.setDetail( to_string(this->m_base) + " <--> " + to_string(right.m_base) );
         throw e;
     }
@@ -184,21 +184,21 @@ void StringNumber::processBase8()
 {
     string copyStr(m_strNumber);
     if ( copyStr.empty() ) {
-        ParserException e(E_INVALID_OCTAL_NUMBER);
+        MyException e(E_INVALID_OCTAL_NUMBER);
         e.setDetail(" empty octal number " );
         throw e;
     }
 
     char firstCh = copyStr.front();
     if ( firstCh != '0' ) {
-        ParserException e(E_INVALID_OCTAL_NUMBER);
+        MyException e(E_INVALID_OCTAL_NUMBER);
         e.setDetail(" Octal number is not start with '0' " );
         throw e;
     }
 
     copyStr = copyStr.substr(1);
     if ( copyStr.empty() ) {
-        ParserException e(E_INVALID_OCTAL_NUMBER);
+        MyException e(E_INVALID_OCTAL_NUMBER);
         e.setDetail(" empty octal number after cuting the beginning '0' " );
         throw e;
     }
@@ -226,7 +226,7 @@ void StringNumber::processBase10()
 {
     string copyStr(m_strNumber);
     if ( copyStr.empty() ) {
-        ParserException e(E_INVALID_DECIMAL_NUMBER);
+        MyException e(E_INVALID_DECIMAL_NUMBER);
         e.setDetail(" empty decimal number " );
         throw e;
     }
@@ -256,21 +256,21 @@ void StringNumber::processBase16()
     string copyStr(m_strNumber);
     int len = static_cast<int>( copyStr.size() );
     if ( len <=2 ) {
-        ParserException e(E_INVALID_HEX_NUMBER);
+        MyException e(E_INVALID_HEX_NUMBER);
         e.setDetail(" invalid hex number , len <=2 " );
         throw e;
     }
 
     string prefix = copyStr.substr(0,2);
     if ( prefix != "0x" &&    prefix != "0X" ) {
-        ParserException e(E_INVALID_HEX_NUMBER);
+        MyException e(E_INVALID_HEX_NUMBER);
         e.setDetail(" Hex number is not start with \"0x\" " );
         throw e;
     }
 
     copyStr = copyStr.substr(2);
     if ( copyStr.empty() ) {
-        ParserException e(E_INVALID_HEX_NUMBER);
+        MyException e(E_INVALID_HEX_NUMBER);
         e.setDetail(" empty Hex number after cuting the beginning \"0x\" " );
         throw e;
     }

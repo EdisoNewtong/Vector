@@ -8,11 +8,11 @@
 
 
 
-class ParserException : public std::exception
+class MyException : public std::exception
 {
 public:
-	ParserException(E_ExceptionCode errorCode);
-	ParserException(const  ParserException& r);
+	MyException(E_ExceptionCode errorCode);
+	MyException(const  MyException& r) = default;
 	virtual const char* what() const throw();
 
 	void setDetail(const std::string& detail);
