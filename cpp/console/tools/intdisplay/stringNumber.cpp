@@ -587,7 +587,11 @@ string StringNumber::calcOctal()
 string StringNumber::calcDecimal()
 {
     if ( m_base == 10 ) {
-        return m_orignalStr;
+        if ( m_orignalStr.at(0) == '-' ) {
+            return base2_10( base10_2(m_orignalStr) );
+        } else {
+            return m_orignalStr;
+        }
     }
 
     string retstr;
@@ -609,12 +613,13 @@ string StringNumber::calcDecimal()
 
 string StringNumber::calcDecimalWithSignedFlag()
 {
+    string copyStr;
     if ( m_base == 10 ) {
-        return m_orignalStr;
+        copyStr = base10_2(m_orignalStr);
+        // return m_orignalStr;
     }
 
 
-    string copyStr;
     string retstr;
     // 2 8 16
     if ( m_base == 2 ) {
