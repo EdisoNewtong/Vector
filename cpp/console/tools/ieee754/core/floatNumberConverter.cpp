@@ -562,7 +562,7 @@ void FloatConverter::floatPart2Binary()
 
                 m_floatCvtInfo.isFloatPartLoop = true;
                 m_floatCvtInfo.loopStartIdx = loopStart;
-                m_floatCvtInfo.loopEndIdx = calcProcessLst.size() - 1;
+                m_floatCvtInfo.loopEndIdx = static_cast<int>( calcProcessLst.size() - 1);
                 
                 loopLst.clear();
                 auto sz = m_floatCvtInfo.loopEndIdx - m_floatCvtInfo.loopStartIdx + 1;
@@ -760,7 +760,7 @@ if the 24th bit is 1 , then increase to 23th
                     floatValidBitsString = floatValidBitsString.substr(0,allFractionBits);
                 } else {
                     // back == '1' ,    + '1' to previous bit
-                    for ( int i = floatValidBitsString.size()-2; i>=0; --i ) {
+                    for ( int i = static_cast<int>( floatValidBitsString.size()-2 ); i>=0; --i ) {
                         auto ch = floatValidBitsString.at(i);
                         if ( ch == ZERO_ASCII_CODE ) {
                             floatValidBitsString.at(i) = ONE_ASCII_CODE;
@@ -774,7 +774,7 @@ if the 24th bit is 1 , then increase to 23th
             }
         } else {
             // condition = 2
-            int rest = allFractionBits - intValidBitsString.size();
+            int rest = static_cast<int>( allFractionBits - intValidBitsString.size() );
             exponent = static_cast<int>(intValidBitsString.size()) + exponent_bias;
 
             if ( rest < 0 ) {
@@ -791,7 +791,7 @@ if the 24th bit is 1 , then increase to 23th
                     floatValidBitsString = m_floatCvtInfo.convertFloatPart.substr(0, rest);
                 } else {
                     // floatValidBitsString.back() == '1' ,     + '1' to previous bit
-                    for ( int i = floatValidBitsString.size()-2; i>=0; --i ) {
+                    for ( int i = static_cast<int>( floatValidBitsString.size()-2 ); i>=0; --i ) {
                         auto ch = floatValidBitsString.at(i);
                         if ( ch == ZERO_ASCII_CODE ) {
                             floatValidBitsString.at(i) = ONE_ASCII_CODE;
@@ -855,7 +855,7 @@ if the 24th bit is 1 , then increase to 23th
                 auto bit = m_floatCvtInfo.binaryAry[i];
                 if ( bit == ONE_ASCII_CODE ) {
                     // unsigned long long mask = 1UL << (maxSz-i-1);
-                    unsigned long long mask = 1UL << (maxSz-i-1);
+                    unsigned long long mask = 1ULL << (maxSz-i-1);
                     m_floatCvtInfo.cvtLLBinary |= mask;
                 }
             }

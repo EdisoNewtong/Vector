@@ -152,7 +152,7 @@ bool getRequiredArgs(int argc, char* argv[], bool &isFloat, int &iIntPartBit, in
 			} else if ( string(argv[2]) == "double" ) {
 				isFloat =  false;
 			} else {
-				error == "type must either float or double";
+				error = "type must either float or double";
 				parse1OK = false;
 			}
 
@@ -162,18 +162,18 @@ bool getRequiredArgs(int argc, char* argv[], bool &isFloat, int &iIntPartBit, in
 				try {
 					iIntPartBit = std::stoi( string(argv[4]) );
 					parseIntPart = true;
-				} catch ( const invalid_argument& invError ) {
+				} catch ( const invalid_argument& /*invError*/ ) {
 					error = string(argv[4]) + " is invalid int number";
-				} catch (const out_of_range& overflow ) {
+				} catch (const out_of_range& /*overflow*/ ) {
 					error = string(argv[4]) + " is out of range";
 				}	
 
 				try {
 					iFloatPartBit = std::stoi( string(argv[6]));
 					parseFloatPart = true;
-				} catch ( const std::invalid_argument& invError ) {
+				} catch ( const std::invalid_argument& /* invError */ ) {
 					error = string(argv[6]) + " is invalid int number";
-				} catch (const out_of_range& overflow ) {
+				} catch (const out_of_range& /* overflow */ ) {
 					error = string(argv[6]) + " is out of range";
 				}	
 
