@@ -3,6 +3,7 @@
 
 #include <list>
 #include <string>
+#include <cstdint>
 using namespace std;
 
 namespace constPart {
@@ -56,7 +57,7 @@ struct floatInfo
     // int    power2;
     char   binaryAry[constPart::BINARY_ARRAY_SIZE];
 
-    unsigned int       cvtIntBinary;
+    uint32_t           cvtIntBinary;
     unsigned long long cvtLLBinary;
 
     floatInfo();

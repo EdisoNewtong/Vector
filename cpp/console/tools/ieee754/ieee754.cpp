@@ -1,228 +1,122 @@
-#include "floatNumberConverter.h"
-
 #include <iostream>
-#include <fstream>
-#include <cmath> // for math function pow use
+#include <string>
+#include <utility>
+#include <cstdint>
+#include <exception>
+#include <iomanip>
 using namespace std;
 
-union intFloatNum
+#include "floatNumberConverter.h"
+
+
+union FloatIntUnion 
 {
-    unsigned int i_num;
-    float        f_num;
+	float f_num;
+	uint32_t ui_num;
 };
 
-union llDoubleNum
+union DoubleIntUnion 
 {
-    unsigned long long i_num;
-    double             f_num;
+	double d_num;
+	unsigned long long dull_num;
 };
 
-string generateStrFloat(unsigned long long num, int intBits,int floatBits, bool setNegative, bool fSuffixFlag)
+
+int main( int argc, char* argv[], char* env[] )
 {
-    auto requireBits = intBits + floatBits;
-
-    string finalStr;
-    string strNum = to_string(num);
-    auto sz = strNum.size();
-    if ( static_cast<int>(sz) < requireBits ) {
-        auto delta = static_cast<int>(requireBits - sz);
-        for ( int i = 0; i < delta; ++i ) {
-            finalStr += '0';
-        }
-
-        finalStr += strNum;
-    } else {
-        finalStr = strNum;
+    if ( argc == 1 ) {
+        cout << 
+R"([ERROR] : missing float number argument"
+   Usage :
+          ./<ProgramName>  <floatnumber>[f|F]
+)"
+        << endl;
+        return -1;
+    } else if ( argc != 2 ) {
+        cout <<
+R"([ERROR] : invalid command-line format"
+   Usage :
+          ./<ProgramName>  <floatnumber>[f|F]
+)"
+        << endl;
+        return -1;
     }
 
-    string intPart   = finalStr.substr(0, intBits);
-    string floatPart = finalStr.substr(intBits);
 
-    intPart = HelperUtil::numberTrimmed(intPart, true);
-    floatPart = HelperUtil::numberTrimmed(floatPart, false);
+    //
+    // argc == 2
+    //
+    string strfloat = argv[1];
+    char lastCh = strfloat.back();
+    auto isLastfF = (lastCh == 'f' || lastCh == 'F');
 
-    finalStr = "";
-    if ( setNegative ) {
-        finalStr = "-";
-    }
+    FloatIntUnion fui;
+    DoubleIntUnion dui;
+    auto convertSuccessful = false;
 
-    finalStr += intPart;
-    finalStr += ".";
-    finalStr += floatPart;
-
-    if ( fSuffixFlag ) {
-        finalStr += "f";
-    }
-
-    return finalStr;
-}
-
-
-bool checkStringFloat(const string& text)
-{
-    string err;
-    FloatConverter cvt;
-    auto b = false;
-
-    // string strFloatNumber = "0.05f";
-    // string strFloatNumber = "0.36f";
-    string strFloatNumber = text;
-    b = cvt.isValidFloat(strFloatNumber,err);
-    string floatOrDoubleString = !cvt.getCvt().fFlag.second.empty() ? "float" : "double";
-
-    if ( !b ) {
-        cout << strFloatNumber << "| " << err << " | Sorry : is <Not> a Valid Float-Point number" << endl;
-        return false;
-    } else {
-        cout << strFloatNumber << "   is a <Valid> " << floatOrDoubleString << " number. ";
-        b = cvt.doConvert(err);
-        if ( !b ) {
-            cout << strFloatNumber << " | " << err << " | Sorry doConvert(...)  Failed  " << endl;
-            return false;
+    try {
+        if ( isLastfF ) {
+            fui.f_num = stof(strfloat);
         } else {
-            const auto& coreObj = cvt.getCvt();
-
-            if ( !coreObj.fFlag.second.empty()  ) {
-                // float type
-                intFloatNum uNum;
-                uNum.f_num = static_cast<float>( atof(strFloatNumber.c_str() ));
-
-                if ( uNum.i_num == coreObj.cvtIntBinary ) {
-                    cout << strFloatNumber << " Convert OK " << endl;
-                } else {
-                    cout << strFloatNumber << " | Sorry : Convert <Not> Equal  " << endl;
-                    cout << "uNum.i_num           = 0x" << std::hex << uNum.i_num << endl;
-                    cout << "coreObj.cvtIntBinary = 0x" << std::hex << coreObj.cvtIntBinary << endl;
-                    return false;
-                }
-            } else {
-                // double type
-                llDoubleNum llNum;
-                llNum.f_num = atof(strFloatNumber.c_str() );
-
-                if ( llNum.i_num == coreObj.cvtLLBinary ) {
-                    cout << strFloatNumber << " Convert OK " << endl;
-                } else {
-                    cout << strFloatNumber << " | Sorry : Convert <Not> Equal  " << endl;
-                    cout << "llNum.i_num           = 0x" << std::hex << llNum.i_num << endl;
-                    cout << "coreObj.cvtLLBinary   = 0x" << std::hex << coreObj.cvtLLBinary << endl;
-                    return false;
-                }
-            }
-
+            dui.d_num = stod(strfloat);
         }
+        convertSuccessful = true;
+    } catch ( const std::exception& e ) {
+        cout << "[ERROR] : " << e.what() << endl;
+    } catch ( ... ) {
+        cout << "[ERROR] : catch an unexpected  exception , maybe convert from string -->  float/double failed " << endl;
     }
 
-    return true;
-}
-
-void readFloatByGenerate(int intBits,int floatBits, bool neFlag, bool fFlag)
-{
-    unsigned long long maxNum = static_cast<unsigned long long>( pow(10, intBits+floatBits) );
-    for ( unsigned long long i = 0; i < maxNum; ++i ) {
-        auto strRet = generateStrFloat(i, intBits, floatBits, neFlag, fFlag);
-        auto b = checkStringFloat(strRet);
-        if ( !b ) {
-            cout << "[ERROR] : convert float/double on string \"" << strRet << "\"" << endl;
-            break;
-        }
-    }
-}
-
-
-void testOnly()
-{
-    string err;
-    FloatConverter cvt;
-    auto b = false;
-    string checkFloatStr = "0.01f";
-
-    b = cvt.isValidFloat(checkFloatStr,err);
-    if ( !b ) {
-        cout << checkFloatStr << "| " << err << " | Sorry : is <Not> a Valid Float-Point number" << endl;
-        return;
-    } else {
-        b = cvt.doConvert(err);
-        if ( !b ) {
-            cout << "0.01f" << " | " << err << " | Sorry doConvert(...)  Failed  " << endl;
-            return;
+    if( !convertSuccessful ) {
+        if ( isLastfF ) {
+            fui.f_num = 0.0f;
         } else {
-            const auto& coreObj = cvt.getCvt();
+            dui.d_num = 0.0;
+        }
+        cout << "[ERROR] : stof(argv[1]) or stod(argv[1])  failed , exit" << endl;
+        return -1;
+    }
 
-            if ( !coreObj.fFlag.second.empty()  ) {
-                // float type
-                intFloatNum uNum;
-                /********************************
-                   replace the hard-code number here
-                ********************************/
-                uNum.f_num = 0.01f;
 
-                if ( uNum.i_num == coreObj.cvtIntBinary ) {
-                    cout << checkFloatStr << " Convert OK " << endl;
-                } else {
-                    cout << checkFloatStr  << " | Sorry : Convert <Not> Equal  " << endl;
-                    cout << "uNum.i_num           = 0x" << std::hex << uNum.i_num << endl;
-                    cout << "coreObj.cvtIntBinary = 0x" << std::hex << coreObj.cvtIntBinary << endl;
-                    return;
-                }
+    try {
+        FloatConverter cvt;
+        string errorMsg;
+        auto bret = cvt.isValidFloat( strfloat, errorMsg);
+        if ( !bret ) {
+            cout << "[ERROR] , Parse String \"" << strfloat << "\" as Float Failed : " << errorMsg << endl;
+        } else {
+            bret = cvt.doConvert(errorMsg);
+            const auto& cvtRet = cvt.getCvt();
+            if ( !bret ) {
+                cout << "[ERROR] , Convert String as Float Failed : " << errorMsg << endl;
             } else {
-                // double type
-                llDoubleNum llNum;
-                /********************************
-                   replace the hard-code number here
-                ********************************/
-                llNum.f_num = 0.01;
-
-                if ( llNum.i_num == coreObj.cvtLLBinary ) {
-                    cout << checkFloatStr << " Convert OK " << endl;
+                auto bConvertEqualFlag = false;
+                if ( isLastfF ) {
+                    bConvertEqualFlag = (cvtRet.cvtIntBinary == fui.ui_num);
                 } else {
-                    cout << checkFloatStr << " | Sorry : Convert <Not> Equal  " << endl;
-                    cout << "llNum.i_num           = 0x" << std::hex << llNum.i_num << endl;
-                    cout << "coreObj.cvtLLBinary   = 0x" << std::hex << coreObj.cvtLLBinary << endl;
-                    return;
+                    bConvertEqualFlag = (cvtRet.cvtLLBinary == dui.dull_num);
+                }
+
+                if ( bConvertEqualFlag ) {
+                    if ( isLastfF ) {
+                        cout << "[SUCCESSFUL] , Convert Equal. "   <<  "Number = " <<  strfloat <<  " = 0x" << std::hex << std::uppercase << fui.ui_num << " => 32 bits , 1 integer number " << endl;
+                    } else {
+                        cout << "[SUCCESSFUL] , Convert Equal. "   <<  "Number = " <<  strfloat <<  " = 0x" << std::hex << std::uppercase << dui.dull_num << " => 64 bits , 1 unsigned long long " << endl;
+                    }
+                } else {
+                    cout << "[FAILED] , Convert <Not> Equal ! "       <<  endl
+                         << "number = \""   << strfloat  << "\"" << endl
+                         << "       = 0x" << std::hex << fui.ui_num    << " ( Union   Convert )" << endl
+                         << "      != 0x" << std::hex << cvtRet.cvtIntBinary << " ( Program Convert )" << endl;
                 }
             }
         }
+    } catch ( const std::exception& e ) {
+        cout << "[ERROR] : " << e.what() << endl;
+    } catch ( ... ) {
+        cout << "[ERROR] : catch an unexpected  exception , maybe convert from string -->  float/double failed " << endl;
     }
 
+	return 0;
 }
-
-
-int main(int argc, char* argv[],char* env[])
-{
-    auto testFlag = 0;
-    if ( testFlag == 1 ) {
-        testOnly();
-        return 0;
-    }
-
-
-    if ( argc != 5 ) {
-        cout << "Missing generate args " << endl;
-        cout << "          int part   float part     negative       f|F flag"  << endl;
-        cout << "./ieee754   <intBits>   <floatBits>   <[ne|other]>  <[f|other]>" << endl;
-        return -1;
-    }
-
-    int intBits = atoi(argv[1]);
-    if ( intBits <= 0 ) {
-        cout << "int bit count must > 0 " << endl;
-        return -1;
-    }
-    int floatBits = atoi(argv[2]);
-    if ( floatBits <= 0 ) {
-        cout << "floatBits bit count must > 0 " << endl;
-        return -1;
-    }
-
-    string negativeStr = argv[3];
-    string fStr = argv[4];
-    auto neFlag = (negativeStr == "ne");    // negative flag , if the number is none negative , set the argv[3] as  any arbitrary string
-    auto fFlag  = (fStr == "f");            // f|F   flag , if double , set as none "f"
-
-    readFloatByGenerate(intBits, floatBits, neFlag, fFlag);
-
-    return 0;
-}
-
 
