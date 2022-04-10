@@ -1,5 +1,14 @@
 This program tool is used to convert from decimal float point number (such as float/double)  into binary number
 
+
+--------------------------------------------------
+ieee754.cpp
+--------------------------------------------------
+Usage :
+    $ ./ieee754    <floatNumber>(f/F)
+
+
+
 --------------------------------------------------
 demo.cpp
 --------------------------------------------------
@@ -11,10 +20,10 @@ Convert   pr.second (1.1f)  =>   binary format
 
 
 --------------------------------------------------
-ieee754.cpp
+unitTest.cpp
 --------------------------------------------------
 Usage : 
-	$ ./ieee754   <intBits>   <floatBits>   <[ne|other]>  <[f|other]>
+	$ ./unitTest   <intBits>   <floatBits>   <[ne|other]>  <[f|other]>
 e.g.
 $ ./ieee754 2 2  a f
 1. generate from  a string list from "00.00f" ~ "99.99f"
