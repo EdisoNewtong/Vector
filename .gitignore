@@ -20,7 +20,7 @@ cpp/console/tools/ieee754/demo
 cpp/console/tools/ieee754/genTools
 cpp/console/tools/ieee754/ieee754
 cpp/console/tools/ieee754/unitTest
-cpp/console/tools/intergerValueRange/intergerValueRange
+cpp/console/tools/intValueRange/intValueRange
 cpp/console/tools/asciiCodeTable/asciiCodeTable
 cpp/console/tools/mathOperatation/mathCalc
 cpp/console/tools/**/*.exe
