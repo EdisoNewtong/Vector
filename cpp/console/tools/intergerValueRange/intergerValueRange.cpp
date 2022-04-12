@@ -135,12 +135,12 @@ int main(int argc, char* argv[], char* env[])
 
 
         auto notMatchFlag = false;
+        cout <<  "===========================================================================" << endl;
         if ( typeArgCnt == 1 ) {
             //
             // typeArgCnt == 1
             //
 
-            cout <<  "===========================================================================" << endl << endl;
             if ( typeArgs == "char" ) {
                 cout << "\t" << getTypeValueRange<char>("char",4) << "    " << sizeof(char) << " byte , " << (sizeof(char) * 8) << " bits. " << endl;
             } else if ( typeArgs == "short" ) {
@@ -202,7 +202,7 @@ int main(int argc, char* argv[], char* env[])
             cout << "Unknown Type : \"" << typeArgs << "\" ??? " << endl << endl;
             printUsage();
         } else {
-            cout << endl <<  "===========================================================================" << endl; 
+            cout <<  "===========================================================================" << endl; 
         }
     } 
     
