@@ -16,13 +16,15 @@ cpp/console/tools/eolconvert/eolconvert
 cpp/console/tools/spacetabconvert/spacetabconvert
 cpp/console/tools/hexstring/hexstring
 cpp/console/tools/intdisplay/intdisplay
-cpp/console/tools/ieee754/*.exe
 cpp/console/tools/ieee754/demo
 cpp/console/tools/ieee754/genTools
 cpp/console/tools/ieee754/ieee754
 cpp/console/tools/ieee754/unitTest
+cpp/console/tools/intergerValueRange/intergerValueRange
 cpp/console/tools/asciiCodeTable/asciiCodeTable
 cpp/console/tools/mathOperatation/mathCalc
+cpp/console/tools/**/*.exe
+
 
 lua/sourceCodeStudy/lua-5.1.5/src/lua
 lua/sourceCodeStudy/lua-5.1.5/src/luac
