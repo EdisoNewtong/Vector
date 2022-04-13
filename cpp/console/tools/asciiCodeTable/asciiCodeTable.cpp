@@ -3,6 +3,7 @@
 using namespace std;
 
 #if !defined(_MSC_VER)
+// #pragma message("in unix/linux platform")
 
 void printAsciiCodeTable()
 {
@@ -281,6 +282,7 @@ u8R"(
 
 #else
 
+// #pragma message("in windows platform")
 
 void printAsciiCodeTableForWindows()
 {
