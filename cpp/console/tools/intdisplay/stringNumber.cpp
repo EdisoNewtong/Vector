@@ -257,7 +257,7 @@ void StringNumber::decimalMinus1()
     //
     //  Only Support Decimal Number
     //
-    int lastIdx = m_snumber.size() - 1;
+    int lastIdx = static_cast<int>( m_snumber.size() - 1);
     char ch = m_snumber.at(lastIdx);
 
     if ( ch == '0' ) {
@@ -490,7 +490,7 @@ void StringNumber::check10()
 
 void StringNumber::check16()
 {
-    int len = m_snumber.size();
+    int len = static_cast<int>( m_snumber.size() );
     if ( len <= 2 ) {
         throw MyException("invalid hex format , str.length <=2");
     }
@@ -636,7 +636,7 @@ string StringNumber::calcDecimalWithSignedFlag()
     //
     // process if sign bit is '1'
     //
-    int binLen = copyStr.size();
+    int binLen = static_cast<int>( copyStr.size() );
     int nBits = 0;
     if ( isbB(copyStr.back()) ) {
         nBits = binLen - 1;
