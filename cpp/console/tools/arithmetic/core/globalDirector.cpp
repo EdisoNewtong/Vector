@@ -1,0 +1,201 @@
+#include "globalDirector.h"
+#include "charUtil.h"
+#include "parserOption.h"
+#include "enumUtil.h"
+#include "myException.h"
+#include "tokenMgr.h"
+
+
+#include <iostream>
+#include <cassert>
+using namespace std;
+
+GlobalDirector::GlobalDirector()
+    //-------------------------------------
+    : m_pCurrentParser(nullptr) 
+    //-------------------------------------
+    , m_pBaseParser(nullptr)
+    , m_pBlankParser(nullptr)
+    , m_pSinglelineCommentParser(nullptr)
+    , m_pMultilineCommentParser(nullptr)
+    , m_pOperatorParser(nullptr)
+    , m_pSequenceParser(nullptr)
+    , m_pSemicolonParser(nullptr)
+    //-------------------------------------
+    , m_buff( nullptr )
+    , m_currentParserType(ParserBase::E_BASE)
+{
+    m_pBaseParser = new ParserBase();         // 0
+    m_pBlankParser = new BlankParser();       // 1
+    m_pSinglelineCommentParser = new SinglelineCommentParser();   // 2
+    m_pMultilineCommentParser  = new MultilineCommentParser();     // 3
+    m_pOperatorParser = new OperatorParser(); // 4
+    m_pSequenceParser = new SequenceParser(); // 5
+    m_pSemicolonParser = new SemiColonParser(); // 6
+
+    // Set Current Parser
+    m_pCurrentParser = m_pBaseParser;
+
+    m_currentParserType = ParserBase::E_BASE;
+}
+
+// virtual 
+GlobalDirector::~GlobalDirector()
+{
+    INNER_SAFE_DELETE(m_pBaseParser)
+    INNER_SAFE_DELETE(m_pBlankParser)
+    INNER_SAFE_DELETE(m_pSinglelineCommentParser)
+    INNER_SAFE_DELETE(m_pMultilineCommentParser)
+    INNER_SAFE_DELETE(m_pOperatorParser)
+    INNER_SAFE_DELETE(m_pSequenceParser)
+    INNER_SAFE_DELETE(m_pSemicolonParser)
+
+    // delete the file content inside Buff::~Buff()
+    INNER_SAFE_DELETE(m_buff)
+
+    m_pCurrentParser = nullptr;
+}
+
+
+void GlobalDirector::setData(Buff* data)
+{
+    m_buff = data;
+}
+
+
+void GlobalDirector::switchParser(ParserBase::E_PARSER_TYPE type)
+{
+
+    if ( type == ParserBase::E_BASE ) {
+        m_pCurrentParser = m_pBaseParser;
+    } else if ( type == ParserBase::E_BLANK ) {
+        m_pCurrentParser = m_pBlankParser;
+    } else if ( type == ParserBase::E_SINGLE_LINE_COMMENT ) {
+        m_pCurrentParser = m_pSinglelineCommentParser;
+    } else if ( type == ParserBase::E_MULTI_LINE_COMMENT ) {
+        m_pCurrentParser = m_pMultilineCommentParser;
+    } else if ( type == ParserBase::E_OPERATOR ) {
+        m_pCurrentParser = m_pOperatorParser;
+    } else if ( type == ParserBase::E_SEQUENCE ) {
+        m_pCurrentParser = m_pSequenceParser;
+    } else if ( type == ParserBase::E_SEMICOLON ) {
+        m_pCurrentParser = m_pSemicolonParser;
+    } else {
+        m_pCurrentParser = nullptr;
+    }
+
+    m_currentParserType = type;
+}
+
+
+
+void GlobalDirector::doParse()
+{
+    using namespace charutil;
+
+    if ( m_buff == nullptr ) {
+        return;
+    }
+
+    auto debugOpt = ParserOption::getDebugOption();
+    auto flagOpt  = ParserOption::getFlag();
+
+    auto needMove2Next = true;
+    ChInfo& rChInfo = m_buff->getCursor();
+
+    auto previousParser = m_pCurrentParser;
+
+    while ( !m_buff->isAtEnd() )
+    {
+        needMove2Next = true;
+
+        if ( m_pCurrentParser != nullptr ) {
+            E_ParserAction act = E_NO_ACTION;
+            auto changeType = m_pCurrentParser->appendChar(rChInfo, act);
+            if ( changeType != m_currentParserType ) {
+                auto oldType = m_currentParserType;
+                if ( debugOpt >= 1 || flagOpt >= 3 ) {
+                    cout << rChInfo.getPos() << ".  Switch Parser from "<< EnumUtil::enumName(oldType) << " -> " << EnumUtil::enumName(changeType) << endl;
+                }
+
+                // 1. core save previous 
+                previousParser = m_pCurrentParser;
+                switchParser( changeType );
+
+                assert( m_pCurrentParser != nullptr);
+                switch( act )
+                {
+                case E_SWITCH_FROM_BASE_TO_SPECIAL_PARSER:
+                    {
+                        m_pCurrentParser->clearSequence();
+                        m_pCurrentParser->resetInternalState();
+                        m_pCurrentParser->pushHeadChar( previousParser->getSequence().at(0), rChInfo );
+
+                        previousParser->clearSequence();
+                    }
+                    break;
+                case E_TRANSFER_TO_OTHER:
+                    {
+                        m_pCurrentParser->clearSequence();
+                        m_pCurrentParser->resetInternalState();
+                        m_pCurrentParser->receiverTransfered( previousParser->getSequence() , rChInfo );
+
+                        previousParser->clearSequence();
+                    }
+                    break;
+                case E_GENERATE_TOKEN_SWITCH_TO_DEFAULT_KEEP_CURSOR:
+                case E_GENERATE_TOKEN_SWITCH_TO_DEFAULT_STEP_NEXT:
+                    {
+                        needMove2Next = !(act == E_GENERATE_TOKEN_SWITCH_TO_DEFAULT_KEEP_CURSOR);
+
+                        if ( !previousParser->isParsedSeqValid() ) {
+                            MyException e(E_THROW_INVALID_PARSEDSTR_TO_GENERATE_TOKEN);
+                            e.setDetail( previousParser->getSequence() );
+                            throw e;
+                        } 
+
+                        // else generate token
+                        auto token = previousParser->generateToken();
+                        TokenMgr::getInstance()->pushToken( token );
+                    }
+                    break;
+                default:
+                    break;
+                }
+            }
+        }
+
+        // iterator to next character , and calculate  line/column info
+        if ( needMove2Next ) {
+            m_buff->moveNext();
+        }
+
+    } // end while
+
+    //
+    // After travelsal all buff , push the final token
+    //
+    if ( m_pCurrentParser != m_pBaseParser ) {
+        if ( !m_pCurrentParser->isParsedSeqValid() ) {
+            MyException e(E_THROW_INVALID_PARSEDSTR_TO_GENERATE_TOKEN);
+            e.setDetail( m_pCurrentParser->getSequence() );
+            throw e;
+        }
+
+        // else generate token
+        auto token = previousParser->generateToken();
+        TokenMgr::getInstance()->pushToken( token );
+    }
+
+
+}
+
+
+void GlobalDirector::execCode()
+{
+    using namespace charutil;
+
+}
+
+
+
