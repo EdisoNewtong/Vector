@@ -33,10 +33,10 @@ lua/lua_C_Lab/basic/lualib/*.a
 lua/lua_C_Lab/basic/lualib/*.lib
 lua/sourceCodeStudy/xcodeLuaStudy
 
-**/build/*
 *.pro.user
 
 !cpp/console/mathOperatation/build/**
+!cpp/console/tools/arithMetic/build/*.o
 cpp/console/mathOperatation/build/*.o
 
 

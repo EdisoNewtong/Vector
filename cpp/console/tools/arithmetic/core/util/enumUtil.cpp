@@ -1,0 +1,335 @@
+#include "enumUtil.h"
+#include "myException.h"
+using namespace std;
+
+#define INNER_ENUM_2_STRING_MAP(enumTp) case enumTp:\
+    retstr = #enumTp;\
+    break;
+
+///////////////////////////////////////////////////////////////////////////
+//
+// static class member function
+//
+///////////////////////////////////////////////////////////////////////////
+
+string EnumUtil::enumName(E_CharType tp)
+{
+    string retstr;
+    switch( tp )
+    {
+    INNER_ENUM_2_STRING_MAP(E_CHAR_UNKNOWN)
+    INNER_ENUM_2_STRING_MAP(E_CHAR_ALPHA)
+    INNER_ENUM_2_STRING_MAP(E_CHAR_NUMBER)
+    INNER_ENUM_2_STRING_MAP(E_CHAR_OPERATOR)
+    INNER_ENUM_2_STRING_MAP(E_CHAR_BLANK)
+    INNER_ENUM_2_STRING_MAP(E_CHAR_MISC)
+    default:
+         retstr = string("??? E_CharType ??? | value = ") + to_string( static_cast<int>(tp) );
+         break;
+    }
+
+    return retstr;
+}
+
+
+// static 
+string EnumUtil::enumName(E_OperatorType tp)
+{
+    string retstr;
+
+    switch( tp )
+    {
+    INNER_ENUM_2_STRING_MAP(E_OPERATOR_UNKNOWN)
+    INNER_ENUM_2_STRING_MAP(E_ADD)
+    INNER_ENUM_2_STRING_MAP(E_POSITIVE)
+    INNER_ENUM_2_STRING_MAP(E_MINUS)
+    INNER_ENUM_2_STRING_MAP(E_NEGATIVE)
+    INNER_ENUM_2_STRING_MAP(E_MULTIPLY)
+    INNER_ENUM_2_STRING_MAP(E_DIVIDE)
+    INNER_ENUM_2_STRING_MAP(E_MOD)
+    INNER_ENUM_2_STRING_MAP(E_BIT_AND)
+    INNER_ENUM_2_STRING_MAP(E_BIT_OR)
+    INNER_ENUM_2_STRING_MAP(E_BIT_XOR)
+    INNER_ENUM_2_STRING_MAP(E_BIT_NOT)
+    INNER_ENUM_2_STRING_MAP(E_BIT_LEFT_SHIFT)
+    INNER_ENUM_2_STRING_MAP(E_BIT_RIGHT_SHIFT)
+    INNER_ENUM_2_STRING_MAP(E_OPEN_PARENTHESES)
+    INNER_ENUM_2_STRING_MAP(E_CLOSE_PARENTHESES)
+    INNER_ENUM_2_STRING_MAP(E_ASSIGNMENT)
+    default:
+        retstr = string("??? E_OperatorType ??? | value = ") + to_string( static_cast<int>(tp) );
+        break;
+    }
+
+    return retstr;
+}
+
+
+ 
+string EnumUtil::enumName(E_TokenType tp)
+{
+    string retstr;
+
+    switch( tp )
+    {
+    INNER_ENUM_2_STRING_MAP(E_TOKEN_UNKNOWN)
+    INNER_ENUM_2_STRING_MAP(E_TOKEN_BLANK)
+    INNER_ENUM_2_STRING_MAP(E_TOKEN_SINGLE_LINE_COMMENT)
+    INNER_ENUM_2_STRING_MAP(E_TOKEN_MULTI_LINE_COMMENT)
+    INNER_ENUM_2_STRING_MAP(E_TOKEN_EXPRESSION)
+    INNER_ENUM_2_STRING_MAP(E_TOKEN_OPERATOR)
+    INNER_ENUM_2_STRING_MAP(E_TOKEN_SEMICOLON)
+    default:
+        retstr = string("??? E_TokenType ??? | value = ") + to_string( static_cast<int>(tp) );
+        break;
+    }
+    return retstr;
+}
+
+
+
+string EnumUtil::enumName(E_DataType tp)
+{
+    string retstr;
+
+    switch( tp )
+    {
+    case E_TP_UNKNOWN:
+        retstr = "unknown type";
+        break;
+    case E_TP_CHAR:
+        retstr = "char";
+        break;
+    case E_TP_U_CHAR:
+        retstr = "unsigned char";
+        break;
+    case E_TP_S_CHAR:
+        retstr = "signed char";
+        break;
+    case E_TP_U_SHORT:
+        retstr = "unsigned short";
+        break;
+    case E_TP_S_SHORT:
+        retstr = "signed short";
+        break;
+    case E_TP_U_INT:
+        retstr = "unsigned int";
+        break;
+    case E_TP_S_INT:
+        retstr = "signed int";
+        break;
+    case E_TP_U_LONG:
+        retstr = "unsigned long";
+        break;
+    case E_TP_S_LONG:
+        retstr = "signed long";
+        break;
+    case E_TP_U_LONG_LONG:
+        retstr = "unsigned long long";
+        break;
+    case E_TP_S_LONG_LONG:
+        retstr = "signed long long";
+        break;
+    case E_TP_FLOAT:
+        retstr = "float";
+        break;
+    case E_TP_DOUBLE:
+        retstr = "double";
+        break;
+
+
+    // INNER_ENUM_2_STRING_MAP(E_TP_UNKNOWN)
+    // INNER_ENUM_2_STRING_MAP(E_TP_CHAR)
+    // INNER_ENUM_2_STRING_MAP(E_TP_U_CHAR)
+    // INNER_ENUM_2_STRING_MAP(E_TP_S_CHAR)
+    // INNER_ENUM_2_STRING_MAP(E_TP_U_SHORT)
+    // INNER_ENUM_2_STRING_MAP(E_TP_S_SHORT)
+    // INNER_ENUM_2_STRING_MAP(E_TP_U_INT)
+    // INNER_ENUM_2_STRING_MAP(E_TP_S_INT)
+    // INNER_ENUM_2_STRING_MAP(E_TP_U_LONG)
+    // INNER_ENUM_2_STRING_MAP(E_TP_S_LONG)
+    // INNER_ENUM_2_STRING_MAP(E_TP_U_LONG_LONG)
+    // INNER_ENUM_2_STRING_MAP(E_TP_S_LONG_LONG)
+    // INNER_ENUM_2_STRING_MAP(E_TP_FLOAT)
+    // INNER_ENUM_2_STRING_MAP(E_TP_DOUBLE)
+    // INNER_ENUM_2_STRING_MAP(E_TP_LONG_DOUBLE)
+    default:
+        retstr = string("??? E_DataType ??? | value = ") + to_string( static_cast<int>(tp) );
+        break;
+    }
+
+    return retstr;
+}
+
+
+
+string EnumUtil::enumName(E_ParserAction tp)
+{
+    string retstr;
+
+    switch(tp)
+    {
+    INNER_ENUM_2_STRING_MAP(E_NO_ACTION)
+    INNER_ENUM_2_STRING_MAP(E_SWITCH_FROM_BASE_TO_SPECIAL_PARSER)
+    INNER_ENUM_2_STRING_MAP(E_TRANSFER_TO_OTHER)
+    INNER_ENUM_2_STRING_MAP(E_GENERATE_TOKEN_SWITCH_TO_DEFAULT_KEEP_CURSOR)
+    default:
+        retstr = string("??? E_ParserAction ??? | value = ") + to_string( static_cast<int>(tp) );
+        break;
+    }
+
+    return retstr;
+}
+
+// static 
+string EnumUtil::enumName(E_ExceptionType tp)
+{
+    string retstr;
+    switch( tp )
+    {
+    INNER_ENUM_2_STRING_MAP(E_THROW_UNKNOWN_CHAR)
+    INNER_ENUM_2_STRING_MAP(E_THROW_CODE_CANNOT_REACH_HERE)
+    INNER_ENUM_2_STRING_MAP(E_THROW_INVALID_CHAR_AFTER_LEFT_BRACKET)
+    INNER_ENUM_2_STRING_MAP(E_THROW_INVALID_CHAR_AFTER_RIGHT_BRACKET)
+    INNER_ENUM_2_STRING_MAP(E_THROW_INVALID_PARSEDSTR_TO_GENERATE_TOKEN)
+    INNER_ENUM_2_STRING_MAP(E_THROW_INVALID_CHAR_IN_DECIMAL_SEQ)
+    INNER_ENUM_2_STRING_MAP(E_THROW_INVALID_CHAR_IN_OCTAL_SEQ)
+    INNER_ENUM_2_STRING_MAP(E_THROW_INVALID_CHAR_IN_HEX_SEQ)
+    INNER_ENUM_2_STRING_MAP(E_THROW_INVALID_CHAR_IN_FLOAT_SEQ)
+    INNER_ENUM_2_STRING_MAP(E_THROW_INVALID_CHAR_IN_VARIBLE_SEQ)
+    INNER_ENUM_2_STRING_MAP(E_THROW_INVALID_NUMBER_BASE)
+    INNER_ENUM_2_STRING_MAP(E_THROW_DIFFERENT_NUMBER_BASE)
+    INNER_ENUM_2_STRING_MAP(E_THROW_INVALID_DECIMAL_NUMBER)
+    INNER_ENUM_2_STRING_MAP(E_THROW_INVALID_OCTAL_NUMBER)
+    INNER_ENUM_2_STRING_MAP(E_THROW_INVALID_HEX_NUMBER)
+    //
+    INNER_ENUM_2_STRING_MAP(E_THROW_INVALID_LONG_NUMBER_WHEN_CONVERTING)
+    INNER_ENUM_2_STRING_MAP(E_THROW_INVALID_UNSIGNED_LONG_NUMBER_WHEN_CONVERTING)
+    INNER_ENUM_2_STRING_MAP(E_THROW_INVALID_LONG_LONG_NUMBER_WHEN_CONVERTING)
+    INNER_ENUM_2_STRING_MAP(E_THROW_INVALID_UNSIGNED_LONG_LONG_NUMBER_WHEN_CONVERTING)
+    INNER_ENUM_2_STRING_MAP(E_THROW_INVALID_FLOAT_NUMBER_WHEN_CONVERTING)
+    INNER_ENUM_2_STRING_MAP(E_THROW_INVALID_DOUBLE_NUMBER_WHEN_CONVERTING)
+    INNER_ENUM_2_STRING_MAP(E_THROW_INVALID_LONG_DOUBLE_NUMBER_WHEN_CONVERTING)
+    //
+    INNER_ENUM_2_STRING_MAP(E_THROW_INVALID_OPERATOR)
+    INNER_ENUM_2_STRING_MAP(E_THROW_INVALID_TOKEN_RELATIONSHIP)
+
+    INNER_ENUM_2_STRING_MAP(E_THROW_VARIBLE_ALREADY_DEFINED)
+    INNER_ENUM_2_STRING_MAP(E_THROW_VARIBLE_CANNOT_BE_KEYWORD)
+    INNER_ENUM_2_STRING_MAP(E_THROW_VARIBLE_NOT_DEFINED)
+
+    INNER_ENUM_2_STRING_MAP(E_THROW_SENTENCE_TOO_LESS_TOKEN)
+    INNER_ENUM_2_STRING_MAP(E_THROW_SENTENCE_TOO_MORE_ASSIGNMENT)
+    INNER_ENUM_2_STRING_MAP(E_THROW_SENTENCE_DEFINITION_PREFIX_IS_NOT_ALL_KEYWORD)
+    INNER_ENUM_2_STRING_MAP(E_THROW_SENTENCE_DEFINITION_SUFFIX_IS_NOT_VARIBLE)
+    INNER_ENUM_2_STRING_MAP(E_THROW_SENTENCE_DEFINITION_TOO_MANY_KEYWORDS)
+    INNER_ENUM_2_STRING_MAP(E_THROW_SENTENCE_NO_EXPR_BEFORE_ASSIGNMENT)
+    INNER_ENUM_2_STRING_MAP(E_THROW_SENTENCE_NO_EXPR_AFTER_ASSIGNMENT)
+    INNER_ENUM_2_STRING_MAP(E_THROW_SENTENCE_UNKNOWN_DATA_TYPE)
+    INNER_ENUM_2_STRING_MAP(E_THROW_SUFFIXEXPR_BINARY_OP_MISS_TWO_OPERANDS)
+    INNER_ENUM_2_STRING_MAP(E_THROW_SUFFIXEXPR_UNARY_OP_MISS_ONE_OPERAND)
+
+    INNER_ENUM_2_STRING_MAP(E_THROW_DIVIDE_ZERO)
+    INNER_ENUM_2_STRING_MAP(E_THROW_MODULO_ZERO)
+    INNER_ENUM_2_STRING_MAP(E_THROW_MODULO_CANNOT_APPLY_ON_FLOAT)
+
+    INNER_ENUM_2_STRING_MAP(E_THROW_BITAND_CANNOT_APPLY_ON_FLOAT)
+    INNER_ENUM_2_STRING_MAP(E_THROW_BITOR_CANNOT_APPLY_ON_FLOAT)
+    INNER_ENUM_2_STRING_MAP(E_THROW_BITXOR_CANNOT_APPLY_ON_FLOAT)
+    INNER_ENUM_2_STRING_MAP(E_THROW_BITNOT_CANNOT_APPLY_ON_FLOAT)
+
+    INNER_ENUM_2_STRING_MAP(E_THROW_BIT_LEFTSHIFT_CANNOT_APPLY_ON_FLOAT)
+    INNER_ENUM_2_STRING_MAP(E_THROW_BIT_RIGHTSHIFT_CANNOT_APPLY_ON_FLOAT)
+    INNER_ENUM_2_STRING_MAP(E_THROW_INVALID_SUFFIX_EXPRESSION)
+
+    default:
+        retstr = string("??? E_ExceptionType ??? | value = ") + to_string( static_cast<int>(tp) );
+        break;
+    }
+
+    return retstr;
+}
+
+ 
+string EnumUtil::enumName(ParserBase::E_PARSER_TYPE tp)
+{
+
+    string retstr;
+    switch( tp )
+    {
+    INNER_ENUM_2_STRING_MAP(ParserBase::E_BASE)
+    INNER_ENUM_2_STRING_MAP(ParserBase::E_BLANK)
+    INNER_ENUM_2_STRING_MAP(ParserBase::E_SINGLE_LINE_COMMENT)
+    INNER_ENUM_2_STRING_MAP(ParserBase::E_MULTI_LINE_COMMENT)
+    INNER_ENUM_2_STRING_MAP(ParserBase::E_OPERATOR)
+    INNER_ENUM_2_STRING_MAP(ParserBase::E_SEQUENCE)
+    INNER_ENUM_2_STRING_MAP(ParserBase::E_SEMICOLON)
+    default:
+        retstr = string("???  ParserBase::E_PARSER_TYPE ??? | value = ") + to_string( static_cast<int>(tp) );
+        break;
+    }
+
+    return retstr;
+}
+
+
+// static 
+E_OperatorType EnumUtil::getOpType(const char& firstCh, bool isUnary /* = false */)
+{
+    E_OperatorType retOpTp = E_OPERATOR_UNKNOWN;
+    switch ( firstCh )
+    {
+    case '+':
+        retOpTp = (!isUnary ?  E_ADD : E_POSITIVE);
+        break;
+    case '-':
+        retOpTp = (!isUnary ?  E_MINUS : E_NEGATIVE);
+        break;
+    case '*':
+        retOpTp = E_MULTIPLY;
+        break;
+    case '/':
+        retOpTp = E_DIVIDE;
+        break;
+    case '%':
+        retOpTp = E_MOD;
+        break;
+    case '&':
+        retOpTp = E_BIT_AND;
+        break;
+    case '|':
+        retOpTp = E_BIT_OR;
+        break;
+    case '^':
+        retOpTp = E_BIT_XOR;
+        break;
+    case '~':
+        retOpTp = E_BIT_NOT;
+        break;
+    case '<':
+        retOpTp = E_BIT_LEFT_SHIFT;
+        break;
+    case '>':
+        retOpTp = E_BIT_RIGHT_SHIFT;
+        break;
+    case '(':
+        retOpTp = E_OPEN_PARENTHESES;
+        break;
+    case ')':
+        retOpTp = E_CLOSE_PARENTHESES;
+        break;
+    case '=':
+        retOpTp = E_ASSIGNMENT;
+        break;
+    default:
+        {
+            MyException e(E_THROW_INVALID_OPERATOR);
+            e.setDetail( string(1, firstCh) );
+            throw e;
+        }
+        break;
+    }
+
+    return retOpTp;
+}
+
