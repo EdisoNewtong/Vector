@@ -84,9 +84,9 @@ protected:
     TokenBase* doAssignment(TokenBase* left, TokenBase* right);
 
     //      Unary Op
-    TokenBase* doPositive(TokenBase* right);
-    TokenBase* doNegative(TokenBase* right);
-    TokenBase* doBitNot(TokenBase* right);
+    TokenBase* doPositive(TokenBase* op, TokenBase* right);
+    TokenBase* doNegative(TokenBase* op, TokenBase* right);
+    TokenBase* doBitNot(TokenBase* op, TokenBase* right);
 
     E_DataType operatorPrepairDataTypeConversion1(DataValue* pRightVal);
     E_DataType operatorPrepairDataTypeConversion2(DataValue* pLeftVal, DataValue* pRightVal);
@@ -98,7 +98,7 @@ protected:
     static const std::unordered_map<std::string, E_DataType> s_keywordsDataTypeMap;
     static std::list<TokenBase*> s_generatedTmpTokenPool;
 
-    static TokenBase* generateTmpExpression(E_DataType dt, const std::string& expression);
+    static TokenBase* generateTmpExpression(E_DataType dt, const std::string& expression, TokenBase* begtoken, TokenBase* endtoken);
     static void clearTokenPool();
 
 

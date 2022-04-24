@@ -17,7 +17,9 @@ public:
 
     std::string getDetail();
     void setDetail(const std::string& detail);
-    virtual const char* what() const noexcept override; // throw();
+    // virtual const char* what() const noexcept override; // throw();
+
+    std::string getExceptionDetail() const;
 protected:
     E_ExceptionType m_errorCode;
     std::string     m_detail;
