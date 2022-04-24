@@ -927,13 +927,13 @@ TokenBase* TokenMgr::doUnaryOp(TokenBase* op, TokenBase* right)
     switch( op->getOperatorType() )
     {
     case E_POSITIVE:
-        genTmpExp = doPositive(right);
+        genTmpExp = doPositive(op,right);
         break;
     case E_NEGATIVE:
-        genTmpExp = doNegative(right);
+        genTmpExp = doNegative(op,right);
         break;
     case E_BIT_NOT:
-        genTmpExp = doBitNot(right);
+        genTmpExp = doBitNot(op,right);
         break;
     default:
         break;
@@ -1273,7 +1273,7 @@ TokenBase* TokenMgr::doAdd(TokenBase* left, TokenBase* right)
     E_DataType retDt = leftVal.type;
     DataValue sumRet = leftVal + rightVal;
 
-    TokenBase* ret = generateTmpExpression(retDt, finalExpr);
+    TokenBase* ret = generateTmpExpression(retDt, finalExpr, left, right);
     ret->setRealValue( sumRet );
 
     return ret;
@@ -1294,7 +1294,9 @@ TokenBase* TokenMgr::doMinus(TokenBase* left, TokenBase* right)
     E_DataType retDt = leftVal.type;
     DataValue substractRet = leftVal - rightVal;
 
-    TokenBase* ret = generateTmpExpression(retDt, finalExpr);
+    TokenBase* ret = generateTmpExpression(retDt, finalExpr, left, right);
+    ret->setBeginPos( left->getBeginPos() );
+    ret->setEndPos(   right->getBeginPos() );
     ret->setRealValue( substractRet );
 
     return ret;
@@ -1315,7 +1317,7 @@ TokenBase* TokenMgr::doMultiply(TokenBase* left, TokenBase* right)
     E_DataType retDt = leftVal.type;
     DataValue multiRet = leftVal * rightVal;
 
-    TokenBase* ret = generateTmpExpression(retDt, finalExpr);
+    TokenBase* ret = generateTmpExpression(retDt, finalExpr, left, right);
     ret->setRealValue( multiRet  );
 
     return ret;
@@ -1346,7 +1348,7 @@ TokenBase* TokenMgr::doDivide(TokenBase* left, TokenBase* right)
         throw;
     }
 
-    TokenBase* ret = generateTmpExpression(retDt, finalExpr);
+    TokenBase* ret = generateTmpExpression(retDt, finalExpr, left, right);
     ret->setRealValue( divideRet );
 
     return ret;
@@ -1377,7 +1379,7 @@ TokenBase* TokenMgr::doMod(TokenBase* left, TokenBase* right)
         throw;
     }
 
-    TokenBase* ret = generateTmpExpression(retDt, finalExpr);
+    TokenBase* ret = generateTmpExpression(retDt, finalExpr, left, right);
     ret->setRealValue( modRet );
 
     return ret;
@@ -1400,7 +1402,7 @@ TokenBase* TokenMgr::doBitAnd(TokenBase* left, TokenBase* right)
     // calc 
     DataValue bitAndRet = (leftVal & rightVal);
 
-    TokenBase* ret = generateTmpExpression(retDt, finalExpr);
+    TokenBase* ret = generateTmpExpression(retDt, finalExpr, left, right);
     ret->setRealValue( bitAndRet );
 
     return ret;
@@ -1424,7 +1426,7 @@ TokenBase* TokenMgr::doBitOr(TokenBase* left, TokenBase* right)
     // calc 
     DataValue bitOrRet = (leftVal | rightVal);
 
-    TokenBase* ret = generateTmpExpression(retDt, finalExpr);
+    TokenBase* ret = generateTmpExpression(retDt, finalExpr, left, right);
     ret->setRealValue( bitOrRet );
 
     return ret;
@@ -1447,7 +1449,7 @@ TokenBase* TokenMgr::doBitXor(TokenBase* left, TokenBase* right)
     // calc 
     DataValue bitXOrRet = (leftVal ^ rightVal);
 
-    TokenBase* ret = generateTmpExpression(retDt, finalExpr);
+    TokenBase* ret = generateTmpExpression(retDt, finalExpr, left, right);
     ret->setRealValue( bitXOrRet );
 
     return ret;
@@ -1470,7 +1472,7 @@ TokenBase* TokenMgr::doBitLeftShift(TokenBase* left, TokenBase* right)
     DataValue bitLeftShiftRet = (leftVal << rightVal);
     bitLeftShiftRet.downerCast( leftPromotionDt );
 
-    TokenBase* ret = generateTmpExpression(leftPromotionDt, finalExpr);
+    TokenBase* ret = generateTmpExpression(leftPromotionDt, finalExpr, left, right);
     ret->setRealValue( bitLeftShiftRet );
 
     return ret;
@@ -1494,7 +1496,7 @@ TokenBase* TokenMgr::doBitRightShift(TokenBase* left, TokenBase* right)
     DataValue bitRightShiftRet = (leftVal >> rightVal);
     bitRightShiftRet.downerCast( leftPromotionDt );
 
-    TokenBase* ret = generateTmpExpression(leftPromotionDt, finalExpr);
+    TokenBase* ret = generateTmpExpression(leftPromotionDt, finalExpr, left, right);
     ret->setRealValue( bitRightShiftRet );
 
     return ret;
@@ -1511,12 +1513,16 @@ TokenBase* TokenMgr::doAssignment(TokenBase* left, TokenBase* right)
     DataValue leftVal  = left->getRealValue();
     DataValue rightVal = right->getRealValue();
 
+    //
+    // Core Core Core :
+    // Can't use  assignment : Because the left operand and the right operand has different data type
+    //
+    //    leftVal = rightVal;
+    //
     leftVal.doAssignment(rightVal);
-    // leftVal = rightVal;
-
     left->setRealValue( leftVal );
 
-    TokenBase* ret = generateTmpExpression( leftVal.type , finalExpr);
+    TokenBase* ret = generateTmpExpression( leftVal.type , finalExpr, left, right);
     ret->setRealValue( leftVal );
 
     return ret;
@@ -1526,7 +1532,7 @@ TokenBase* TokenMgr::doAssignment(TokenBase* left, TokenBase* right)
 //####################################################################################################
 //
 //      Unary Op
-TokenBase* TokenMgr::doPositive(TokenBase* right)
+TokenBase* TokenMgr::doPositive(TokenBase* op, TokenBase* right)
 {
     static const string SC_OP_POSITIVE_BEGIN = "+";
     // static const string SC_OP_POSITIVE_END = " )";
@@ -1540,13 +1546,13 @@ TokenBase* TokenMgr::doPositive(TokenBase* right)
     // calc 
     DataValue positiveRet = +(rightVal);
 
-    TokenBase* ret = generateTmpExpression(rightPromotionDt, finalExpr);
+    TokenBase* ret = generateTmpExpression(rightPromotionDt, finalExpr, op, right);
     ret->setRealValue( positiveRet );
 
     return ret;
 }
 
-TokenBase* TokenMgr::doNegative(TokenBase* right)
+TokenBase* TokenMgr::doNegative(TokenBase* op, TokenBase* right)
 {
     static const string SC_OP_NEGATIVE_BEGIN = "-";
     // static const string SC_OP_POSITIVE_END = " )";
@@ -1560,14 +1566,14 @@ TokenBase* TokenMgr::doNegative(TokenBase* right)
     // calc 
     DataValue negativeRet = -(rightVal);
 
-    TokenBase* ret = generateTmpExpression(rightPromotionDt, finalExpr);
+    TokenBase* ret = generateTmpExpression(rightPromotionDt, finalExpr, op, right);
     ret->setRealValue( negativeRet  );
 
     return ret;
 
 }
 
-TokenBase* TokenMgr::doBitNot(TokenBase* right)
+TokenBase* TokenMgr::doBitNot(TokenBase* op, TokenBase* right)
 {
     static const string SC_OP_BIT_NOT_BEGIN = "~";
     // static const string SC_OP_POSITIVE_END = " )";
@@ -1581,7 +1587,7 @@ TokenBase* TokenMgr::doBitNot(TokenBase* right)
     // calc 
     DataValue bitNotRet = ~(rightVal);
 
-    TokenBase* ret = generateTmpExpression(rightPromotionDt, finalExpr);
+    TokenBase* ret = generateTmpExpression(rightPromotionDt, finalExpr, op, right);
     ret->setRealValue( bitNotRet );
 
     return ret;
@@ -1589,11 +1595,13 @@ TokenBase* TokenMgr::doBitNot(TokenBase* right)
 
 
 // static 
-TokenBase* TokenMgr::generateTmpExpression(E_DataType dt, const std::string& expression)
+TokenBase* TokenMgr::generateTmpExpression(E_DataType dt, const std::string& expression, TokenBase* begtoken, TokenBase* endtoken)
 {
     TokenBase* pTmpExpression = new TokenBase(dt);
     pTmpExpression->setAsTmpExpression();
     pTmpExpression->setTokenContent( expression );
+    pTmpExpression->setBeginPos( begtoken->getBeginPos() );
+    pTmpExpression->setEndPos( endtoken->getEndPos() );
 
     s_generatedTmpTokenPool.push_back( pTmpExpression );
     return pTmpExpression;

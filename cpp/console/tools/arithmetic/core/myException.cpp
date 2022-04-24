@@ -118,9 +118,36 @@ string MyException::getDetail()
     return m_detail;
 }
 
+string MyException::getExceptionDetail() const
+{
+    static const string SC_SINGLE_QUOTO("\"");
 
+    string detail;
+    auto it = s_exceptionMap.find(m_errorCode);
+    if ( it != s_exceptionMap.end() ) {
+        detail = it->second;
+    } else {
+        detail = EnumUtil::enumName(m_errorCode); 
+    }
+
+    detail += std::string(" "); 
+    if ( m_hasSetCursor ) {
+        detail += m_cursor.getPos();
+    }
+
+    if ( !m_detail.empty() ) {
+        detail += string(" "); 
+        detail += (SC_SINGLE_QUOTO + m_detail + SC_SINGLE_QUOTO);
+    }
+
+    // MyException::s_retDetail = detail;
+
+    // return MyException::s_retDetail.c_str();
+    return detail.c_str();
+}
 
 // virtual 
+/*
 const char* MyException::what() const noexcept // throw()
 {
     static const string SC_SINGLE_QUOTO("\"");
@@ -148,4 +175,5 @@ const char* MyException::what() const noexcept // throw()
     return MyException::s_retDetail.c_str();
     // return detail.c_str();
 }
+*/
 

@@ -103,7 +103,8 @@ int main(int argc, char* argv[], char* env[])
         director.setData(fileBuff);
         director.doParse();
     } catch( const MyException& e ) { 
-        cout << "[ERROR] : Meet a self-defined exception : " << e.what() << endl;
+        // cout << "[ERROR] : Meet a self-defined exception : " << e.what() << endl;
+        cout << "[ERROR] : Meet a self-defined exception : " << e.getExceptionDetail() << endl;
     } catch(const exception& e) {
         cout << "[ERROR] : Meet a common exception : " << e.what() << endl;
     } catch( ... ) {
