@@ -1,11 +1,13 @@
-# makefile
+#!/bin/bash
 
-all:main
 
-#gcc -g -Wall -o main main.c -framework OPENGL -framework GLUT
-main:main.c
+linux:main.c
+	gcc -g -Wall -o main main.c -lglut -lGL -lGLU
+
+macos:main.c
 	gcc -g -Wall -o main main.c -framework OPENGL -framework GLUT
 
+
 clean:
-	rm -Rf *.o main main.dSYM
+	-rm -Rf *.o* *.exe *.dSYM  main
 
