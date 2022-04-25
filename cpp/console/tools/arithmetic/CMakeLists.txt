@@ -19,10 +19,10 @@ file(GLOB_RECURSE all_header_list *.h)
         
 # process all header files 
 foreach(hd IN LISTS all_header_list)
-    # 1. get the relative path of xxx.h     e.g.   /xxx/src/aaa/bbb/ccc/inc.h    ==>    calc__rel__path = "aaa/bbb/ccc/inc.h"
-    file(RELATIVE_PATH calc__rel__path  "${arithmetic_SOURCE_DIR}" ${hd})
+    # 1. get the relative path of xxx.h     e.g.   /xxx/src/aaa/bbb/ccc/inc.h    ==>    calcRelPath = "aaa/bbb/ccc/inc.h"
+    file(RELATIVE_PATH calcRelPath  "${arithmetic_SOURCE_DIR}" ${hd})
     # 2. get the directory path from   "aaa/bbb/ccc/inc.h"   =>    aaa/bbb/ccc
-    get_filename_component(dir ${calc__rel__path} DIRECTORY)
+    get_filename_component(dir ${calcRelPath} DIRECTORY)
     # 3. push it into list named 'allHeadDir'
     list(APPEND allHeadDir ${dir})
 endforeach()
