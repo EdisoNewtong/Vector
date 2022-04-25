@@ -183,7 +183,7 @@ void GlobalDirector::doParse()
         }
 
         // else generate token
-        auto token = previousParser->generateToken();
+        auto token = m_pCurrentParser->generateToken();
         TokenMgr::getInstance()->pushToken( token );
     }
 

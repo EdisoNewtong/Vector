@@ -8,24 +8,24 @@ struct DataValue
     E_DataType type;
     union {
         // char 
-                 char   char_val;
-          signed char   schar_val;
-        unsigned char   uchar_val;
+                 char       char_val;
+          signed char       schar_val;
+        unsigned char       uchar_val;
         // short 
-          signed short  sshort_val;
-        unsigned short  ushort_val;
+          signed short      sshort_val;
+        unsigned short      ushort_val;
         // int 
-          signed int    sint_val;
-        unsigned int    uint_val;
+          signed int        sint_val;
+        unsigned int        uint_val;
         // long 
-          signed long    slong_val;
-        unsigned long    ulong_val;
+          signed long       slong_val;
+        unsigned long       ulong_val;
         // long long
-          signed long    slonglong_val;
-        unsigned long    ulonglong_val;
+          signed long long  slonglong_val;
+        unsigned long long  ulonglong_val;
         // float / double 
-        float            float_val;
-        double           double_val;
+        float               float_val;
+        double              double_val;
     } value;
 
     void doIntergerPromotion(E_DataType promotionTp);
