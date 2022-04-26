@@ -28,6 +28,7 @@ protected:
     void inneralLog0(ChInfo& chInfo);
     void inneralLog1(ParserBase::E_PARSER_TYPE oldtp, ParserBase::E_PARSER_TYPE newtp);
     void inneralLog2(bool moveNext);
+    void printAllVaribles();
 protected:
     ParserBase*       m_pCurrentParser;   // default : 0
 

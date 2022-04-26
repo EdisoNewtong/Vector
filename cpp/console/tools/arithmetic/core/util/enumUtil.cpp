@@ -110,25 +110,25 @@ string EnumUtil::enumName(E_DataType tp)
         retstr = "unsigned short";
         break;
     case E_TP_S_SHORT:
-        retstr = "signed short";
+        retstr = "short";
         break;
     case E_TP_U_INT:
         retstr = "unsigned int";
         break;
     case E_TP_S_INT:
-        retstr = "signed int";
+        retstr = "int";
         break;
     case E_TP_U_LONG:
         retstr = "unsigned long";
         break;
     case E_TP_S_LONG:
-        retstr = "signed long";
+        retstr = "long";
         break;
     case E_TP_U_LONG_LONG:
         retstr = "unsigned long long";
         break;
     case E_TP_S_LONG_LONG:
-        retstr = "signed long long";
+        retstr = "long long";
         break;
     case E_TP_FLOAT:
         retstr = "float";

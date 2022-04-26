@@ -1831,7 +1831,7 @@ void TokenMgr::printOperatorStack()
             cerr << m_execodeIdx << ". Operator Stack  : <Empty> " << endl;
         } else {
             cerr << m_execodeIdx <<". Operator Stack  : " <<  m_opertorStack.size() << " Element(s)" << endl;
-            cerr << "\t";
+            // cerr << "\t";
 
             auto idx = 0;
             auto it = m_opertorStack.begin();
@@ -1866,7 +1866,7 @@ void TokenMgr::printSuffixExpression(int tag)
             cerr << m_execodeIdx << ". Suffix Expression List  : <Empty> " << endl;
         } else {
             cerr << m_execodeIdx << ". Suffix Expression List  : " <<  m_suffixExpression.size() << " Element(s)" << endl;
-            cerr << "\t";
+            // cerr << "\t";
 
             auto idx = 0;
             auto it = m_suffixExpression.begin();

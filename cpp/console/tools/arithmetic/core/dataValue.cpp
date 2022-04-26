@@ -1,6 +1,7 @@
 #include "dataValue.h"
 #include "dataTypeUtil.h"
 #include "myException.h"
+#include <sstream>
 using namespace std;
 
 
@@ -1947,10 +1948,61 @@ void DataValue::doAssignment(const DataValue& rightVal)
         break;
     }
 
-
-    this->type = rightVal.type;
+    // Core Core Core : do not set the right type --> left type
+    // this->type = rightVal.type;
 
 }
 
 
+string DataValue::getPrintValue()
+{
+    stringstream strValue;
+    switch( this->type )
+    {
+    case E_TP_CHAR:
+        strValue << value.char_val << " => " << static_cast<int>(value.char_val);
+        break;
+    case E_TP_U_CHAR:
+        strValue << value.uchar_val << " => " << static_cast<int>(value.uchar_val);
+        break;
+    case E_TP_S_CHAR:
+        strValue << value.schar_val << " => " << static_cast<int>(value.schar_val);
+        break;
+    case E_TP_U_SHORT:
+        strValue << value.ushort_val;
+        break;
+    case E_TP_S_SHORT:
+        strValue << value.sshort_val;
+        break;
+    case E_TP_U_INT:
+        strValue << value.uint_val;
+        break;
+    case E_TP_S_INT:
+        strValue << value.sint_val;
+        break;
+    case E_TP_U_LONG:
+        strValue << value.ulong_val;
+        break;
+    case E_TP_S_LONG:
+        strValue << value.slong_val;
+        break;
+    case E_TP_U_LONG_LONG:
+        strValue << value.ulonglong_val;
+        break;
+    case E_TP_S_LONG_LONG:
+        strValue << value.slonglong_val;
+        break;
+    case E_TP_FLOAT:
+        strValue << value.float_val;
+        break;
+    case E_TP_DOUBLE:
+        strValue << value.double_val;
+        break;
+    default:
+        break;
+    }
+
+    return strValue.str();
+
+}
 

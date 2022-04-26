@@ -1,5 +1,8 @@
 #include "variblePool.h"
 #include "myException.h"
+#include "enumUtil.h"
+#include <iostream>
+using namespace std;
 
 // static
 VariblePool* VariblePool::s_gPool = nullptr;
@@ -30,8 +33,10 @@ void VariblePool::finalize()
 
 VariblePool::VariblePool()
     : m_pool()
+    , m_varDefinedOrder()
 {
     m_pool.clear();
+    m_varDefinedOrder.clear();
 }
     
 // virtual 
@@ -46,6 +51,8 @@ VariblePool::~VariblePool()
         }
     }
     m_pool.clear();
+
+    m_varDefinedOrder.clear();
 }
 
 
@@ -79,7 +86,33 @@ VaribleInfo* VariblePool::create_a_new_varible(E_DataType dt, const std::string&
     newVarible->definedLine = defline;
 
     m_pool.insert( make_pair(varname, newVarible) );
+    m_varDefinedOrder.push_back( varname );
 
     return newVarible;
+}
+
+
+
+void VariblePool::printAllVaribles()
+{
+    if ( m_varDefinedOrder.empty() ) {
+        cout << "<Empty> VariblePool" << endl;
+        return;
+    }
+
+
+    int idx = 0;
+    for( const auto& varname : m_varDefinedOrder ) {
+        auto it = m_pool.find(varname);
+        if ( it != m_pool.end() ) {
+            VaribleInfo* pVarInfo = it->second;
+            if ( pVarInfo != nullptr ) {
+                cout << (idx+1) << ".  " << EnumUtil::enumName(pVarInfo->dataVal.type) << " " << pVarInfo->varName << " = " << pVarInfo->dataVal.getPrintValue() << endl;
+            }
+        }
+
+        ++idx;
+    }
+
 }
 
