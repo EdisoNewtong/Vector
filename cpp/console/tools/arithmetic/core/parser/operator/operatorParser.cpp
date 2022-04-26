@@ -21,8 +21,7 @@ ParserBase::E_PARSER_TYPE OperatorParser::appendChar(const ChInfo& rChInfo,  E_P
 {
     using namespace charutil;
 
-    m_endChPos = rChInfo;
-
+    auto setEndPosFlag = false;
     ParserBase::E_PARSER_TYPE retType = m_type;
 
     char curCh = rChInfo.ch;
@@ -36,10 +35,12 @@ ParserBase::E_PARSER_TYPE OperatorParser::appendChar(const ChInfo& rChInfo,  E_P
         case '/':
             {
                 if ( curCh == '/' ) {
+                    setEndPosFlag = true;
                     m_parsedSeq = "//";
                     afterAction = E_TRANSFER_TO_OTHER;
                     retType = ParserBase::E_SINGLE_LINE_COMMENT;
                 } else if ( curCh == '*' ) {
+                    setEndPosFlag = true;
                     m_parsedSeq = "/*";
                     afterAction = E_TRANSFER_TO_OTHER;
                     retType = ParserBase::E_MULTI_LINE_COMMENT;
@@ -52,6 +53,7 @@ ParserBase::E_PARSER_TYPE OperatorParser::appendChar(const ChInfo& rChInfo,  E_P
         case '<':
             {
                 if ( curCh == '<' ) {
+                    setEndPosFlag = true;
                     m_parsedSeq = "<<";
                     afterAction = E_GENERATE_TOKEN_SWITCH_TO_DEFAULT_STEP_NEXT;
                     retType = ParserBase::E_BASE;
@@ -64,6 +66,7 @@ ParserBase::E_PARSER_TYPE OperatorParser::appendChar(const ChInfo& rChInfo,  E_P
         case '>':
             {
                 if ( curCh == '>' ) {
+                    setEndPosFlag = true;
                     m_parsedSeq = ">>";
                     afterAction = E_GENERATE_TOKEN_SWITCH_TO_DEFAULT_STEP_NEXT;
                     retType = ParserBase::E_BASE;
@@ -83,6 +86,10 @@ ParserBase::E_PARSER_TYPE OperatorParser::appendChar(const ChInfo& rChInfo,  E_P
         // 2nd is not an operator type
         afterAction  = E_GENERATE_TOKEN_SWITCH_TO_DEFAULT_KEEP_CURSOR;
         retType = ParserBase::E_BASE;
+    }
+
+    if ( setEndPosFlag ) {
+        m_endChPos = rChInfo;
     }
 
     return retType;

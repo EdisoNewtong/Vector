@@ -26,12 +26,11 @@ ParserBase::E_PARSER_TYPE SinglelineCommentParser::appendChar(const ChInfo& rChI
 {
     using namespace charutil;
 
-    m_endChPos = rChInfo;
-
     auto retType = m_type;
 
     if ( rChInfo.isLastCh ) {
         m_bIsFinished = true;
+        m_endChPos = rChInfo;
 
         retType  = ParserBase::E_BASE;
         afterAction = E_GENERATE_TOKEN_SWITCH_TO_DEFAULT_STEP_NEXT;
@@ -50,6 +49,7 @@ ParserBase::E_PARSER_TYPE SinglelineCommentParser::appendChar(const ChInfo& rChI
             retType = ParserBase::E_BASE;
             afterAction = E_GENERATE_TOKEN_SWITCH_TO_DEFAULT_STEP_NEXT;
 
+            m_endChPos = rChInfo;
             m_bIsFinished = true;
         } else {
             // \r
@@ -70,6 +70,7 @@ ParserBase::E_PARSER_TYPE SinglelineCommentParser::appendChar(const ChInfo& rChI
         m_bIsFinished = true;
     } else {
         m_parsedSeq += curCh;
+        m_endChPos = rChInfo;
     }
 
     return retType;
