@@ -30,7 +30,7 @@ struct DataValue
 
     void doIntergerPromotion(E_DataType promotionTp);
     void doConvertion(E_DataType destinationTp);
-    bool isIntZero();
+    bool isIntZero() const;
     bool isFloatZero();
 
     void downerCast(E_DataType castTp);
