@@ -97,8 +97,6 @@ void GlobalDirector::doParse()
         return;
     }
 
-    auto debugOpt = ParserOption::getDebugOption();
-    auto flagOpt  = ParserOption::getFlag();
 
     auto needMove2Next = true;
     ChInfo& rChInfo = m_buff->getCursor();
@@ -111,15 +109,16 @@ void GlobalDirector::doParse()
 
         if ( m_pCurrentParser != nullptr ) {
             E_ParserAction act = E_NO_ACTION;
+
+            inneralLog0(rChInfo);
+
+            // core : save previous 
+            auto oldType = m_currentParserType;
+            previousParser = m_pCurrentParser;
+
             auto changeType = m_pCurrentParser->appendChar(rChInfo, act);
             if ( changeType != m_currentParserType ) {
-                auto oldType = m_currentParserType;
-                if ( debugOpt >= 1 || flagOpt >= 3 ) {
-                    cout << rChInfo.getPos() << ".  Switch Parser from "<< EnumUtil::enumName(oldType) << " -> " << EnumUtil::enumName(changeType) << endl;
-                }
 
-                // 1. core save previous 
-                previousParser = m_pCurrentParser;
                 switchParser( changeType );
 
                 assert( m_pCurrentParser != nullptr);
@@ -162,13 +161,16 @@ void GlobalDirector::doParse()
                 default:
                     break;
                 }
-            }
+            } 
+
+            inneralLog1(oldType, changeType);
         }
 
         // iterator to next character , and calculate  line/column info
         if ( needMove2Next ) {
             m_buff->moveNext();
         }
+        inneralLog2(needMove2Next);
 
     } // end while
 
@@ -188,14 +190,44 @@ void GlobalDirector::doParse()
     }
 
 
+    auto pr = TokenMgr::getInstance()->isLastValidTokenSemicolonOrEmpty();
+    if ( !pr.first ) {
+        MyException e(E_THROW_LAST_VALID_TOKEN_IS_NOT_SEMICOLON);
+        e.setDetail( pr.second );
+        throw e;
+    }
 }
 
 
-void GlobalDirector::execCode()
+void GlobalDirector::inneralLog0(ChInfo& chInfo)
 {
-    using namespace charutil;
+    auto debugOpt = ParserOption::getDebugOption();
+    if ( debugOpt & 0x1U ) {
+        cerr << chInfo.getPos() << " ";
+    }
 
 }
 
 
+
+void GlobalDirector::inneralLog1(ParserBase::E_PARSER_TYPE oldtp, ParserBase::E_PARSER_TYPE newtp)
+{
+    auto debugOpt = ParserOption::getDebugOption();
+    if ( debugOpt & 0x1U  ) {
+        if ( oldtp == newtp ) {
+            cerr << EnumUtil::enumName(oldtp) << " ";
+        } else {
+            cerr << EnumUtil::enumName(oldtp) << " -> " << EnumUtil::enumName(newtp) << " ";
+        }
+    }
+}
+
+
+void GlobalDirector::inneralLog2(bool moveNext)
+{
+    auto debugOpt = ParserOption::getDebugOption();
+    if ( debugOpt & 0x1U ) {
+        cerr << (moveNext ? " Keep " : " Next ") << endl;
+    }
+}
 

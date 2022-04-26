@@ -3,7 +3,9 @@
 #include "enumUtil.h"
 #include "opUtil.h"
 #include "dataTypeUtil.h"
+#include "parserOption.h"
 #include <iterator>
+#include <iostream>
 using namespace std;
 
 //////////////////////////////////////////////////////////////////////
@@ -341,6 +343,7 @@ TokenMgr::TokenMgr()
     , m_oneSentence()
     , m_opertorStack()
     , m_suffixExpression()
+    , m_execodeIdx(0)
 {
     m_allTokenList.clear();
     m_validTokenList.clear();
@@ -436,11 +439,27 @@ void TokenMgr::pushToken(TokenBase* pToken)
         if ( tokenType == E_TOKEN_SEMICOLON ) {
             // Core Core Core
             executeCode();
+            ++m_execodeIdx;
         } else {
             m_oneSentence.push_back( pToken );
         }
     }
 
+}
+
+
+pair<bool,string>
+TokenMgr::isLastValidTokenSemicolonOrEmpty()
+{
+    if ( m_validTokenList.empty() ) {
+        return make_pair(true,"");
+    }
+
+    auto lastElement = m_validTokenList.back();
+    auto tp = lastElement->getTokenType();
+    auto content = lastElement->getTokenContent();
+    auto isValid = (tp == E_TOKEN_SEMICOLON);
+    return make_pair(isValid, content);
 }
 
 
@@ -452,10 +471,9 @@ void TokenMgr::executeCode()
     // Core Core Core
     //
     //////////////////////////////////////////////////////////////////////
-    //
-    // TODO  : build suffix expression
-    //
+    printOperatorStack();
     m_opertorStack.clear();
+    printSuffixExpression(1);
     m_suffixExpression.clear();
 
     if ( m_oneSentence.empty() ) {
@@ -505,9 +523,9 @@ void TokenMgr::executeCode()
     string varname;
     auto varIdx = 0;
     if ( equalCnt == 0 ) {
+        // 1. int a;
         varIdx = (vecSz - 1);
         defDt = checkPrefixKeyWordsAndGetDataType(varIdx, varname);
-        // 1. int a;
         sentenceType = 1;
     } else {
         // 1 '='
@@ -582,6 +600,10 @@ void TokenMgr::executeCode()
     if ( sentenceType != 1 ) {
         buildSuffixExpression(sentenceType, pVaribleInfo, varIdx);
         checkSuffixExpressionValid();
+        popAllOperatorStack();
+
+        printSuffixExpression(2);
+
         evaluateSuffixExpression();
     }
 
@@ -589,7 +611,6 @@ void TokenMgr::executeCode()
     // After Execute , clear
     m_oneSentence.clear();
     clearTokenPool();
-
 }
 
 
@@ -634,6 +655,7 @@ void TokenMgr::buildSuffixExpression(int sentenceType, VaribleInfo* pVarible, in
             }
 
             m_suffixExpression.push_back( pToken );
+            traceSuffixExpression( pToken , true);
         } else {
             // must be a type of operator
             TokenBase* previousToken;
@@ -699,12 +721,21 @@ void TokenMgr::processOperatorStack(TokenBase* previousToken, TokenBase* pToken)
             // Positive  or Negative
             changedTp = (isAdd ? E_POSITIVE : E_NEGATIVE);
             pToken->setOpType(changedTp);
+
+            tracePositiveNegativeFlag( previousToken, opType );
+
             opType = changedTp;
+
         } else {
             auto previousTp = previousToken->getTokenType();
             if ( previousTp == E_TOKEN_OPERATOR   &&   previousToken->getOperatorType() != E_CLOSE_PARENTHESES ) {
                 changedTp = (isAdd ? E_POSITIVE : E_NEGATIVE);
+
+                tracePositiveNegativeFlag( previousToken, opType );
+
                 pToken->setOpType(changedTp);
+
+
                 opType = changedTp;
             }
         }
@@ -730,6 +761,7 @@ void TokenMgr::processOperatorStack(TokenBase* previousToken, TokenBase* pToken)
         // operator is not ')'
         if ( m_opertorStack.empty() ) { // stack is empty
             m_opertorStack.push_back( pToken );
+            traceOperatorStack( pToken, true);
             return;
         }
 
@@ -751,15 +783,18 @@ void TokenMgr::processOperatorStack(TokenBase* previousToken, TokenBase* pToken)
 
             if ( toPushed_p < cmp_p ) {
                 m_opertorStack.insert( rit.base(), pToken );
+                traceOperatorStack( pToken, true );
 
                 pushedFlag = true;
             } else if ( toPushed_p == cmp_p ) {
                 if ( opType == E_OPEN_PARENTHESES ) { // '(' is right-to-Left Associativity
                     m_opertorStack.insert( rit.base(), pToken );
+                    traceOperatorStack( pToken, true );
                 } else {
                     if ( cmp_rightAss ) {
                         // Associativity is   right 2 left
                         forwardIt = m_opertorStack.insert( rit.base(), pToken );
+                        traceOperatorStack( pToken, true );
                         rit = reverse_iterator< decltype(forwardIt) >( forwardIt );
                     } else {
                         // Associativity is   left 2 right , 
@@ -767,12 +802,15 @@ void TokenMgr::processOperatorStack(TokenBase* previousToken, TokenBase* pToken)
                         //   2. pop only one : the current
                         //   3. insert the same priority operator
                         m_suffixExpression.push_back( pVisitToken ); // 1
+                        traceSuffixExpression( pVisitToken, true );
 
                         forwardIt = m_opertorStack.erase( (++rit).base() ); // 2
                         rit = reverse_iterator< decltype(forwardIt) >( forwardIt );
+                        traceOperatorStack( pVisitToken, false );
 
                         m_opertorStack.insert( forwardIt, pToken ); // 3
                         rit = reverse_iterator< decltype(forwardIt) >( forwardIt );
+                        traceOperatorStack( pToken, true );
                     }
                 }
 
@@ -782,13 +820,16 @@ void TokenMgr::processOperatorStack(TokenBase* previousToken, TokenBase* pToken)
                 if ( visitOpType == E_OPEN_PARENTHESES ) {
                     forwardIt = m_opertorStack.insert( rit.base(), pToken );
                     rit = reverse_iterator< decltype(forwardIt) >( forwardIt );
+                    traceOperatorStack( pToken, true );
 
                     pushedFlag = true;
                 } else {
                     m_suffixExpression.push_back( pVisitToken );
+                    traceSuffixExpression( pVisitToken, true );
 
                     forwardIt = m_opertorStack.erase( (++rit).base() );
                     rit = reverse_iterator< decltype(forwardIt) >( forwardIt );
+                    traceOperatorStack( pVisitToken, false );
                 }
             }
 
@@ -800,6 +841,8 @@ void TokenMgr::processOperatorStack(TokenBase* previousToken, TokenBase* pToken)
 
         if ( !pushedFlag ) {
             m_opertorStack.push_back( pToken );
+
+            traceOperatorStack( pToken, true );
         }
     }
 }
@@ -871,8 +914,6 @@ void TokenMgr::evaluateSuffixExpression()
                 auto genTmpExp = doUnaryOp(currentElement, rightOperand);
 
                 it = m_suffixExpression.erase(it, nextIt);
-
-                // (void)genTmpExp;
                 it = m_suffixExpression.insert(it, genTmpExp);
 
                 // previousExpCnt -= 1;
@@ -960,14 +1001,16 @@ void TokenMgr::popUntilOpenParentheses()
         TokenBase* pElement = *rit;
         auto isopenParentheses = (pElement->getOperatorType() == E_OPEN_PARENTHESES);
 
+        traceOperatorStack( pElement, false );
         auto fit = m_opertorStack.erase( (++rit).base() );
-        rit = reverse_iterator< decltype(fit)>( fit );
+        rit = reverse_iterator< decltype(fit) >( fit );
 
         if ( isopenParentheses ) {
             // meet the matched    '('
             break;
         } else {
             m_suffixExpression.push_back( pElement );
+            traceSuffixExpression( pElement , true);
         }
     }
 
@@ -1780,4 +1823,127 @@ E_DataType TokenMgr::operatorPrepairDataTypeConversion2(DataValue* pLeftVal, Dat
 
 }
 
+void TokenMgr::printOperatorStack()
+{
+    auto flag = ParserOption::getFlag();
+    if ( flag & 0x1U ) {
+        if ( m_opertorStack.empty() ) {
+            cerr << m_execodeIdx << ". Operator Stack  : <Empty> " << endl;
+        } else {
+            cerr << m_execodeIdx <<". Operator Stack  : " <<  m_opertorStack.size() << " Element(s)" << endl;
+            cerr << "\t";
+
+            auto idx = 0;
+            auto it = m_opertorStack.begin();
+            while ( it != m_opertorStack.end() ) {
+                auto pToken = *it;
+                auto content = pToken->getTokenContent();
+                cerr << idx << ". " << content << endl;
+
+                ++it;
+                ++idx;
+            }
+            cerr << endl;
+        }
+    }
+}
+
+
+
+
+void TokenMgr::printSuffixExpression(int tag)
+{
+    auto flag = ParserOption::getFlag();
+    auto printFlag = false;
+    if ( tag == 1 ) {
+        printFlag = ( ((flag >> 1) & 0x1U) != 0);
+    } else if ( tag == 2 )  {
+        printFlag = ( ((flag >> 2) & 0x1U) != 0);
+    }
+
+    if ( printFlag ) {
+        if ( m_suffixExpression.empty() ) {
+            cerr << m_execodeIdx << ". Suffix Expression List  : <Empty> " << endl;
+        } else {
+            cerr << m_execodeIdx << ". Suffix Expression List  : " <<  m_suffixExpression.size() << " Element(s)" << endl;
+            cerr << "\t";
+
+            auto idx = 0;
+            auto it = m_suffixExpression.begin();
+            while ( it != m_suffixExpression.end() ) {
+                auto pToken = *it;
+                auto content = pToken->getTokenContent();
+                cerr << idx << ". " << content << endl;
+
+                ++it;
+                ++idx;
+            }
+            cerr << endl;
+        }
+
+    }
+
+
+}
+
+
+
+void TokenMgr::popAllOperatorStack()
+{
+    for( auto rit = m_opertorStack.rbegin(); rit != m_opertorStack.rend(); ++rit )
+    {
+        auto pToken = *rit;
+
+        traceOperatorStack(pToken, false);
+        m_suffixExpression.push_back( pToken );
+        traceSuffixExpression(pToken, true);
+    }
+    m_opertorStack.clear();
+}
+
+
+
+
+void TokenMgr::traceOperatorStack(TokenBase* pToken, bool push)
+{
+    auto flag = ParserOption::getFlag();
+    if ( (flag >> 3) & 0x1 ) {
+        if ( push ) {
+            cerr << "OpStack->Push \"" <<  pToken->getTokenContent() << "\"" << endl;
+        } else {
+            cerr << "OpStack->Pop \""  <<  pToken->getTokenContent() << "\"" << endl;
+        }
+
+    }
+
+}
+
+void TokenMgr::traceSuffixExpression(TokenBase* pToken, bool push)
+{
+    auto flag = ParserOption::getFlag();
+    if ( (flag >> 4) & 0x1 ) {
+        if ( push ) {
+            cerr << "SuffixExpr->Push \"" <<  pToken->getTokenContent() << "\"" << endl;
+        } else {
+            cerr << "SuffixExpr->Pop \""  <<  pToken->getTokenContent() << "\"" << endl;
+        }
+
+    }
+}
+
+
+void TokenMgr::tracePositiveNegativeFlag(TokenBase* pToken, E_OperatorType op)
+{
+    auto flag = ParserOption::getFlag();
+    if ( (flag >> 5) & 0x1 ) {
+        auto isAdd = (op == E_ADD);
+        if ( pToken == nullptr ) {
+            cerr << "chOp : nullptr , so " << (isAdd ? " add -> positive" : " minus -> negative ") << endl;
+        } else {
+            auto content = pToken->getTokenContent();
+            cerr << "ChOp :  \"" << content << "\" , so  " << (isAdd ? " add -> positive" : " minus -> negative ") << endl;
+        }
+    }
+
+}
 

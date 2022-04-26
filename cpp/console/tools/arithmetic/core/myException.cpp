@@ -69,6 +69,7 @@ unordered_map<MyException::ErrorType,string>    MyException::s_exceptionMap{
     { enumCvt(E_THROW_BIT_LEFTSHIFT_CANNOT_APPLY_ON_FLOAT),              "Bit-Left-Shift can't apply on float " },
     { enumCvt(E_THROW_BIT_RIGHTSHIFT_CANNOT_APPLY_ON_FLOAT),             "Bit-Right-Shift can't apply on float " },
     { enumCvt(E_THROW_INVALID_SUFFIX_EXPRESSION),                        "Invalid suffix expression " },
+    { enumCvt(E_THROW_LAST_VALID_TOKEN_IS_NOT_SEMICOLON),                "Final valid token is not ';' " },
 };
 
 

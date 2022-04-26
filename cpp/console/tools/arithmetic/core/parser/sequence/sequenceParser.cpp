@@ -3,6 +3,7 @@
 #include "myException.h"
 #include "commonEnum.h"
 #include "keywordList.h"
+#include "parserOption.h"
 #include <cassert>
 using namespace std;
 

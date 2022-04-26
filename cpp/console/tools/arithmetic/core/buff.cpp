@@ -23,25 +23,25 @@ string ChInfo::getPos() const
     string positionStr;
     if ( ch <= 32 ) {
         if ( ch == 32 ) {
-            positionStr = "<Space> ";
+            positionStr = "' ' ";
         } else if ( ch == '\t' ) {
-            positionStr = "<Tab> ";
+            positionStr = "'\\t' ";
         } else if ( ch == '\r' ) {
             positionStr = "'\\r' ";
         } else if ( ch == '\n' ) {
             positionStr = "'\\n' ";
         } else {
             auto code = static_cast<int>(ch & 0xFF);
-            positionStr = string("'?' code = ") + to_string(code) + " ";
+            positionStr = string("'?' code = ") + to_string(code) + SC_SPACE;
         }
     } else if ( ch == 127 ) {
-            positionStr = "<Del> ";
+            positionStr = "'Del' ";
     } else {
         // normal printable character
         positionStr = (SC_SINGLE_QUOTO + string(1, ch) + SC_SINGLE_QUOTO + SC_SPACE);
     }
 
-    positionStr += (to_string(line) + ":" + to_string(column) + " (idx = " + to_string(cursorIdx) + ") ");
+    positionStr += (to_string(line) + ":" + to_string(column) + " (idx=" + to_string(cursorIdx) + ") ");
     return positionStr;
 }
 

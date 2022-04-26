@@ -44,6 +44,7 @@ public:
 
 public:
     void pushToken(TokenBase* pToken);
+    std::pair<bool,std::string> isLastValidTokenSemicolonOrEmpty();
 protected:
     TokenMgr();
     virtual ~TokenMgr();
@@ -61,6 +62,7 @@ protected:
     void checkSuffixExpressionValid();
     void evaluateSuffixExpression();
     void processOperatorStack(TokenBase* previousToken, TokenBase* pToken);
+    void popAllOperatorStack();
 
     void popUntilOpenParentheses();
 
@@ -91,6 +93,14 @@ protected:
     E_DataType operatorPrepairDataTypeConversion1(DataValue* pRightVal);
     E_DataType operatorPrepairDataTypeConversion2(DataValue* pLeftVal, DataValue* pRightVal);
 
+    // log function
+    void printOperatorStack();
+    void printSuffixExpression(int flag);
+
+    void traceOperatorStack(TokenBase* pToken, bool push);
+    void traceSuffixExpression(TokenBase* pToken, bool push);
+    void tracePositiveNegativeFlag(TokenBase* pToken, E_OperatorType op);
+
 protected:
     static TokenMgr* s_gInstance;
 
@@ -112,6 +122,8 @@ protected:
     // std::stack<TokenBase*>  m_opertorStack;
     std::list<TokenBase*>   m_opertorStack;
     std::list<TokenBase*>   m_suffixExpression;
+
+    int m_execodeIdx;
 
 };
 

@@ -11,14 +11,14 @@ public:
     static std::string getUserManual();
 
     // get Option/Flag value
-    static int  getDebugOption();
-    static int  getFlag();
+    static unsigned int  getDebugOption();
+    static unsigned int  getFlag();
 protected:
     ParserOption() = delete;
     virtual ~ParserOption() = delete;
 
-    static int s_option;
-    static int s_flag;
+    static unsigned int s_option;
+    static unsigned int s_flag;
 
 };
 

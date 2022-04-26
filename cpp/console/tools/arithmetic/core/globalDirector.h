@@ -23,10 +23,11 @@ public:
     void setData(Buff* data);
 
     void doParse();
-
-    void execCode();
 protected:
     void switchParser(ParserBase::E_PARSER_TYPE type);
+    void inneralLog0(ChInfo& chInfo);
+    void inneralLog1(ParserBase::E_PARSER_TYPE oldtp, ParserBase::E_PARSER_TYPE newtp);
+    void inneralLog2(bool moveNext);
 protected:
     ParserBase*       m_pCurrentParser;   // default : 0
 
