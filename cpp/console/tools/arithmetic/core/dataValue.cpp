@@ -669,9 +669,9 @@ DataValue DataValue::operator / ( const DataValue& right)
         throw e;
     }
 
-    auto pDtInfo = DataTypeUtil::getTypeInfo( this->type );
+    auto pDtInfo = DataTypeUtil::getTypeInfo( right.type );
     if ( pDtInfo->isIntegerFamily() ) {
-        if ( isIntZero() ) {
+        if ( right.isIntZero() ) {
             MyException e(E_THROW_DIVIDE_ZERO);
             throw e;
         }
@@ -741,9 +741,9 @@ DataValue DataValue::operator % ( const DataValue& right)
     //     throw e;
     // }
 
-    auto pDtInfo = DataTypeUtil::getTypeInfo( this->type );
+    auto pDtInfo = DataTypeUtil::getTypeInfo( right.type );
     if ( pDtInfo->isIntegerFamily() ) {
-        if ( isIntZero()  ) {
+        if ( right.isIntZero()  ) {
             MyException e(E_THROW_MODULO_ZERO);
             throw e;
         }
@@ -990,7 +990,7 @@ DataValue DataValue::operator ^ ( const DataValue& right)
 }
 
 
-bool DataValue::isIntZero()
+bool DataValue::isIntZero() const
 {
     auto bret = false;
 
