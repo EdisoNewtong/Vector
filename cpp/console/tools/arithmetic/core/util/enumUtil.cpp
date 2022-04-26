@@ -245,6 +245,7 @@ string EnumUtil::enumName(E_ExceptionType tp)
     INNER_ENUM_2_STRING_MAP(E_THROW_BIT_LEFTSHIFT_CANNOT_APPLY_ON_FLOAT)
     INNER_ENUM_2_STRING_MAP(E_THROW_BIT_RIGHTSHIFT_CANNOT_APPLY_ON_FLOAT)
     INNER_ENUM_2_STRING_MAP(E_THROW_INVALID_SUFFIX_EXPRESSION)
+    INNER_ENUM_2_STRING_MAP(E_THROW_LAST_VALID_TOKEN_IS_NOT_SEMICOLON)
 
     default:
         retstr = string("??? E_ExceptionType ??? | value = ") + to_string( static_cast<int>(tp) );
@@ -261,13 +262,27 @@ string EnumUtil::enumName(ParserBase::E_PARSER_TYPE tp)
     string retstr;
     switch( tp )
     {
-    INNER_ENUM_2_STRING_MAP(ParserBase::E_BASE)
-    INNER_ENUM_2_STRING_MAP(ParserBase::E_BLANK)
-    INNER_ENUM_2_STRING_MAP(ParserBase::E_SINGLE_LINE_COMMENT)
-    INNER_ENUM_2_STRING_MAP(ParserBase::E_MULTI_LINE_COMMENT)
-    INNER_ENUM_2_STRING_MAP(ParserBase::E_OPERATOR)
-    INNER_ENUM_2_STRING_MAP(ParserBase::E_SEQUENCE)
-    INNER_ENUM_2_STRING_MAP(ParserBase::E_SEMICOLON)
+    case ParserBase::E_BASE:
+        retstr = "ParserBase";
+        break;
+    case ParserBase::E_BLANK:
+        retstr = "BlankParser";
+        break;
+    case ParserBase::E_SINGLE_LINE_COMMENT:
+        retstr = "SinglelineCommentParser";
+        break;
+    case ParserBase::E_MULTI_LINE_COMMENT:
+        retstr = "MultilineCommentParser";
+        break;
+    case ParserBase::E_OPERATOR:
+        retstr = "OperatorParser";
+        break;
+    case ParserBase::E_SEQUENCE:
+        retstr = "SequenceParser";
+        break;
+    case ParserBase::E_SEMICOLON:
+        retstr = "SemiColonParser";
+        break;
     default:
         retstr = string("???  ParserBase::E_PARSER_TYPE ??? | value = ") + to_string( static_cast<int>(tp) );
         break;

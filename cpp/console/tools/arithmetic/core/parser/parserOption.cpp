@@ -1,6 +1,9 @@
 #include "parserOption.h"
 
+#include <iostream>
+#include <exception>
 using namespace std;
+
 
 namespace
 {
@@ -14,8 +17,8 @@ namespace
 //
 // static Member Data Init
 //
-int ParserOption::s_option = 0;
-int ParserOption::s_flag = 0;
+unsigned int ParserOption::s_option = 0;
+unsigned int ParserOption::s_flag = 0;
 
 
 
@@ -34,10 +37,20 @@ bool ParserOption::analyzeOption(const vector<string>& args, string& errorMsg)
         if ( pos1 == 0  ) {
             // set debug option
             string optValue = sOption.substr(  OPT_PREFIX.size() );
-            s_option = stoi(optValue);
+            try {
+                s_option = static_cast<unsigned int>( stoi(optValue) );
+            } catch ( const exception& e ) {
+                bret = false;
+                cout << "\"" << optValue << "\" after " << OPT_PREFIX << " can't convert to a number. " << endl;
+            }
         } else if ( pos2 == 0 ) {
             string flagValue = sOption.substr(  FLGS_PREFIX.size() );
-            s_flag = stoi( flagValue );
+            try {
+                s_flag = static_cast<unsigned int>( stoi( flagValue ) );
+            } catch ( const exception& e ) {
+                bret = false;
+                cout << "\"" << flagValue << "\" after " << FLGS_PREFIX  << " can't convert to a number. " << endl;
+            }
         } else {
             bret = false;
             errorMsg = singlequoto + sOption + singlequoto + " is unknown";
@@ -50,15 +63,19 @@ bool ParserOption::analyzeOption(const vector<string>& args, string& errorMsg)
 
 
 
-int  ParserOption::getDebugOption()
+unsigned int  ParserOption::getDebugOption()
 {
     return s_option;
 }
 
-int  ParserOption::getFlag()
+
+
+unsigned int  ParserOption::getFlag()
 {
     return s_flag;
 }
+
+
 
 // static 
 string ParserOption::getUserManual()
