@@ -149,7 +149,7 @@ void GlobalDirector::doParse()
                         needMove2Next = !(act == E_GENERATE_TOKEN_SWITCH_TO_DEFAULT_KEEP_CURSOR);
 
                         if ( !previousParser->isParsedSeqValid() ) {
-                            MyException e(E_THROW_INVALID_PARSEDSTR_TO_GENERATE_TOKEN);
+                            MyException e(E_THROW_INVALID_PARSEDSTR_TO_GENERATE_TOKEN , rChInfo);
                             e.setDetail( previousParser->getSequence() );
                             throw e;
                         } 
@@ -177,7 +177,7 @@ void GlobalDirector::doParse()
     //
     if ( m_pCurrentParser != m_pBaseParser ) {
         if ( !m_pCurrentParser->isParsedSeqValid() ) {
-            MyException e(E_THROW_INVALID_PARSEDSTR_TO_GENERATE_TOKEN);
+            MyException e(E_THROW_INVALID_PARSEDSTR_TO_GENERATE_TOKEN , rChInfo);
             e.setDetail( m_pCurrentParser->getSequence() );
             throw e;
         }

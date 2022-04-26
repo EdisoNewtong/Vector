@@ -106,7 +106,7 @@ void TokenBase::setTokenContentWithoutSuffix(const std::string& content, const s
     if ( isFixedLiteral() ) {
         int base = getFixedLiteralBase();
         if ( base == 0 ) {
-            MyException e(E_THROW_INVALID_NUMBER_BASE);
+            MyException e(E_THROW_INVALID_NUMBER_BASE,  this->m_beginPos );
             e.setDetail( content );
             throw e;
         }
@@ -120,7 +120,7 @@ void TokenBase::setTokenContentWithoutSuffix(const std::string& content, const s
                 {
                     float f = strtof(noSuffix.c_str(), &str_end);
                     if ( !( str_end == nullptr || ( str_end != nullptr && str_end[0] == '\0' ) ) ) {
-                        MyException e(E_THROW_INVALID_FLOAT_NUMBER_WHEN_CONVERTING);
+                        MyException e(E_THROW_INVALID_FLOAT_NUMBER_WHEN_CONVERTING , this->m_beginPos );
                         e.setDetail( noSuffix );
                         throw e;
                     } 
@@ -132,7 +132,7 @@ void TokenBase::setTokenContentWithoutSuffix(const std::string& content, const s
                 {
                     double d = strtod(noSuffix.c_str(), &str_end);
                     if ( !( str_end == nullptr || ( str_end != nullptr && str_end[0] == '\0' ) ) ) {
-                        MyException e(E_THROW_INVALID_DOUBLE_NUMBER_WHEN_CONVERTING);
+                        MyException e(E_THROW_INVALID_DOUBLE_NUMBER_WHEN_CONVERTING, this->m_beginPos);
                         e.setDetail( noSuffix );
                         throw e;
                     } 
@@ -145,7 +145,7 @@ void TokenBase::setTokenContentWithoutSuffix(const std::string& content, const s
                 {   
                     long double ld = strtold(noSuffix.c_str(), &str_end);
                     if ( !( str_end == nullptr || ( str_end != nullptr && str_end[0] == '\0') ) ) {
-                        MyException e(E_THROW_INVALID_LONG_DOUBLE_NUMBER_WHEN_CONVERTING);
+                        MyException e(E_THROW_INVALID_LONG_DOUBLE_NUMBER_WHEN_CONVERTING , this->m_beginPos);
                         e.setDetail( noSuffix );
                         throw e;
                     } 
@@ -167,7 +167,7 @@ void TokenBase::setTokenContentWithoutSuffix(const std::string& content, const s
                 {
                     signed long l_num = strtol(noSuffix.c_str(), &str_end, base);
                     if ( !( str_end == nullptr || ( str_end != nullptr && str_end[0] == '\0' ) ) ) {
-                        MyException e(E_THROW_INVALID_LONG_NUMBER_WHEN_CONVERTING);
+                        MyException e(E_THROW_INVALID_LONG_NUMBER_WHEN_CONVERTING , this->m_beginPos );
                         e.setDetail( noSuffix );
                         throw e;
                     }
@@ -184,7 +184,7 @@ void TokenBase::setTokenContentWithoutSuffix(const std::string& content, const s
                 {
                     unsigned long ul_num = strtoul(noSuffix.c_str(), &str_end, base);
                     if ( !( str_end == nullptr || ( str_end != nullptr && str_end[0] == '\0' ) ) ) {
-                        MyException e(E_THROW_INVALID_UNSIGNED_LONG_NUMBER_WHEN_CONVERTING);
+                        MyException e(E_THROW_INVALID_UNSIGNED_LONG_NUMBER_WHEN_CONVERTING , this->m_beginPos );
                         e.setDetail( noSuffix );
                         throw e;
                     }
@@ -200,7 +200,7 @@ void TokenBase::setTokenContentWithoutSuffix(const std::string& content, const s
                 {
                     signed long long ll_num = strtoll(noSuffix.c_str(), &str_end, base);
                     if ( !( str_end == nullptr || ( str_end != nullptr && str_end[0] == '\0' ) ) ) {
-                        MyException e(E_THROW_INVALID_LONG_LONG_NUMBER_WHEN_CONVERTING);
+                        MyException e(E_THROW_INVALID_LONG_LONG_NUMBER_WHEN_CONVERTING, this->m_beginPos);
                         e.setDetail( noSuffix );
                         throw e;
                     } 
@@ -212,7 +212,7 @@ void TokenBase::setTokenContentWithoutSuffix(const std::string& content, const s
                 {
                     unsigned long long ull_num = strtoull(noSuffix.c_str(), &str_end, base);
                     if ( !( str_end == nullptr || ( str_end != nullptr && str_end[0] == '\0'  ) ) ) {
-                        MyException e(E_THROW_INVALID_UNSIGNED_LONG_LONG_NUMBER_WHEN_CONVERTING);
+                        MyException e(E_THROW_INVALID_UNSIGNED_LONG_LONG_NUMBER_WHEN_CONVERTING, this->m_beginPos);
                         e.setDetail( noSuffix );
                         throw e;
                     }

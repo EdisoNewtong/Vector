@@ -552,7 +552,6 @@ ParserBase::E_PARSER_TYPE SequenceParser::SequenceParser::appendForType_hex(cons
 
 ParserBase::E_PARSER_TYPE SequenceParser::appendForType_float(const ChInfo& rChInfo, E_ParserAction& afterAction)
 {
-    // E_THROW_INVALID_CHAR_IN_FLOAT_SEQ
     using namespace charutil;
 
     ParserBase::E_PARSER_TYPE retType = m_type;
@@ -1474,8 +1473,8 @@ TokenBase* SequenceParser::generateToken() // override;
             pGenToken = new TokenBase( E_TP_UNKNOWN );
             if ( KeyWordList::isKeyWord( m_parsedSeq) ) {
                 if ( !KeyWordList::isTypeKeyWord( m_parsedSeq ) ) { 
-                    MyException e(E_THROW_VARIBLE_CANNOT_BE_KEYWORD);
-                    e.setDetail( m_beginChPos.getPos() );
+                    MyException e(E_THROW_VARIBLE_CANNOT_BE_KEYWORD );
+                    e.setDetail( surroundDoubleQuoto(m_parsedSeq) + string(" @") + m_beginChPos.getPos() );
                     throw e;
                 } 
 

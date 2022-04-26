@@ -12,6 +12,14 @@ struct VaribleInfo
     std::string varName;
     DataValue dataVal;
     bool isInitialed;
+    int  definedLine;
+
+    VaribleInfo() 
+        : varName()
+        , isInitialed(false)
+        , definedLine(0) 
+    {
+    }
 };
 
 class VariblePool
@@ -22,7 +30,7 @@ public:
     static void finalize();
 
 public:
-    VaribleInfo* create_a_new_varible(E_DataType dt, const std::string& varname);
+    VaribleInfo* create_a_new_varible(E_DataType dt, const std::string& varname, int defline);
     VaribleInfo* getVaribleByName(const std::string& varname);
 protected:
     std::unordered_map<std::string, VaribleInfo*> m_pool;

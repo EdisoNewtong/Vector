@@ -735,11 +735,11 @@ DataValue DataValue::operator % ( const DataValue& right)
         throw e;
     }
 
-    if ( this->type == E_TP_FLOAT  ||  this->type == E_TP_DOUBLE ) {
-        MyException e(E_THROW_MODULO_CANNOT_APPLY_ON_FLOAT);
-        e.setDetail("Can't apply  '%' operator on float operands");
-        throw e;
-    }
+    // if ( this->type == E_TP_FLOAT  ||  this->type == E_TP_DOUBLE ) {
+    //     MyException e(E_THROW_MODULO_CANNOT_APPLY_ON_FLOAT);
+    //     e.setDetail("Can't apply  '%' operator on float operands");
+    //     throw e;
+    // }
 
     auto pDtInfo = DataTypeUtil::getTypeInfo( this->type );
     if ( pDtInfo->isIntegerFamily() ) {
@@ -809,11 +809,11 @@ DataValue DataValue::operator & ( const DataValue& right)
         throw e;
     }
 
-    if ( this->type == E_TP_FLOAT  ||  this->type == E_TP_DOUBLE ) {
-        MyException e(E_THROW_BITAND_CANNOT_APPLY_ON_FLOAT);
-        e.setDetail("Can't apply  '&' operator on float operands");
-        throw e;
-    }
+    // if ( this->type == E_TP_FLOAT  ||  this->type == E_TP_DOUBLE ) {
+    //     MyException e(E_THROW_BITAND_CANNOT_APPLY_ON_FLOAT);
+    //     e.setDetail("Can't apply  '&' operator on float operands");
+    //     throw e;
+    // }
 
     DataValue retVal;
     retVal.type = this->type;
@@ -873,11 +873,11 @@ DataValue DataValue::operator | ( const DataValue& right)
         throw e;
     }
 
-    if ( this->type == E_TP_FLOAT  ||  this->type == E_TP_DOUBLE ) {
-        MyException e(E_THROW_BITOR_CANNOT_APPLY_ON_FLOAT);
-        e.setDetail("Can't apply  '|' operator on float operands");
-        throw e;
-    }
+    // if ( this->type == E_TP_FLOAT  ||  this->type == E_TP_DOUBLE ) {
+    //     MyException e(E_THROW_BITOR_CANNOT_APPLY_ON_FLOAT);
+    //     e.setDetail("Can't apply  '|' operator on float operands");
+    //     throw e;
+    // }
 
     DataValue retVal;
     retVal.type = this->type;
@@ -936,11 +936,11 @@ DataValue DataValue::operator ^ ( const DataValue& right)
         throw e;
     }
 
-    if ( this->type == E_TP_FLOAT  ||  this->type == E_TP_DOUBLE ) {
-        MyException e(E_THROW_BITXOR_CANNOT_APPLY_ON_FLOAT);
-        e.setDetail("Can't apply  '^' operator on float operands");
-        throw e;
-    }
+    // if ( this->type == E_TP_FLOAT  ||  this->type == E_TP_DOUBLE ) {
+    //     MyException e(E_THROW_BITXOR_CANNOT_APPLY_ON_FLOAT);
+    //     e.setDetail("Can't apply  '^' operator on float operands");
+    //     throw e;
+    // }
 
 
     DataValue retVal;
@@ -1061,10 +1061,10 @@ bool DataValue::isFloatZero()
 
 DataValue DataValue::operator ~ () // bit not
 {
-    if ( this->type == E_TP_FLOAT  ||  this->type == E_TP_DOUBLE ) {
-        MyException e(E_THROW_BITNOT_CANNOT_APPLY_ON_FLOAT);
-        throw e;
-    }
+    // if ( this->type == E_TP_FLOAT  ||  this->type == E_TP_DOUBLE ) {
+    //     MyException e(E_THROW_BITNOT_CANNOT_APPLY_ON_FLOAT);
+    //     throw e;
+    // }
 
 
     DataValue retVal;
@@ -1127,10 +1127,10 @@ DataValue DataValue::operator << ( const DataValue& right)
     }
 
 
-    if ( this->type == E_TP_FLOAT  ||  this->type == E_TP_DOUBLE ) {
-        MyException e(E_THROW_BIT_LEFTSHIFT_CANNOT_APPLY_ON_FLOAT);
-        throw e;
-    }
+    // if ( this->type == E_TP_FLOAT  ||  this->type == E_TP_DOUBLE ) {
+    //     MyException e(E_THROW_BIT_LEFTSHIFT_CANNOT_APPLY_ON_FLOAT);
+    //     throw e;
+    // }
 
     DataValue retVal;
     retVal.type = this->type;
@@ -1192,10 +1192,10 @@ DataValue DataValue::operator >> ( const DataValue& right)
     }
 
     
-    if ( this->type == E_TP_FLOAT  ||  this->type == E_TP_DOUBLE ) {
-        MyException e(E_THROW_BIT_RIGHTSHIFT_CANNOT_APPLY_ON_FLOAT);
-        throw e;
-    }
+    // if ( this->type == E_TP_FLOAT  ||  this->type == E_TP_DOUBLE ) {
+    //     MyException e(E_THROW_BIT_RIGHTSHIFT_CANNOT_APPLY_ON_FLOAT);
+    //     throw e;
+    // }
 
 
     DataValue retVal;
