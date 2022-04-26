@@ -380,7 +380,7 @@ void TokenMgr::pushToken(TokenBase* pToken)
         MyException e(E_THROW_NULL_PTR);
 
         string detail( __FILE__ );
-        detail += (string(" @line : ") + to_string(__LINE__));
+        detail += (string(" TokenMgr::pushToken( nullptr ) @line : ") + to_string(__LINE__));
 
         e.setDetail(detail);
         throw e;
@@ -391,11 +391,13 @@ void TokenMgr::pushToken(TokenBase* pToken)
     auto isValid = pr.first;
     if ( !isValid ) {
         auto previousToken = pr.second;
-        MyException e(E_THROW_INVALID_TOKEN_RELATIONSHIP);
+        MyException e(E_THROW_INVALID_TOKEN_RELATIONSHIP, pToken->getBeginPos() );
 
         string detailstr;
         if ( previousToken == nullptr ) {
             detailstr += "nullptr";
+            detailstr += "       ";
+            detailstr += pToken->getBeginPos().getPos();
         } else {
             //  previousToken != nullptr
             auto preTp = previousToken->getTokenType();
@@ -404,6 +406,8 @@ void TokenMgr::pushToken(TokenBase* pToken)
             } else {
                 detailstr += EnumUtil::enumName( preTp );
             }
+            detailstr += previousToken->getBeginPos().getPos();
+
 
             detailstr += "  ";
             if ( tokenType == E_TOKEN_OPERATOR ) {
@@ -411,6 +415,7 @@ void TokenMgr::pushToken(TokenBase* pToken)
             } else {
                 detailstr += EnumUtil::enumName( tokenType );
             }
+            detailstr += pToken->getBeginPos().getPos();
         }
         e.setDetail(detailstr);
         throw e;
@@ -463,8 +468,8 @@ void TokenMgr::executeCode()
     // Sequence / operator   Only
     int vecSz = static_cast<int>( m_oneSentence.size() );
     if ( vecSz < 2 ) {
-        MyException e(E_THROW_SENTENCE_TOO_LESS_TOKEN);
-        e.setDetail( m_oneSentence.front()->getBeginPos().getPos() );
+        MyException e(E_THROW_SENTENCE_TOO_LESS_TOKEN, m_oneSentence.front()->getBeginPos() );
+        // e.setDetail( m_oneSentence.front()->getBeginPos().getPos() );
         throw e;
     } 
 
@@ -491,8 +496,8 @@ void TokenMgr::executeCode()
     }
 
     if ( equalCnt >= 2 ) {
-        MyException e(E_THROW_SENTENCE_TOO_MORE_ASSIGNMENT);
-        e.setDetail( m_oneSentence.at(equal2ndIdx)->getBeginPos().getPos() );
+        MyException e(E_THROW_SENTENCE_TOO_MORE_ASSIGNMENT, m_oneSentence.at(equal2ndIdx)->getBeginPos() );
+        // e.setDetail( m_oneSentence.at(equal2ndIdx)->getBeginPos().getPos() );
         throw e;
     }
 
@@ -508,12 +513,12 @@ void TokenMgr::executeCode()
         // 1 '='
         // make sure  there must be at least 1 content before and after  '='
         if ( equal1stIdx == 0 ) {
-            MyException e(E_THROW_SENTENCE_NO_EXPR_BEFORE_ASSIGNMENT);
-            e.setDetail( m_oneSentence.front()->getBeginPos().getPos() );
+            MyException e(E_THROW_SENTENCE_NO_EXPR_BEFORE_ASSIGNMENT, m_oneSentence.front()->getBeginPos() );
+            // e.setDetail( m_oneSentence.front()->getBeginPos().getPos() );
             throw e;
         } else if ( equal1stIdx == (vecSz -1) ) {
-            MyException e(E_THROW_SENTENCE_NO_EXPR_AFTER_ASSIGNMENT);
-            e.setDetail( m_oneSentence.back()->getBeginPos().getPos() );
+            MyException e(E_THROW_SENTENCE_NO_EXPR_AFTER_ASSIGNMENT , m_oneSentence.back()->getBeginPos() );
+            // e.setDetail( m_oneSentence.back()->getBeginPos().getPos() );
             throw e;
         }
 
@@ -527,8 +532,8 @@ void TokenMgr::executeCode()
             // equal1stIdx == 1  =>     varname = expression
             auto varElement = m_oneSentence.at(varIdx);
             if ( !(varElement->getTokenType() == E_TOKEN_EXPRESSION &&    varElement->isVarible()) ) {
-                MyException e(E_THROW_SENTENCE_DEFINITION_SUFFIX_IS_NOT_VARIBLE);
-                e.setDetail( varElement->getBeginPos().getPos() );
+                MyException e(E_THROW_SENTENCE_DEFINITION_SUFFIX_IS_NOT_VARIBLE , varElement->getBeginPos() );
+                // e.setDetail( varElement->getBeginPos().getPos() );
                 throw e;
             }
             varname = varElement->getTokenContent();
@@ -557,17 +562,17 @@ void TokenMgr::executeCode()
     VaribleInfo* pVaribleInfo = nullptr;
     if ( sentenceType == 1 ) {
         // 1. e.g.  unsigned int a;
-        pVaribleInfo = VariblePool::getPool()->create_a_new_varible(defDt, varname);
+        pVaribleInfo = VariblePool::getPool()->create_a_new_varible(defDt, varname, sentenceVarElement->getBeginPos().line );
         sentenceVarElement->setRealValue( pVaribleInfo->dataVal );
     } else if ( sentenceType == 2 ) {
         // 2. e.g.  unsigned int           a = 3;
-        pVaribleInfo = VariblePool::getPool()->create_a_new_varible(defDt, varname);
+        pVaribleInfo = VariblePool::getPool()->create_a_new_varible(defDt, varname, sentenceVarElement->getBeginPos().line );
         sentenceVarElement->setRealValue( pVaribleInfo->dataVal );
     } else if ( sentenceType == 3 ) {
         // 3. e.g.               a   = 3;
         pVaribleInfo = VariblePool::getPool()->getVaribleByName(varname);
         if ( pVaribleInfo == nullptr ) {
-            MyException e(E_THROW_VARIBLE_NOT_DEFINED);
+            MyException e(E_THROW_VARIBLE_NOT_DEFINED, sentenceVarElement->getBeginPos() );
             e.setDetail( varname );
             throw e;
         }
@@ -604,8 +609,8 @@ void TokenMgr::buildSuffixExpression(int sentenceType, VaribleInfo* pVarible, in
         if ( tokenType == E_TOKEN_EXPRESSION ) {
             // fixed literal / varible / KeyWord
             if ( pToken->isKeyword() ) {
-                MyException e(E_THROW_CANNOT_PUSH_TOKEN_KEYWORD);
-                e.setDetail( pToken->getBeginPos().getPos() );
+                MyException e(E_THROW_CANNOT_PUSH_TOKEN_KEYWORD, pToken->getBeginPos() );
+                // e.setDetail( pToken->getBeginPos().getPos() );
                 throw e;
             } else if ( pToken->isVarible() ) {
                 if ( sentenceType == 1 || sentenceType == 2 ) {
@@ -614,8 +619,8 @@ void TokenMgr::buildSuffixExpression(int sentenceType, VaribleInfo* pVarible, in
 
                         VaribleInfo* pVisitedVaribleInfo = VariblePool::getPool()->getVaribleByName( pVisitVarName );
                         if ( pVisitedVaribleInfo == nullptr ) {
-                            MyException e(E_THROW_VARIBLE_NOT_DEFINED);
-                            e.setDetail( pVisitVarName + string(" : ") + pToken->getBeginPos().getPos() );
+                            MyException e(E_THROW_VARIBLE_NOT_DEFINED , pToken->getBeginPos());
+                            e.setDetail( pVisitVarName );
                             throw e;
                         }
 
@@ -671,9 +676,9 @@ void TokenMgr::checkSuffixExpressionValid()
 
 
     if ( errorToken != nullptr ) {
-        auto errorTp = errorToken->getTokenType();
-        MyException e(E_THROW_INVALID_SUFFIX_EXPRESSION);
-        e.setDetail( EnumUtil::enumName(errorTp)  + std::string(" , ") +  errorToken->getBeginPos().getPos() );
+        // auto errorTp = errorToken->getTokenType();
+        MyException e(E_THROW_INVALID_SUFFIX_EXPRESSION, errorToken->getBeginPos() );
+        // e.setDetail( EnumUtil::enumName(errorTp)  + std::string(" , ") +  errorToken->getBeginPos().getPos() );
         throw e;
     }
 }
@@ -711,8 +716,8 @@ void TokenMgr::processOperatorStack(TokenBase* previousToken, TokenBase* pToken)
     //    Generate Suffix Expression
     if ( opType == E_CLOSE_PARENTHESES ) {
         if ( !hasPreviousExistOpenParentheses() ) {
-            MyException e(E_THROW_NO_MATCHED_OPEN_PARENTHESES);
-            e.setDetail( pToken->getBeginPos().getPos() );
+            MyException e(E_THROW_NO_MATCHED_OPEN_PARENTHESES, pToken->getBeginPos() );
+            // e.setDetail( pToken->getBeginPos().getPos() );
             throw e;
         } else {
             //  toPushed is ')' , 
@@ -814,7 +819,7 @@ void TokenMgr::evaluateSuffixExpression()
             // is an operator
             auto opType = currentElement->getOperatorType();
             if ( opType == E_OPERATOR_UNKNOWN || opType == E_OPEN_PARENTHESES || opType == E_CLOSE_PARENTHESES ) {
-                MyException e(E_THROW_INVALID_OPERATOR);
+                MyException e(E_THROW_INVALID_OPERATOR , currentElement->getBeginPos() );
                 string detailstr = "inside suffix expression : ";
                 detailstr += EnumUtil::enumName( opType );
                 detailstr += (string(", ") + currentElement->getBeginPos().getPos() );
@@ -826,8 +831,8 @@ void TokenMgr::evaluateSuffixExpression()
             auto isbinaryOp = !opMeta.isUnaryOp();
             if ( isbinaryOp ) {
                 if ( previousExpCnt < 2 ) {
-                    MyException e(E_THROW_SUFFIXEXPR_BINARY_OP_MISS_TWO_OPERANDS);
-                    e.setDetail( currentElement->getBeginPos().getPos() );
+                    MyException e(E_THROW_SUFFIXEXPR_BINARY_OP_MISS_TWO_OPERANDS, currentElement->getBeginPos() );
+                    // e.setDetail( currentElement->getBeginPos().getPos() );
                     throw e;
                 }
 
@@ -847,12 +852,13 @@ void TokenMgr::evaluateSuffixExpression()
                 it = m_suffixExpression.erase(it, nextIt);
                 it = m_suffixExpression.insert(it, genTmpExp);
 
-                previousExpCnt -= 2;
-                previousExpCnt += 1;
+                // previousExpCnt -= 2;
+                // previousExpCnt += 1;
+                previousExpCnt -= 1;
             } else {
                 if ( previousExpCnt < 1 ) {
-                    MyException e(E_THROW_SUFFIXEXPR_UNARY_OP_MISS_ONE_OPERAND);
-                    e.setDetail( currentElement->getBeginPos().getPos() );
+                    MyException e(E_THROW_SUFFIXEXPR_UNARY_OP_MISS_ONE_OPERAND, currentElement->getBeginPos());
+                    // e.setDetail( currentElement->getBeginPos().getPos() );
                     throw e;
                 }
 
@@ -997,21 +1003,21 @@ E_DataType TokenMgr::checkPrefixKeyWordsAndGetDataType(int varIdx, string& varna
     }
 
     if ( !isAllKeyWord ) {
-        MyException e(E_THROW_SENTENCE_DEFINITION_PREFIX_IS_NOT_ALL_KEYWORD);
-        e.setDetail( m_oneSentence.at(errorIdx)->getBeginPos().getPos() );
+        MyException e(E_THROW_SENTENCE_DEFINITION_PREFIX_IS_NOT_ALL_KEYWORD , m_oneSentence.at(errorIdx)->getBeginPos() );
+        // e.setDetail( m_oneSentence.at(errorIdx)->getBeginPos().getPos() );
         throw e;
     }
 
     if ( keywordsCnt > s_MAX_KEYWORDS_CNT ) {
-        MyException e(E_THROW_SENTENCE_DEFINITION_TOO_MANY_KEYWORDS);
-        e.setDetail( m_oneSentence.at(0)->getBeginPos().getPos() );
+        MyException e(E_THROW_SENTENCE_DEFINITION_TOO_MANY_KEYWORDS, m_oneSentence.at(0)->getBeginPos() );
+        // e.setDetail( m_oneSentence.at(0)->getBeginPos().getPos() );
         throw e;
     }
 
     auto varElement = m_oneSentence.at(varIdx);
-    if ( !(varElement->getTokenType() == E_TOKEN_EXPRESSION &&    varElement->isVarible()) ) {
-        MyException e(E_THROW_SENTENCE_DEFINITION_SUFFIX_IS_NOT_VARIBLE);
-        e.setDetail( varElement->getBeginPos().getPos() );
+    if ( !(varElement->getTokenType() == E_TOKEN_EXPRESSION    &&   varElement->isVarible()) ) {
+        MyException e(E_THROW_SENTENCE_DEFINITION_SUFFIX_IS_NOT_VARIBLE , varElement->getBeginPos() );
+        // e.setDetail( varElement->getBeginPos().getPos() );
         throw e;
     }
     varname = varElement->getTokenContent();
@@ -1341,6 +1347,9 @@ TokenBase* TokenMgr::doDivide(TokenBase* left, TokenBase* right)
     DataValue rightVal = right->getRealValue();
     operatorPrepairDataTypeConversion2(&leftVal, &rightVal);
 
+
+
+
     E_DataType retDt = leftVal.type;
 
     // calc 
@@ -1348,9 +1357,11 @@ TokenBase* TokenMgr::doDivide(TokenBase* left, TokenBase* right)
     try {
         divideRet  = (leftVal / rightVal);
     } catch ( MyException& e ) {
-        if ( e.getDetail().empty() ) {
-            e.setDetail( rightContent + " is zero Value ( in Divide )");
-        }
+        // auto detailstr = e.getDetail();
+        // if ( detailstr.empty() ) {
+        //     e.setDetail( rightContent + " is zero Value ( in Divide ) @"  +  right->getBeginPos().getPos() );
+        // } 
+        e.setDetail( rightContent + " is zero Value ( in Divide ) @"  +  right->getBeginPos().getPos() );
         throw;
     }
 
@@ -1372,6 +1383,17 @@ TokenBase* TokenMgr::doMod(TokenBase* left, TokenBase* right)
     DataValue rightVal = right->getRealValue();
     operatorPrepairDataTypeConversion2(&leftVal, &rightVal);
 
+    if ( leftVal.type == E_TP_FLOAT  ||  leftVal.type == E_TP_DOUBLE ) {
+        MyException e(E_THROW_MODULO_CANNOT_APPLY_ON_FLOAT, left->getBeginPos() );
+        e.setDetail( leftContent );
+        throw e;
+    } else if ( rightVal.type == E_TP_FLOAT  ||  rightVal.type == E_TP_DOUBLE ) {
+        MyException e(E_THROW_MODULO_CANNOT_APPLY_ON_FLOAT, right->getBeginPos() );
+        e.setDetail( rightContent );
+        throw e;
+    }
+
+
     E_DataType retDt = leftVal.type;
 
     // calc 
@@ -1380,7 +1402,7 @@ TokenBase* TokenMgr::doMod(TokenBase* left, TokenBase* right)
         modRet  = (leftVal % rightVal);
     } catch ( MyException& e ) {
         if ( e.getDetail().empty() ) {
-            e.setDetail( rightContent + " is zero Value ( in Modulo )");
+            e.setDetail( rightContent + " is zero Value ( in Modulo ) @" + right->getBeginPos().getPos() );
         }
         throw;
     }
@@ -1402,6 +1424,16 @@ TokenBase* TokenMgr::doBitAnd(TokenBase* left, TokenBase* right)
     DataValue leftVal  = left->getRealValue();
     DataValue rightVal = right->getRealValue();
     operatorPrepairDataTypeConversion2(&leftVal, &rightVal);
+
+    if ( leftVal.type == E_TP_FLOAT  ||  leftVal.type == E_TP_DOUBLE ) {
+        MyException e(E_THROW_BITAND_CANNOT_APPLY_ON_FLOAT, left->getBeginPos() );
+        e.setDetail( leftContent );
+        throw e;
+    } else if ( rightVal.type == E_TP_FLOAT  ||  rightVal.type == E_TP_DOUBLE ) {
+        MyException e(E_THROW_BITAND_CANNOT_APPLY_ON_FLOAT, right->getBeginPos() );
+        e.setDetail( rightContent );
+        throw e;
+    }
 
     E_DataType retDt = leftVal.type;
 
@@ -1427,6 +1459,17 @@ TokenBase* TokenMgr::doBitOr(TokenBase* left, TokenBase* right)
     DataValue rightVal = right->getRealValue();
     operatorPrepairDataTypeConversion2(&leftVal, &rightVal);
 
+    if ( leftVal.type == E_TP_FLOAT  ||  leftVal.type == E_TP_DOUBLE ) {
+        MyException e(E_THROW_BITOR_CANNOT_APPLY_ON_FLOAT, left->getBeginPos() );
+        e.setDetail( leftContent );
+        throw e;
+    } else if ( rightVal.type == E_TP_FLOAT  ||  rightVal.type == E_TP_DOUBLE ) {
+        MyException e(E_THROW_BITOR_CANNOT_APPLY_ON_FLOAT, right->getBeginPos() );
+        e.setDetail( rightContent );
+        throw e;
+    }
+
+
     E_DataType retDt = leftVal.type;
 
     // calc 
@@ -1450,6 +1493,18 @@ TokenBase* TokenMgr::doBitXor(TokenBase* left, TokenBase* right)
     DataValue rightVal = right->getRealValue();
     operatorPrepairDataTypeConversion2(&leftVal, &rightVal);
 
+    if ( leftVal.type == E_TP_FLOAT  ||  leftVal.type == E_TP_DOUBLE ) {
+        MyException e(E_THROW_BITXOR_CANNOT_APPLY_ON_FLOAT, left->getBeginPos() );
+        e.setDetail( leftContent );
+        throw e;
+    } else if ( rightVal.type == E_TP_FLOAT  ||  rightVal.type == E_TP_DOUBLE ) {
+        MyException e(E_THROW_BITXOR_CANNOT_APPLY_ON_FLOAT, right->getBeginPos() );
+        e.setDetail( rightContent );
+        throw e;
+    }
+
+    
+
     E_DataType retDt = leftVal.type;
 
     // calc 
@@ -1472,6 +1527,18 @@ TokenBase* TokenMgr::doBitLeftShift(TokenBase* left, TokenBase* right)
     DataValue leftVal  = left->getRealValue();
     DataValue rightVal = right->getRealValue();
     E_DataType leftPromotionDt = operatorPrepairDataTypeConversion2(&leftVal, &rightVal);
+
+
+    if ( leftVal.type == E_TP_FLOAT  ||  leftVal.type == E_TP_DOUBLE ) {
+        MyException e(E_THROW_BIT_LEFTSHIFT_CANNOT_APPLY_ON_FLOAT, left->getBeginPos() );
+        e.setDetail( leftContent );
+        throw e;
+    } else if ( rightVal.type == E_TP_FLOAT  ||  rightVal.type == E_TP_DOUBLE ) {
+        MyException e(E_THROW_BIT_LEFTSHIFT_CANNOT_APPLY_ON_FLOAT, right->getBeginPos() );
+        e.setDetail( rightContent );
+        throw e;
+    }
+
     // E_DataType retDt = leftVal->type;
 
     // calc 
@@ -1496,6 +1563,17 @@ TokenBase* TokenMgr::doBitRightShift(TokenBase* left, TokenBase* right)
     DataValue rightVal = right->getRealValue();
     E_DataType leftPromotionDt = operatorPrepairDataTypeConversion2(&leftVal, &rightVal);
 
+    if ( leftVal.type == E_TP_FLOAT  ||  leftVal.type == E_TP_DOUBLE ) {
+        MyException e(E_THROW_BIT_RIGHTSHIFT_CANNOT_APPLY_ON_FLOAT, left->getBeginPos() );
+        e.setDetail( leftContent );
+        throw e;
+    } else if ( rightVal.type == E_TP_FLOAT  ||  rightVal.type == E_TP_DOUBLE ) {
+        MyException e(E_THROW_BIT_RIGHTSHIFT_CANNOT_APPLY_ON_FLOAT, right->getBeginPos() );
+        e.setDetail( rightContent );
+        throw e;
+    }
+
+
     
 
     // calc 
@@ -1516,8 +1594,8 @@ TokenBase* TokenMgr::doAssignment(TokenBase* left, TokenBase* right)
     auto content = left->getTokenContent();
     if (    !( left->isVarible() ) 
         ||  ( ( toBeAssignmentVar = VariblePool::getPool()->getVaribleByName(content)) == nullptr )  ) {
-        MyException e(E_THROW_VARIBLE_NOT_DEFINED);
-        e.setDetail( content  + string(" : ") + left->getBeginPos().getPos() );
+        MyException e(E_THROW_VARIBLE_NOT_DEFINED, left->getBeginPos() );
+        e.setDetail( content );
         throw e;
     } 
 
@@ -1540,7 +1618,7 @@ TokenBase* TokenMgr::doAssignment(TokenBase* left, TokenBase* right)
 
     // update varible' value
     toBeAssignmentVar->dataVal.doAssignment( leftVal );
-    toBeAssignmentVar->dataVal.isInitialed = true; // set as initialed
+    toBeAssignmentVar->isInitialed = true; // set as initialed
 
 
     TokenBase* ret = generateTmpExpression( leftVal.type , finalExpr, left, right);
@@ -1606,8 +1684,15 @@ TokenBase* TokenMgr::doBitNot(TokenBase* op, TokenBase* right)
     DataValue rightVal = right->getRealValue();
     E_DataType rightPromotionDt = operatorPrepairDataTypeConversion1(&rightVal);
 
+    if ( rightVal.type == E_TP_FLOAT  ||  rightVal.type == E_TP_DOUBLE ) {
+        MyException e(E_THROW_BITNOT_CANNOT_APPLY_ON_FLOAT, right->getBeginPos() );
+        e.setDetail( rightContent );
+        throw e;
+    } 
+
+
     // calc 
-    DataValue bitNotRet = ~(rightVal);
+    DataValue bitNotRet   =    ~rightVal;
 
     TokenBase* ret = generateTmpExpression(rightPromotionDt, finalExpr, op, right);
     ret->setRealValue( bitNotRet );

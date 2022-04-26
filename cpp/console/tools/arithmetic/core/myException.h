@@ -14,6 +14,7 @@ public:
     MyException(E_ExceptionType errorCode, ChInfo cur);
     MyException(const  MyException& r) = default;
     // MyException(const  MyException& r);
+    E_ExceptionType getCode();
 
     std::string getDetail();
     void setDetail(const std::string& detail);

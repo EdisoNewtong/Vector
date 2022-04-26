@@ -62,13 +62,13 @@ VaribleInfo* VariblePool::getVaribleByName(const std::string& varname)
 
 
 
-VaribleInfo* VariblePool::create_a_new_varible(E_DataType dt, const std::string& varname)
+VaribleInfo* VariblePool::create_a_new_varible(E_DataType dt, const std::string& varname, int defline)
 {
     auto foundIt = m_pool.find(varname);
     if ( foundIt != m_pool.end() ) {
         // already found it
         MyException e(E_THROW_VARIBLE_ALREADY_DEFINED);
-        e.setDetail( varname );
+        e.setDetail( varname + std::string(" @") + std::to_string(defline) +  std::string(" has already been defined at line : ") + std::to_string( foundIt->second->definedLine) );
         throw e;
     }
 
@@ -76,6 +76,7 @@ VaribleInfo* VariblePool::create_a_new_varible(E_DataType dt, const std::string&
     newVarible->dataVal.type = dt;
     newVarible->varName = varname;
     newVarible->isInitialed = false; // when create , set initial flag as false
+    newVarible->definedLine = defline;
 
     m_pool.insert( make_pair(varname, newVarible) );
 

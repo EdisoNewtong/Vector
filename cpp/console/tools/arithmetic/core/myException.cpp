@@ -5,8 +5,8 @@ using namespace std;
 // static 
 unordered_map<MyException::ErrorType,string>    MyException::s_exceptionMap{
     { enumCvt(E_THROW_UNKNOWN_CHAR),                            "Unknown character "},
-    { enumCvt(E_THROW_NULL_PTR),                                "NULL pointer "},
     { enumCvt(E_THROW_CODE_CANNOT_REACH_HERE),                  "Strange ! code can't reach here. "},
+    { enumCvt(E_THROW_NULL_PTR),                                "NULL pointer "},
 
     { enumCvt(E_THROW_INVALID_CHAR_AFTER_LEFT_BRACKET),         "Invalid char after '<' "},
     { enumCvt(E_THROW_INVALID_CHAR_AFTER_RIGHT_BRACKET),        "Invalid char after '>' "},
@@ -51,6 +51,8 @@ unordered_map<MyException::ErrorType,string>    MyException::s_exceptionMap{
     { enumCvt(E_THROW_SENTENCE_NO_EXPR_AFTER_ASSIGNMENT),                "Sentence no expression after assignment " },
     { enumCvt(E_THROW_SENTENCE_UNKNOWN_DATA_TYPE),                       "Sentence unknown data type " },
     { enumCvt(E_THROW_NO_MATCHED_OPEN_PARENTHESES),                      "Sentence no matched '(' while pushing   ')' " },
+    { enumCvt(E_THROW_CANNOT_PUSH_TOKEN_KEYWORD),                        "Keyword can't existed after '=' " },
+
 
     { enumCvt(E_THROW_SUFFIXEXPR_BINARY_OP_MISS_TWO_OPERANDS),           "Suffix-Expression miss 2 operands while processing binary operator " },
     { enumCvt(E_THROW_SUFFIXEXPR_UNARY_OP_MISS_ONE_OPERAND),             "Suffix-Expression miss 1 operand  while processing unary operator " },
@@ -145,6 +147,13 @@ string MyException::getExceptionDetail() const
     // return MyException::s_retDetail.c_str();
     return detail.c_str();
 }
+
+
+E_ExceptionType MyException::getCode()
+{
+    return m_errorCode;
+}
+
 
 // virtual 
 /*
