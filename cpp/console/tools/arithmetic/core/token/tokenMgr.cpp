@@ -502,6 +502,7 @@ void TokenMgr::executeCode()
     if ( equalCnt == 0 ) {
         varIdx = (vecSz - 1);
         defDt = checkPrefixKeyWordsAndGetDataType(varIdx, varname);
+        // 1. int a;
         sentenceType = 1;
     } else {
         // 1 '='
@@ -520,6 +521,7 @@ void TokenMgr::executeCode()
         // equal1stIdx >=1
         if ( equal1stIdx > 1 ) {
             defDt  = checkPrefixKeyWordsAndGetDataType(varIdx, varname);
+            // 2. int a = 3;
             sentenceType = 2;
         } else {
             // equal1stIdx == 1  =>     varname = expression
@@ -530,6 +532,7 @@ void TokenMgr::executeCode()
                 throw e;
             }
             varname = varElement->getTokenContent();
+            // 3. a = 3;
             sentenceType = 3;
         }
     }
@@ -550,18 +553,18 @@ void TokenMgr::executeCode()
         ///////////////////////////////////////////////////////////////////////
 
     */
+    auto sentenceVarElement = m_oneSentence.at(varIdx);
     VaribleInfo* pVaribleInfo = nullptr;
     if ( sentenceType == 1 ) {
-        // 1. DataType    varible                   (;)    type-id = 1
-        // e.g.  unsigned int a;
+        // 1. e.g.  unsigned int a;
         pVaribleInfo = VariblePool::getPool()->create_a_new_varible(defDt, varname);
+        sentenceVarElement->setRealValue( pVaribleInfo->dataVal );
     } else if ( sentenceType == 2 ) {
-        // 2.    DataType         varible = expression      (;)    type=id = 2
-        // e.g.  unsigned int           a = 3;
+        // 2. e.g.  unsigned int           a = 3;
         pVaribleInfo = VariblePool::getPool()->create_a_new_varible(defDt, varname);
+        sentenceVarElement->setRealValue( pVaribleInfo->dataVal );
     } else if ( sentenceType == 3 ) {
-        // 3              varible = expression      (;)    type-id = 3
-        // e.g.               a   = 3;
+        // 3. e.g.               a   = 3;
         pVaribleInfo = VariblePool::getPool()->getVaribleByName(varname);
         if ( pVaribleInfo == nullptr ) {
             MyException e(E_THROW_VARIBLE_NOT_DEFINED);
@@ -570,13 +573,17 @@ void TokenMgr::executeCode()
         }
     }
 
-    buildSuffixExpression(sentenceType, pVaribleInfo, varIdx);
-    checkSuffixExpressionValid();
-    evaluateSuffixExpression(pVaribleInfo);
+
+    if ( sentenceType != 1 ) {
+        buildSuffixExpression(sentenceType, pVaribleInfo, varIdx);
+        checkSuffixExpressionValid();
+        evaluateSuffixExpression();
+    }
 
 
     // After Execute , clear
     m_oneSentence.clear();
+    clearTokenPool();
 
 }
 
@@ -604,18 +611,19 @@ void TokenMgr::buildSuffixExpression(int sentenceType, VaribleInfo* pVarible, in
                 if ( sentenceType == 1 || sentenceType == 2 ) {
                     if ( idx != varibleIdx ) {
                         string pVisitVarName = pToken->getTokenContent();
-                        if ( pVisitVarName == varibleName ) {
-                            // TODO : generate a warning   
-                            // e.g.   int a = a + b;
-                            // 1st defined varible is appeared in the expression after '='
-                        } else {
-                            VaribleInfo* pVisitedVaribleInfo = VariblePool::getPool()->getVaribleByName(pVisitVarName);
-                            if ( pVisitedVaribleInfo == nullptr ) {
-                                MyException e(E_THROW_VARIBLE_NOT_DEFINED);
-                                e.setDetail( pVisitVarName + string(" : ") + pToken->getBeginPos().getPos() );
-                                throw e;
-                            }
+
+                        VaribleInfo* pVisitedVaribleInfo = VariblePool::getPool()->getVaribleByName( pVisitVarName );
+                        if ( pVisitedVaribleInfo == nullptr ) {
+                            MyException e(E_THROW_VARIBLE_NOT_DEFINED);
+                            e.setDetail( pVisitVarName + string(" : ") + pToken->getBeginPos().getPos() );
+                            throw e;
                         }
+
+                        if ( !(pVisitedVaribleInfo->isInitialed) ) {
+                            // TODO : generate a warning   
+                        }
+
+                        pToken->setRealValue( pVisitedVaribleInfo->dataVal );
                     }
                 }
             }
@@ -792,9 +800,8 @@ void TokenMgr::processOperatorStack(TokenBase* previousToken, TokenBase* pToken)
 }
 
 
-void TokenMgr::evaluateSuffixExpression(VaribleInfo* pVarible)
+void TokenMgr::evaluateSuffixExpression()
 {
-    (void)pVarible;
     int previousExpCnt = 0;
     for( auto it = m_suffixExpression.begin(); it != m_suffixExpression.end(); ) 
     {
@@ -838,10 +845,7 @@ void TokenMgr::evaluateSuffixExpression(VaribleInfo* pVarible)
                 auto genTmpExp = doBinaryOp(leftOperand, currentElement, rightOperand);
 
                 it = m_suffixExpression.erase(it, nextIt);
-
-                // TODO : insert tmp exp
-                (void)genTmpExp;
-                // it = m_suffixExpression.insert(it, genTmpExp);
+                it = m_suffixExpression.insert(it, genTmpExp);
 
                 previousExpCnt -= 2;
                 previousExpCnt += 1;
@@ -862,9 +866,8 @@ void TokenMgr::evaluateSuffixExpression(VaribleInfo* pVarible)
 
                 it = m_suffixExpression.erase(it, nextIt);
 
-                // TODO : insert tmp exp
-                (void)genTmpExp;
-                // it = m_suffixExpression.insert(it, genTmpExp);
+                // (void)genTmpExp;
+                it = m_suffixExpression.insert(it, genTmpExp);
 
                 // previousExpCnt -= 1;
                 // previousExpCnt += 1;
@@ -949,9 +952,12 @@ void TokenMgr::popUntilOpenParentheses()
     for( auto rit = m_opertorStack.rbegin(); rit != m_opertorStack.rend(); )
     {
         TokenBase* pElement = *rit;
+        auto isopenParentheses = (pElement->getOperatorType() == E_OPEN_PARENTHESES);
 
-        m_opertorStack.erase( (++rit).base() );
-        if ( pElement->getOperatorType() == E_OPEN_PARENTHESES ) {
+        auto fit = m_opertorStack.erase( (++rit).base() );
+        rit = reverse_iterator< decltype(fit)>( fit );
+
+        if ( isopenParentheses ) {
             // meet the matched    '('
             break;
         } else {
@@ -1506,6 +1512,16 @@ TokenBase* TokenMgr::doAssignment(TokenBase* left, TokenBase* right)
 {
     static const string SC_OP_BIT_ASSIGNMENT = " = ";
 
+    VaribleInfo* toBeAssignmentVar = nullptr;
+    auto content = left->getTokenContent();
+    if (    !( left->isVarible() ) 
+        ||  ( ( toBeAssignmentVar = VariblePool::getPool()->getVaribleByName(content)) == nullptr )  ) {
+        MyException e(E_THROW_VARIBLE_NOT_DEFINED);
+        e.setDetail( content  + string(" : ") + left->getBeginPos().getPos() );
+        throw e;
+    } 
+
+
     string leftContent  = left->getExpressionContent();
     string rightContent = right->getExpressionContent();
     string finalExpr = leftContent + SC_OP_BIT_ASSIGNMENT + rightContent;
@@ -1521,6 +1537,11 @@ TokenBase* TokenMgr::doAssignment(TokenBase* left, TokenBase* right)
     //
     leftVal.doAssignment(rightVal);
     left->setRealValue( leftVal );
+
+    // update varible' value
+    toBeAssignmentVar->dataVal.doAssignment( leftVal );
+    toBeAssignmentVar->dataVal.isInitialed = true; // set as initialed
+
 
     TokenBase* ret = generateTmpExpression( leftVal.type , finalExpr, left, right);
     ret->setRealValue( leftVal );
@@ -1560,7 +1581,8 @@ TokenBase* TokenMgr::doNegative(TokenBase* op, TokenBase* right)
     string rightContent = right->getExpressionContent();
     string finalExpr = SC_OP_NEGATIVE_BEGIN + rightContent;
 
-    DataValue rightVal = right->getRealValue();
+    DataValue rightVal = right->getRealValue(); 
+
     E_DataType rightPromotionDt = operatorPrepairDataTypeConversion1(&rightVal);
 
     // calc 

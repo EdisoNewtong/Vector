@@ -105,6 +105,7 @@ TokenBase* OperatorParser::generateToken() // override;
     auto opTp = EnumUtil::getOpType(firstCh);
 
     pGenToken->setOpType( opTp );
+    pGenToken->setTokenContent( m_parsedSeq );
 
     return pGenToken;
 }
