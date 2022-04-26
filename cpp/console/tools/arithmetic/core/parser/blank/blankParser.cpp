@@ -24,12 +24,12 @@ ParserBase::E_PARSER_TYPE BlankParser::appendChar(const ChInfo& rChInfo, E_Parse
 {
     using namespace charutil;
 
-    m_endChPos = rChInfo;
     ParserBase::E_PARSER_TYPE retType = m_type;
 
     char currentCh = rChInfo.ch;
     if ( isBlank(currentCh) ) {
         m_parsedSeq += currentCh;
+        m_endChPos = rChInfo;
     } else {
         afterAction = E_GENERATE_TOKEN_SWITCH_TO_DEFAULT_KEEP_CURSOR;
         retType = ParserBase::E_BASE;

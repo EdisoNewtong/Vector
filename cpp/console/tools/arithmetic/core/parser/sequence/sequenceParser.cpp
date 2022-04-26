@@ -47,7 +47,7 @@ SequenceParser::~SequenceParser()
 ParserBase::E_PARSER_TYPE SequenceParser::appendChar(const ChInfo& rChInfo,  E_ParserAction& afterAction) // override;
 {
     using namespace charutil;
-    m_endChPos = rChInfo;
+    // m_endChPos = rChInfo;
 
     auto retType = m_type;
 
@@ -70,6 +70,10 @@ ParserBase::E_PARSER_TYPE SequenceParser::appendChar(const ChInfo& rChInfo,  E_P
         break;
     default:
         break;
+    }
+
+    if ( m_type == retType ) {
+        m_endChPos = rChInfo;
     }
 
     return retType;

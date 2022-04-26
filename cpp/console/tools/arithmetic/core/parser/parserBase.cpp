@@ -106,6 +106,7 @@ void ParserBase::pushHeadChar(char ch, const ChInfo& chInfo)
     assert( m_parsedSeq.empty() );
     m_parsedSeq += ch;
     m_beginChPos = chInfo;
+    m_endChPos   = chInfo;
 }
 
 
