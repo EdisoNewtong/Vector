@@ -6,6 +6,7 @@
 #include "dataValue.h"
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 struct VaribleInfo
 {
@@ -32,8 +33,11 @@ public:
 public:
     VaribleInfo* create_a_new_varible(E_DataType dt, const std::string& varname, int defline);
     VaribleInfo* getVaribleByName(const std::string& varname);
+
+    void printAllVaribles();
 protected:
     std::unordered_map<std::string, VaribleInfo*> m_pool;
+    std::vector<std::string>                      m_varDefinedOrder;
 
 private:
     VariblePool();

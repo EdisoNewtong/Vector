@@ -46,7 +46,7 @@ build/dataValue.o:core/dataValue.cpp   core/dataValue.h   core/commonEnum.h   co
 	g++    $(COMPILE_OPT)  -o  build/dataValue.o   core/dataValue.cpp
 
 
-build/variblePool.o:core/variblePool/variblePool.cpp  core/variblePool/variblePool.h  core/myException.h core/token/tokenBase.h core/dataValue.h
+build/variblePool.o:core/variblePool/variblePool.cpp  core/variblePool/variblePool.h  core/myException.h core/token/tokenBase.h core/dataValue.h  core/util/enumUtil.h
 	g++    $(COMPILE_OPT)  -o  build/variblePool.o   core/variblePool/variblePool.cpp
 
 build/enumUtil.o:core/util/enumUtil.cpp core/util/enumUtil.h core/parser/parserBase.h  core/commonEnum.h  core/myException.h
@@ -64,7 +64,7 @@ build/stringNumber.o:core/util/stringNumber.cpp core/util/stringNumber.h
 build/opUtil.o:core/util/opUtil.cpp core/util/opUtil.h  core/commonEnum.h  core/myException.h
 	g++    $(COMPILE_OPT)  -o  build/opUtil.o   core/util/opUtil.cpp
 
-build/globalDirector.o:core/globalDirector.cpp  core/globalDirector.h   core/parser/parserBase.h   core/parser/blank/blankParser.h  core/parser/comment/singlelineCommentParser.h core/parser/comment/multilineCommentParser.h core/parser/sequence/sequenceParser.h core/util/charUtil.h   core/parser/blank/blankParser.h core/parser/comment/singlelineCommentParser.h core/parser/comment/multilineCommentParser.h core/parser/operator/operatorParser.h core/parser/sequence/sequenceParser.h core/parser/semicolon/semicolonParser.h   core/token/tokenBase.h core/parser/parserOption.h core/util/enumUtil.h core/myException.h core/token/tokenMgr.h
+build/globalDirector.o:core/globalDirector.cpp  core/globalDirector.h   core/parser/parserBase.h   core/parser/blank/blankParser.h  core/parser/comment/singlelineCommentParser.h core/parser/comment/multilineCommentParser.h core/parser/sequence/sequenceParser.h core/util/charUtil.h   core/parser/blank/blankParser.h core/parser/comment/singlelineCommentParser.h core/parser/comment/multilineCommentParser.h core/parser/operator/operatorParser.h core/parser/sequence/sequenceParser.h core/parser/semicolon/semicolonParser.h   core/token/tokenBase.h core/parser/parserOption.h core/util/enumUtil.h core/myException.h core/token/tokenMgr.h core/variblePool/variblePool.h
 	g++    $(COMPILE_OPT)  -o  build/globalDirector.o    core/globalDirector.cpp
 
 ####################################################################################################

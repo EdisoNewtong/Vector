@@ -2,6 +2,7 @@
 #define DATA_VALUE_H
 
 #include "commonEnum.h"
+#include <string>
 
 struct DataValue
 {
@@ -32,6 +33,7 @@ struct DataValue
     void doConvertion(E_DataType destinationTp);
     bool isIntZero() const;
     bool isFloatZero();
+    std::string getPrintValue();
 
     void downerCast(E_DataType castTp);
 
