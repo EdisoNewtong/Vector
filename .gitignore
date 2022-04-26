@@ -36,7 +36,9 @@ lua/sourceCodeStudy/xcodeLuaStudy
 *.pro.user
 
 !cpp/console/mathOperatation/build/**
-!cpp/console/tools/arithMetic/build/*.o
+!cpp/console/tools/arithmetic/build/tmp.txt
+cpp/console/tools/arithmetic/arithMetic
+cpp/console/tools/arithmetic/build/arithMetic
 cpp/console/mathOperatation/build/*.o
 
 

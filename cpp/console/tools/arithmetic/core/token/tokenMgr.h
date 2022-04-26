@@ -59,7 +59,7 @@ protected:
     void executeCode();
     void buildSuffixExpression(int sentenceType, VaribleInfo* pVarible, int varibleIdx);
     void checkSuffixExpressionValid();
-    void evaluateSuffixExpression(VaribleInfo* pVarible);
+    void evaluateSuffixExpression();
     void processOperatorStack(TokenBase* previousToken, TokenBase* pToken);
 
     void popUntilOpenParentheses();
@@ -90,6 +90,7 @@ protected:
 
     E_DataType operatorPrepairDataTypeConversion1(DataValue* pRightVal);
     E_DataType operatorPrepairDataTypeConversion2(DataValue* pLeftVal, DataValue* pRightVal);
+
 protected:
     static TokenMgr* s_gInstance;
 

@@ -11,7 +11,7 @@ struct VaribleInfo
 {
     std::string varName;
     DataValue dataVal;
-    // bool hasAssigned;
+    bool isInitialed;
 };
 
 class VariblePool

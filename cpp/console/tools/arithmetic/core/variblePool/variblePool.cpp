@@ -75,6 +75,8 @@ VaribleInfo* VariblePool::create_a_new_varible(E_DataType dt, const std::string&
     VaribleInfo* newVarible = new VaribleInfo();
     newVarible->dataVal.type = dt;
     newVarible->varName = varname;
+    newVarible->isInitialed = false; // when create , set initial flag as false
+
     m_pool.insert( make_pair(varname, newVarible) );
 
     return newVarible;
