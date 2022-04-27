@@ -2,6 +2,7 @@
 #include "dataTypeUtil.h"
 #include "myException.h"
 #include <sstream>
+#include <iomanip>
 using namespace std;
 
 
@@ -1954,43 +1955,214 @@ void DataValue::doAssignment(const DataValue& rightVal)
 }
 
 
-string DataValue::getPrintValue()
+string DataValue::getPrintValue(unsigned int flag)
 {
     stringstream strValue;
     switch( this->type )
     {
     case E_TP_CHAR:
-        strValue << value.char_val << " => " << static_cast<int>(value.char_val);
+        {
+            int code = static_cast<int>(value.char_val);
+            strValue << value.char_val << " => " << code;
+
+            if ( (flag >> 1) & 0x1 ) {
+                // print hex
+                strValue << " = 0x" << std::hex << std::uppercase << code;
+            }
+
+            if ( (flag >> 2) & 0x1 ) {
+                // print binary
+            }
+
+            if ( (flag >> 3) & 0x1 ) {
+                // print oct
+                strValue << " = (0)" << std::oct << code;
+            }
+        }
         break;
     case E_TP_U_CHAR:
-        strValue << value.uchar_val << " => " << static_cast<int>(value.uchar_val);
+        {
+            int code = static_cast<int>(value.uchar_val);
+            strValue << value.uchar_val << " => " << code;
+            if ( (flag >> 1) & 0x1 ) {
+                // print hex
+                strValue << " = 0x" << std::hex << std::uppercase << code;
+            }
+
+            if ( (flag >> 2) & 0x1 ) {
+                // print binary
+            }
+
+            if ( (flag >> 3) & 0x1 ) {
+                // print oct
+                strValue << " = (0)" << std::oct << code;
+            }
+        }
         break;
     case E_TP_S_CHAR:
-        strValue << value.schar_val << " => " << static_cast<int>(value.schar_val);
+        {
+            int code = static_cast<int>(value.schar_val);
+            strValue << value.schar_val << " => " << code;
+
+            if ( (flag >> 1) & 0x1 ) {
+                // print hex
+                strValue << " = 0x" << std::hex << std::uppercase << code;
+            }
+
+            if ( (flag >> 2) & 0x1 ) {
+                // print binary
+            }
+
+            if ( (flag >> 3) & 0x1 ) {
+                // print oct
+                strValue << " = (0)" << std::oct << code;
+            }
+        }
         break;
     case E_TP_U_SHORT:
-        strValue << value.ushort_val;
+        {
+            strValue << value.ushort_val;
+            if ( (flag >> 1) & 0x1 ) {
+                // print hex
+                strValue << " = 0x" << std::hex << std::uppercase << value.ushort_val;
+            }
+
+            if ( (flag >> 2) & 0x1 ) {
+                // print binary
+            }
+
+            if ( (flag >> 3) & 0x1 ) {
+                // print oct
+                strValue << " = (0)" << std::oct << value.ushort_val;
+            }
+        }
         break;
     case E_TP_S_SHORT:
-        strValue << value.sshort_val;
+        {
+            strValue << value.sshort_val;
+
+            if ( (flag >> 1) & 0x1 ) {
+                // print hex
+                strValue << " = 0x" << std::hex << std::uppercase << value.sshort_val;
+            }
+
+            if ( (flag >> 2) & 0x1 ) {
+                // print binary
+            }
+
+            if ( (flag >> 3) & 0x1 ) {
+                // print oct
+                strValue << " = (0)" << std::oct << value.sshort_val;
+            }
+        }
         break;
     case E_TP_U_INT:
-        strValue << value.uint_val;
+        {
+            strValue << value.uint_val;
+            if ( (flag >> 1) & 0x1 ) {
+                // print hex
+                strValue << " = 0x" << std::hex << std::uppercase << value.uint_val;
+            }
+
+            if ( (flag >> 2) & 0x1 ) {
+                // print binary
+            }
+
+            if ( (flag >> 3) & 0x1 ) {
+                // print oct
+                strValue << " = (0)" << std::oct << value.uint_val;
+            }
+        }
         break;
     case E_TP_S_INT:
-        strValue << value.sint_val;
+        {
+            strValue << value.sint_val;
+            if ( (flag >> 1) & 0x1 ) {
+                // print hex
+                strValue << " = 0x" << std::hex << std::uppercase << value.sint_val;
+            }
+
+            if ( (flag >> 2) & 0x1 ) {
+                // print binary
+            }
+
+            if ( (flag >> 3) & 0x1 ) {
+                // print oct
+                strValue << " = (0)" << std::oct << value.sint_val;
+            }
+        }
         break;
     case E_TP_U_LONG:
-        strValue << value.ulong_val;
+        {
+            strValue << value.ulong_val;
+            if ( (flag >> 1) & 0x1 ) {
+                // print hex
+                strValue << " = 0x" << std::hex << std::uppercase << value.ulong_val;
+            }
+
+            if ( (flag >> 2) & 0x1 ) {
+                // print binary
+            }
+
+            if ( (flag >> 3) & 0x1 ) {
+                // print oct
+                strValue << " = (0)" << std::oct << value.ulong_val;
+            }
+        }
         break;
     case E_TP_S_LONG:
-        strValue << value.slong_val;
+        {
+            strValue << value.slong_val;
+            if ( (flag >> 1) & 0x1 ) {
+                // print hex
+                strValue << " = 0x" << std::hex << std::uppercase << value.slong_val;
+            }
+
+            if ( (flag >> 2) & 0x1 ) {
+                // print binary
+            }
+
+            if ( (flag >> 3) & 0x1 ) {
+                // print oct
+                strValue << " = (0)" << std::oct << value.slong_val;
+            }
+        }
         break;
     case E_TP_U_LONG_LONG:
-        strValue << value.ulonglong_val;
+        {
+            strValue << value.ulonglong_val;
+            if ( (flag >> 1) & 0x1 ) {
+                // print hex
+                strValue << " = 0x" << std::hex << std::uppercase << value.ulonglong_val;
+            }
+
+            if ( (flag >> 2) & 0x1 ) {
+                // print binary
+            }
+
+            if ( (flag >> 3) & 0x1 ) {
+                // print oct
+                strValue << " = (0)" << std::oct << value.ulonglong_val;
+            }
+        }
         break;
     case E_TP_S_LONG_LONG:
-        strValue << value.slonglong_val;
+        {
+            strValue << value.slonglong_val;
+            if ( (flag >> 1) & 0x1 ) {
+                // print hex
+                strValue << " = 0x" << std::hex << std::uppercase << value.slonglong_val;
+            }
+
+            if ( (flag >> 2) & 0x1 ) {
+                // print binary
+            }
+
+            if ( (flag >> 3) & 0x1 ) {
+                // print oct
+                strValue << " = (0)" << std::oct << value.slonglong_val;
+            }
+        }
         break;
     case E_TP_FLOAT:
         strValue << value.float_val;

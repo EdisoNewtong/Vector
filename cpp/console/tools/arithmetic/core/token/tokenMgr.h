@@ -110,7 +110,7 @@ protected:
     static std::list<TokenBase*> s_generatedTmpTokenPool;
 
     static TokenBase* generateTmpExpression(E_DataType dt, const std::string& expression, TokenBase* begtoken, TokenBase* endtoken);
-    static void clearTokenPool();
+    static void clearTmpGenTokenPool();
 
 
 

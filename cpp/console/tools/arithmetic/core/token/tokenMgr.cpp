@@ -306,7 +306,7 @@ void TokenMgr::init()
 
 void TokenMgr::release()
 {
-    clearTokenPool();
+    clearTmpGenTokenPool();
     INNER_SAFE_DELETE(s_gInstance);
 }
 
@@ -605,12 +605,15 @@ void TokenMgr::executeCode()
         printSuffixExpression(2);
 
         evaluateSuffixExpression();
+
+        printSuffixExpression(3);
+        m_suffixExpression.clear(); // clear the only 1 element
     }
 
 
     // After Execute , clear
     m_oneSentence.clear();
-    clearTokenPool();
+    clearTmpGenTokenPool();
 }
 
 
@@ -634,24 +637,20 @@ void TokenMgr::buildSuffixExpression(int sentenceType, VaribleInfo* pVarible, in
                 // e.setDetail( pToken->getBeginPos().getPos() );
                 throw e;
             } else if ( pToken->isVarible() ) {
-                if ( sentenceType == 1 || sentenceType == 2 ) {
-                    if ( idx != varibleIdx ) {
-                        string pVisitVarName = pToken->getTokenContent();
+                string pVisitVarName = pToken->getTokenContent();
 
-                        VaribleInfo* pVisitedVaribleInfo = VariblePool::getPool()->getVaribleByName( pVisitVarName );
-                        if ( pVisitedVaribleInfo == nullptr ) {
-                            MyException e(E_THROW_VARIBLE_NOT_DEFINED , pToken->getBeginPos());
-                            e.setDetail( pVisitVarName );
-                            throw e;
-                        }
-
-                        if ( !(pVisitedVaribleInfo->isInitialed) ) {
-                            // TODO : generate a warning   
-                        }
-
-                        pToken->setRealValue( pVisitedVaribleInfo->dataVal );
-                    }
+                VaribleInfo* pVisitedVaribleInfo = VariblePool::getPool()->getVaribleByName( pVisitVarName );
+                if ( pVisitedVaribleInfo == nullptr ) {
+                    MyException e(E_THROW_VARIBLE_NOT_DEFINED , pToken->getBeginPos());
+                    e.setDetail( pVisitVarName );
+                    throw e;
                 }
+
+                if ( !(pVisitedVaribleInfo->isInitialed) ) {
+                    // TODO : generate a warning   
+                }
+
+                pToken->setRealValue( pVisitedVaribleInfo->dataVal );
             }
 
             m_suffixExpression.push_back( pToken );
@@ -895,9 +894,9 @@ void TokenMgr::evaluateSuffixExpression()
                 it = m_suffixExpression.erase(it, nextIt);
                 it = m_suffixExpression.insert(it, genTmpExp);
 
-                // previousExpCnt -= 2;
+                // previousExpCnt -= 3;
                 // previousExpCnt += 1;
-                previousExpCnt -= 1;
+                previousExpCnt -= 2;
             } else {
                 if ( previousExpCnt < 1 ) {
                     MyException e(E_THROW_SUFFIXEXPR_UNARY_OP_MISS_ONE_OPERAND, currentElement->getBeginPos());
@@ -916,8 +915,9 @@ void TokenMgr::evaluateSuffixExpression()
                 it = m_suffixExpression.erase(it, nextIt);
                 it = m_suffixExpression.insert(it, genTmpExp);
 
-                // previousExpCnt -= 1;
+                // previousExpCnt -= 2;
                 // previousExpCnt += 1;
+                --previousExpCnt;
             }
 
         }
@@ -1759,7 +1759,7 @@ TokenBase* TokenMgr::generateTmpExpression(E_DataType dt, const std::string& exp
 
 
 // static 
-void TokenMgr::clearTokenPool()
+void TokenMgr::clearTmpGenTokenPool()
 {
     for( auto it = s_generatedTmpTokenPool.begin(); it != s_generatedTmpTokenPool.end(); ++it )
     {
@@ -1859,13 +1859,15 @@ void TokenMgr::printSuffixExpression(int tag)
         printFlag = ( ((flag >> 1) & 0x1U) != 0);
     } else if ( tag == 2 )  {
         printFlag = ( ((flag >> 2) & 0x1U) != 0);
+    } else if ( tag == 3 ) {
+        printFlag = ( ((flag >> 3) & 0x1U) != 0);
     }
 
     if ( printFlag ) {
         if ( m_suffixExpression.empty() ) {
-            cerr << m_execodeIdx << ". Suffix Expression List  : <Empty> " << endl;
+            cerr << m_execodeIdx << "-" << tag << " . Suffix Expression List  : <Empty> " << endl;
         } else {
-            cerr << m_execodeIdx << ". Suffix Expression List  : " <<  m_suffixExpression.size() << " Element(s)" << endl;
+            cerr << m_execodeIdx << "-" << tag << ". Suffix Expression List  : " <<  m_suffixExpression.size() << " Element(s)" << endl;
             // cerr << "\t";
 
             auto idx = 0;
@@ -1907,7 +1909,7 @@ void TokenMgr::popAllOperatorStack()
 void TokenMgr::traceOperatorStack(TokenBase* pToken, bool push)
 {
     auto flag = ParserOption::getFlag();
-    if ( (flag >> 3) & 0x1 ) {
+    if ( (flag >> 4) & 0x1 ) {
         if ( push ) {
             cerr << "OpStack->Push \"" <<  pToken->getTokenContent() << "\"" << endl;
         } else {
@@ -1921,7 +1923,7 @@ void TokenMgr::traceOperatorStack(TokenBase* pToken, bool push)
 void TokenMgr::traceSuffixExpression(TokenBase* pToken, bool push)
 {
     auto flag = ParserOption::getFlag();
-    if ( (flag >> 4) & 0x1 ) {
+    if ( (flag >> 5) & 0x1 ) {
         if ( push ) {
             cerr << "SuffixExpr->Push \"" <<  pToken->getTokenContent() << "\"" << endl;
         } else {
@@ -1935,7 +1937,7 @@ void TokenMgr::traceSuffixExpression(TokenBase* pToken, bool push)
 void TokenMgr::tracePositiveNegativeFlag(TokenBase* pToken, E_OperatorType op)
 {
     auto flag = ParserOption::getFlag();
-    if ( (flag >> 5) & 0x1 ) {
+    if ( (flag >> 6) & 0x1 ) {
         auto isAdd = (op == E_ADD);
         if ( pToken == nullptr ) {
             cerr << "chOp : nullptr , so " << (isAdd ? " add -> positive" : " minus -> negative ") << endl;
