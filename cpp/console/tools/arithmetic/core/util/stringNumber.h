@@ -61,7 +61,8 @@ protected:
     string m_strNumber;
     string m_stripedNumber;
     int    m_base;
-
+public:
+    string getStrNumber() const;
 };
 
 #endif

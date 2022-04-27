@@ -304,5 +304,9 @@ void StringNumber::processBase16()
 }
 
 
+string StringNumber::getStrNumber() const
+{
+    return m_strNumber;
+}
 
 

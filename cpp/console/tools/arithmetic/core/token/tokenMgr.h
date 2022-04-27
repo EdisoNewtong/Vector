@@ -1,10 +1,12 @@
 #ifndef TOKEN_MGR_H
 #define TOKEN_MGR_H
 
+
 #include "tokenBase.h"
 #include "commonEnum.h"
 #include "variblePool.h"
 #include "dataValue.h"
+#include "dataTypeUtil.h"
 #include <string>
 // #include <stack>
 #include <list>
@@ -100,6 +102,9 @@ protected:
     void traceOperatorStack(TokenBase* pToken, bool push);
     void traceSuffixExpression(TokenBase* pToken, bool push);
     void tracePositiveNegativeFlag(TokenBase* pToken, E_OperatorType op);
+
+    void tracePushedTokenWarning(TokenBase* pToken);
+    void tracebitShiftWarning(TypeBaseInfo& leftTpInfo,const std::string& lExpr,  TypeBaseInfo& rightTpInfo, const std::string& rExpr,  DataValue& rightVal);
 
 protected:
     static TokenMgr* s_gInstance;

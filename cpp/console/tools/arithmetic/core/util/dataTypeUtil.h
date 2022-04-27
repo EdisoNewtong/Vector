@@ -14,7 +14,8 @@ class TypeBaseInfo
 public:
     TypeBaseInfo(E_DataType dtype);
 
-    size_t getMemorySize(); // in 'byte' unit
+    int getMemorySize(); // in 'byte' unit
+    int getBits();       // in 'bits' unit
     unsigned int getLevel();
     E_DataType getType();
 
@@ -27,8 +28,10 @@ public:
     bool isUnsignedType();
 protected:
     unsigned int m_level;
-    size_t   m_bytes;
+    int   m_bytes;
+    int   m_bits;
     E_DataType m_type;
+
 };
 
 

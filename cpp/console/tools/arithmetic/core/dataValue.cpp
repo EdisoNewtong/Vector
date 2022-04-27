@@ -3,6 +3,7 @@
 #include "myException.h"
 #include <sstream>
 #include <iomanip>
+#include <limits>
 using namespace std;
 
 
@@ -1955,9 +1956,99 @@ void DataValue::doAssignment(const DataValue& rightVal)
 }
 
 
+// static
+string DataValue::toBinary(const string& hex)
+{
+    static const string SEP_BEG("| ");
+    static const string SEP_END("|");
+    static const string SEP_SPACE(5,' ');
+    string retstr;
+    size_t sz = static_cast<int>( hex.size() );
+    int cnt = 0;
+    if ( sz % 2 == 1 ) {
+        cnt = 1;
+        retstr += (SEP_BEG + SEP_SPACE);
+    } else {
+        cnt = 0;
+        retstr += SEP_BEG;
+    }
+
+    for( size_t idx = 0; idx < sz; ++idx ) 
+    {
+        char ch = hex.at(idx);
+        string map2str;
+        switch ( ch )
+        {
+        case '0':
+            map2str = "0000 ";
+            break;
+        case '1':
+            map2str = "0001 ";
+            break;
+        case '2':
+            map2str = "0010 ";
+            break;
+        case '3':
+            map2str = "0011 ";
+            break;
+        case '4':
+            map2str = "0100 ";
+            break;
+        case '5':
+            map2str = "0101 ";
+            break;
+        case '6':
+            map2str = "0110 ";
+            break;
+        case '7':
+            map2str = "0111 ";
+            break;
+        case '8':
+            map2str = "1000 ";
+            break;
+        case '9':
+            map2str = "1001 ";
+            break;
+        case 'A':
+            map2str = "1010 ";
+            break;
+        case 'B':
+            map2str = "1011 ";
+            break;
+        case 'C':
+            map2str = "1100 ";
+            break;
+        case 'D':
+            map2str = "1101 ";
+            break;
+        case 'E':
+            map2str = "1110 ";
+            break;
+        case 'F':
+            map2str = "1111 ";
+            break;
+        default:
+            break;
+        }
+
+        retstr += map2str;
+        ++cnt;
+        if ( cnt % 2 == 0   &&  idx != (sz-1)  ) {
+            retstr += SEP_BEG;
+        }
+    }
+
+    retstr += SEP_END;
+
+    return retstr;
+}
+
+
+
 string DataValue::getPrintValue(unsigned int flag)
 {
     stringstream strValue;
+    stringstream hexStr;
     switch( this->type )
     {
     case E_TP_CHAR:
@@ -1972,6 +2063,8 @@ string DataValue::getPrintValue(unsigned int flag)
 
             if ( (flag >> 2) & 0x1 ) {
                 // print binary
+                hexStr << std::hex << std::uppercase << code;
+                strValue << " = " <<  DataValue::toBinary( hexStr.str() ) << " (B) ";
             }
 
             if ( (flag >> 3) & 0x1 ) {
@@ -1991,6 +2084,8 @@ string DataValue::getPrintValue(unsigned int flag)
 
             if ( (flag >> 2) & 0x1 ) {
                 // print binary
+                hexStr << std::hex << std::uppercase << code;
+                strValue << " = " <<  DataValue::toBinary( hexStr.str() ) << " (B) ";
             }
 
             if ( (flag >> 3) & 0x1 ) {
@@ -2011,6 +2106,8 @@ string DataValue::getPrintValue(unsigned int flag)
 
             if ( (flag >> 2) & 0x1 ) {
                 // print binary
+                hexStr << std::hex << std::uppercase << code;
+                strValue << " = " <<  DataValue::toBinary( hexStr.str() ) << " (B) ";
             }
 
             if ( (flag >> 3) & 0x1 ) {
@@ -2029,6 +2126,8 @@ string DataValue::getPrintValue(unsigned int flag)
 
             if ( (flag >> 2) & 0x1 ) {
                 // print binary
+                hexStr << std::hex << std::uppercase << value.ushort_val;
+                strValue << " = " <<  DataValue::toBinary( hexStr.str() ) << " (B) ";
             }
 
             if ( (flag >> 3) & 0x1 ) {
@@ -2048,6 +2147,8 @@ string DataValue::getPrintValue(unsigned int flag)
 
             if ( (flag >> 2) & 0x1 ) {
                 // print binary
+                hexStr << std::hex << std::uppercase << value.sshort_val;
+                strValue << " = " <<  DataValue::toBinary( hexStr.str() ) << " (B) ";
             }
 
             if ( (flag >> 3) & 0x1 ) {
@@ -2066,6 +2167,8 @@ string DataValue::getPrintValue(unsigned int flag)
 
             if ( (flag >> 2) & 0x1 ) {
                 // print binary
+                hexStr << std::hex << std::uppercase << value.uint_val;
+                strValue << " = " <<  DataValue::toBinary( hexStr.str() ) << " (B) ";
             }
 
             if ( (flag >> 3) & 0x1 ) {
@@ -2084,6 +2187,8 @@ string DataValue::getPrintValue(unsigned int flag)
 
             if ( (flag >> 2) & 0x1 ) {
                 // print binary
+                hexStr << std::hex << std::uppercase << value.sint_val;
+                strValue << " = " <<  DataValue::toBinary( hexStr.str() ) << " (B) ";
             }
 
             if ( (flag >> 3) & 0x1 ) {
@@ -2102,6 +2207,8 @@ string DataValue::getPrintValue(unsigned int flag)
 
             if ( (flag >> 2) & 0x1 ) {
                 // print binary
+                hexStr << std::hex << std::uppercase << value.ulong_val;
+                strValue << " = " <<  DataValue::toBinary( hexStr.str() ) << " (B) ";
             }
 
             if ( (flag >> 3) & 0x1 ) {
@@ -2120,6 +2227,8 @@ string DataValue::getPrintValue(unsigned int flag)
 
             if ( (flag >> 2) & 0x1 ) {
                 // print binary
+                hexStr << std::hex << std::uppercase << value.slong_val;
+                strValue << " = " <<  DataValue::toBinary( hexStr.str() ) << " (B) ";
             }
 
             if ( (flag >> 3) & 0x1 ) {
@@ -2138,6 +2247,8 @@ string DataValue::getPrintValue(unsigned int flag)
 
             if ( (flag >> 2) & 0x1 ) {
                 // print binary
+                hexStr << std::hex << std::uppercase << value.ulonglong_val;
+                strValue << " = " <<  DataValue::toBinary( hexStr.str() ) << " (B) ";
             }
 
             if ( (flag >> 3) & 0x1 ) {
@@ -2156,6 +2267,8 @@ string DataValue::getPrintValue(unsigned int flag)
 
             if ( (flag >> 2) & 0x1 ) {
                 // print binary
+                hexStr << std::hex << std::uppercase << value.slonglong_val;
+                strValue << " = " <<  DataValue::toBinary( hexStr.str() ) << " (B) ";
             }
 
             if ( (flag >> 3) & 0x1 ) {
@@ -2175,6 +2288,89 @@ string DataValue::getPrintValue(unsigned int flag)
     }
 
     return strValue.str();
+
+}
+
+
+bool DataValue::isGreaterThanBits(int bits)
+{
+    bool bret = false;
+    switch( this->type )
+    {
+    case E_TP_CHAR:
+        bret = (static_cast<int>(value.char_val) > bits);
+        break;
+    case E_TP_U_CHAR:
+        bret = (static_cast<int>(value.uchar_val) > bits);
+        break;
+    case E_TP_S_CHAR:
+        bret = (static_cast<int>(value.schar_val) > bits);
+        break;
+    case E_TP_U_SHORT:
+        bret = (static_cast<int>(value.ushort_val) > bits);
+        break;
+    case E_TP_S_SHORT:
+        bret = (static_cast<int>(value.sshort_val) > bits);
+        break;
+    case E_TP_U_INT:
+        bret = (static_cast<int>(value.uint_val) > bits);
+        break;
+    case E_TP_S_INT:
+        bret = (static_cast<int>(value.sint_val) > bits);
+        break;
+    case E_TP_U_LONG:
+        bret = (value.ulong_val > static_cast<unsigned long>(bits));
+        break;
+    case E_TP_S_LONG:
+        bret = (value.slong_val > static_cast<signed long>(bits));
+        break;
+    case E_TP_U_LONG_LONG:
+        bret = (value.ulonglong_val > static_cast<unsigned long long>(bits));
+        break;
+    case E_TP_S_LONG_LONG:
+        bret = (value.slonglong_val > static_cast<signed long long>(bits));
+        break;
+    default:
+        break;
+    }
+
+    return bret;
+}
+
+
+bool DataValue::isNegative()
+{
+    bool bret = false;
+
+    switch( this->type )
+    {
+    case E_TP_CHAR:
+        {
+            if ( numeric_limits<char>::is_signed ) {
+                bret = (value.char_val < 0);
+            } 
+        }
+        break;
+    case E_TP_S_CHAR:
+        bret = (value.schar_val < 0);
+        break;
+    case E_TP_S_SHORT:
+        bret = (value.sshort_val < 0);
+        break;
+    case E_TP_S_INT:
+        bret = (value.sint_val < 0);
+        break;
+    case E_TP_S_LONG:
+        bret = (value.slong_val < 0l);
+        break;
+    case E_TP_S_LONG_LONG:
+        bret = (value.slonglong_val < 0ll);
+        break;
+    default:
+        break;
+    }
+
+    return bret;
 
 }
 

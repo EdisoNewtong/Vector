@@ -106,6 +106,8 @@ TokenBase* OperatorParser::generateToken() // override;
 
     pGenToken->setOpType( opTp );
     pGenToken->setTokenContent( m_parsedSeq );
+    pGenToken->setBeginPos( m_beginChPos );
+    pGenToken->setEndPos( m_endChPos );
 
     return pGenToken;
 }
