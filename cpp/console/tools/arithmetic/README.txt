@@ -6,14 +6,24 @@ Usage :
 
 
 option :       | x | x | x | x | x | x | x | x |
-                                             1   : print parser detail every step
+                                             1   : bit-1 => print all varible with decimal format
+                                         1       : bit-2 => print all varible with hex format
+                                      1          : bit-3 => print all varible with binary format
+                                  1              : bit-4 => print all varible with octal format
+                              1                  : bit-5 => print parser detail every step
+
+
+
+
+
 
 
 
 flag  :       | x | x | x | x | x | x | x | x |
                                             1    : bit-1 =>  print operatorStack List All
-                                         1       : bit-2 =>  print suffix List before 
-                                     1           : bit-3 =>  print suffix List after 
-                                1                : bit-4 =>  trace operatorStack change
-                             1                   : bit-5 =>  trace suffixExpression change
-                         1                       : bit-6 =>  trace +/- property change
+                                        1        : bit-2 =>  print suffix List before build
+                                    1            : bit-3 =>  print suffix List after build
+                                1                : bit-4 =>  print suffix List after evaluate
+                            1                    : bit-5 =>  trace operatorStack change
+                        1                        : bit-6 =>  trace suffixExpression change
+                    1                            : bit-7 =>  trace +/- property change

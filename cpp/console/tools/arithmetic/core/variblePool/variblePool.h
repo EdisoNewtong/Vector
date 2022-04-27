@@ -34,7 +34,7 @@ public:
     VaribleInfo* create_a_new_varible(E_DataType dt, const std::string& varname, int defline);
     VaribleInfo* getVaribleByName(const std::string& varname);
 
-    void printAllVaribles();
+    void printAllVaribles(unsigned int flag);
 protected:
     std::unordered_map<std::string, VaribleInfo*> m_pool;
     std::vector<std::string>                      m_varDefinedOrder;

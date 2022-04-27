@@ -33,7 +33,7 @@ struct DataValue
     void doConvertion(E_DataType destinationTp);
     bool isIntZero() const;
     bool isFloatZero();
-    std::string getPrintValue();
+    std::string getPrintValue(unsigned int flag);
 
     void downerCast(E_DataType castTp);
 

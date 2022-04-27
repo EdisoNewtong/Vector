@@ -207,7 +207,7 @@ void GlobalDirector::printAllVaribles()
 {
     auto debugOpt = ParserOption::getDebugOption();
     if ( debugOpt & 0x1U ) {
-        VariblePool::getPool()->printAllVaribles();
+        VariblePool::getPool()->printAllVaribles(debugOpt);
     }
 }
 
@@ -215,7 +215,7 @@ void GlobalDirector::printAllVaribles()
 void GlobalDirector::inneralLog0(ChInfo& chInfo)
 {
     auto debugOpt = ParserOption::getDebugOption();
-    if ( (debugOpt>>1) & 0x1U ) {
+    if ( (debugOpt>>4) & 0x1U ) {
         cerr << chInfo.getPos() << " ";
     }
 
@@ -226,7 +226,7 @@ void GlobalDirector::inneralLog0(ChInfo& chInfo)
 void GlobalDirector::inneralLog1(ParserBase::E_PARSER_TYPE oldtp, ParserBase::E_PARSER_TYPE newtp)
 {
     auto debugOpt = ParserOption::getDebugOption();
-    if ( (debugOpt>>1) & 0x1U  ) {
+    if ( (debugOpt>>4) & 0x1U  ) {
         if ( oldtp == newtp ) {
             cerr << EnumUtil::enumName(oldtp) << " ";
         } else {
@@ -239,7 +239,7 @@ void GlobalDirector::inneralLog1(ParserBase::E_PARSER_TYPE oldtp, ParserBase::E_
 void GlobalDirector::inneralLog2(bool moveNext)
 {
     auto debugOpt = ParserOption::getDebugOption();
-    if ( (debugOpt>>1) & 0x1U ) {
+    if ( (debugOpt>>4) & 0x1U ) {
         cerr << (moveNext ? " Keep " : " Next ") << endl;
     }
 }
