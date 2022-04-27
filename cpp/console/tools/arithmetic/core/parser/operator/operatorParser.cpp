@@ -112,16 +112,29 @@ TokenBase* OperatorParser::generateToken() // override;
 
 
 // virtual 
-bool OperatorParser::isParsedSeqValid() // override
+bool OperatorParser::isParsedSeqValid(std::string& errorMsg) // override
 {
+    auto bret = false;
     auto sz = static_cast<int>( m_parsedSeq.size() );
     if ( sz == 1 ) {
-        return true;
+        const auto& ch = m_parsedSeq.front();
+        if ( ch == '<' || ch == '>' ) {
+            bret = false;
+            errorMsg = "Operator with 1 char is incomplete , <  or > ";
+        } else {
+            bret = true;
+        }
     } else if ( sz == 2 ) {
-        return (m_parsedSeq == "<<" ||  m_parsedSeq == ">>");
+        bret = (m_parsedSeq == "<<" ||  m_parsedSeq == ">>");
+        if ( !bret  ) {
+            errorMsg = "Operator with 2 chars is neither  <<   nor   >>";
+        }
     } else {
-        return false;
+        bret = false;
+        errorMsg = "Operator with more than 2 chars ";
     }
+
+    return bret;
 }
 
 

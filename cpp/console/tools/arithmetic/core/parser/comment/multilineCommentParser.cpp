@@ -78,8 +78,9 @@ void MultilineCommentParser::resetInternalState() // override;
 
 
 // virtual 
-bool MultilineCommentParser::isParsedSeqValid() // override;
+bool MultilineCommentParser::isParsedSeqValid(string& errorMsg) // override;
 {
+    auto bret = false;
     const int atLeastSize = 4;
     int sz = static_cast<int>( m_parsedSeq.size() );
     if ( sz < atLeastSize ) {
@@ -89,6 +90,11 @@ bool MultilineCommentParser::isParsedSeqValid() // override;
     // sz >= atLeastSize
     string prefixStr = m_parsedSeq.substr(0, 2);
     string suffixStr = m_parsedSeq.substr(sz - 2);
-    return (prefixStr == s_COMMENT_PREFIX_STR  &&  suffixStr == s_COMMENT_SUFFIX_STR);
+    bret = (prefixStr == s_COMMENT_PREFIX_STR  &&  suffixStr == s_COMMENT_SUFFIX_STR);
+    if ( !bret ) {
+        errorMsg = "MultilineComment is not startwith  \"/*\"   or  endwith   \"*/\"";
+    }
+
+    return bret;
 }
 

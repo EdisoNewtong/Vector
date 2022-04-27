@@ -37,7 +37,7 @@ public:
     virtual void pushHeadChar(char ch , const ChInfo& rChInfo) override;
 
     virtual void resetInternalState() override; 
-    virtual bool isParsedSeqValid() override;
+    virtual bool isParsedSeqValid(std::string& errorMsg) override;
 
     virtual TokenBase* generateToken() override;
 protected:

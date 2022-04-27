@@ -40,7 +40,7 @@ ParserBase::E_PARSER_TYPE BlankParser::appendChar(const ChInfo& rChInfo, E_Parse
 
 
 // virtual 
-bool BlankParser::isParsedSeqValid() // override;
+bool BlankParser::isParsedSeqValid(std::string& errorMsg) // override;
 {
     using namespace charutil;
 
@@ -50,6 +50,11 @@ bool BlankParser::isParsedSeqValid() // override;
     {
         char ch =  m_parsedSeq.at(0);
         if ( !isBlank(ch) ) {
+
+            errorMsg = "Invalid Blank char : '";
+            errorMsg += ch;
+            errorMsg += '\'';
+
             isAllBlank = false;
             break;
         }

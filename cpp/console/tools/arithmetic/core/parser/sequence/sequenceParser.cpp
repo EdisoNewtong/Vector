@@ -1417,30 +1417,56 @@ bool SequenceParser::isValid_Varible()
 
 
 // virtual
-bool SequenceParser::isParsedSeqValid()
+bool SequenceParser::isParsedSeqValid(string& errorMSg)
 {
     auto isSeqvalid = false;
 
     switch( m_guessType )
     {
     case SequenceParser::E_GUESS_DEC:
-        isSeqvalid = isValid_Decimal();
+        {
+            isSeqvalid = isValid_Decimal();
+            if ( !isSeqvalid ) {
+                errorMSg = "invalid decimal format ";
+            }
+        }
         break;
     case SequenceParser::E_GUESS_OCT:
-        isSeqvalid = isValid_Octal();
+        {
+            isSeqvalid = isValid_Octal();
+            if ( !isSeqvalid ) {
+                errorMSg = "invalid octal format ";
+            }
+        }
         break;
     case SequenceParser::E_GUESS_HEX:
-        isSeqvalid = isValid_Hex();
+        {
+            isSeqvalid = isValid_Hex();
+            if ( !isSeqvalid ) {
+                errorMSg = "invalid hex format ";
+            }
+        }
         break;
     case SequenceParser::E_GUESS_FLOAT:
-        isSeqvalid = isValid_Float();
+        {
+            isSeqvalid = isValid_Float();
+            if ( !isSeqvalid ) {
+                errorMSg = "invalid float format ";
+            }
+        }
         break;
     case SequenceParser::E_GUESS_VARIBLE:
-        isSeqvalid = isValid_Varible();
+        {
+            isSeqvalid = isValid_Varible();
+            if ( !isSeqvalid ) {
+                errorMSg = "invalid varible format ";
+            }
+        }
         break;
     default:
         break;
     }
+
 
     return isSeqvalid;
 }

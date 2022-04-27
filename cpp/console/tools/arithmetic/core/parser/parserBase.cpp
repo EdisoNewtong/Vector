@@ -131,8 +131,9 @@ TokenBase* ParserBase::generateToken()
 }
 
 // virtual 
-bool ParserBase::isParsedSeqValid()
+bool ParserBase::isParsedSeqValid(string& errorMsg)
 {
+    (void)errorMsg;
     return true;
 }
 

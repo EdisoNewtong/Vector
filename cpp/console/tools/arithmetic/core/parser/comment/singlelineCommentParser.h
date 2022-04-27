@@ -15,7 +15,7 @@ public:
 
     virtual void resetInternalState() override; 
 
-    virtual bool isParsedSeqValid() override;
+    virtual bool isParsedSeqValid(std::string& errorMSg) override;
 protected:
     bool m_bIsFinished;
     
