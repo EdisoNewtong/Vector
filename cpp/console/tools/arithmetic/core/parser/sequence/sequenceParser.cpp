@@ -604,9 +604,6 @@ ParserBase::E_PARSER_TYPE SequenceParser::appendForType_float(const ChInfo& rChI
         }
 
     } else {
-
-        auto lastCh = m_parsedSeq.back();
-
         if ( isDot(lastCh) ) {
             // last is '.'
             switch(tp)
@@ -799,7 +796,10 @@ ParserBase::E_PARSER_TYPE SequenceParser::appendForType_float(const ChInfo& rChI
                 case E_CHAR_ALPHA:
                     {
                         auto isCh_fF = false;
-                        if ( (isCh_fF=is_fF(ch) ) || is_lL(ch) ) {
+                        if ( is_eE(ch) ) {
+                            m_parsedSeq += ch;
+                            increase_eE_CntAndCheck(rChInfo);
+                        } else if ( (isCh_fF=is_fF(ch) ) || is_lL(ch) ) {
                             if ( m_numberCnt > 0 ) {
                                 if ( isCh_fF ) {
                                     increase_float_suffix_fF_CntAndCheck(rChInfo);
@@ -1109,35 +1109,35 @@ std::string SequenceParser::surroundDoubleQuoto(const std::string str)
 void  SequenceParser::throw_Int_exception(const ChInfo& rChInfo, const string& detail)
 {
     MyException e(E_THROW_INVALID_CHAR_IN_DECIMAL_SEQ, rChInfo);
-    e.setDetail(surroundDoubleQuoto(detail));
+    e.setDetail(detail);
     throw e;
 }
 
 void  SequenceParser::throw_Oct_exception(const ChInfo& rChInfo, const string& detail)
 {
     MyException e(E_THROW_INVALID_CHAR_IN_OCTAL_SEQ, rChInfo);
-    e.setDetail(surroundDoubleQuoto(detail));
+    e.setDetail(detail);
     throw e;
 }
 
 void  SequenceParser::throw_Hex_exception(const ChInfo& rChInfo, const string& detail)
 {
     MyException e(E_THROW_INVALID_CHAR_IN_HEX_SEQ, rChInfo);
-    e.setDetail(surroundDoubleQuoto(detail));
+    e.setDetail(detail);
     throw e;
 }
 
 void  SequenceParser::throw_Float_exception(const ChInfo& rChInfo, const string& detail)
 {
     MyException e(E_THROW_INVALID_CHAR_IN_FLOAT_SEQ, rChInfo);
-    e.setDetail(surroundDoubleQuoto(detail));
+    e.setDetail( detail );
     throw e;
 }
 
 void  SequenceParser::throw_Varible_exception(const ChInfo& rChInfo, const string& detail)
 {
     MyException e(E_THROW_INVALID_CHAR_IN_VARIBLE_SEQ,  rChInfo);
-    e.setDetail(surroundDoubleQuoto(detail));
+    e.setDetail(detail);
     throw e;
 }
 
