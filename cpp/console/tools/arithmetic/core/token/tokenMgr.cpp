@@ -2,7 +2,6 @@
 #include "myException.h"
 #include "enumUtil.h"
 #include "opUtil.h"
-#include "dataTypeUtil.h"
 #include "parserOption.h"
 #include <iterator>
 #include <iostream>
@@ -434,6 +433,7 @@ void TokenMgr::pushToken(TokenBase* pToken)
     // Always Push to All-Token-List
     //
     m_allTokenList.push_back(pToken);
+    tracePushedTokenWarning(pToken);
 
 
     //      Skip :  Blank / Single-Comment / Multi-Comment   <===   such types can be ignored
@@ -705,7 +705,7 @@ void TokenMgr::checkSuffixExpressionValid()
     if ( errorToken != nullptr ) {
         // auto errorTp = errorToken->getTokenType();
         MyException e(E_THROW_INVALID_SUFFIX_EXPRESSION, errorToken->getBeginPos() );
-        // e.setDetail( EnumUtil::enumName(errorTp)  + std::string(" , ") +  errorToken->getBeginPos().getPos() );
+        // e.setDetail( EnumUtil::enumName(errorTp)  + string(" , ") +  errorToken->getBeginPos().getPos() );
         throw e;
     }
 }
@@ -1574,7 +1574,12 @@ TokenBase* TokenMgr::doBitLeftShift(TokenBase* left, TokenBase* right)
     string finalExpr = leftContent + SC_OP_BIT_LEFT_SHIFT  + rightContent;
 
     DataValue leftVal  = left->getRealValue();
+    TypeBaseInfo leftTpInfo(leftVal.type);
+
     DataValue rightVal = right->getRealValue();
+    TypeBaseInfo rightTpInfo(rightVal.type);
+    DataValue rightCpVal = rightVal;
+
     E_DataType leftPromotionDt = operatorPrepairDataTypeConversion2(&leftVal, &rightVal);
 
 
@@ -1587,6 +1592,9 @@ TokenBase* TokenMgr::doBitLeftShift(TokenBase* left, TokenBase* right)
         e.setDetail( rightContent );
         throw e;
     }
+
+    tracebitShiftWarning(leftTpInfo,leftContent,  rightTpInfo, rightContent, rightCpVal);
+
 
     // E_DataType retDt = leftVal->type;
 
@@ -1609,7 +1617,12 @@ TokenBase* TokenMgr::doBitRightShift(TokenBase* left, TokenBase* right)
     string finalExpr = leftContent + SC_OP_BIT_RIGHT_SHIFT   + rightContent;
 
     DataValue leftVal  = left->getRealValue();
+    TypeBaseInfo leftTpInfo(leftVal.type);
+
     DataValue rightVal = right->getRealValue();
+    TypeBaseInfo rightTpInfo(rightVal.type);
+    DataValue rightCpVal = rightVal;
+
     E_DataType leftPromotionDt = operatorPrepairDataTypeConversion2(&leftVal, &rightVal);
 
     if ( leftVal.type == E_TP_FLOAT  ||  leftVal.type == E_TP_DOUBLE ) {
@@ -1622,7 +1635,7 @@ TokenBase* TokenMgr::doBitRightShift(TokenBase* left, TokenBase* right)
         throw e;
     }
 
-
+    tracebitShiftWarning(leftTpInfo,leftContent,  rightTpInfo, rightContent, rightCpVal);
     
 
     // calc 
@@ -1751,7 +1764,7 @@ TokenBase* TokenMgr::doBitNot(TokenBase* op, TokenBase* right)
 
 
 // static 
-TokenBase* TokenMgr::generateTmpExpression(E_DataType dt, const std::string& expression, TokenBase* begtoken, TokenBase* endtoken)
+TokenBase* TokenMgr::generateTmpExpression(E_DataType dt, const string& expression, TokenBase* begtoken, TokenBase* endtoken)
 {
     TokenBase* pTmpExpression = new TokenBase(dt);
     pTmpExpression->setAsTmpExpression();
@@ -1955,3 +1968,51 @@ void TokenMgr::tracePositiveNegativeFlag(TokenBase* pToken, E_OperatorType op)
 
 }
 
+
+
+void TokenMgr::tracePushedTokenWarning(TokenBase* pToken)
+{
+    auto flag = ParserOption::getFlag();
+    auto strWarning = pToken->getWarningContent();
+    if ( ( (flag >> 7) & 0x1)    &&   !strWarning.empty() ) {
+        auto tp = pToken->getTokenType();
+        if ( !(tp == E_TOKEN_SINGLE_LINE_COMMENT || tp == E_TOKEN_MULTI_LINE_COMMENT ) ) {
+            auto content = pToken->getTokenContent();
+            cerr << "\"" << content << "\"" << endl;
+        }
+
+        cerr << strWarning << endl;
+    }
+}
+
+
+void TokenMgr::tracebitShiftWarning(TypeBaseInfo& leftTpInfo,const string& lExpr,  TypeBaseInfo& rightTpInfo, const string& rExpr,  DataValue& rightVal)
+{
+    auto flag = ParserOption::getFlag();
+    if (  (flag >> 7) & 0x1 ) {
+        auto leftusFlag = leftTpInfo.isUnsignedType();
+        if ( !leftusFlag ) {
+            cerr << "leftOperand is not unsigned type : "  << EnumUtil::enumName(leftTpInfo.getType()) << " : " << lExpr << endl;
+        }
+
+        int leftallbits = leftTpInfo.getBits();
+        auto rightusFlag = rightTpInfo.isUnsignedType();
+        if ( !rightusFlag ) {
+            // with  +/-
+            if ( rightVal.isNegative() ) {
+                cerr << "rightOperand's value <= 0 , type = "  << EnumUtil::enumName(rightTpInfo.getType()) << " : " << rExpr << " = " << rightVal.getPrintValue(0) << endl;
+            } else {
+                // >=0
+                if ( rightVal.isGreaterThanBits(leftallbits) ) {
+                    cerr << "rightOperand's value > "  << leftallbits << " (bitwidth) , " << rExpr << " = " << rightVal.getPrintValue(0) << endl;
+                }
+            }
+            
+        } else {
+            // >=0
+            if ( rightVal.isGreaterThanBits(leftallbits) ) {
+                cerr << "rightOperand's value > "  << leftallbits << " (bitwidth) , " << rExpr << " = " << rightVal.getPrintValue(0) << endl;
+            }
+        }
+    }
+}

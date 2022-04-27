@@ -25,6 +25,7 @@ using namespace std;
 TypeBaseInfo::TypeBaseInfo(E_DataType dtype)
     : m_level(0)
     , m_bytes(0)
+    , m_bits(0)
     , m_type(dtype)
 {
     /*
@@ -34,35 +35,46 @@ TypeBaseInfo::TypeBaseInfo(E_DataType dtype)
 
     if (   m_type == E_TP_CHAR   ||     m_type == E_TP_U_CHAR       || m_type == E_TP_S_CHAR )       {
         m_level = 1;
-        m_bytes = sizeof(char);
+        m_bytes = static_cast<int>( sizeof(char) );
     } else if ( m_type == E_TP_U_SHORT      || m_type == E_TP_S_SHORT )      {
         m_level = 2;
-        m_bytes = sizeof(short);
+        m_bytes = static_cast<int>( sizeof(short) );
     } else if ( m_type == E_TP_U_INT        || m_type == E_TP_S_INT )        {
         m_level = 3;
-        m_bytes = sizeof(int);
+        m_bytes = static_cast<int>( sizeof(int) );
     } else if ( m_type == E_TP_U_LONG       || m_type == E_TP_S_LONG )       {
         m_level = 4;
-        m_bytes = sizeof(long);
+        m_bytes = static_cast<int>( sizeof(long) );
     } else if ( m_type == E_TP_U_LONG_LONG  || m_type == E_TP_S_LONG_LONG )  {
         m_level = 5;
-        m_bytes = sizeof(long long);
+        m_bytes = static_cast<int>( sizeof(long long) );
     } else if ( m_type == E_TP_FLOAT )                                       {
         m_level = 6;
-        m_bytes = sizeof(float);
+        m_bytes = static_cast<int>( sizeof(float) );
     } else if ( m_type == E_TP_DOUBLE )                                      {
         m_level = 7;
-        m_bytes = sizeof(double);
+        m_bytes = static_cast<int>( sizeof(double) );
     } 
+
+    m_bits = m_bytes * 8;
 }
 
 //
 // in 'byte' unit
 //
-size_t TypeBaseInfo::getMemorySize()
+int TypeBaseInfo::getMemorySize()
 {
     return m_bytes;
 }
+
+//
+// in 'bits' unit
+//
+int TypeBaseInfo::getBits()
+{
+    return m_bits;
+}
+
 
 unsigned int TypeBaseInfo::getLevel()
 {
@@ -76,11 +88,14 @@ E_DataType TypeBaseInfo::getType()
 
 bool TypeBaseInfo::isUnsignedType()
 {
-    return isIntegerFamily() && (   m_type == E_TP_U_CHAR   
-                                 || m_type == E_TP_U_SHORT
-                                 || m_type == E_TP_U_INT
-                                 || m_type == E_TP_U_LONG
-                                 || m_type == E_TP_U_LONG_LONG );
+    if ( m_type == E_TP_U_CHAR ) {
+        return !(numeric_limits<char>::is_signed);
+    } else {
+        return isIntegerFamily() && (   m_type == E_TP_U_SHORT
+                                    || m_type == E_TP_U_INT
+                                    || m_type == E_TP_U_LONG
+                                    || m_type == E_TP_U_LONG_LONG );
+    }
            
 }
 

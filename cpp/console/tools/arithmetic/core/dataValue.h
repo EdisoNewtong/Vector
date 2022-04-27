@@ -33,6 +33,8 @@ struct DataValue
     void doConvertion(E_DataType destinationTp);
     bool isIntZero() const;
     bool isFloatZero();
+    bool isNegative();
+    bool isGreaterThanBits(int bits);
     std::string getPrintValue(unsigned int flag);
 
     void downerCast(E_DataType castTp);
@@ -55,6 +57,10 @@ struct DataValue
     DataValue operator >> ( const DataValue& right);
 
     void doAssignment( const DataValue& right);
+
+
+    //
+    static std::string toBinary(const std::string& hex);
 
 };
 
