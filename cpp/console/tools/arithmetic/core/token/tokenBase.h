@@ -46,6 +46,9 @@ public:
 
     DataValue      getRealValue();
     void           setRealValue(const DataValue& value);
+
+    void           setWarningContent( const std::string& content);
+    std::string    getWarningContent();
 protected:
     E_TokenType    m_tokenType;
 
@@ -72,6 +75,8 @@ protected:
     ChInfo         m_endPos;
 
     DataValue      m_dataValue;
+
+    std::string    m_warningContent;
 
 public:
     static const std::string sc_str_OPEN_PARENTHESES;

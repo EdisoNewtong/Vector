@@ -10,7 +10,6 @@ const string MultilineCommentParser::s_COMMENT_SUFFIX_STR = "*/";
 
 MultilineCommentParser::MultilineCommentParser()
     : ParserBase()
-    , m_warningCnt(0)
 {
     m_type = E_PARSER_TYPE::E_MULTI_LINE_COMMENT;
     m_tokenType = E_TOKEN_MULTI_LINE_COMMENT;
@@ -41,7 +40,8 @@ ParserBase::E_PARSER_TYPE MultilineCommentParser::appendChar(const ChInfo& rChIn
     if ( lastCh == '/' && ch == '*' ) {
         //  /* 
         //      /*  inside multi-line-comment     "/*"
-        ++m_warningCnt;
+        m_warningContent += (to_string(m_warningCnt) + ". ");
+        m_warningContent += (" \"/*\" is inside  multilineComment , @" + rChInfo.getPos() + "\n");
     }
 
 
@@ -73,6 +73,7 @@ void MultilineCommentParser::receiverTransfered( const std::string& content, con
 void MultilineCommentParser::resetInternalState() // override;
 {
     m_warningCnt = 0;
+    m_warningContent = "";
 }
 
 

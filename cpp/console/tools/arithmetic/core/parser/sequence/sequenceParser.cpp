@@ -4,6 +4,7 @@
 #include "commonEnum.h"
 #include "keywordList.h"
 #include "parserOption.h"
+#include "stringNumber.h"
 #include <cassert>
 using namespace std;
 
@@ -134,6 +135,8 @@ void SequenceParser::resetInternalState() // override;
     m_oct_broken_flag = false;
     m_int_suffix_string = "";
 
+    m_warningCnt = 0;
+    m_warningContent = "";
 }
 
 
@@ -1579,16 +1582,236 @@ E_DataType SequenceParser::calcFixedLiteralDataType()
             int uCnt,lCnt;
             uCnt = lCnt = 0;
             isIntSuffixValid(&uCnt, &lCnt);
-            if ( lCnt == 0 ) {
-                dt = (uCnt>0 ? E_TP_U_INT : E_TP_S_INT);
+
+            string stripSuffixULL = m_parsedSeq.substr(0, static_cast<int>( m_parsedSeq.size() - (uCnt + lCnt) ) );
+
+            int compareType = 1;
+            if ( lCnt == 0 ) { // only 1 'u'
+                // dt = E_TP_U_INT;
+
+                switch ( m_guessType )
+                {
+                case SequenceParser::E_GUESS_DEC:
+                    {
+                        StringNumber currentNumber10(stripSuffixULL, 10);
+                        if (          currentNumber10 <=  StringNumber::s_unsignedIntMax10 ) {
+                            compareType = 1;
+                        } else if (   currentNumber10 <=  StringNumber::s_unsignedLongMax10 ) {
+                            compareType = 2;
+                        } else if (   currentNumber10 <=  StringNumber::s_unsignedLongLongMax10 ) {
+                            compareType = 3;
+                        } else {
+                            // larger than max number
+                        }
+                    }
+                    break;
+                case SequenceParser::E_GUESS_OCT:
+                    {
+                        StringNumber currentNumber8(stripSuffixULL, 8);
+                        if (          currentNumber8 <=  StringNumber::s_unsignedIntMax8 ) {
+                            compareType = 1;
+                        } else if (   currentNumber8 <=  StringNumber::s_unsignedLongMax8 ) {
+                            compareType = 2;
+                        } else if (   currentNumber8 <=  StringNumber::s_unsignedLongLongMax8 ) {
+                            compareType = 3;
+                        } else {
+                            // larger than max number
+                        }
+                    }
+                    break;
+                case SequenceParser::E_GUESS_HEX:
+                    {
+                        StringNumber currentNumber16(stripSuffixULL, 16);
+                        if (          currentNumber16 <=  StringNumber::s_unsignedIntMax16 ) {
+                            compareType = 1;
+                        } else if (   currentNumber16 <=  StringNumber::s_unsignedLongMax16 ) {
+                            compareType = 2;
+                        } else if (   currentNumber16 <=  StringNumber::s_unsignedLongLongMax16 ) {
+                            compareType = 3;
+                        } else {
+                            // larger than max number
+                        }
+                    }
+                    break;
+                default:
+                    break;
+                }
+
+
+                if ( compareType == 1 ) {
+                    dt = E_TP_U_INT;
+                } else if ( compareType == 2 ) {
+                    dt = E_TP_U_LONG;
+                } else if ( compareType == 3 ) {
+                    dt = E_TP_U_LONG_LONG;
+                } else {
+                    dt = E_TP_U_INT;
+                }
+
             } else if ( lCnt == 1 ) {
-                dt = (uCnt>0 ? E_TP_U_LONG : E_TP_S_LONG);
+                // 1 'l' , 0/1 'u'
+                // dt = (uCnt>0 ? E_TP_U_LONG : E_TP_S_LONG);
+
+                int compareType = 2;
+
+                switch ( m_guessType )
+                {
+                case SequenceParser::E_GUESS_DEC:
+                    {
+                        StringNumber currentNumber10(stripSuffixULL, 10);
+                        if (         (uCnt>0) ?  (currentNumber10 <=  StringNumber::s_unsignedLongMax10)     : (currentNumber10 <=  StringNumber::s_signedLongMax10) ) {        
+                            compareType = 2;
+                        } else if (  (uCnt>0) ?  (currentNumber10 <=  StringNumber::s_unsignedLongLongMax10) : (currentNumber10 <= StringNumber::s_signedLongLongMax10)  ) {
+                            compareType = 3;
+                        } else {
+                            // larger than max number
+                        }
+                    }
+                    break;
+                case SequenceParser::E_GUESS_OCT:
+                    {
+                        StringNumber currentNumber8(stripSuffixULL, 8);
+                        if (         (uCnt>0) ?  (currentNumber8 <=  StringNumber::s_unsignedLongMax8)     : (currentNumber8 <=  StringNumber::s_signedLongMax8) ) {        
+                            compareType = 2;
+                        } else if (  (uCnt>0) ?  (currentNumber8 <=  StringNumber::s_unsignedLongLongMax8) : (currentNumber8 <= StringNumber::s_signedLongLongMax8)  ) {
+                            compareType = 3;
+                        } else {
+                            // larger than max number
+                        }
+                    }
+                    break;
+                case SequenceParser::E_GUESS_HEX:
+                    {
+                        StringNumber currentNumber16(stripSuffixULL, 16);
+                        if (         (uCnt>0) ?  (currentNumber16 <=  StringNumber::s_unsignedLongMax16)     : (currentNumber16 <= StringNumber::s_signedLongMax16) ) {        
+                            compareType = 2;
+                        } else if (  (uCnt>0) ?  (currentNumber16 <=  StringNumber::s_unsignedLongLongMax16) : (currentNumber16 <= StringNumber::s_signedLongLongMax16)  ) {
+                            compareType = 3;
+                        } else {
+                            // larger than max number
+                        }
+                    }
+                    break;
+                default:
+                    break;
+                }
+
+                if ( compareType == 2 ) {
+                    dt = (uCnt>0 ? E_TP_U_LONG : E_TP_S_LONG);
+                } else if ( compareType == 3 ) {
+                    dt = (uCnt>0 ? E_TP_U_LONG_LONG : E_TP_S_LONG_LONG);
+                } else {
+                    dt = (uCnt>0 ? E_TP_U_LONG : E_TP_S_LONG);
+                }
+
             } else { // lCnt == 2
-                dt = (uCnt>0 ? E_TP_U_LONG_LONG : E_TP_S_LONG_LONG);
+                // 2 'l' , 0/1 'u'
+                // dt = (uCnt>0 ? E_TP_U_LONG_LONG : E_TP_S_LONG_LONG);
+
+                int compareType = 3;
+                switch ( m_guessType )
+                {
+                case SequenceParser::E_GUESS_DEC:
+                    {
+                        StringNumber currentNumber10(stripSuffixULL, 10);
+                        if ( (uCnt>0) ?   (currentNumber10 <=  StringNumber::s_unsignedLongLongMax10) : (currentNumber10 <=  StringNumber::s_signedLongLongMax10) ) {
+                            compareType = 3;
+                        } else {
+                            // larger than max number
+                        }
+                    }
+                    break;
+                case SequenceParser::E_GUESS_OCT:
+                    {
+                        StringNumber currentNumber8(stripSuffixULL, 8);
+                        if ( (uCnt>0)  ?   (currentNumber8 <=  StringNumber::s_unsignedLongLongMax8) : (currentNumber8 <=  StringNumber::s_signedLongLongMax8) ) {
+                            compareType = 3;
+                        } else {
+                            // larger than max number
+                        }
+                    }
+                    break;
+                case SequenceParser::E_GUESS_HEX:
+                    {
+                        StringNumber currentNumber16(stripSuffixULL, 16);
+                        if ( (uCnt>0)  ?   (currentNumber16 <=  StringNumber::s_unsignedLongLongMax16) : (currentNumber16 <=  StringNumber::s_signedLongLongMax16) ) {
+                            compareType = 3;
+                        } else {
+                            // larger than max number
+                        }
+                    }
+                    break;
+                default:
+                    break;
+                }
+
+
+                if ( compareType == 3 ) {
+                    dt = (uCnt>0 ? E_TP_U_LONG_LONG : E_TP_S_LONG_LONG);
+                } else {
+                    // dt = (uCnt>0 ? E_TP_U_LONG_LONG : E_TP_S_LONG_LONG);
+                }
+
             }
         } else {
-            // TODO : by real value ?
-            dt = E_TP_S_INT;
+            // 1: int     2: long      3:long long
+            int compareType = 1;
+            switch ( m_guessType )
+            {
+            case SequenceParser::E_GUESS_DEC:
+                {
+                    StringNumber currentNumber10(m_parsedSeq, 10);
+                    if (          currentNumber10 <=  StringNumber::s_signedIntMax10 ) {
+                        compareType = 1;
+                    } else if (   currentNumber10 <=  StringNumber::s_signedLongMax10 ) {
+                        compareType = 2;
+                    } else if (   currentNumber10 <=  StringNumber::s_signedLongLongMax10 ) {
+                        compareType = 3;
+                    } else {
+                        // larger than max number
+                    }
+                }
+                break;
+            case SequenceParser::E_GUESS_OCT:
+                {
+                    StringNumber currentNumber8(m_parsedSeq, 8);
+                    if (          currentNumber8 <=  StringNumber::s_signedIntMax8 ) {
+                        compareType = 1;
+                    } else if (   currentNumber8 <=  StringNumber::s_signedLongMax8 ) {
+                        compareType = 2;
+                    } else if (   currentNumber8 <=  StringNumber::s_signedLongLongMax8 ) {
+                        compareType = 3;
+                    } else {
+                        // larger than max number
+                    }
+                }
+                break;
+            case SequenceParser::E_GUESS_HEX:
+                {
+                    StringNumber currentNumber16(m_parsedSeq, 16);
+                    if (          currentNumber16 <=  StringNumber::s_signedIntMax16 ) {
+                        compareType = 1;
+                    } else if (   currentNumber16 <=  StringNumber::s_signedLongMax16 ) {
+                        compareType = 2;
+                    } else if (   currentNumber16 <=  StringNumber::s_signedLongLongMax16 ) {
+                        compareType = 3;
+                    } else {
+                        // larger than max number
+                    }
+                }
+                break;
+            default:
+                break;
+            }
+
+
+            if ( compareType == 1) {
+                dt = E_TP_S_INT;
+            } else if ( compareType == 2 ) {
+                dt = E_TP_S_LONG;
+            } else if ( compareType == 3 ) {
+                dt = E_TP_S_LONG_LONG;
+            }
         }
     }
 

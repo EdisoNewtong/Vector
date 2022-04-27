@@ -95,7 +95,7 @@ build/multilineCommentParser.o:core/parser/comment/multilineCommentParser.cpp co
 	g++    $(COMPILE_OPT)  -o  build/multilineCommentParser.o    core/parser/comment/multilineCommentParser.cpp
 
 
-build/sequenceParser.o:core/parser/sequence/sequenceParser.cpp  core/parser/sequence/sequenceParser.h core/parser/parserBase.h core/util/charUtil.h core/util/keywordList.h
+build/sequenceParser.o:core/parser/sequence/sequenceParser.cpp  core/parser/sequence/sequenceParser.h core/parser/parserBase.h core/util/charUtil.h core/util/keywordList.h core/util/stringNumber.h
 	g++    $(COMPILE_OPT)  -o  build/sequenceParser.o    core/parser/sequence/sequenceParser.cpp
 
 build/operatorParser.o:core/parser/operator/operatorParser.cpp  core/parser/operator/operatorParser.h core/parser/parserBase.h core/util/charUtil.h

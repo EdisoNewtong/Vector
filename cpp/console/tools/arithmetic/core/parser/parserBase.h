@@ -42,10 +42,15 @@ public:
 protected:
     E_PARSER_TYPE   m_type;
     E_TokenType     m_tokenType;
+
+
     std::string     m_parsedSeq;
 
     ChInfo          m_beginChPos;
     ChInfo          m_endChPos;
+
+    int m_warningCnt;
+    std::string     m_warningContent;
 
 };
 

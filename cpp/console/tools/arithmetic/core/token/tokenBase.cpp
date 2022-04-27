@@ -20,6 +20,7 @@ TokenBase::TokenBase(E_TokenType tp)
     , m_beginPos()
     , m_endPos()
     , m_dataValue()
+    , m_warningContent()
 {
     m_dataValue.type = E_TP_UNKNOWN;
 }
@@ -119,7 +120,7 @@ void TokenBase::setTokenContentWithoutSuffix(const std::string& content, const s
             case E_TP_FLOAT:
                 {
                     float f = strtof(noSuffix.c_str(), &str_end);
-                    if ( !( str_end == nullptr || ( str_end != nullptr && str_end[0] == '\0' ) ) ) {
+                    if ( !( str_end == nullptr || ( str_end != nullptr && (*str_end) == '\0' ) ) ) {
                         MyException e(E_THROW_INVALID_FLOAT_NUMBER_WHEN_CONVERTING , this->m_beginPos );
                         e.setDetail( noSuffix );
                         throw e;
@@ -131,7 +132,7 @@ void TokenBase::setTokenContentWithoutSuffix(const std::string& content, const s
             case E_TP_DOUBLE:
                 {
                     double d = strtod(noSuffix.c_str(), &str_end);
-                    if ( !( str_end == nullptr || ( str_end != nullptr && str_end[0] == '\0' ) ) ) {
+                    if ( !( str_end == nullptr || ( str_end != nullptr && (*str_end) == '\0' ) ) ) {
                         MyException e(E_THROW_INVALID_DOUBLE_NUMBER_WHEN_CONVERTING, this->m_beginPos);
                         e.setDetail( noSuffix );
                         throw e;
@@ -144,7 +145,7 @@ void TokenBase::setTokenContentWithoutSuffix(const std::string& content, const s
             case E_TP_LONG_DOUBLE:
                 {   
                     long double ld = strtold(noSuffix.c_str(), &str_end);
-                    if ( !( str_end == nullptr || ( str_end != nullptr && str_end[0] == '\0') ) ) {
+                    if ( !( str_end == nullptr || ( str_end != nullptr && (*str_end) == '\0') ) ) {
                         MyException e(E_THROW_INVALID_LONG_DOUBLE_NUMBER_WHEN_CONVERTING , this->m_beginPos);
                         e.setDetail( noSuffix );
                         throw e;
@@ -166,7 +167,7 @@ void TokenBase::setTokenContentWithoutSuffix(const std::string& content, const s
             case E_TP_S_LONG:
                 {
                     signed long l_num = strtol(noSuffix.c_str(), &str_end, base);
-                    if ( !( str_end == nullptr || ( str_end != nullptr && str_end[0] == '\0' ) ) ) {
+                    if ( !( str_end == nullptr || ( str_end != nullptr && (*str_end) == '\0' ) ) ) {
                         MyException e(E_THROW_INVALID_LONG_NUMBER_WHEN_CONVERTING , this->m_beginPos );
                         e.setDetail( noSuffix );
                         throw e;
@@ -183,7 +184,7 @@ void TokenBase::setTokenContentWithoutSuffix(const std::string& content, const s
             case E_TP_U_LONG:
                 {
                     unsigned long ul_num = strtoul(noSuffix.c_str(), &str_end, base);
-                    if ( !( str_end == nullptr || ( str_end != nullptr && str_end[0] == '\0' ) ) ) {
+                    if ( !( str_end == nullptr || ( str_end != nullptr && (*str_end) == '\0' ) ) ) {
                         MyException e(E_THROW_INVALID_UNSIGNED_LONG_NUMBER_WHEN_CONVERTING , this->m_beginPos );
                         e.setDetail( noSuffix );
                         throw e;
@@ -199,7 +200,7 @@ void TokenBase::setTokenContentWithoutSuffix(const std::string& content, const s
             case E_TP_S_LONG_LONG:
                 {
                     signed long long ll_num = strtoll(noSuffix.c_str(), &str_end, base);
-                    if ( !( str_end == nullptr || ( str_end != nullptr && str_end[0] == '\0' ) ) ) {
+                    if ( !( str_end == nullptr || ( str_end != nullptr && (*str_end) == '\0' ) ) ) {
                         MyException e(E_THROW_INVALID_LONG_LONG_NUMBER_WHEN_CONVERTING, this->m_beginPos);
                         e.setDetail( noSuffix );
                         throw e;
@@ -211,7 +212,7 @@ void TokenBase::setTokenContentWithoutSuffix(const std::string& content, const s
             case E_TP_U_LONG_LONG:
                 {
                     unsigned long long ull_num = strtoull(noSuffix.c_str(), &str_end, base);
-                    if ( !( str_end == nullptr || ( str_end != nullptr && str_end[0] == '\0'  ) ) ) {
+                    if ( !( str_end == nullptr || ( str_end != nullptr && (*str_end) == '\0'  ) ) ) {
                         MyException e(E_THROW_INVALID_UNSIGNED_LONG_LONG_NUMBER_WHEN_CONVERTING, this->m_beginPos);
                         e.setDetail( noSuffix );
                         throw e;
@@ -372,3 +373,14 @@ string    TokenBase::getExpressionContent()
 
 
 
+void   TokenBase::setWarningContent( const std::string& content)
+{
+    m_warningContent = content;
+}
+
+
+
+string    TokenBase::getWarningContent()
+{
+    return m_warningContent;
+}
