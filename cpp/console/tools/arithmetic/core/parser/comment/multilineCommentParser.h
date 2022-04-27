@@ -17,8 +17,6 @@ public:
 
     virtual bool isParsedSeqValid(std::string& errorMsg) override;
 protected:
-    int m_warningCnt;
-    
     static const std::string s_COMMENT_PREFIX_STR;
     static const std::string s_COMMENT_SUFFIX_STR;
 

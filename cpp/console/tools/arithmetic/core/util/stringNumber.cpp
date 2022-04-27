@@ -172,6 +172,14 @@ bool StringNumber::operator == (const StringNumber& right)
 
 }
 
+
+bool StringNumber::operator <=  (const StringNumber& right)
+{
+    return       ( this->operator < ( right) )
+             ||  ( this->operator == ( right) );
+}
+
+
 bool StringNumber::operator > (const StringNumber& right)
 {
     return !( this->operator < ( right) );

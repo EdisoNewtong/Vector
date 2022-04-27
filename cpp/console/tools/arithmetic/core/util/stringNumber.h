@@ -14,6 +14,8 @@ public:
 
     bool operator <  (const StringNumber& right);
     bool operator == (const StringNumber& right);
+    bool operator <=  (const StringNumber& right);
+
     bool operator >  (const StringNumber& right);
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////

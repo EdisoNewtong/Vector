@@ -12,6 +12,8 @@ ParserBase::ParserBase()
     , m_parsedSeq()
     , m_beginChPos()
     , m_endChPos()
+    , m_warningCnt(0)
+    , m_warningContent()
 {
 
 }
@@ -127,6 +129,10 @@ TokenBase* ParserBase::generateToken()
     pGenRet->setTokenContent( m_parsedSeq );
     pGenRet->setBeginPos( m_beginChPos );
     pGenRet->setEndPos(   m_endChPos );
+    if ( m_warningCnt > 0 ) {
+        string title = string("Catched ") + to_string( m_warningCnt ) + (m_warningCnt>1 ? " warings : " : " warning : ");
+        pGenRet->setWarningContent( title + "\n" + m_warningContent );
+    }
     return pGenRet;
 }
 

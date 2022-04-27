@@ -81,16 +81,20 @@ unsigned int  ParserOption::getFlag()
 string ParserOption::getUserManual()
 {
     string strUserManul;
-    strUserManul += "==================================================\n";
+    strUserManul += "====================================================================================================\n";
     strUserManul += "Usage : \n";
-    strUserManul += "\t<programName> ";
+    strUserManul += "\t<programName>   ";
+    strUserManul += "[";
     strUserManul += OPT_HINTS;
-    strUserManul += "  ";
+    strUserManul += "]";
+    strUserManul += "   ";
+    strUserManul += "[";
     strUserManul += FLGS_HINTS;
+    strUserManul += "]";
 
     strUserManul += "   ";
     strUserManul += "<sourceCode>\n";
-    strUserManul += "==================================================\n";
+    strUserManul += "====================================================================================================\n";
 
     return strUserManul;
 }

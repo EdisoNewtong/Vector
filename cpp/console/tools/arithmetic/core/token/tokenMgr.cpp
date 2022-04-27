@@ -404,20 +404,26 @@ void TokenMgr::pushToken(TokenBase* pToken)
         } else {
             //  previousToken != nullptr
             auto preTp = previousToken->getTokenType();
+            auto leftContent = previousToken->getTokenContent();
             if ( preTp  == E_TOKEN_OPERATOR ) {
                 detailstr += EnumUtil::enumName( previousToken->getOperatorType() );
             } else {
                 detailstr += EnumUtil::enumName( preTp );
             }
+            detailstr += (" \"" + leftContent + "\"");
+            detailstr += " @";
             detailstr += previousToken->getBeginPos().getPos();
 
 
+            auto rightContent = pToken->getTokenContent();
             detailstr += "  ";
             if ( tokenType == E_TOKEN_OPERATOR ) {
                 detailstr += EnumUtil::enumName( pToken->getOperatorType() );
             } else {
                 detailstr += EnumUtil::enumName( tokenType );
             }
+            detailstr += (" \"" + rightContent + "\"");
+            detailstr += " @";
             detailstr += pToken->getBeginPos().getPos();
         }
         e.setDetail(detailstr);
