@@ -104,7 +104,7 @@ protected:
     void tracePositiveNegativeFlag(TokenBase* pToken, E_OperatorType op);
 
     void tracePushedTokenWarning(TokenBase* pToken);
-    void tracebitShiftWarning(TypeBaseInfo& leftTpInfo,const std::string& lExpr,  TypeBaseInfo& rightTpInfo, const std::string& rExpr,  DataValue& rightVal);
+    void tracebitShiftWarning(bool isLeftBitShift, TypeBaseInfo& leftTpInfo,const std::string& lExpr,  TypeBaseInfo& rightTpInfo, const std::string& rExpr,  DataValue& rightVal);
 
 protected:
     static TokenMgr* s_gInstance;
