@@ -91,7 +91,7 @@ bool TypeBaseInfo::isUnsignedType()
     if ( m_type == E_TP_U_CHAR ) {
         return !(numeric_limits<char>::is_signed);
     } else {
-        return isIntegerFamily() && (   m_type == E_TP_U_SHORT
+        return isIntegerFamily() && (  m_type == E_TP_U_SHORT
                                     || m_type == E_TP_U_INT
                                     || m_type == E_TP_U_LONG
                                     || m_type == E_TP_U_LONG_LONG );

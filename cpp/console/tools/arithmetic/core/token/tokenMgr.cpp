@@ -1593,7 +1593,7 @@ TokenBase* TokenMgr::doBitLeftShift(TokenBase* left, TokenBase* right)
         throw e;
     }
 
-    tracebitShiftWarning(leftTpInfo,leftContent,  rightTpInfo, rightContent, rightCpVal);
+    tracebitShiftWarning(true, leftTpInfo,leftContent,  rightTpInfo, rightContent, rightCpVal);
 
 
     // E_DataType retDt = leftVal->type;
@@ -1635,7 +1635,7 @@ TokenBase* TokenMgr::doBitRightShift(TokenBase* left, TokenBase* right)
         throw e;
     }
 
-    tracebitShiftWarning(leftTpInfo,leftContent,  rightTpInfo, rightContent, rightCpVal);
+    tracebitShiftWarning(false, leftTpInfo,leftContent,  rightTpInfo, rightContent, rightCpVal);
     
 
     // calc 
@@ -1986,13 +1986,16 @@ void TokenMgr::tracePushedTokenWarning(TokenBase* pToken)
 }
 
 
-void TokenMgr::tracebitShiftWarning(TypeBaseInfo& leftTpInfo,const string& lExpr,  TypeBaseInfo& rightTpInfo, const string& rExpr,  DataValue& rightVal)
+void TokenMgr::tracebitShiftWarning(bool isLeftBitShift, TypeBaseInfo& leftTpInfo,const string& lExpr,  TypeBaseInfo& rightTpInfo, const string& rExpr,  DataValue& rightVal)
 {
     auto flag = ParserOption::getFlag();
     if (  (flag >> 7) & 0x1 ) {
+        auto hasprintFlag = false;
         auto leftusFlag = leftTpInfo.isUnsignedType();
         if ( !leftusFlag ) {
+            cerr << "calculating : " << (isLeftBitShift ? "<<" : ">>") << endl;
             cerr << "leftOperand is not unsigned type : "  << EnumUtil::enumName(leftTpInfo.getType()) << " : " << lExpr << endl;
+            hasprintFlag = true;
         }
 
         int leftallbits = leftTpInfo.getBits();
@@ -2000,10 +2003,18 @@ void TokenMgr::tracebitShiftWarning(TypeBaseInfo& leftTpInfo,const string& lExpr
         if ( !rightusFlag ) {
             // with  +/-
             if ( rightVal.isNegative() ) {
+                if ( !hasprintFlag ) {
+                    cerr << "calculating : " << (isLeftBitShift ? "<<" : ">>") << endl;
+                    hasprintFlag = true;
+                }
                 cerr << "rightOperand's value <= 0 , type = "  << EnumUtil::enumName(rightTpInfo.getType()) << " : " << rExpr << " = " << rightVal.getPrintValue(0) << endl;
             } else {
                 // >=0
                 if ( rightVal.isGreaterThanBits(leftallbits) ) {
+                    if ( !hasprintFlag ) {
+                        cerr << "calculating : " << (isLeftBitShift ? "<<" : ">>") << endl;
+                        hasprintFlag = true;
+                    }
                     cerr << "rightOperand's value > "  << leftallbits << " (bitwidth) , " << rExpr << " = " << rightVal.getPrintValue(0) << endl;
                 }
             }
@@ -2011,6 +2022,10 @@ void TokenMgr::tracebitShiftWarning(TypeBaseInfo& leftTpInfo,const string& lExpr
         } else {
             // >=0
             if ( rightVal.isGreaterThanBits(leftallbits) ) {
+                if ( !hasprintFlag ) {
+                    cerr << "calculating : " << (isLeftBitShift ? "<<" : ">>") << endl;
+                    hasprintFlag = true;
+                }
                 cerr << "rightOperand's value > "  << leftallbits << " (bitwidth) , " << rExpr << " = " << rightVal.getPrintValue(0) << endl;
             }
         }
