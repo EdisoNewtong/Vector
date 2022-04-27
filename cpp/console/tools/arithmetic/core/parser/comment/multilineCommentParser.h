@@ -15,7 +15,7 @@ public:
     virtual void resetInternalState() override;
     virtual void receiverTransfered( const std::string& content, const ChInfo& rChInfo) override;
 
-    virtual bool isParsedSeqValid() override;
+    virtual bool isParsedSeqValid(std::string& errorMsg) override;
 protected:
     int m_warningCnt;
     

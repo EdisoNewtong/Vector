@@ -12,7 +12,7 @@ public:
     virtual ParserBase::E_PARSER_TYPE appendChar(const ChInfo& rChInfo,  E_ParserAction& afterAction) override;
     virtual TokenBase* generateToken() override;
 
-    virtual bool isParsedSeqValid() override;
+    virtual bool isParsedSeqValid(std::string& errorMsg) override;
 protected:
 
 };

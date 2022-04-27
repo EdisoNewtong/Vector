@@ -97,14 +97,20 @@ void SinglelineCommentParser::resetInternalState() // override;
 
 
 // virtual 
-bool SinglelineCommentParser::isParsedSeqValid() // override;
+bool SinglelineCommentParser::isParsedSeqValid(string& errorMSg) // override;
 {
     using namespace charutil;
+    auto bret = false;
 
     string prefix2 = m_parsedSeq.substr(0,2);
     char   lastCh  = m_parsedSeq.back();
-    return  (prefix2 == s_SingleCommentPrefix) 
+    bret = (prefix2 == s_SingleCommentPrefix) 
         && ( m_bIsFinished || (lastCh == NEW_LINE_N || lastCh == NEW_LINE_R) );
+    if ( !bret ) {
+        errorMSg = "singlelineComment is not startwith //   or  endwith   \\r | \\n";
+    }
+
+    return bret;
 }
 
 

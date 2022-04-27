@@ -148,9 +148,10 @@ void GlobalDirector::doParse()
                     {
                         needMove2Next = !(act == E_GENERATE_TOKEN_SWITCH_TO_DEFAULT_KEEP_CURSOR);
 
-                        if ( !previousParser->isParsedSeqValid() ) {
+                        string errorMSg;
+                        if ( !previousParser->isParsedSeqValid(errorMSg) ) {
                             MyException e(E_THROW_INVALID_PARSEDSTR_TO_GENERATE_TOKEN , rChInfo);
-                            e.setDetail( previousParser->getSequence() );
+                            e.setDetail( errorMSg + string(" : ") + previousParser->getSequence() );
                             throw e;
                         } 
 
@@ -179,9 +180,10 @@ void GlobalDirector::doParse()
     // After travelsal all buff , push the final token
     //
     if ( m_pCurrentParser != m_pBaseParser ) {
-        if ( !m_pCurrentParser->isParsedSeqValid() ) {
+        string errorMSg;
+        if ( !m_pCurrentParser->isParsedSeqValid(errorMSg) ) {
             MyException e(E_THROW_INVALID_PARSEDSTR_TO_GENERATE_TOKEN , rChInfo);
-            e.setDetail( m_pCurrentParser->getSequence() );
+            e.setDetail( errorMSg + string(" : ") + m_pCurrentParser->getSequence() );
             throw e;
         }
 

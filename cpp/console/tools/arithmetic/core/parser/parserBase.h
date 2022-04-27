@@ -35,7 +35,7 @@ public:
     virtual void pushHeadChar(char ch, const ChInfo& chInfo);
 
     virtual TokenBase* generateToken();
-    virtual bool isParsedSeqValid();
+    virtual bool isParsedSeqValid(std::string& errorMsg);
 
     // ChInfo    getBeginPos();
     // ChInfo    getEndPos();
