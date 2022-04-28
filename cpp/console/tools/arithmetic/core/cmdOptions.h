@@ -3,12 +3,17 @@
 
 #include <vector>
 #include <string>
+#include <utility>
 
 class CmdOptions
 {
 public:
-    static bool analyzeOption(const std::vector<std::string>& args, std::string& errorMsg);
+    static std::pair<bool,std::string>   parseCmdArgs(const std::vector<std::string>& args);
+    static std::pair<bool,std::string>   parseCfgFile(bool hasCmdArgs, const std::string& cfgfile, const std::string& binPath);
+
     static std::string getUserManual();
+    static std::string getDefaultCfgFileName();
+    static std::string sampleCfgFile();
 
     //
     // print varible flag
@@ -32,6 +37,7 @@ public:
     static bool needTracePositiveNegativePropertyChange();
     static bool needTraceTmpExpressionProcess();
 
+    static bool needPrintSrcCodeLength();
     static bool needTraceParseTimeStep();
 
 
@@ -47,6 +53,16 @@ protected:
 
     static unsigned int s_debugOption;
     static unsigned int s_flag;
+
+    static const std::string SC_DEFAULT_FILENAME;
+    static const std::string CFG_PREFIX; // ("--cfgFile=");
+    static const std::string CFG_HINTS;  // ("--cfgFile=<filename>");
+    static const std::string SC_CFG_CONTENT;
+
+    static const std::vector< std::pair<std::string,unsigned int> > SC_DEBUG_OPTIONS_MAP;
+    static const std::vector< std::pair<std::string,unsigned int> > SC_FLAG_MAP;
+
+
 
 };
 

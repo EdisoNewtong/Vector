@@ -4,9 +4,9 @@
 #include <vector>
 
 #ifndef _WIN32 
-    #include <unistd.h>
+ #include <unistd.h>
 #else
-    #include <windows.h>
+ #include <windows.h>
 #endif
 
 
@@ -20,12 +20,6 @@
 
 using namespace std;
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Global Option
-//
-static auto bPrintFileLengthFlag = true;
-////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //
 // get the abs path for the current running process :
@@ -56,35 +50,63 @@ string getBinaryPath()
     //  Windows  Implementation Here
 #endif
     return retPath;
-
 }
 
 
 int main(int argc, char* argv[], char* env[])
 {
+    string runningPath = getBinaryPath();
+
     if ( argc < 2 ) {
         cout << CmdOptions::getUserManual() << endl;
         return -1;
     }
 
 
+    auto successParseArgs = false;
+    string cfgfile;
     // else    :   argc >= 2
     if ( argc > 2 ) {
-        //
-        // Parser cmd-line-argument
-        //
-        string errorMsg;
+        // Prepare cmd-line-argument
         vector<string> arglist;
         for( int idx = 1; idx < (argc-1); ++idx ) {
             arglist.push_back( string(argv[idx]) );
         }
 
-        auto bOptionParserFlag = CmdOptions::analyzeOption(arglist , errorMsg);
-        if ( !bOptionParserFlag ) {
-            cout << errorMsg << endl
+        auto pr = CmdOptions::parseCmdArgs(arglist);
+        if ( !pr.first ) {
+            cout << pr.second << endl
                  << CmdOptions::getUserManual() << endl;
             return -1;
+        } else {
+            // success parsing args
+            cfgfile = pr.second;
+            successParseArgs = true;
         }
+    }
+    // args == 2      ./prog   <srcCode>
+    // CmdOptions::
+
+    auto pr = CmdOptions::parseCfgFile(successParseArgs, cfgfile, runningPath);
+    if ( !pr.first ) {
+        cout << pr.second << endl
+             << CmdOptions::getUserManual() << endl;
+        cout << "== Use Default Options ===" << endl;
+        if ( !successParseArgs ) {
+            cout << "You can create a config file named : " << CmdOptions::getDefaultCfgFileName() << " to set program's runtime features. " << endl;
+            cout << "Like the following format : " << endl;
+            cout << "==================================================" << endl;
+            cout << CmdOptions::sampleCfgFile() << endl;
+            cout << "==================================================" << endl;
+        }
+    } else {
+        cout << "----------------------------------------------------------------------------------------------------" << endl;
+        if ( !successParseArgs ) {
+            cout << "[INFO] : Success Reading the ***[Default]*** config File : " << pr.second << endl; 
+        } else {
+            cout << "[INFO] : Success Reading specified config file : " << pr.second << endl;
+        }
+        cout << "----------------------------------------------------------------------------------------------------" << endl;
     }
 
 
@@ -102,7 +124,8 @@ int main(int argc, char* argv[], char* env[])
     auto filelen = static_cast<int>( file.tellg() );
     file.seekg(0, ios::beg); // file-pointer move to the begin of file
 
-    if ( bPrintFileLengthFlag ) {
+    if ( CmdOptions::needPrintSrcCodeLength()  ) {
+        cout << endl;
         cout << "==================================================" << endl;
         cout << "file.length = " << filelen << " byte(s)" << endl;
         cout << "==================================================" << endl
