@@ -1,6 +1,6 @@
 #include "globalDirector.h"
 #include "charUtil.h"
-#include "parserOption.h"
+#include "cmdOptions.h"
 #include "enumUtil.h"
 #include "myException.h"
 #include "tokenMgr.h"
@@ -207,7 +207,7 @@ void GlobalDirector::doParse()
 
 void GlobalDirector::printAllVaribles()
 {
-    if ( ParserOption::needPrintVaribleFinally() ) {
+    if ( CmdOptions::needPrintVaribleFinally() ) {
         const unsigned int printFlag = 1U;
         VariblePool::getPool()->printAllVaribles( printFlag );
     }
@@ -216,7 +216,7 @@ void GlobalDirector::printAllVaribles()
 
 void GlobalDirector::inneralLog0(ChInfo& chInfo)
 {
-    if ( ParserOption::needTraceParseTimeStep() ) {
+    if ( CmdOptions::needTraceParseTimeStep() ) {
         cerr << chInfo.getPos() << " ";
     }
 
@@ -226,7 +226,7 @@ void GlobalDirector::inneralLog0(ChInfo& chInfo)
 
 void GlobalDirector::inneralLog1(ParserBase::E_PARSER_TYPE oldtp, ParserBase::E_PARSER_TYPE newtp)
 {
-    if ( ParserOption::needTraceParseTimeStep()  ) {
+    if ( CmdOptions::needTraceParseTimeStep()  ) {
         if ( oldtp == newtp ) {
             cerr << EnumUtil::enumName(oldtp) << " ";
         } else {
@@ -238,7 +238,7 @@ void GlobalDirector::inneralLog1(ParserBase::E_PARSER_TYPE oldtp, ParserBase::E_
 
 void GlobalDirector::inneralLog2(bool moveNext)
 {
-    if ( ParserOption::needTraceParseTimeStep() ) {
+    if ( CmdOptions::needTraceParseTimeStep() ) {
         cerr << (moveNext ? " Keep " : " Next ") << endl;
     }
 }

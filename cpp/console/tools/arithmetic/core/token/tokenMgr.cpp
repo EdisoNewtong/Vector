@@ -2,7 +2,7 @@
 #include "myException.h"
 #include "enumUtil.h"
 #include "opUtil.h"
-#include "parserOption.h"
+#include "cmdOptions.h"
 #include "charUtil.h"
 #include <iterator>
 #include <iostream>
@@ -1877,7 +1877,7 @@ E_DataType TokenMgr::operatorPrepairDataTypeConversion2(DataValue* pLeftVal, Dat
 
 void TokenMgr::printOperatorStack()
 {
-    if ( ParserOption::needPrintOperatorStackAll()  ) {
+    if ( CmdOptions::needPrintOperatorStackAll()  ) {
         if ( m_opertorStack.empty() ) {
             cerr << m_execodeIdx << ". Operator Stack  : <Empty> " << endl;
         } else {
@@ -1905,11 +1905,11 @@ void TokenMgr::printSuffixExpression(int tag)
 {
     auto printFlag = false;
     if ( tag == 1 ) {
-        printFlag = ParserOption::needPrintSuffixExpressionBefore();
+        printFlag = CmdOptions::needPrintSuffixExpressionBefore();
     } else if ( tag == 2 )  {
-        printFlag = ParserOption::needPrintSuffixExpressionAfterBuild();
+        printFlag = CmdOptions::needPrintSuffixExpressionAfterBuild();
     } else if ( tag == 3 ) {
-        printFlag = ParserOption::needPrintSuffixExpressionAfterEvaluate();
+        printFlag = CmdOptions::needPrintSuffixExpressionAfterEvaluate();
     }
 
     if ( printFlag ) {
@@ -1956,7 +1956,7 @@ void TokenMgr::popAllOperatorStack()
 
 void TokenMgr::traceOperatorStack(TokenBase* pToken, bool push)
 {
-    if ( ParserOption::needTraceOperatorStackChange()  ) {
+    if ( CmdOptions::needTraceOperatorStackChange()  ) {
         if ( push ) {
             cerr << "OpStack->Push \"" <<  pToken->getTokenContent() << "\"" << endl;
         } else {
@@ -1969,7 +1969,7 @@ void TokenMgr::traceOperatorStack(TokenBase* pToken, bool push)
 
 void TokenMgr::traceSuffixExpression(TokenBase* pToken, bool push)
 {
-    if ( ParserOption::needTraceSuffixExpressionChange()  ) {
+    if ( CmdOptions::needTraceSuffixExpressionChange()  ) {
         if ( push ) {
             cerr << "SuffixExpr->Push \"" <<  pToken->getTokenContent() << "\"" << endl;
         } else {
@@ -1982,7 +1982,7 @@ void TokenMgr::traceSuffixExpression(TokenBase* pToken, bool push)
 
 void TokenMgr::tracePositiveNegativeFlag(TokenBase* pToken, E_OperatorType op)
 {
-    if ( ParserOption::needTracePositiveNegativePropertyChange() ) {
+    if ( CmdOptions::needTracePositiveNegativePropertyChange() ) {
         auto isAdd = (op == E_ADD);
         if ( pToken == nullptr ) {
             cerr << "chOp : nullptr , so " << (isAdd ? " add -> positive" : " minus -> negative ") << endl;
@@ -2001,7 +2001,7 @@ void TokenMgr::tracePushedTokenWarning(TokenBase* pToken)
     using namespace charutil;
 
     auto strWarning = pToken->getWarningContent();
-    if (  ParserOption::needPrintParseRuntimeWarning()    &&   !strWarning.empty() ) {
+    if (  CmdOptions::needPrintParseRuntimeWarning()    &&   !strWarning.empty() ) {
         auto tp = pToken->getTokenType();
         cerr << SC_WARNING_TITLE;
         if ( !(tp == E_TOKEN_SINGLE_LINE_COMMENT || tp == E_TOKEN_MULTI_LINE_COMMENT ) ) {
@@ -2023,7 +2023,7 @@ void TokenMgr::tracebitShiftWarning(bool isLeftBitShift, TokenBase* left,  Token
     // Core Core Core : config this flag
     static const bool SC_B_SHOULD_ALWAYS_CHECK_RIGHT_VALUE = true;
 
-    if (  ParserOption::needPrintParseRuntimeWarning()  ) {
+    if (  CmdOptions::needPrintParseRuntimeWarning()  ) {
         auto hasprintFlag = false;
         auto hasLeftWarningFlag = false;
         auto hasRightWarningFlag = false;
@@ -2099,7 +2099,7 @@ void TokenMgr::traceNegativeOperation(TokenBase* right)
 {
     using namespace charutil;
 
-    if ( ParserOption::needPrintParseRuntimeWarning()  ) {
+    if ( CmdOptions::needPrintParseRuntimeWarning()  ) {
         if ( right->isVarible()  ) {
             DataValue rightVal = right->getRealValue();
 
@@ -2121,7 +2121,7 @@ void TokenMgr::traceNegativeOperation(TokenBase* right)
 
 void TokenMgr::traceTmpOpResult(const std::string& expr, DataValue& retValue)
 {
-    if ( ParserOption::needTraceTmpExpressionProcess() ) {
+    if ( CmdOptions::needTraceTmpExpressionProcess() ) {
         TypeBaseInfo retTpInfo(retValue.type);
         cerr << "[INFO] : " << expr << " => " << EnumUtil::enumName( retTpInfo.getType() ) << " , value = " << retValue.getPrintValue(0) << endl;
     }
@@ -2136,7 +2136,7 @@ void TokenMgr::traceUnInitializedVarWhenUsed(TokenBase* pToken)
 
     using namespace charutil;
 
-    if ( ParserOption::needPrintParseRuntimeWarning() ) {
+    if ( CmdOptions::needPrintParseRuntimeWarning() ) {
         cerr << SC_WARNING_TITLE;
         cerr << " varible named " << SINGLE_QUOTO << pToken->getTokenContent() << SINGLE_QUOTO << " is not initialized before used " << endl;
     }

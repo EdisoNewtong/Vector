@@ -1,4 +1,4 @@
-#include "parserOption.h"
+#include "cmdOptions.h"
 #include "charUtil.h"
 
 #include <iostream>
@@ -18,13 +18,13 @@ namespace
 //
 // static Member Data Init
 //
-unsigned int ParserOption::s_debugOption = 0;
-unsigned int ParserOption::s_flag = 1;
+unsigned int CmdOptions::s_debugOption = 0;
+unsigned int CmdOptions::s_flag = 1;
 
 
 
 // static 
-bool ParserOption::analyzeOption(const vector<string>& args, string& errorMsg)
+bool CmdOptions::analyzeOption(const vector<string>& args, string& errorMsg)
 {
     using namespace charutil;
 
@@ -66,14 +66,14 @@ bool ParserOption::analyzeOption(const vector<string>& args, string& errorMsg)
 
 
 
-// unsigned int  ParserOption::getDebugOption()
+// unsigned int  CmdOptions::getDebugOption()
 // {
 //     return s_debugOption;
 // }
 
 
 
-// unsigned int  ParserOption::getFlag()
+// unsigned int  CmdOptions::getFlag()
 // {
 //     return s_flag;
 // }
@@ -81,7 +81,7 @@ bool ParserOption::analyzeOption(const vector<string>& args, string& errorMsg)
 
 
 // static 
-string ParserOption::getUserManual()
+string CmdOptions::getUserManual()
 {
     string strUserManul;
     strUserManul += "====================================================================================================\n";
@@ -109,10 +109,10 @@ string ParserOption::getUserManual()
 //
 // print varible flag
 //
-bool ParserOption::needPrintVaribleFinally() { return (  s_flag      & 0x1U) != 0; }
-bool ParserOption::needPrintVarible_16()     { return ( (s_flag>> 1) & 0x1U) != 0; }
-bool ParserOption::needPrintVarible_2()      { return ( (s_flag>> 2) & 0x1U) != 0; }
-bool ParserOption::needPrintVarible_8()      { return ( (s_flag>> 3) & 0x1U) != 0; }
+bool CmdOptions::needPrintVaribleFinally() { return (  s_flag      & 0x1U) != 0; }
+bool CmdOptions::needPrintVarible_16()     { return ( (s_flag>> 1) & 0x1U) != 0; }
+bool CmdOptions::needPrintVarible_2()      { return ( (s_flag>> 2) & 0x1U) != 0; }
+bool CmdOptions::needPrintVarible_8()      { return ( (s_flag>> 3) & 0x1U) != 0; }
 
 
 
@@ -120,20 +120,20 @@ bool ParserOption::needPrintVarible_8()      { return ( (s_flag>> 3) & 0x1U) != 
 //
 // Debug Intermediate Process
 //
-bool ParserOption::needPrintParseRuntimeWarning()            { return  (  s_debugOption          & 0x1) != 0;  }
+bool CmdOptions::needPrintParseRuntimeWarning()            { return  (  s_debugOption          & 0x1) != 0;  }
 
-bool ParserOption::needPrintOperatorStackAll()               { return  ( (s_debugOption>>1)      & 0x1) != 0;  }
-bool ParserOption::needPrintSuffixExpressionBefore()         { return  ( (s_debugOption>>2)      & 0x1) != 0;  }
-bool ParserOption::needPrintSuffixExpressionAfterBuild()     { return  ( (s_debugOption>>3)      & 0x1) != 0;  }
-bool ParserOption::needPrintSuffixExpressionAfterEvaluate()  { return  ( (s_debugOption>>4)      & 0x1) != 0;  }
+bool CmdOptions::needPrintOperatorStackAll()               { return  ( (s_debugOption>>1)      & 0x1) != 0;  }
+bool CmdOptions::needPrintSuffixExpressionBefore()         { return  ( (s_debugOption>>2)      & 0x1) != 0;  }
+bool CmdOptions::needPrintSuffixExpressionAfterBuild()     { return  ( (s_debugOption>>3)      & 0x1) != 0;  }
+bool CmdOptions::needPrintSuffixExpressionAfterEvaluate()  { return  ( (s_debugOption>>4)      & 0x1) != 0;  }
 
-bool ParserOption::needTraceOperatorStackChange()            { return  ( (s_debugOption>>5)      & 0x1) != 0;  }
-bool ParserOption::needTraceSuffixExpressionChange()         { return  ( (s_debugOption>>6)      & 0x1) != 0;  }
+bool CmdOptions::needTraceOperatorStackChange()            { return  ( (s_debugOption>>5)      & 0x1) != 0;  }
+bool CmdOptions::needTraceSuffixExpressionChange()         { return  ( (s_debugOption>>6)      & 0x1) != 0;  }
 
-bool ParserOption::needTracePositiveNegativePropertyChange() { return  ( (s_debugOption>>7)      & 0x1) != 0;  }
-bool ParserOption::needTraceTmpExpressionProcess()           { return  ( (s_debugOption>>8)      & 0x1) != 0;  }
+bool CmdOptions::needTracePositiveNegativePropertyChange() { return  ( (s_debugOption>>7)      & 0x1) != 0;  }
+bool CmdOptions::needTraceTmpExpressionProcess()           { return  ( (s_debugOption>>8)      & 0x1) != 0;  }
 
-bool ParserOption::needTraceParseTimeStep()                  { return  ( (s_debugOption>>23)     & 0x1) != 0;  }
+bool CmdOptions::needTraceParseTimeStep()                  { return  ( (s_debugOption>>23)     & 0x1) != 0;  }
 
 
 
