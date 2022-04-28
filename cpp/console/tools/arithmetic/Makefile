@@ -35,7 +35,7 @@ build/arithMetic.o:arithMetic.cpp core/commonEnum.h core/myException.h core/buff
 
 
 
-build/myException.o:core/myException.cpp core/myException.h core/buff.h core/commonEnum.h core/util/enumUtil.h
+build/myException.o:core/myException.cpp core/myException.h core/buff.h core/commonEnum.h core/util/enumUtil.h  core/util/charUtil.h
 	g++    $(COMPILE_OPT)  -o  build/myException.o   core/myException.cpp
 
 build/buff.o:core/buff.cpp core/buff.h
@@ -70,10 +70,10 @@ build/globalDirector.o:core/globalDirector.cpp  core/globalDirector.h   core/par
 ####################################################################################################
 ####################################################################################################
 ####################################################################################################
-build/tokenBase.o:core/token/tokenBase.cpp core/token/tokenBase.h core/commonEnum.h core/util/keywordList.h core/myException.h core/buff.h core/dataValue.h
+build/tokenBase.o:core/token/tokenBase.cpp core/token/tokenBase.h core/commonEnum.h core/util/keywordList.h core/myException.h core/buff.h core/dataValue.h  core/util/charUtil.h
 	g++    $(COMPILE_OPT)  -o  build/tokenBase.o    core/token/tokenBase.cpp
 
-build/tokenMgr.o:core/token/tokenMgr.cpp  core/token/tokenMgr.h core/token/tokenBase.h core/myException.h   core/variblePool/variblePool.h core/util/opUtil.h core/util/dataTypeUtil.h core/parser/parserOption.h
+build/tokenMgr.o:core/token/tokenMgr.cpp  core/token/tokenMgr.h core/token/tokenBase.h core/myException.h   core/variblePool/variblePool.h core/util/opUtil.h core/util/dataTypeUtil.h core/parser/parserOption.h   core/util/charUtil.h
 	g++    $(COMPILE_OPT)  -o  build/tokenMgr.o   core/token/tokenMgr.cpp
 
 
@@ -106,7 +106,7 @@ build/semicolonParser.o:core/parser/semicolon/semicolonParser.cpp  core/parser/s
 	g++    $(COMPILE_OPT)  -o  build/semicolonParser.o    core/parser/semicolon/semicolonParser.cpp 
 
 
-build/parserOption.o:core/parser/parserOption.cpp  core/parser/parserOption.h
+build/parserOption.o:core/parser/parserOption.cpp  core/parser/parserOption.h core/util/charUtil.h
 	g++    $(COMPILE_OPT)  -o  build/parserOption.o    core/parser/parserOption.cpp
 
 

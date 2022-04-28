@@ -1104,8 +1104,9 @@ bool SequenceParser::isOctValid()
 
 std::string SequenceParser::surroundDoubleQuoto(const std::string str)
 {
-    static const string QUOTO("\"");
-    string retstr = QUOTO + str + QUOTO;
+    using namespace charutil;
+
+    string retstr = DOUBLE_QUOTO + str + DOUBLE_QUOTO;
     return retstr;
 }
 
@@ -1504,7 +1505,7 @@ TokenBase* SequenceParser::generateToken() // override;
             if ( KeyWordList::isKeyWord( m_parsedSeq) ) {
                 if ( !KeyWordList::isTypeKeyWord( m_parsedSeq ) ) { 
                     MyException e(E_THROW_VARIBLE_CANNOT_BE_KEYWORD );
-                    e.setDetail( surroundDoubleQuoto(m_parsedSeq) + string(" @") + m_beginChPos.getPos() );
+                    e.setDetail( surroundDoubleQuoto(m_parsedSeq) + string(" @") + m_beginChPos.getPos(0) );
                     throw e;
                 } 
 
@@ -1554,6 +1555,10 @@ TokenBase* SequenceParser::generateToken() // override;
         } else {
             pGenToken->setTokenContent( m_parsedSeq );
         }
+
+        if ( m_warningCnt > 0 ) {
+            pGenToken->setWarningContent( m_warningContent );
+        }
     }
 
     return pGenToken;
@@ -1562,7 +1567,10 @@ TokenBase* SequenceParser::generateToken() // override;
 
 E_DataType SequenceParser::calcFixedLiteralDataType()
 {
+    using namespace charutil;
+
     E_DataType dt = E_TP_UNKNOWN;
+
     if ( m_guessType == E_GUESS_FLOAT ) {
         if( m_float_reachSuffix_fF_lL_flag ) {
             dt = E_TP_FLOAT; // suffix is 'f/F'
@@ -1603,7 +1611,7 @@ E_DataType SequenceParser::calcFixedLiteralDataType()
                         } else {
                             // larger than max number
                             ++m_warningCnt;
-                            m_warningContent = m_parsedSeq + " (10) is out of max int : " + StringNumber::s_unsignedLongLongMax10.getStrNumber();
+                            m_warningContent = m_parsedSeq + " (10) is out of max int : " + StringNumber::s_unsignedLongLongMax10.getStrNumber() + SPACE_1 + "@" + m_beginChPos.getPos(0);
                         }
                     }
                     break;
@@ -1619,7 +1627,7 @@ E_DataType SequenceParser::calcFixedLiteralDataType()
                         } else {
                             // larger than max number
                             ++m_warningCnt;
-                            m_warningContent = m_parsedSeq + " (8) is out of max int : " + StringNumber::s_unsignedLongLongMax8.getStrNumber();
+                            m_warningContent = m_parsedSeq + " (8) is out of max int : " + StringNumber::s_unsignedLongLongMax8.getStrNumber() + SPACE_1 + "@" + m_beginChPos.getPos(0);
                         }
                     }
                     break;
@@ -1635,7 +1643,7 @@ E_DataType SequenceParser::calcFixedLiteralDataType()
                         } else {
                             // larger than max number
                             ++m_warningCnt;
-                            m_warningContent = m_parsedSeq + " (16) is out of max int : " + StringNumber::s_unsignedLongLongMax16.getStrNumber();
+                            m_warningContent = m_parsedSeq + " (16) is out of max int : " + StringNumber::s_unsignedLongLongMax16.getStrNumber() + SPACE_1 + "@" + m_beginChPos.getPos(0);
                         }
                     }
                     break;
@@ -1672,10 +1680,11 @@ E_DataType SequenceParser::calcFixedLiteralDataType()
                             ++m_warningCnt;
                             m_warningContent = m_parsedSeq + " (10) is out of max int : ";
                             if ( uCnt > 0 ) {
-                                m_warningContent += StringNumber::s_unsignedLongMax10.getStrNumber();
+                                m_warningContent += (StringNumber::s_unsignedLongMax10.getStrNumber());
                             } else {
-                                m_warningContent += StringNumber::s_signedLongMax10.getStrNumber();
+                                m_warningContent += (StringNumber::s_signedLongMax10.getStrNumber());
                             }
+                            m_warningContent += (SPACE_1 + "@" + m_beginChPos.getPos(0) );
                         }
 
                         /*
@@ -1707,6 +1716,7 @@ E_DataType SequenceParser::calcFixedLiteralDataType()
                             } else {
                                 m_warningContent += StringNumber::s_signedLongMax8.getStrNumber();
                             }
+                            m_warningContent += (SPACE_1 + "@" + m_beginChPos.getPos(0) );
                         }
 
                         /* 
@@ -1740,6 +1750,7 @@ E_DataType SequenceParser::calcFixedLiteralDataType()
                             } else {
                                 m_warningContent += StringNumber::s_signedLongMax16.getStrNumber();
                             }
+                            m_warningContent += (SPACE_1 + "@" + m_beginChPos.getPos(0) );
                         }
 
                         /*
@@ -1794,6 +1805,7 @@ E_DataType SequenceParser::calcFixedLiteralDataType()
                             } else {
                                 m_warningContent += StringNumber::s_signedLongLongMax10.getStrNumber();
                             }
+                            m_warningContent += (SPACE_1 + "@" + m_beginChPos.getPos(0) );
                         }
                     }
                     break;
@@ -1811,6 +1823,7 @@ E_DataType SequenceParser::calcFixedLiteralDataType()
                             } else {
                                 m_warningContent += StringNumber::s_signedLongLongMax8.getStrNumber();
                             }
+                            m_warningContent += (SPACE_1 + "@" + m_beginChPos.getPos(0) );
                         }
                     }
                     break;
@@ -1828,6 +1841,7 @@ E_DataType SequenceParser::calcFixedLiteralDataType()
                             } else {
                                 m_warningContent += StringNumber::s_signedLongLongMax16.getStrNumber();
                             }
+                            m_warningContent += (SPACE_1 + "@" + m_beginChPos.getPos(0) );
                         }
                     }
                     break;
@@ -1864,6 +1878,7 @@ E_DataType SequenceParser::calcFixedLiteralDataType()
                         // larger than max number
                         ++m_warningCnt;
                         m_warningContent = m_parsedSeq + " (10) is out of max int : " + StringNumber::s_signedLongLongMax10.getStrNumber();
+                        m_warningContent += (SPACE_1 + "@" + m_beginChPos.getPos(0) );
                     }
                 }
                 break;
@@ -1880,6 +1895,7 @@ E_DataType SequenceParser::calcFixedLiteralDataType()
                         // larger than max number
                         ++m_warningCnt;
                         m_warningContent = m_parsedSeq + " (8) is out of max int : " + StringNumber::s_signedLongLongMax8.getStrNumber();
+                        m_warningContent += (SPACE_1 + "@" + m_beginChPos.getPos(0) );
                     }
                 }
                 break;
@@ -1896,6 +1912,7 @@ E_DataType SequenceParser::calcFixedLiteralDataType()
                         // larger than max number
                         ++m_warningCnt;
                         m_warningContent = m_parsedSeq + " (16) is out of max int : " + StringNumber::s_signedLongLongMax16.getStrNumber();
+                        m_warningContent += (SPACE_1 + "@" + m_beginChPos.getPos(0) );
                     }
                 }
                 break;

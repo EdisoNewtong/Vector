@@ -103,8 +103,13 @@ protected:
     void traceSuffixExpression(TokenBase* pToken, bool push);
     void tracePositiveNegativeFlag(TokenBase* pToken, E_OperatorType op);
 
+    void traceNegativeOperation(TokenBase* right);
+
     void tracePushedTokenWarning(TokenBase* pToken);
-    void tracebitShiftWarning(bool isLeftBitShift, TypeBaseInfo& leftTpInfo,const std::string& lExpr,  TypeBaseInfo& rightTpInfo, const std::string& rExpr,  DataValue& rightVal);
+    void tracebitShiftWarning(bool isLeftBitShift, TokenBase* left,  TokenBase* right);
+
+    void traceTmpOpResult(const std::string& expr, DataValue& retValue);
+    void traceUnInitializedVarWhenUsed(TokenBase* pToken);
 
 protected:
     static TokenMgr* s_gInstance;
@@ -118,6 +123,7 @@ protected:
     static void clearTmpGenTokenPool();
 
 
+    static bool s_treatUnInitializedVaribleAsError;
 
 protected:
     std::vector<TokenBase*> m_allTokenList;

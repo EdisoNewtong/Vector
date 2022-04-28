@@ -2292,43 +2292,43 @@ string DataValue::getPrintValue(unsigned int flag)
 }
 
 
-bool DataValue::isGreaterThanBits(int bits)
+bool DataValue::isGreaterEqualBitsWidth(int bits)
 {
     bool bret = false;
     switch( this->type )
     {
     case E_TP_CHAR:
-        bret = (static_cast<int>(value.char_val) > bits);
+        bret = (static_cast<int>(value.char_val) >= bits);
         break;
     case E_TP_U_CHAR:
-        bret = (static_cast<int>(value.uchar_val) > bits);
+        bret = (static_cast<int>(value.uchar_val) >= bits);
         break;
     case E_TP_S_CHAR:
-        bret = (static_cast<int>(value.schar_val) > bits);
+        bret = (static_cast<int>(value.schar_val) >= bits);
         break;
     case E_TP_U_SHORT:
-        bret = (static_cast<int>(value.ushort_val) > bits);
+        bret = (static_cast<int>(value.ushort_val) >= bits);
         break;
     case E_TP_S_SHORT:
-        bret = (static_cast<int>(value.sshort_val) > bits);
+        bret = (static_cast<int>(value.sshort_val) >= bits);
         break;
     case E_TP_U_INT:
-        bret = (static_cast<int>(value.uint_val) > bits);
+        bret = (static_cast<int>(value.uint_val) >= bits);
         break;
     case E_TP_S_INT:
-        bret = (static_cast<int>(value.sint_val) > bits);
+        bret = (static_cast<int>(value.sint_val) >= bits);
         break;
     case E_TP_U_LONG:
-        bret = (value.ulong_val > static_cast<unsigned long>(bits));
+        bret = (value.ulong_val >= static_cast<unsigned long>(bits));
         break;
     case E_TP_S_LONG:
-        bret = (value.slong_val > static_cast<signed long>(bits));
+        bret = (value.slong_val >= static_cast<signed long>(bits));
         break;
     case E_TP_U_LONG_LONG:
-        bret = (value.ulonglong_val > static_cast<unsigned long long>(bits));
+        bret = (value.ulonglong_val >= static_cast<unsigned long long>(bits));
         break;
     case E_TP_S_LONG_LONG:
-        bret = (value.slonglong_val > static_cast<signed long long>(bits));
+        bret = (value.slonglong_val >= static_cast<signed long long>(bits));
         break;
     default:
         break;
@@ -2373,4 +2373,41 @@ bool DataValue::isNegative()
     return bret;
 
 }
+
+
+bool DataValue::isMinimumNegativeNumber()
+{
+    bool bret = false;
+
+    switch( this->type )
+    {
+    case E_TP_CHAR:
+        {
+            if ( numeric_limits<char>::is_signed ) {
+                bret = ( value.char_val == numeric_limits<char>::min() );
+            } 
+        }
+        break;
+    case E_TP_S_CHAR:
+        bret = (value.schar_val == numeric_limits<signed char>::min() );
+        break;
+    case E_TP_S_SHORT:
+        bret = (value.sshort_val == numeric_limits<signed short>::min() );
+        break;
+    case E_TP_S_INT:
+        bret = (value.sint_val == numeric_limits<signed int>::min() );
+        break;
+    case E_TP_S_LONG:
+        bret = (value.slong_val == numeric_limits<signed long>::min() );
+        break;
+    case E_TP_S_LONG_LONG:
+        bret = (value.slonglong_val == numeric_limits<signed long long>::min() );
+        break;
+    default:
+        break;
+    }
+
+    return bret;
+}
+
 

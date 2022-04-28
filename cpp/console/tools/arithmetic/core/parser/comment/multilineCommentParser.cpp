@@ -40,8 +40,9 @@ ParserBase::E_PARSER_TYPE MultilineCommentParser::appendChar(const ChInfo& rChIn
     if ( lastCh == '/' && ch == '*' ) {
         //  /* 
         //      /*  inside multi-line-comment     "/*"
+        ++m_warningCnt;
         m_warningContent += (to_string(m_warningCnt) + ". ");
-        m_warningContent += (" \"/*\" is inside  multilineComment , @" + rChInfo.getPos() + "\n");
+        m_warningContent += (" \"/*\" is inside  multilineComment , @" + rChInfo.getPos(0) + "\n");
     }
 
 

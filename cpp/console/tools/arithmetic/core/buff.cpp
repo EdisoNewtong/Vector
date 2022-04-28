@@ -15,33 +15,34 @@ ChInfo::ChInfo()
 }
 
 
-string ChInfo::getPos() const
+string ChInfo::getPos(int flag /* = 1 */) const
 {
-    static const string SC_SINGLE_QUOTO(1,'\'');
-    static const string SC_SPACE(1,' ');
+    using namespace charutil;
 
     string positionStr;
-    if ( ch <= 32 ) {
-        if ( ch == 32 ) {
-            positionStr = "' ' ";
-        } else if ( ch == '\t' ) {
-            positionStr = "'\\t' ";
-        } else if ( ch == '\r' ) {
-            positionStr = "'\\r' ";
-        } else if ( ch == '\n' ) {
-            positionStr = "'\\n' ";
+    positionStr = (to_string(line) + ":" + to_string(column) + " (idx=" + to_string(cursorIdx) + ") ");
+    if ( flag == 1 ) {
+        if ( ch <= 32 ) {
+            if ( ch == 32 ) {
+                positionStr += "' ' ";
+            } else if ( ch == '\t' ) {
+                positionStr += "'\\t' ";
+            } else if ( ch == '\r' ) {
+                positionStr += "'\\r' ";
+            } else if ( ch == '\n' ) {
+                positionStr += "'\\n' ";
+            } else {
+                auto code = static_cast<int>(ch & 0xFF);
+                positionStr += string("'?' code = ") + to_string(code) + SPACE_1;
+            }
+        } else if ( ch == 127 ) {
+                positionStr += "'Del' ";
         } else {
-            auto code = static_cast<int>(ch & 0xFF);
-            positionStr = string("'?' code = ") + to_string(code) + SC_SPACE;
+            // normal printable character
+            positionStr += (SINGLE_QUOTO + string(1, ch) + SINGLE_QUOTO + SPACE_1);
         }
-    } else if ( ch == 127 ) {
-            positionStr = "'Del' ";
-    } else {
-        // normal printable character
-        positionStr = (SC_SINGLE_QUOTO + string(1, ch) + SC_SINGLE_QUOTO + SC_SPACE);
     }
 
-    positionStr += (to_string(line) + ":" + to_string(column) + " (idx=" + to_string(cursorIdx) + ") ");
     return positionStr;
 }
 

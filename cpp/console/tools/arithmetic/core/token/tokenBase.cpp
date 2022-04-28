@@ -1,14 +1,11 @@
 #include "tokenBase.h"
 #include "keywordList.h"
 #include "myException.h"
+#include "charUtil.h"
 #include <cstdlib>
 using namespace std;
 
 
-// static 
-const std::string TokenBase::sc_str_OPEN_PARENTHESES("(");
-const std::string TokenBase::sc_str_CLOSE_PARENTHESES(")");
-const std::string TokenBase::sc_str_BLANK(" ");
 
 
 TokenBase::TokenBase(E_TokenType tp)
@@ -353,17 +350,19 @@ void TokenBase::setRealValue(const DataValue& value)
 
 string    TokenBase::getExpressionContent()
 {
+    using namespace charutil;
+
     string retExpr = getTokenContent();
 
     if ( isTmpExpression() ) {
         int sz = static_cast<int>( retExpr.size() );
         if ( sz >= 2 ) {
-            if (    !(   retExpr.front() == TokenBase::sc_str_OPEN_PARENTHESES.at(0)
-                      && retExpr.back()  == TokenBase::sc_str_CLOSE_PARENTHESES.at(0) ) )
+            if (    !(   retExpr.front() == STR_OPEN_PARENTHESES.at(0)
+                      && retExpr.back()  == STR_CLOSE_PARENTHESES.at(0) ) )
             {
-                retExpr = (TokenBase::sc_str_OPEN_PARENTHESES + sc_str_BLANK
+                retExpr = (STR_OPEN_PARENTHESES + SPACE_1
                            + retExpr 
-                           + sc_str_BLANK + TokenBase::sc_str_CLOSE_PARENTHESES);
+                           + SPACE_1 + STR_CLOSE_PARENTHESES);
             }
         } 
     } 

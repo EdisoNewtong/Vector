@@ -3,6 +3,7 @@
 #include "enumUtil.h"
 #include "opUtil.h"
 #include "parserOption.h"
+#include "charUtil.h"
 #include <iterator>
 #include <iostream>
 using namespace std;
@@ -14,6 +15,8 @@ using namespace std;
 //////////////////////////////////////////////////////////////////////
 
 TokenMgr* TokenMgr::s_gInstance = nullptr;
+bool TokenMgr::s_treatUnInitializedVaribleAsError = false;
+
 
 const TokenMgr::OpPairCfg TokenMgr::s_OpPairCfgTable[s_TABLE_SIZE] = {
     /* left,                right,  closeAvaliable,  seperateAvaliable  */
@@ -67,6 +70,21 @@ const TokenMgr::OpPairCfg TokenMgr::s_OpPairCfgTable[s_TABLE_SIZE] = {
     { E_CLOSE_PARENTHESES,  E_MULTIPLY,   true,          true  },  // (...)*   or  (...)   *
     { E_ASSIGNMENT,         E_MULTIPLY,  false,         false  },
 
+
+    //
+    //   Don't worry about the following statement          
+    //                                +//
+    //                             or + //
+    //                             or +/* ... */
+    //                             or + /* ... */
+    //                             or ? //
+    //                             or ? /* ... */
+    //==========================================================================================================================================
+    //
+    // Because while push token , the token is parsed none by parser explicitly and be assigned as a token type
+    //
+    //==========================================================================================================================================
+    //
     /* left,                right,  closeAvaliable,  seperateAvaliable  */
     // ?                      /
     { E_ADD,                E_DIVIDE,    false,         false  },
@@ -234,7 +252,7 @@ const TokenMgr::OpPairCfg TokenMgr::s_OpPairCfgTable[s_TABLE_SIZE] = {
     { E_BIT_LEFT_SHIFT,     E_CLOSE_PARENTHESES, false,   false  },
     { E_BIT_RIGHT_SHIFT,    E_CLOSE_PARENTHESES, false,   false  },  
     { E_OPEN_PARENTHESES,   E_CLOSE_PARENTHESES, false,   false  },  // () or  (    )   Empty content inside  () is not allowed
-    { E_CLOSE_PARENTHESES,  E_CLOSE_PARENTHESES, true,    true },    // )) or  ) ) are both avaliable
+    { E_CLOSE_PARENTHESES,  E_CLOSE_PARENTHESES, true,    true   },    // )) or  ) ) are both avaliable
     { E_ASSIGNMENT,         E_CLOSE_PARENTHESES, false,   false  },  // =) = ) are neither allowed
 
     /* left,                right,  closeAvaliable,  seperateAvaliable  */
@@ -378,6 +396,8 @@ TokenMgr::~TokenMgr()
 
 void TokenMgr::pushToken(TokenBase* pToken)
 {
+    using namespace charutil;
+
     if ( pToken == nullptr ) {
         MyException e(E_THROW_NULL_PTR);
 
@@ -393,12 +413,12 @@ void TokenMgr::pushToken(TokenBase* pToken)
     auto isValid = pr.first;
     if ( !isValid ) {
         auto previousToken = pr.second;
-        MyException e(E_THROW_INVALID_TOKEN_RELATIONSHIP, pToken->getBeginPos() );
+        MyException e(E_THROW_INVALID_TOKEN_RELATIONSHIP);
 
         string detailstr;
         if ( previousToken == nullptr ) {
             detailstr += "nullptr";
-            detailstr += "       ";
+            detailstr += SPACE_4;
             detailstr += pToken->getBeginPos().getPos();
         } else {
             //  previousToken != nullptr
@@ -411,19 +431,19 @@ void TokenMgr::pushToken(TokenBase* pToken)
             }
             detailstr += (" \"" + leftContent + "\"");
             detailstr += " @";
-            detailstr += previousToken->getBeginPos().getPos();
+            detailstr += previousToken->getBeginPos().getPos(0);
 
 
             auto rightContent = pToken->getTokenContent();
-            detailstr += "  ";
+            detailstr += SPACE_1;
             if ( tokenType == E_TOKEN_OPERATOR ) {
                 detailstr += EnumUtil::enumName( pToken->getOperatorType() );
             } else {
                 detailstr += EnumUtil::enumName( tokenType );
             }
-            detailstr += (" \"" + rightContent + "\"");
+            detailstr += (SPACE_1 + DOUBLE_QUOTO + rightContent + DOUBLE_QUOTO);
             detailstr += " @";
-            detailstr += pToken->getBeginPos().getPos();
+            detailstr += pToken->getBeginPos().getPos(0);
         }
         e.setDetail(detailstr);
         throw e;
@@ -483,7 +503,7 @@ void TokenMgr::executeCode()
     m_suffixExpression.clear();
 
     if ( m_oneSentence.empty() ) {
-        // TODO : create a warning : empty sentence , do nothing
+        // TODO or not : create a warning : empty sentence , do nothing
         return;
     }
     
@@ -628,6 +648,8 @@ void TokenMgr::executeCode()
 
 void TokenMgr::buildSuffixExpression(int sentenceType, VaribleInfo* pVarible, int varibleIdx)
 {
+
+
     auto varibleToken = m_oneSentence.at(varibleIdx);
     string varibleName = varibleToken->getTokenContent();
     int sententSz = static_cast<int>( m_oneSentence.size() );
@@ -652,8 +674,14 @@ void TokenMgr::buildSuffixExpression(int sentenceType, VaribleInfo* pVarible, in
                     throw e;
                 }
 
-                if ( !(pVisitedVaribleInfo->isInitialed) ) {
-                    // TODO : generate a warning   
+                if ( idx > varibleIdx &&  !(pVisitedVaribleInfo->isInitialed) ) {
+                    if ( TokenMgr::s_treatUnInitializedVaribleAsError ) {
+                        MyException e(E_THROW_VARIBLE_NOT_INITIALIZED_BEFORE_USED, pToken->getBeginPos() );
+                        throw e;
+                    } else {
+                        traceUnInitializedVarWhenUsed(pToken);
+                    }
+
                 }
 
                 pToken->setRealValue( pVisitedVaribleInfo->dataVal );
@@ -1028,6 +1056,8 @@ void TokenMgr::popUntilOpenParentheses()
 
 E_DataType TokenMgr::checkPrefixKeyWordsAndGetDataType(int varIdx, string& varname)
 {
+    using namespace charutil;
+
     E_DataType dt = E_TP_UNKNOWN;
 
     auto isAllKeyWord = true;
@@ -1046,7 +1076,7 @@ E_DataType TokenMgr::checkPrefixKeyWordsAndGetDataType(int varIdx, string& varna
             ++keywordsCnt;
             keywordsSeq += pToken->getTokenContent();
             if ( idx != (varIdx-1) ) {
-                keywordsSeq += " ";
+                keywordsSeq += SPACE_1;
             }
         }
     }
@@ -1321,7 +1351,7 @@ pair<TokenBase*,TokenBase*> TokenMgr::getPreviousToken()
 //      Binary Op
 TokenBase* TokenMgr::doAdd(TokenBase* left, TokenBase* right)
 {
-    static const string SC_OP_ADD = " + ";
+    using namespace charutil;
 
     string leftContent  = left->getExpressionContent();
     string rightContent = right->getExpressionContent();
@@ -1333,6 +1363,7 @@ TokenBase* TokenMgr::doAdd(TokenBase* left, TokenBase* right)
 
     E_DataType retDt = leftVal.type;
     DataValue sumRet = leftVal + rightVal;
+    traceTmpOpResult(finalExpr, sumRet);
 
     TokenBase* ret = generateTmpExpression(retDt, finalExpr, left, right);
     ret->setRealValue( sumRet );
@@ -1342,7 +1373,7 @@ TokenBase* TokenMgr::doAdd(TokenBase* left, TokenBase* right)
 
 TokenBase* TokenMgr::doMinus(TokenBase* left, TokenBase* right)
 {
-    static const string SC_OP_MINUS = " - ";
+    using namespace charutil;
 
     string leftContent  = left->getExpressionContent();
     string rightContent = right->getExpressionContent();
@@ -1354,6 +1385,7 @@ TokenBase* TokenMgr::doMinus(TokenBase* left, TokenBase* right)
 
     E_DataType retDt = leftVal.type;
     DataValue substractRet = leftVal - rightVal;
+    traceTmpOpResult(finalExpr, substractRet);
 
     TokenBase* ret = generateTmpExpression(retDt, finalExpr, left, right);
     ret->setBeginPos( left->getBeginPos() );
@@ -1365,7 +1397,7 @@ TokenBase* TokenMgr::doMinus(TokenBase* left, TokenBase* right)
 
 TokenBase* TokenMgr::doMultiply(TokenBase* left, TokenBase* right)
 {
-    static const string SC_OP_MULTIPLY = " * ";
+    using namespace charutil;
 
     string leftContent  = left->getExpressionContent();
     string rightContent = right->getExpressionContent();
@@ -1377,6 +1409,7 @@ TokenBase* TokenMgr::doMultiply(TokenBase* left, TokenBase* right)
 
     E_DataType retDt = leftVal.type;
     DataValue multiRet = leftVal * rightVal;
+    traceTmpOpResult(finalExpr, multiRet);
 
     TokenBase* ret = generateTmpExpression(retDt, finalExpr, left, right);
     ret->setRealValue( multiRet  );
@@ -1386,7 +1419,7 @@ TokenBase* TokenMgr::doMultiply(TokenBase* left, TokenBase* right)
 
 TokenBase* TokenMgr::doDivide(TokenBase* left, TokenBase* right)
 {
-    static const string SC_OP_DIVIDE = " * ";
+    using namespace charutil;
 
     string leftContent  = left->getExpressionContent();
     string rightContent = right->getExpressionContent();
@@ -1395,8 +1428,6 @@ TokenBase* TokenMgr::doDivide(TokenBase* left, TokenBase* right)
     DataValue leftVal  = left->getRealValue();
     DataValue rightVal = right->getRealValue();
     operatorPrepairDataTypeConversion2(&leftVal, &rightVal);
-
-
 
 
     E_DataType retDt = leftVal.type;
@@ -1410,9 +1441,10 @@ TokenBase* TokenMgr::doDivide(TokenBase* left, TokenBase* right)
         // if ( detailstr.empty() ) {
         //     e.setDetail( rightContent + " is zero Value ( in Divide ) @"  +  right->getBeginPos().getPos() );
         // } 
-        e.setDetail( rightContent + " is zero Value ( in Divide ) @"  +  right->getBeginPos().getPos() );
+        e.setDetail( rightContent + " is zero Value ( in Divide ) @"  +  right->getBeginPos().getPos(0) );
         throw;
     }
+    traceTmpOpResult(finalExpr, divideRet);
 
     TokenBase* ret = generateTmpExpression(retDt, finalExpr, left, right);
     ret->setRealValue( divideRet );
@@ -1422,7 +1454,7 @@ TokenBase* TokenMgr::doDivide(TokenBase* left, TokenBase* right)
 
 TokenBase* TokenMgr::doMod(TokenBase* left, TokenBase* right)
 {
-    static const string SC_OP_MOD = " % ";
+    using namespace charutil;
 
     string leftContent  = left->getExpressionContent();
     string rightContent = right->getExpressionContent();
@@ -1451,10 +1483,12 @@ TokenBase* TokenMgr::doMod(TokenBase* left, TokenBase* right)
         modRet  = (leftVal % rightVal);
     } catch ( MyException& e ) {
         if ( e.getDetail().empty() ) {
-            e.setDetail( rightContent + " is zero Value ( in Modulo ) @" + right->getBeginPos().getPos() );
+            e.setDetail( rightContent + " is zero Value ( in Modulo ) @" + right->getBeginPos().getPos(0) );
         }
         throw;
     }
+
+    traceTmpOpResult(finalExpr, modRet);
 
     TokenBase* ret = generateTmpExpression(retDt, finalExpr, left, right);
     ret->setRealValue( modRet );
@@ -1464,7 +1498,7 @@ TokenBase* TokenMgr::doMod(TokenBase* left, TokenBase* right)
 
 TokenBase* TokenMgr::doBitAnd(TokenBase* left, TokenBase* right)
 {
-    static const string SC_OP_BIT_AND = " & ";
+    using namespace charutil;
 
     string leftContent  = left->getExpressionContent();
     string rightContent = right->getExpressionContent();
@@ -1488,6 +1522,7 @@ TokenBase* TokenMgr::doBitAnd(TokenBase* left, TokenBase* right)
 
     // calc 
     DataValue bitAndRet = (leftVal & rightVal);
+    traceTmpOpResult(finalExpr, bitAndRet);
 
     TokenBase* ret = generateTmpExpression(retDt, finalExpr, left, right);
     ret->setRealValue( bitAndRet );
@@ -1498,7 +1533,7 @@ TokenBase* TokenMgr::doBitAnd(TokenBase* left, TokenBase* right)
 
 TokenBase* TokenMgr::doBitOr(TokenBase* left, TokenBase* right)
 {
-    static const string SC_OP_BIT_OR = " | ";
+    using namespace charutil;
 
     string leftContent  = left->getExpressionContent();
     string rightContent = right->getExpressionContent();
@@ -1523,6 +1558,7 @@ TokenBase* TokenMgr::doBitOr(TokenBase* left, TokenBase* right)
 
     // calc 
     DataValue bitOrRet = (leftVal | rightVal);
+    traceTmpOpResult(finalExpr, bitOrRet);
 
     TokenBase* ret = generateTmpExpression(retDt, finalExpr, left, right);
     ret->setRealValue( bitOrRet );
@@ -1532,7 +1568,7 @@ TokenBase* TokenMgr::doBitOr(TokenBase* left, TokenBase* right)
 
 TokenBase* TokenMgr::doBitXor(TokenBase* left, TokenBase* right)
 {
-    static const string SC_OP_BIT_XOR = " ^ ";
+    using namespace charutil;
 
     string leftContent  = left->getExpressionContent();
     string rightContent = right->getExpressionContent();
@@ -1558,6 +1594,7 @@ TokenBase* TokenMgr::doBitXor(TokenBase* left, TokenBase* right)
 
     // calc 
     DataValue bitXOrRet = (leftVal ^ rightVal);
+    traceTmpOpResult(finalExpr, bitXOrRet);
 
     TokenBase* ret = generateTmpExpression(retDt, finalExpr, left, right);
     ret->setRealValue( bitXOrRet );
@@ -1567,18 +1604,14 @@ TokenBase* TokenMgr::doBitXor(TokenBase* left, TokenBase* right)
 
 TokenBase* TokenMgr::doBitLeftShift(TokenBase* left, TokenBase* right)
 {
-    static const string SC_OP_BIT_LEFT_SHIFT = " << ";
+    using namespace charutil;
 
     string leftContent  = left->getExpressionContent();
     string rightContent = right->getExpressionContent();
     string finalExpr = leftContent + SC_OP_BIT_LEFT_SHIFT  + rightContent;
 
     DataValue leftVal  = left->getRealValue();
-    TypeBaseInfo leftTpInfo(leftVal.type);
-
     DataValue rightVal = right->getRealValue();
-    TypeBaseInfo rightTpInfo(rightVal.type);
-    DataValue rightCpVal = rightVal;
 
     E_DataType leftPromotionDt = operatorPrepairDataTypeConversion2(&leftVal, &rightVal);
 
@@ -1593,7 +1626,7 @@ TokenBase* TokenMgr::doBitLeftShift(TokenBase* left, TokenBase* right)
         throw e;
     }
 
-    tracebitShiftWarning(true, leftTpInfo,leftContent,  rightTpInfo, rightContent, rightCpVal);
+    tracebitShiftWarning(true, left, right);
 
 
     // E_DataType retDt = leftVal->type;
@@ -1601,6 +1634,8 @@ TokenBase* TokenMgr::doBitLeftShift(TokenBase* left, TokenBase* right)
     // calc 
     DataValue bitLeftShiftRet = (leftVal << rightVal);
     bitLeftShiftRet.downerCast( leftPromotionDt );
+
+    traceTmpOpResult(finalExpr, bitLeftShiftRet);
 
     TokenBase* ret = generateTmpExpression(leftPromotionDt, finalExpr, left, right);
     ret->setRealValue( bitLeftShiftRet );
@@ -1610,18 +1645,14 @@ TokenBase* TokenMgr::doBitLeftShift(TokenBase* left, TokenBase* right)
 
 TokenBase* TokenMgr::doBitRightShift(TokenBase* left, TokenBase* right)
 {
-    static const string SC_OP_BIT_RIGHT_SHIFT = " >> ";
+    using namespace charutil;
 
     string leftContent  = left->getExpressionContent();
     string rightContent = right->getExpressionContent();
     string finalExpr = leftContent + SC_OP_BIT_RIGHT_SHIFT   + rightContent;
 
     DataValue leftVal  = left->getRealValue();
-    TypeBaseInfo leftTpInfo(leftVal.type);
-
     DataValue rightVal = right->getRealValue();
-    TypeBaseInfo rightTpInfo(rightVal.type);
-    DataValue rightCpVal = rightVal;
 
     E_DataType leftPromotionDt = operatorPrepairDataTypeConversion2(&leftVal, &rightVal);
 
@@ -1635,12 +1666,13 @@ TokenBase* TokenMgr::doBitRightShift(TokenBase* left, TokenBase* right)
         throw e;
     }
 
-    tracebitShiftWarning(false, leftTpInfo,leftContent,  rightTpInfo, rightContent, rightCpVal);
+    tracebitShiftWarning(false, left, right);
     
 
     // calc 
     DataValue bitRightShiftRet = (leftVal >> rightVal);
     bitRightShiftRet.downerCast( leftPromotionDt );
+    traceTmpOpResult(finalExpr, bitRightShiftRet);
 
     TokenBase* ret = generateTmpExpression(leftPromotionDt, finalExpr, left, right);
     ret->setRealValue( bitRightShiftRet );
@@ -1650,7 +1682,7 @@ TokenBase* TokenMgr::doBitRightShift(TokenBase* left, TokenBase* right)
 
 TokenBase* TokenMgr::doAssignment(TokenBase* left, TokenBase* right)
 {
-    static const string SC_OP_BIT_ASSIGNMENT = " = ";
+    using namespace charutil;
 
     VaribleInfo* toBeAssignmentVar = nullptr;
     auto content = left->getTokenContent();
@@ -1682,6 +1714,7 @@ TokenBase* TokenMgr::doAssignment(TokenBase* left, TokenBase* right)
     toBeAssignmentVar->dataVal.doAssignment( leftVal );
     toBeAssignmentVar->isInitialed = true; // set as initialed
 
+    traceTmpOpResult(finalExpr, leftVal);
 
     TokenBase* ret = generateTmpExpression( leftVal.type , finalExpr, left, right);
     ret->setRealValue( leftVal );
@@ -1695,8 +1728,7 @@ TokenBase* TokenMgr::doAssignment(TokenBase* left, TokenBase* right)
 //      Unary Op
 TokenBase* TokenMgr::doPositive(TokenBase* op, TokenBase* right)
 {
-    static const string SC_OP_POSITIVE_BEGIN = "+";
-    // static const string SC_OP_POSITIVE_END = " )";
+    using namespace charutil;
 
     string rightContent = right->getExpressionContent();
     string finalExpr = SC_OP_POSITIVE_BEGIN + rightContent;
@@ -1705,7 +1737,8 @@ TokenBase* TokenMgr::doPositive(TokenBase* op, TokenBase* right)
     E_DataType rightPromotionDt = operatorPrepairDataTypeConversion1(&rightVal);
 
     // calc 
-    DataValue positiveRet = +(rightVal);
+    DataValue positiveRet = +rightVal;
+    traceTmpOpResult(finalExpr, positiveRet);
 
     TokenBase* ret = generateTmpExpression(rightPromotionDt, finalExpr, op, right);
     ret->setRealValue( positiveRet );
@@ -1715,18 +1748,19 @@ TokenBase* TokenMgr::doPositive(TokenBase* op, TokenBase* right)
 
 TokenBase* TokenMgr::doNegative(TokenBase* op, TokenBase* right)
 {
-    static const string SC_OP_NEGATIVE_BEGIN = "-";
-    // static const string SC_OP_POSITIVE_END = " )";
+    using namespace charutil;
 
     string rightContent = right->getExpressionContent();
     string finalExpr = SC_OP_NEGATIVE_BEGIN + rightContent;
 
     DataValue rightVal = right->getRealValue(); 
+    traceNegativeOperation(right);
 
     E_DataType rightPromotionDt = operatorPrepairDataTypeConversion1(&rightVal);
 
     // calc 
     DataValue negativeRet = -(rightVal);
+    traceTmpOpResult(finalExpr, negativeRet);
 
     TokenBase* ret = generateTmpExpression(rightPromotionDt, finalExpr, op, right);
     ret->setRealValue( negativeRet  );
@@ -1737,8 +1771,7 @@ TokenBase* TokenMgr::doNegative(TokenBase* op, TokenBase* right)
 
 TokenBase* TokenMgr::doBitNot(TokenBase* op, TokenBase* right)
 {
-    static const string SC_OP_BIT_NOT_BEGIN = "~";
-    // static const string SC_OP_POSITIVE_END = " )";
+    using namespace charutil;
 
     string rightContent = right->getExpressionContent();
     string finalExpr = SC_OP_BIT_NOT_BEGIN + rightContent;
@@ -1755,6 +1788,7 @@ TokenBase* TokenMgr::doBitNot(TokenBase* op, TokenBase* right)
 
     // calc 
     DataValue bitNotRet   =    ~rightVal;
+    traceTmpOpResult(finalExpr, bitNotRet);
 
     TokenBase* ret = generateTmpExpression(rightPromotionDt, finalExpr, op, right);
     ret->setRealValue( bitNotRet );
@@ -1850,7 +1884,6 @@ void TokenMgr::printOperatorStack()
             cerr << m_execodeIdx << ". Operator Stack  : <Empty> " << endl;
         } else {
             cerr << m_execodeIdx <<". Operator Stack  : " <<  m_opertorStack.size() << " Element(s)" << endl;
-            // cerr << "\t";
 
             auto idx = 0;
             auto it = m_opertorStack.begin();
@@ -1887,7 +1920,6 @@ void TokenMgr::printSuffixExpression(int tag)
             cerr << m_execodeIdx << "-" << tag << " . Suffix Expression List  : <Empty> " << endl;
         } else {
             cerr << m_execodeIdx << "-" << tag << ". Suffix Expression List  : " <<  m_suffixExpression.size() << " Element(s)" << endl;
-            // cerr << "\t";
 
             auto idx = 0;
             auto it = m_suffixExpression.begin();
@@ -1972,30 +2004,55 @@ void TokenMgr::tracePositiveNegativeFlag(TokenBase* pToken, E_OperatorType op)
 
 void TokenMgr::tracePushedTokenWarning(TokenBase* pToken)
 {
+    using namespace charutil;
+
     auto flag = ParserOption::getFlag();
     auto strWarning = pToken->getWarningContent();
     if ( ( (flag >> 7) & 0x1)    &&   !strWarning.empty() ) {
         auto tp = pToken->getTokenType();
+        cerr << SC_WARNING_TITLE;
         if ( !(tp == E_TOKEN_SINGLE_LINE_COMMENT || tp == E_TOKEN_MULTI_LINE_COMMENT ) ) {
             auto content = pToken->getTokenContent();
             cerr << "\"" << content << "\"" << endl;
         }
 
-        cerr << strWarning << endl;
+        cerr << strWarning 
+             << endl
+             << endl;
     }
 }
 
 
-void TokenMgr::tracebitShiftWarning(bool isLeftBitShift, TypeBaseInfo& leftTpInfo,const string& lExpr,  TypeBaseInfo& rightTpInfo, const string& rExpr,  DataValue& rightVal)
+void TokenMgr::tracebitShiftWarning(bool isLeftBitShift, TokenBase* left,  TokenBase* right)
 {
+    using namespace charutil;
+
+    // Core Core Core : config this flag
+    static const bool SC_B_SHOULD_ALWAYS_CHECK_RIGHT_VALUE = true;
+
     auto flag = ParserOption::getFlag();
     if (  (flag >> 7) & 0x1 ) {
         auto hasprintFlag = false;
+        auto hasLeftWarningFlag = false;
+        auto hasRightWarningFlag = false;
+
+        TypeBaseInfo leftTpInfo(  left->getRealValue().type );
+        TypeBaseInfo rightTpInfo( right->getRealValue().type );
+        DataValue rightVal = right->getRealValue();
+
         auto leftusFlag = leftTpInfo.isUnsignedType();
-        if ( !leftusFlag ) {
-            cerr << "calculating : " << (isLeftBitShift ? "<<" : ">>") << endl;
-            cerr << "leftOperand is not unsigned type : "  << EnumUtil::enumName(leftTpInfo.getType()) << " : " << lExpr << endl;
+        if ( left->isVarible() &&  !leftusFlag ) {
+            cerr << SC_WARNING_TITLE;
+            cerr << " calculating : " << (isLeftBitShift ? "<<" : ">>") << endl;
+            cerr << "leftOperand is not unsigned type : "  << EnumUtil::enumName(leftTpInfo.getType()) << " : " << left->getTokenContent() << SPACE_1 << "@" << left->getBeginPos().getPos(0) << endl;
             hasprintFlag = true;
+            hasLeftWarningFlag = true;
+        }
+
+        auto checkRightFlag =  SC_B_SHOULD_ALWAYS_CHECK_RIGHT_VALUE || right->isVarible();
+
+        if ( !checkRightFlag )  {
+            return;
         }
 
         int leftallbits = leftTpInfo.getBits();
@@ -2004,30 +2061,95 @@ void TokenMgr::tracebitShiftWarning(bool isLeftBitShift, TypeBaseInfo& leftTpInf
             // with  +/-
             if ( rightVal.isNegative() ) {
                 if ( !hasprintFlag ) {
-                    cerr << "calculating : " << (isLeftBitShift ? "<<" : ">>") << endl;
+                    cerr << SC_WARNING_TITLE;
+                    cerr << " calculating : " << (isLeftBitShift ? "<<" : ">>") << endl;
                     hasprintFlag = true;
                 }
-                cerr << "rightOperand's value <= 0 , type = "  << EnumUtil::enumName(rightTpInfo.getType()) << " : " << rExpr << " = " << rightVal.getPrintValue(0) << endl;
+
+                cerr << "rightOperand's value <= 0 , type = "  << EnumUtil::enumName(rightTpInfo.getType()) << " : " << right->getTokenContent() << " = " << rightVal.getPrintValue(0) << endl;
+                hasRightWarningFlag = true;
             } else {
                 // >=0
-                if ( rightVal.isGreaterThanBits(leftallbits) ) {
+                if ( rightVal.isGreaterEqualBitsWidth(leftallbits) ) {
                     if ( !hasprintFlag ) {
-                        cerr << "calculating : " << (isLeftBitShift ? "<<" : ">>") << endl;
+                        cerr << SC_WARNING_TITLE;
+                        cerr << " calculating : " << (isLeftBitShift ? "<<" : ">>") << endl;
                         hasprintFlag = true;
                     }
-                    cerr << "rightOperand's value > "  << leftallbits << " (bitwidth) , " << rExpr << " = " << rightVal.getPrintValue(0) << endl;
+
+                    cerr << "rightOperand's value >= "  << leftallbits << " (Bits-Width) , " << right->getTokenContent() << " = " << rightVal.getPrintValue(0) << endl;
+                    hasRightWarningFlag = true;
                 }
             }
-            
         } else {
             // >=0
-            if ( rightVal.isGreaterThanBits(leftallbits) ) {
+            if ( rightVal.isGreaterEqualBitsWidth(leftallbits) ) {
                 if ( !hasprintFlag ) {
-                    cerr << "calculating : " << (isLeftBitShift ? "<<" : ">>") << endl;
+                    cerr << SC_WARNING_TITLE;
+                    cerr << " calculating : " << (isLeftBitShift ? "<<" : ">>") << endl;
                     hasprintFlag = true;
                 }
-                cerr << "rightOperand's value > "  << leftallbits << " (bitwidth) , " << rExpr << " = " << rightVal.getPrintValue(0) << endl;
+
+                cerr << "rightOperand's value > "  << leftallbits << " (Bits-Width) , " << right->getTokenContent() << " = " << rightVal.getPrintValue(0) << endl;
+                hasRightWarningFlag = true;
+            }
+        }
+
+
+        if ( hasLeftWarningFlag || hasRightWarningFlag ) {
+            cerr << endl;
+        }
+    }
+}
+
+
+void TokenMgr::traceNegativeOperation(TokenBase* right)
+{
+    using namespace charutil;
+
+    auto flag = ParserOption::getFlag();
+    if ( (flag >> 7) & 0x1 ) {
+        if ( right->isVarible()  ) {
+            DataValue rightVal = right->getRealValue();
+
+            TypeBaseInfo tpInfo( rightVal.type );
+            if ( tpInfo.isIntegerFamily() ) {
+
+                cerr << SC_WARNING_TITLE;
+                if ( tpInfo.isUnsignedType() ) {
+                    cerr << " operator - (negative) on a unsigned varible \""<< right->getTokenContent() << "\"  doesn't take effect on a number whose value is always >= 0 " << endl;
+                } else if ( rightVal.isMinimumNegativeNumber() ) {
+                    cerr << " operator - (negative) on signed varible \""<< right->getTokenContent() << "\"  doesn't take effect on a number ( minimum negative number ) to making a result as a +number > 0" << endl;
+                }
             }
         }
     }
+
+}
+
+
+void TokenMgr::traceTmpOpResult(const std::string& expr, DataValue& retValue)
+{
+    auto flag = ParserOption::getFlag();
+    if ( (flag >> 8) & 0x1 ) {
+        TypeBaseInfo retTpInfo(retValue.type);
+        cerr << "[INFO] : " << expr << " => " << EnumUtil::enumName( retTpInfo.getType() ) << " , value = " << retValue.getPrintValue(0) << endl;
+    }
+}
+
+
+
+
+
+void TokenMgr::traceUnInitializedVarWhenUsed(TokenBase* pToken)
+{
+
+    using namespace charutil;
+
+    auto flag = ParserOption::getFlag();
+    if ( (flag >> 7) & 0x1 ) {
+        cerr << SC_WARNING_TITLE;
+        cerr << " varible named " << SINGLE_QUOTO << pToken->getTokenContent() << SINGLE_QUOTO << " is not initialized before used " << endl;
+    }
+
 }
