@@ -42,7 +42,7 @@ build/buff.o:core/buff.cpp core/buff.h
 	g++    $(COMPILE_OPT)  -o  build/buff.o   core/buff.cpp
 
 
-build/dataValue.o:core/dataValue.cpp   core/dataValue.h   core/commonEnum.h   core/myException.h  core/util/dataTypeUtil.h
+build/dataValue.o:core/dataValue.cpp   core/dataValue.h   core/commonEnum.h   core/myException.h  core/util/dataTypeUtil.h  core/parser/parserOption.h
 	g++    $(COMPILE_OPT)  -o  build/dataValue.o   core/dataValue.cpp
 
 

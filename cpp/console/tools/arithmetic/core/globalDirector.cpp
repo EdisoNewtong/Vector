@@ -207,17 +207,16 @@ void GlobalDirector::doParse()
 
 void GlobalDirector::printAllVaribles()
 {
-    auto debugOpt = ParserOption::getDebugOption();
-    if ( debugOpt & 0x1U ) {
-        VariblePool::getPool()->printAllVaribles(debugOpt);
+    if ( ParserOption::needPrintVaribleFinally() ) {
+        const unsigned int printFlag = 1U;
+        VariblePool::getPool()->printAllVaribles( printFlag );
     }
 }
 
 
 void GlobalDirector::inneralLog0(ChInfo& chInfo)
 {
-    auto debugOpt = ParserOption::getDebugOption();
-    if ( (debugOpt>>4) & 0x1U ) {
+    if ( ParserOption::needTraceParseTimeStep() ) {
         cerr << chInfo.getPos() << " ";
     }
 
@@ -227,8 +226,7 @@ void GlobalDirector::inneralLog0(ChInfo& chInfo)
 
 void GlobalDirector::inneralLog1(ParserBase::E_PARSER_TYPE oldtp, ParserBase::E_PARSER_TYPE newtp)
 {
-    auto debugOpt = ParserOption::getDebugOption();
-    if ( (debugOpt>>4) & 0x1U  ) {
+    if ( ParserOption::needTraceParseTimeStep()  ) {
         if ( oldtp == newtp ) {
             cerr << EnumUtil::enumName(oldtp) << " ";
         } else {
@@ -240,8 +238,7 @@ void GlobalDirector::inneralLog1(ParserBase::E_PARSER_TYPE oldtp, ParserBase::E_
 
 void GlobalDirector::inneralLog2(bool moveNext)
 {
-    auto debugOpt = ParserOption::getDebugOption();
-    if ( (debugOpt>>4) & 0x1U ) {
+    if ( ParserOption::needTraceParseTimeStep() ) {
         cerr << (moveNext ? " Keep " : " Next ") << endl;
     }
 }
