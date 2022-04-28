@@ -17,7 +17,7 @@ struct ChInfo
 
     bool isLastCh;
 
-    std::string getPos() const;
+    std::string getPos(int flag = 1) const;
 };
 
 

@@ -6,6 +6,34 @@
 
 namespace charutil
 {
+    static const std::string SPACE_1 = std::string(1,' ');
+    static const std::string SPACE_2 = std::string(2,' ');
+    static const std::string SPACE_3 = std::string(3,' ');
+    static const std::string SPACE_4 = std::string(4,' ');
+    static const std::string SPACE_5 = std::string(5,' ');
+    static const std::string DOUBLE_QUOTO = "\"";
+    static const std::string SINGLE_QUOTO = "'";
+    static const std::string STR_OPEN_PARENTHESES = "(";
+    static const std::string STR_CLOSE_PARENTHESES = ")";
+
+    static const std::string SC_OP_ADD                = " + ";
+    static const std::string SC_OP_MINUS              = " - ";
+    static const std::string SC_OP_MULTIPLY           = " * ";
+    static const std::string SC_OP_DIVIDE             = " / ";
+    static const std::string SC_OP_MOD                = " % ";
+    static const std::string SC_OP_BIT_AND            = " & ";
+    static const std::string SC_OP_BIT_OR             = " | ";
+    static const std::string SC_OP_BIT_XOR            = " ^ ";
+    static const std::string SC_OP_BIT_LEFT_SHIFT     = " << ";
+    static const std::string SC_OP_BIT_RIGHT_SHIFT    = " >> ";
+    static const std::string SC_OP_BIT_ASSIGNMENT     = " = ";
+    static const std::string SC_OP_POSITIVE_BEGIN     = "+";
+    static const std::string SC_OP_NEGATIVE_BEGIN     = "-";
+    static const std::string SC_OP_BIT_NOT_BEGIN      = "~";
+
+    static const std::string SC_WARNING_TITLE         =  "[WARNING] : ";
+
+
     static const char NEW_LINE_N = '\n';
     static const char NEW_LINE_R = '\r';
 
@@ -171,9 +199,9 @@ namespace charutil
 
                 } else {
                     // sz == 2
-                    if ( opStr == "<<" ) {
+                    if ( opStr == charutil::SC_OP_BIT_LEFT_SHIFT ) {
                         retType = E_BIT_LEFT_SHIFT;
-                    } else if ( opStr == ">>" ) {
+                    } else if ( opStr == charutil::SC_OP_BIT_RIGHT_SHIFT ) {
                         retType = E_BIT_RIGHT_SHIFT;
                     }
                 }

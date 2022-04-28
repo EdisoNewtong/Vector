@@ -1,5 +1,6 @@
 #include "myException.h"
 #include "enumUtil.h"
+#include "charUtil.h"
 using namespace std;
 
 // static 
@@ -41,6 +42,7 @@ unordered_map<MyException::ErrorType,string>    MyException::s_exceptionMap{
     { enumCvt(E_THROW_VARIBLE_ALREADY_DEFINED),                 "Varible already defined before "},
     { enumCvt(E_THROW_VARIBLE_CANNOT_BE_KEYWORD),               "Varible can't be keyword "},
     { enumCvt(E_THROW_VARIBLE_NOT_DEFINED),                     "Varible is undefined " },
+    { enumCvt(E_THROW_VARIBLE_NOT_INITIALIZED_BEFORE_USED),     "Varible hasn't been initialized before used " },
 
     { enumCvt(E_THROW_SENTENCE_TOO_LESS_TOKEN),                          "Sentence has too few tokens " },
     { enumCvt(E_THROW_SENTENCE_TOO_MORE_ASSIGNMENT),                     "Sentence has too more assignment " },
@@ -123,7 +125,7 @@ string MyException::getDetail()
 
 string MyException::getExceptionDetail() const
 {
-    static const string SC_SINGLE_QUOTO("\"");
+    using namespace charutil;
 
     string detail;
     auto it = s_exceptionMap.find(m_errorCode);
@@ -133,14 +135,14 @@ string MyException::getExceptionDetail() const
         detail = EnumUtil::enumName(m_errorCode); 
     }
 
-    detail += std::string(" "); 
+    detail += SPACE_1;
     if ( m_hasSetCursor ) {
         detail += m_cursor.getPos();
     }
 
     if ( !m_detail.empty() ) {
-        detail += string(" "); 
-        detail += (SC_SINGLE_QUOTO + m_detail + SC_SINGLE_QUOTO);
+        detail += SPACE_1;
+        detail += (DOUBLE_QUOTO + m_detail + DOUBLE_QUOTO);
     }
 
     // MyException::s_retDetail = detail;
@@ -160,7 +162,7 @@ E_ExceptionType MyException::getCode()
 /*
 const char* MyException::what() const noexcept // throw()
 {
-    static const string SC_SINGLE_QUOTO("\"");
+    using namespace charutil;
 
     string detail;
     auto it = s_exceptionMap.find(m_errorCode);
@@ -170,14 +172,14 @@ const char* MyException::what() const noexcept // throw()
         detail = EnumUtil::enumName(m_errorCode); 
     }
 
-    detail += std::string(" "); 
+    detail += SPACE_1;
     if ( m_hasSetCursor ) {
         detail += m_cursor.getPos();
     }
 
     if ( !m_detail.empty() ) {
-        detail += string(" "); 
-        detail += (SC_SINGLE_QUOTO + m_detail + SC_SINGLE_QUOTO);
+        detail += SPACE_1;
+        detail += (DOUBLE_QUOTO + m_detail + DOUBLE_QUOTO);
     }
 
     MyException::s_retDetail = detail;

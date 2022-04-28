@@ -77,12 +77,6 @@ protected:
     DataValue      m_dataValue;
 
     std::string    m_warningContent;
-
-public:
-    static const std::string sc_str_OPEN_PARENTHESES;
-    static const std::string sc_str_CLOSE_PARENTHESES;
-    static const std::string sc_str_BLANK;
-
 };
 
 #endif

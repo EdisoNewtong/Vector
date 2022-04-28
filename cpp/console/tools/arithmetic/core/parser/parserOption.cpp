@@ -1,4 +1,5 @@
 #include "parserOption.h"
+#include "charUtil.h"
 
 #include <iostream>
 #include <exception>
@@ -25,6 +26,8 @@ unsigned int ParserOption::s_flag = 0;
 // static 
 bool ParserOption::analyzeOption(const vector<string>& args, string& errorMsg)
 {
+    using namespace charutil;
+
     const string singlequoto("\'");
     auto bret = true;
     errorMsg = "";
@@ -53,7 +56,7 @@ bool ParserOption::analyzeOption(const vector<string>& args, string& errorMsg)
             }
         } else {
             bret = false;
-            errorMsg = singlequoto + sOption + singlequoto + " is unknown";
+            errorMsg = SINGLE_QUOTO + sOption + SINGLE_QUOTO + " is unknown";
             break;
         }
     }

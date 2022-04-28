@@ -19,7 +19,7 @@ option :       | x | x | x | x | x | x | x | x |
 
 
 
-flag  :       | x | x | x | x | x | x | x | x |
+flag  :   | x | x | x | x | x | x | x | x | x |
                                             1    : bit-1 =>  print operatorStack List All
                                         1        : bit-2 =>  print suffix List before build
                                     1            : bit-3 =>  print suffix List after build
@@ -28,3 +28,4 @@ flag  :       | x | x | x | x | x | x | x | x |
                         1                        : bit-6 =>  trace suffixExpression change
                     1                            : bit-7 =>  trace +/- property change
                 1                                : bit-8 =>  trace compile/runtime warnings
+            1                                    : bit-9 =>  trace tmp expr evaluate process
