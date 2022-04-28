@@ -3,11 +3,18 @@
 #include <fstream>
 #include <vector>
 
+#ifndef _WIN32 
+    #include <unistd.h>
+#else
+    #include <windows.h>
+#endif
+
+
 #include "myException.h"
 #include "buff.h"
 #include "globalDirector.h"
 #include "tokenMgr.h"
-#include "parserOption.h"
+#include "cmdOptions.h"
 #include "variblePool.h"
 #include "dataTypeUtil.h"
 
@@ -20,16 +27,48 @@ using namespace std;
 static auto bPrintFileLengthFlag = true;
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+//
+// get the abs path for the current running process :
+// e.g.    "/usr/bin/ls"    =>   "/usr/bin/"  ( result path contains the last seperate char   '/' )
+//
+string getBinaryPath()
+{
+    string retPath;
+
+#ifndef _WIN32 
+    //  Unix/Linux Implementation Here
+    const size_t C_PATH_LEN = 1024;
+    char bufPath[C_PATH_LEN] = { 0 };
+    // get the abs path for the running bin   e.g.   /usr/bin/ll
+    size_t nn = readlink("/proc/self/exe", bufPath, C_PATH_LEN);
+    if ( nn < C_PATH_LEN ) {
+        bufPath[nn] = '\0';
+    }
+
+    string runningFullPath(bufPath);
+    auto pos = runningFullPath.rfind("/");
+    string runningPath(runningFullPath);
+    if ( pos != string::npos ) {
+        runningPath = runningFullPath.substr(0, pos+1);
+    }
+    retPath = runningPath;
+#else
+    //  Windows  Implementation Here
+#endif
+    return retPath;
+
+}
+
 
 int main(int argc, char* argv[], char* env[])
 {
     if ( argc < 2 ) {
-        cout << ParserOption::getUserManual() << endl;
+        cout << CmdOptions::getUserManual() << endl;
         return -1;
     }
-    // else    :   argc >= 4
 
 
+    // else    :   argc >= 2
     if ( argc > 2 ) {
         //
         // Parser cmd-line-argument
@@ -40,18 +79,17 @@ int main(int argc, char* argv[], char* env[])
             arglist.push_back( string(argv[idx]) );
         }
 
-        auto bOptionParserFlag = ParserOption::analyzeOption(arglist , errorMsg);
+        auto bOptionParserFlag = CmdOptions::analyzeOption(arglist , errorMsg);
         if ( !bOptionParserFlag ) {
             cout << errorMsg << endl
-                 << ParserOption::getUserManual() << endl;
+                 << CmdOptions::getUserManual() << endl;
             return -1;
         }
     }
 
 
-    // argc == 2   ./<program>   <fileName>
     //
-    // Read File
+    // Read File from the last args
     //
     string fname(argv[argc-1]);
     ifstream file(fname.c_str(), ios::in | ios::binary);

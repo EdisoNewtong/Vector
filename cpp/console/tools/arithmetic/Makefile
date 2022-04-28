@@ -16,21 +16,21 @@ COMPILE_OPT :=  -Wall --std=c++11 $(INC_PATH)  $(DEFINED_MACRO) -c -g3
 ####################################################################################################
 
 LINK_OPT := -Wall --std=c++11
-#LINK_OPT := -O0
+#LINK_OPT := -Wall --std=c++11  -O3
 
 
 
 #
 # build/stringNumber.o
 #
-build/arithMetic:build/arithMetic.o build/buff.o build/enumUtil.o build/keywordList.o  build/dataTypeUtil.o  build/stringNumber.o  build/opUtil.o    build/myException.o build/buff.o build/globalDirector.o   build/tokenBase.o build/tokenMgr.o    build/parserOption.o   build/parserBase.o   build/blankParser.o build/singlelineCommentParser.o   build/multilineCommentParser.o  build/operatorParser.o  build/sequenceParser.o build/semicolonParser.o    build/variblePool.o build/dataValue.o
+build/arithMetic:build/arithMetic.o build/buff.o build/enumUtil.o build/keywordList.o  build/dataTypeUtil.o  build/stringNumber.o  build/opUtil.o    build/myException.o build/buff.o build/globalDirector.o   build/tokenBase.o build/tokenMgr.o    build/cmdOptions.o   build/parserBase.o   build/blankParser.o build/singlelineCommentParser.o   build/multilineCommentParser.o  build/operatorParser.o  build/sequenceParser.o build/semicolonParser.o    build/variblePool.o build/dataValue.o
 	@echo -e "\n----------------------------------------------------------------------------------------------------"
 	g++    $(LINK_OPT)    -o    build/arithMetic    build/*.o
 	cp build/arithMetic .
 	@echo "----------------------------------------------------------------------------------------------------"
 
 
-build/arithMetic.o:arithMetic.cpp core/commonEnum.h core/myException.h core/buff.h core/globalDirector.h core/parser/parserOption.h  core/token/tokenMgr.h  core/variblePool/variblePool.h  core/util/dataTypeUtil.h
+build/arithMetic.o:arithMetic.cpp core/commonEnum.h core/myException.h core/buff.h core/globalDirector.h core/cmdOptions.h  core/token/tokenMgr.h  core/variblePool/variblePool.h  core/util/dataTypeUtil.h
 	g++    $(COMPILE_OPT)  -o  build/arithMetic.o   arithMetic.cpp
 
 
@@ -42,7 +42,7 @@ build/buff.o:core/buff.cpp core/buff.h
 	g++    $(COMPILE_OPT)  -o  build/buff.o   core/buff.cpp
 
 
-build/dataValue.o:core/dataValue.cpp   core/dataValue.h   core/commonEnum.h   core/myException.h  core/util/dataTypeUtil.h  core/parser/parserOption.h
+build/dataValue.o:core/dataValue.cpp   core/dataValue.h   core/commonEnum.h   core/myException.h  core/util/dataTypeUtil.h  core/cmdOptions.h
 	g++    $(COMPILE_OPT)  -o  build/dataValue.o   core/dataValue.cpp
 
 
@@ -64,7 +64,7 @@ build/stringNumber.o:core/util/stringNumber.cpp core/util/stringNumber.h
 build/opUtil.o:core/util/opUtil.cpp core/util/opUtil.h  core/commonEnum.h  core/myException.h
 	g++    $(COMPILE_OPT)  -o  build/opUtil.o   core/util/opUtil.cpp
 
-build/globalDirector.o:core/globalDirector.cpp  core/globalDirector.h   core/parser/parserBase.h   core/parser/blank/blankParser.h  core/parser/comment/singlelineCommentParser.h core/parser/comment/multilineCommentParser.h core/parser/sequence/sequenceParser.h core/util/charUtil.h   core/parser/blank/blankParser.h core/parser/comment/singlelineCommentParser.h core/parser/comment/multilineCommentParser.h core/parser/operator/operatorParser.h core/parser/sequence/sequenceParser.h core/parser/semicolon/semicolonParser.h   core/token/tokenBase.h core/parser/parserOption.h core/util/enumUtil.h core/myException.h core/token/tokenMgr.h core/variblePool/variblePool.h
+build/globalDirector.o:core/globalDirector.cpp  core/globalDirector.h   core/parser/parserBase.h   core/parser/blank/blankParser.h  core/parser/comment/singlelineCommentParser.h core/parser/comment/multilineCommentParser.h core/parser/sequence/sequenceParser.h core/util/charUtil.h   core/parser/blank/blankParser.h core/parser/comment/singlelineCommentParser.h core/parser/comment/multilineCommentParser.h core/parser/operator/operatorParser.h core/parser/sequence/sequenceParser.h core/parser/semicolon/semicolonParser.h   core/token/tokenBase.h core/cmdOptions.h core/util/enumUtil.h core/myException.h core/token/tokenMgr.h core/variblePool/variblePool.h
 	g++    $(COMPILE_OPT)  -o  build/globalDirector.o    core/globalDirector.cpp
 
 ####################################################################################################
@@ -73,7 +73,7 @@ build/globalDirector.o:core/globalDirector.cpp  core/globalDirector.h   core/par
 build/tokenBase.o:core/token/tokenBase.cpp core/token/tokenBase.h core/commonEnum.h core/util/keywordList.h core/myException.h core/buff.h core/dataValue.h  core/util/charUtil.h
 	g++    $(COMPILE_OPT)  -o  build/tokenBase.o    core/token/tokenBase.cpp
 
-build/tokenMgr.o:core/token/tokenMgr.cpp  core/token/tokenMgr.h core/token/tokenBase.h core/myException.h   core/variblePool/variblePool.h core/util/opUtil.h core/util/dataTypeUtil.h core/parser/parserOption.h   core/util/charUtil.h
+build/tokenMgr.o:core/token/tokenMgr.cpp  core/token/tokenMgr.h core/token/tokenBase.h core/myException.h   core/variblePool/variblePool.h core/util/opUtil.h core/util/dataTypeUtil.h core/cmdOptions.h   core/util/charUtil.h
 	g++    $(COMPILE_OPT)  -o  build/tokenMgr.o   core/token/tokenMgr.cpp
 
 
@@ -106,8 +106,8 @@ build/semicolonParser.o:core/parser/semicolon/semicolonParser.cpp  core/parser/s
 	g++    $(COMPILE_OPT)  -o  build/semicolonParser.o    core/parser/semicolon/semicolonParser.cpp 
 
 
-build/parserOption.o:core/parser/parserOption.cpp  core/parser/parserOption.h core/util/charUtil.h
-	g++    $(COMPILE_OPT)  -o  build/parserOption.o    core/parser/parserOption.cpp
+build/cmdOptions.o:core/cmdOptions.cpp  core/cmdOptions.h core/util/charUtil.h
+	g++    $(COMPILE_OPT)  -o  build/cmdOptions.o    core/cmdOptions.cpp
 
 
 

@@ -1,10 +1,10 @@
-#ifndef PARSER_OPTION_H
-#define PARSER_OPTION_H
+#ifndef CMD_OPTIONS_H
+#define CMD_OPTIONS_H
 
 #include <vector>
 #include <string>
 
-class ParserOption
+class CmdOptions
 {
 public:
     static bool analyzeOption(const std::vector<std::string>& args, std::string& errorMsg);
@@ -42,8 +42,8 @@ protected:
     // static unsigned int  getFlag();
 
 
-    ParserOption() = delete;
-    virtual ~ParserOption() = delete;
+    CmdOptions() = delete;
+    virtual ~CmdOptions() = delete;
 
     static unsigned int s_debugOption;
     static unsigned int s_flag;
