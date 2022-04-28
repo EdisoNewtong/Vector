@@ -2,18 +2,67 @@
 #include "charUtil.h"
 
 #include <iostream>
+#include <fstream>
 #include <exception>
+
 using namespace std;
 
 
-namespace
-{
-    const string OPT_PREFIX("--debugOption=");
-    const string OPT_HINTS("--debugOption=<IntegerNumber>");
+// static 
+const string  CmdOptions::SC_DEFAULT_FILENAME("mathCfg.cfg");
 
-    const string FLGS_PREFIX("--flag=");
-    const string FLGS_HINTS("--flag=<IntegerNumber>");
-}
+const string  CmdOptions::CFG_PREFIX("--cfgFile=");
+const string  CmdOptions::CFG_HINTS("--cfgFile=<FileName>");
+
+
+const string CmdOptions::SC_CFG_CONTENT{
+R"([DebugOption]
+    PRINT_RUNTIME_WARNING=0
+    PRINT_OPSTACK_ALL=0
+    PRINT_SUFFIXEXP_BEFORE=0
+    PRINT_SUFFIXEXP_AFTER_BUILD=0
+    PRINT_SUFFIXEXP_AFTER_EVALUATE=0
+    TRACE_OPSTACK_CHANGE=0
+    TRACE_SUFFIXEXP_CHANGE=0
+    TRACE_POSNEGAPROPERTY_CHANGE=0
+    TRACE_TMPEXP_PROCESS=0
+    PRINT_PARSE_FILE_LENGTH=0
+    TRACE_PARSE_TIME_STEP=0
+
+[Flag]
+    Dec=1
+    Hex=0
+    Bin=0
+    Oct=0)"};
+
+
+
+const vector< pair<string,unsigned int> > CmdOptions::SC_DEBUG_OPTIONS_MAP{
+    { string("PRINT_RUNTIME_WARNING="),             0  },
+    { string("PRINT_OPSTACK_ALL="),                  1  },
+    { string("PRINT_SUFFIXEXP_BEFORE="),             2  },
+    { string("PRINT_SUFFIXEXP_AFTER_BUILD="),        3  },
+    { string("PRINT_SUFFIXEXP_AFTER_EVALUATE="),     4  },
+    { string("TRACE_OPSTACK_CHANGE="),               5  },
+    { string("TRACE_SUFFIXEXP_CHANGE="),             6  },
+    { string("TRACE_POSNEGAPROPERTY_CHANGE="),       7  },
+    { string("TRACE_TMPEXP_PROCESS="),               8  },
+    { string("PRINT_PARSE_FILE_LENGTH="),            14 },
+    { string("TRACE_PARSE_TIME_STEP="),              15 }
+};
+
+
+ 
+const vector< pair<string,unsigned int> > CmdOptions::SC_FLAG_MAP{
+    { string("Dec="), 0   },
+    { string("Hex="), 1   },
+    { string("Bin="), 2   },
+    { string("Oct="), 3   }
+};
+
+
+
+
 
 //
 // static Member Data Init
@@ -21,48 +70,178 @@ namespace
 unsigned int CmdOptions::s_debugOption = 0;
 unsigned int CmdOptions::s_flag = 1;
 
+string CmdOptions::getDefaultCfgFileName()
+{
+    return CmdOptions::SC_DEFAULT_FILENAME;
+}
 
 
 // static 
-bool CmdOptions::analyzeOption(const vector<string>& args, string& errorMsg)
+pair<bool,string> CmdOptions::parseCmdArgs(const vector<string>& args)
 {
     using namespace charutil;
+    string errorMsg;
 
-    const string singlequoto("\'");
-    auto bret = true;
-    errorMsg = "";
+    vector<string> unknowArgList;
+    string cfgfile;
+    auto bret = false;
+
+    int matchCnt = 0;
 
     for ( const auto& sOption : args ) 
     {
-        auto pos1 = sOption.find(OPT_PREFIX);
-        auto pos2 = sOption.find(FLGS_PREFIX);
-
-        if ( pos1 == 0  ) {
-            // set debug option
-            string optValue = sOption.substr(  OPT_PREFIX.size() );
-            try {
-                s_debugOption = static_cast<unsigned int>( stoi(optValue) );
-            } catch ( const exception& e ) {
-                bret = false;
-                cout << "\"" << optValue << "\" after " << OPT_PREFIX << " can't convert to a number. " << endl;
-            }
-        } else if ( pos2 == 0 ) {
-            string flagValue = sOption.substr(  FLGS_PREFIX.size() );
-            try {
-                s_flag = static_cast<unsigned int>( stoi( flagValue ) );
-            } catch ( const exception& e ) {
-                bret = false;
-                cout << "\"" << flagValue << "\" after " << FLGS_PREFIX  << " can't convert to a number. " << endl;
-            }
+        auto pos = sOption.find( CmdOptions::CFG_PREFIX );
+        if ( pos == 0 ) {
+            cfgfile = sOption.substr(  CmdOptions::CFG_PREFIX.size() );
+            ++matchCnt;
         } else {
-            bret = false;
-            errorMsg = SINGLE_QUOTO + sOption + SINGLE_QUOTO + " is unknown";
-            break;
+            unknowArgList.push_back(sOption);
         }
     }
 
-    return bret;
+    if ( !unknowArgList.empty() ) {
+        for( auto unknownArg : unknowArgList ) {
+            errorMsg += ("Unknown Option : " + unknownArg + NEW_LINE_N);
+        }
+        bret = false;
+    } else {
+        if ( matchCnt == 1 ) {
+            // bret = true;
+            if ( cfgfile.empty() ) {
+                errorMsg = "missing config file name";
+                bret = false;
+            } else {
+                errorMsg = cfgfile;
+                bret = true;
+            } 
+        } else {
+            errorMsg = "more or less for matched argument != 1  , =>  " + to_string(matchCnt);
+            bret = false;
+        }
+    }
+
+
+    return make_pair(bret, errorMsg);
 }
+
+
+
+// static 
+pair<bool,string> CmdOptions::parseCfgFile(bool hasCmdArgs, const string& cfgfile, const string& binPath)
+{
+    string errorMsg;
+    bool bret = false;
+
+    string realCfgPath;
+    string abspath;
+    if ( hasCmdArgs ) {
+        abspath = cfgfile;
+        realCfgPath = cfgfile;
+    } else {
+        abspath = binPath + CmdOptions::SC_DEFAULT_FILENAME;
+        realCfgPath = CmdOptions::SC_DEFAULT_FILENAME;
+    }
+
+    // try reading the cfg file in the running path
+    ifstream inCfgfile(abspath.c_str(), ios::in);
+    if ( !inCfgfile ) {
+        bret = false;
+        errorMsg = "Can't open config file : " + abspath;
+        // Use original value
+        inCfgfile.close();
+    } else {
+        int printableFlag = -1;
+        while ( !inCfgfile.eof() ) {
+            string line;
+            getline(inCfgfile, line);
+
+            //
+            // Set CmdOptions::s_flag
+            //
+            if ( printableFlag != 0  ) {
+                auto fountIdx = -1;
+                unsigned int flagValue = 1;
+                for ( int idx = 0; idx < static_cast<int>( CmdOptions::SC_FLAG_MAP.size() ); ++idx ) 
+                {
+                    auto pr = CmdOptions::SC_FLAG_MAP.at(idx);
+                    auto pos = line.find(pr.first);
+                    if ( pos != string::npos ) {
+                        string restStr =  line.substr( pos + pr.first.size() );
+                        if ( restStr.empty() ) {
+                            flagValue = 0;
+                        } else {
+                            try {
+                                flagValue = static_cast<unsigned int>( stoi(restStr) );
+                            } catch ( const exception& /* e */ ) {
+                                flagValue = 0;
+                            }
+                        }
+
+                        fountIdx = idx;
+                        break;
+                    }
+                }
+
+                if ( fountIdx != -1 ) {
+                    if ( fountIdx == 0 ) {
+                        printableFlag = flagValue;
+                        if ( flagValue == 0 ) {
+                            CmdOptions::s_flag = 0U;
+                        } else {
+                            CmdOptions::s_flag |= (1 << CmdOptions::SC_FLAG_MAP.at(fountIdx).second );
+                        }
+                    } else {
+                        if ( flagValue != 0 ) {
+                            CmdOptions::s_flag |= (1 << CmdOptions::SC_FLAG_MAP.at(fountIdx).second );
+                        }
+                    }
+                }
+            }
+
+            //
+            // Set CmdOptions::s_debugOption
+            //
+            auto fountIdx = -1;
+            unsigned int flagValue = 1;
+            for ( int idx = 0; idx < static_cast<int>( CmdOptions::SC_DEBUG_OPTIONS_MAP.size() ); ++idx ) 
+            {
+                auto pr = CmdOptions::SC_DEBUG_OPTIONS_MAP.at(idx);
+                auto pos = line.find(pr.first);
+                if ( pos != string::npos ) {
+                    string restStr =  line.substr( pos + pr.first.size() );
+                    if ( restStr.empty() ) {
+                        flagValue = 0;
+                    } else {
+                        try {
+                            flagValue = static_cast<unsigned int>( stoi(restStr) );
+                        } catch ( const exception& /* e */ ) {
+                            flagValue = 0;
+                        }
+                    }
+
+                    fountIdx = idx;
+                    break;
+                }
+            }
+
+            if ( fountIdx != -1 ) {
+                if ( flagValue != 0 ) {
+                    s_debugOption  |= (1 << CmdOptions::SC_DEBUG_OPTIONS_MAP.at(fountIdx).second );
+                }
+            }
+
+        }
+
+        inCfgfile.close();
+        bret = true;
+        errorMsg = realCfgPath;
+    }
+
+
+    return make_pair(bret , errorMsg);
+
+}
+
 
 
 
@@ -83,19 +262,17 @@ bool CmdOptions::analyzeOption(const vector<string>& args, string& errorMsg)
 // static 
 string CmdOptions::getUserManual()
 {
+    using namespace charutil;
+
     string strUserManul;
     strUserManul += "====================================================================================================\n";
     strUserManul += "Usage : \n";
     strUserManul += "\t<programName>   ";
     strUserManul += "[";
-    strUserManul += OPT_HINTS;
-    strUserManul += "]";
-    strUserManul += "   ";
-    strUserManul += "[";
-    strUserManul += FLGS_HINTS;
+    strUserManul += CmdOptions::CFG_HINTS;
     strUserManul += "]";
 
-    strUserManul += "   ";
+    strUserManul += SPACE_2;
     strUserManul += "<sourceCode>\n";
     strUserManul += "====================================================================================================\n";
 
@@ -110,9 +287,9 @@ string CmdOptions::getUserManual()
 // print varible flag
 //
 bool CmdOptions::needPrintVaribleFinally() { return (  s_flag      & 0x1U) != 0; }
-bool CmdOptions::needPrintVarible_16()     { return ( (s_flag>> 1) & 0x1U) != 0; }
-bool CmdOptions::needPrintVarible_2()      { return ( (s_flag>> 2) & 0x1U) != 0; }
-bool CmdOptions::needPrintVarible_8()      { return ( (s_flag>> 3) & 0x1U) != 0; }
+bool CmdOptions::needPrintVarible_16()     { return ( (s_flag >> 1) & 0x1U) != 0; }
+bool CmdOptions::needPrintVarible_2()      { return ( (s_flag >> 2) & 0x1U) != 0; }
+bool CmdOptions::needPrintVarible_8()      { return ( (s_flag >> 3) & 0x1U) != 0; }
 
 
 
@@ -122,18 +299,23 @@ bool CmdOptions::needPrintVarible_8()      { return ( (s_flag>> 3) & 0x1U) != 0;
 //
 bool CmdOptions::needPrintParseRuntimeWarning()            { return  (  s_debugOption          & 0x1) != 0;  }
 
-bool CmdOptions::needPrintOperatorStackAll()               { return  ( (s_debugOption>>1)      & 0x1) != 0;  }
-bool CmdOptions::needPrintSuffixExpressionBefore()         { return  ( (s_debugOption>>2)      & 0x1) != 0;  }
-bool CmdOptions::needPrintSuffixExpressionAfterBuild()     { return  ( (s_debugOption>>3)      & 0x1) != 0;  }
-bool CmdOptions::needPrintSuffixExpressionAfterEvaluate()  { return  ( (s_debugOption>>4)      & 0x1) != 0;  }
+bool CmdOptions::needPrintOperatorStackAll()               { return  ( (s_debugOption >> 1)      & 0x1) != 0;  }
+bool CmdOptions::needPrintSuffixExpressionBefore()         { return  ( (s_debugOption >> 2)      & 0x1) != 0;  }
+bool CmdOptions::needPrintSuffixExpressionAfterBuild()     { return  ( (s_debugOption >> 3)      & 0x1) != 0;  }
+bool CmdOptions::needPrintSuffixExpressionAfterEvaluate()  { return  ( (s_debugOption >> 4)      & 0x1) != 0;  }
 
-bool CmdOptions::needTraceOperatorStackChange()            { return  ( (s_debugOption>>5)      & 0x1) != 0;  }
-bool CmdOptions::needTraceSuffixExpressionChange()         { return  ( (s_debugOption>>6)      & 0x1) != 0;  }
+bool CmdOptions::needTraceOperatorStackChange()            { return  ( (s_debugOption >> 5)      & 0x1) != 0;  }
+bool CmdOptions::needTraceSuffixExpressionChange()         { return  ( (s_debugOption >> 6)      & 0x1) != 0;  }
 
-bool CmdOptions::needTracePositiveNegativePropertyChange() { return  ( (s_debugOption>>7)      & 0x1) != 0;  }
-bool CmdOptions::needTraceTmpExpressionProcess()           { return  ( (s_debugOption>>8)      & 0x1) != 0;  }
+bool CmdOptions::needTracePositiveNegativePropertyChange() { return  ( (s_debugOption >> 7)      & 0x1) != 0;  }
+bool CmdOptions::needTraceTmpExpressionProcess()           { return  ( (s_debugOption >> 8)      & 0x1) != 0;  }
 
-bool CmdOptions::needTraceParseTimeStep()                  { return  ( (s_debugOption>>23)     & 0x1) != 0;  }
+bool CmdOptions::needTraceParseTimeStep()                  { return  ( (s_debugOption >> 15)     & 0x1) != 0;  }
+bool CmdOptions::needPrintSrcCodeLength()                  { return  ( (s_debugOption >> 14)     & 0x1) != 0;  }
 
 
 
+string CmdOptions::sampleCfgFile()
+{
+    return CmdOptions::SC_CFG_CONTENT;
+}

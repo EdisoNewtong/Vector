@@ -2106,10 +2106,11 @@ void TokenMgr::traceNegativeOperation(TokenBase* right)
             TypeBaseInfo tpInfo( rightVal.type );
             if ( tpInfo.isIntegerFamily() ) {
 
-                cerr << SC_WARNING_TITLE;
                 if ( tpInfo.isUnsignedType() ) {
+                    cerr << SC_WARNING_TITLE;
                     cerr << " operator - (negative) on a unsigned varible \""<< right->getTokenContent() << "\"  doesn't take effect on a number whose value is always >= 0 " << endl;
                 } else if ( rightVal.isMinimumNegativeNumber() ) {
+                    cerr << SC_WARNING_TITLE;
                     cerr << " operator - (negative) on signed varible \""<< right->getTokenContent() << "\"  doesn't take effect on a number ( minimum negative number ) to making a result as a +number > 0" << endl;
                 }
             }
