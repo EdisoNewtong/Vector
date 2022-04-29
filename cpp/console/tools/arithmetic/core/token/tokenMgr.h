@@ -47,6 +47,8 @@ public:
 public:
     void pushToken(TokenBase* pToken);
     std::pair<bool,std::string> isLastValidTokenSemicolonOrEmpty();
+    static void setUnInitializedVaribleAsError(bool flag);
+    static void setNeedTreatBlankStatementAsWarning(bool flag);
 protected:
     TokenMgr();
     virtual ~TokenMgr();
@@ -111,6 +113,7 @@ protected:
     void traceTmpOpResult(const std::string& expr, DataValue& retValue);
     void traceUnInitializedVarWhenUsed(TokenBase* pToken);
 
+    void traceBlankStatement();
 protected:
     static TokenMgr* s_gInstance;
 
@@ -124,6 +127,7 @@ protected:
 
 
     static bool s_treatUnInitializedVaribleAsError;
+    static bool s_treatBlankStatementAsWarning;
 
 protected:
     std::vector<TokenBase*> m_allTokenList;

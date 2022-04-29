@@ -26,6 +26,8 @@ R"([DebugOption]
     TRACE_SUFFIXEXP_CHANGE=0
     TRACE_POSNEGAPROPERTY_CHANGE=0
     TRACE_TMPEXP_PROCESS=0
+    TREAT_BLANK_STATEMENT_AS_WARNING=0
+    TREAT_UNINITIALIZED_VARIBLE_AS_ERROR=0
     PRINT_PARSE_FILE_LENGTH=0
     TRACE_PARSE_TIME_STEP=0
 
@@ -37,27 +39,30 @@ R"([DebugOption]
 
 
 
-const vector< pair<string,unsigned int> > CmdOptions::SC_DEBUG_OPTIONS_MAP{
-    { string("PRINT_RUNTIME_WARNING="),             0  },
-    { string("PRINT_OPSTACK_ALL="),                  1  },
-    { string("PRINT_SUFFIXEXP_BEFORE="),             2  },
-    { string("PRINT_SUFFIXEXP_AFTER_BUILD="),        3  },
-    { string("PRINT_SUFFIXEXP_AFTER_EVALUATE="),     4  },
-    { string("TRACE_OPSTACK_CHANGE="),               5  },
-    { string("TRACE_SUFFIXEXP_CHANGE="),             6  },
-    { string("TRACE_POSNEGAPROPERTY_CHANGE="),       7  },
-    { string("TRACE_TMPEXP_PROCESS="),               8  },
-    { string("PRINT_PARSE_FILE_LENGTH="),            14 },
-    { string("TRACE_PARSE_TIME_STEP="),              15 }
+const vector< pair<string,unsigned long> > CmdOptions::SC_DEBUG_OPTIONS_MAP{
+    { string("PRINT_RUNTIME_WARNING="),                    0UL  },
+    { string("PRINT_OPSTACK_ALL="),                        1UL  },
+    { string("PRINT_SUFFIXEXP_BEFORE="),                   2UL  },
+    { string("PRINT_SUFFIXEXP_AFTER_BUILD="),              3UL  },
+    { string("PRINT_SUFFIXEXP_AFTER_EVALUATE="),           4UL  },
+    { string("TRACE_OPSTACK_CHANGE="),                     5UL  },
+    { string("TRACE_SUFFIXEXP_CHANGE="),                   6UL  },
+    { string("TRACE_POSNEGAPROPERTY_CHANGE="),             7UL  },
+    { string("TRACE_TMPEXP_PROCESS="),                     8UL  },
+
+    { string("TREAT_BLANK_STATEMENT_AS_WARNING="),         12UL },
+    { string("TREAT_UNINITIALIZED_VARIBLE_AS_ERROR="),     13UL },
+    { string("PRINT_PARSE_FILE_LENGTH="),                  14UL },
+    { string("TRACE_PARSE_TIME_STEP="),                    15UL }
 };
 
 
  
-const vector< pair<string,unsigned int> > CmdOptions::SC_FLAG_MAP{
-    { string("Dec="), 0   },
-    { string("Hex="), 1   },
-    { string("Bin="), 2   },
-    { string("Oct="), 3   }
+const vector< pair<string,unsigned long> > CmdOptions::SC_FLAG_MAP{
+    { string("Dec="), 0UL   },
+    { string("Hex="), 1UL   },
+    { string("Bin="), 2UL   },
+    { string("Oct="), 3UL   }
 };
 
 
@@ -67,8 +72,8 @@ const vector< pair<string,unsigned int> > CmdOptions::SC_FLAG_MAP{
 //
 // static Member Data Init
 //
-unsigned int CmdOptions::s_debugOption = 0;
-unsigned int CmdOptions::s_flag = 1;
+unsigned long CmdOptions::s_debugOption = 0;
+unsigned long CmdOptions::s_flag = 1;
 
 string CmdOptions::getDefaultCfgFileName()
 {
@@ -155,6 +160,7 @@ pair<bool,string> CmdOptions::parseCfgFile(bool hasCmdArgs, const string& cfgfil
             string line;
             getline(inCfgfile, line);
 
+            auto isMatched1Option = false;
             //
             // Set CmdOptions::s_flag
             //
@@ -183,50 +189,54 @@ pair<bool,string> CmdOptions::parseCfgFile(bool hasCmdArgs, const string& cfgfil
                 }
 
                 if ( fountIdx != -1 ) {
+                    isMatched1Option = true;
                     if ( fountIdx == 0 ) {
                         printableFlag = flagValue;
                         if ( flagValue == 0 ) {
-                            CmdOptions::s_flag = 0U;
+                            CmdOptions::s_flag = 0UL;
                         } else {
                             CmdOptions::s_flag |= (1 << CmdOptions::SC_FLAG_MAP.at(fountIdx).second );
                         }
                     } else {
                         if ( flagValue != 0 ) {
-                            CmdOptions::s_flag |= (1 << CmdOptions::SC_FLAG_MAP.at(fountIdx).second );
+                            CmdOptions::s_flag |= (1UL << CmdOptions::SC_FLAG_MAP.at(fountIdx).second );
                         }
                     }
                 }
             }
 
-            //
-            // Set CmdOptions::s_debugOption
-            //
-            auto fountIdx = -1;
-            unsigned int flagValue = 1;
-            for ( int idx = 0; idx < static_cast<int>( CmdOptions::SC_DEBUG_OPTIONS_MAP.size() ); ++idx ) 
-            {
-                auto pr = CmdOptions::SC_DEBUG_OPTIONS_MAP.at(idx);
-                auto pos = line.find(pr.first);
-                if ( pos != string::npos ) {
-                    string restStr =  line.substr( pos + pr.first.size() );
-                    if ( restStr.empty() ) {
-                        flagValue = 0;
-                    } else {
-                        try {
-                            flagValue = static_cast<unsigned int>( stoi(restStr) );
-                        } catch ( const exception& /* e */ ) {
+
+            if ( !isMatched1Option ) {
+                //
+                // Set CmdOptions::s_debugOption
+                //
+                auto fountIdx = -1;
+                unsigned int flagValue = 1;
+                for ( int idx = 0; idx < static_cast<int>( CmdOptions::SC_DEBUG_OPTIONS_MAP.size() ); ++idx ) 
+                {
+                    auto pr = CmdOptions::SC_DEBUG_OPTIONS_MAP.at(idx);
+                    auto pos = line.find(pr.first);
+                    if ( pos != string::npos ) {
+                        string restStr =  line.substr( pos + pr.first.size() );
+                        if ( restStr.empty() ) {
                             flagValue = 0;
+                        } else {
+                            try {
+                                flagValue = static_cast<unsigned int>( stoi(restStr) );
+                            } catch ( const exception& /* e */ ) {
+                                flagValue = 0;
+                            }
                         }
+
+                        fountIdx = idx;
+                        break;
                     }
-
-                    fountIdx = idx;
-                    break;
                 }
-            }
 
-            if ( fountIdx != -1 ) {
-                if ( flagValue != 0 ) {
-                    s_debugOption  |= (1 << CmdOptions::SC_DEBUG_OPTIONS_MAP.at(fountIdx).second );
+                if ( fountIdx != -1 ) {
+                    if ( flagValue != 0 ) {
+                        s_debugOption  |= (1UL << CmdOptions::SC_DEBUG_OPTIONS_MAP.at(fountIdx).second );
+                    }
                 }
             }
 
@@ -286,10 +296,10 @@ string CmdOptions::getUserManual()
 //
 // print varible flag
 //
-bool CmdOptions::needPrintVaribleFinally() { return (  s_flag      & 0x1U) != 0; }
-bool CmdOptions::needPrintVarible_16()     { return ( (s_flag >> 1) & 0x1U) != 0; }
-bool CmdOptions::needPrintVarible_2()      { return ( (s_flag >> 2) & 0x1U) != 0; }
-bool CmdOptions::needPrintVarible_8()      { return ( (s_flag >> 3) & 0x1U) != 0; }
+bool CmdOptions::needPrintVaribleFinally() { return (  s_flag         & 0x1UL) != 0; }
+bool CmdOptions::needPrintVarible_16()     { return ( (s_flag >> 1UL) & 0x1UL) != 0; }
+bool CmdOptions::needPrintVarible_2()      { return ( (s_flag >> 2UL) & 0x1UL) != 0; }
+bool CmdOptions::needPrintVarible_8()      { return ( (s_flag >> 3UL) & 0x1UL) != 0; }
 
 
 
@@ -297,22 +307,24 @@ bool CmdOptions::needPrintVarible_8()      { return ( (s_flag >> 3) & 0x1U) != 0
 //
 // Debug Intermediate Process
 //
-bool CmdOptions::needPrintParseRuntimeWarning()            { return  (  s_debugOption          & 0x1) != 0;  }
+bool CmdOptions::needPrintParseRuntimeWarning()            { return  (  s_debugOption              & 0x1UL) != 0;  }
 
-bool CmdOptions::needPrintOperatorStackAll()               { return  ( (s_debugOption >> 1)      & 0x1) != 0;  }
-bool CmdOptions::needPrintSuffixExpressionBefore()         { return  ( (s_debugOption >> 2)      & 0x1) != 0;  }
-bool CmdOptions::needPrintSuffixExpressionAfterBuild()     { return  ( (s_debugOption >> 3)      & 0x1) != 0;  }
-bool CmdOptions::needPrintSuffixExpressionAfterEvaluate()  { return  ( (s_debugOption >> 4)      & 0x1) != 0;  }
+bool CmdOptions::needPrintOperatorStackAll()               { return  ( (s_debugOption >> 1UL)      & 0x1UL) != 0;  }
+bool CmdOptions::needPrintSuffixExpressionBefore()         { return  ( (s_debugOption >> 2UL)      & 0x1UL) != 0;  }
+bool CmdOptions::needPrintSuffixExpressionAfterBuild()     { return  ( (s_debugOption >> 3UL)      & 0x1UL) != 0;  }
+bool CmdOptions::needPrintSuffixExpressionAfterEvaluate()  { return  ( (s_debugOption >> 4UL)      & 0x1UL) != 0;  }
 
-bool CmdOptions::needTraceOperatorStackChange()            { return  ( (s_debugOption >> 5)      & 0x1) != 0;  }
-bool CmdOptions::needTraceSuffixExpressionChange()         { return  ( (s_debugOption >> 6)      & 0x1) != 0;  }
+bool CmdOptions::needTraceOperatorStackChange()            { return  ( (s_debugOption >> 5UL)      & 0x1UL) != 0;  }
+bool CmdOptions::needTraceSuffixExpressionChange()         { return  ( (s_debugOption >> 6UL)      & 0x1UL) != 0;  }
 
-bool CmdOptions::needTracePositiveNegativePropertyChange() { return  ( (s_debugOption >> 7)      & 0x1) != 0;  }
-bool CmdOptions::needTraceTmpExpressionProcess()           { return  ( (s_debugOption >> 8)      & 0x1) != 0;  }
+bool CmdOptions::needTracePositiveNegativePropertyChange() { return  ( (s_debugOption >> 7UL)      & 0x1UL) != 0;  }
+bool CmdOptions::needTraceTmpExpressionProcess()           { return  ( (s_debugOption >> 8UL)      & 0x1UL) != 0;  }
 
-bool CmdOptions::needTraceParseTimeStep()                  { return  ( (s_debugOption >> 15)     & 0x1) != 0;  }
-bool CmdOptions::needPrintSrcCodeLength()                  { return  ( (s_debugOption >> 14)     & 0x1) != 0;  }
 
+bool CmdOptions::needTreatBlankStatementAsWarning()        { return  ( (s_debugOption >> 12UL)     & 0x1UL) != 0;  }
+bool CmdOptions::needTreatUninitializedVaribleAsError()    { return  ( (s_debugOption >> 13UL)     & 0x1UL) != 0;  }
+bool CmdOptions::needPrintSrcCodeLength()                  { return  ( (s_debugOption >> 14UL)     & 0x1UL) != 0;  }
+bool CmdOptions::needTraceParseTimeStep()                  { return  ( (s_debugOption >> 15UL)     & 0x1UL) != 0;  }
 
 
 string CmdOptions::sampleCfgFile()

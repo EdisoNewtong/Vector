@@ -37,10 +37,10 @@ public:
     static bool needTracePositiveNegativePropertyChange();
     static bool needTraceTmpExpressionProcess();
 
-    static bool needPrintSrcCodeLength();
+    static bool needTreatBlankStatementAsWarning();
+    static bool needTreatUninitializedVaribleAsError();
     static bool needTraceParseTimeStep();
-
-
+    static bool needPrintSrcCodeLength();
 protected:
 
     // get Option/Flag value
@@ -51,16 +51,16 @@ protected:
     CmdOptions() = delete;
     virtual ~CmdOptions() = delete;
 
-    static unsigned int s_debugOption;
-    static unsigned int s_flag;
+    static unsigned long s_debugOption;
+    static unsigned long s_flag;
 
     static const std::string SC_DEFAULT_FILENAME;
     static const std::string CFG_PREFIX; // ("--cfgFile=");
     static const std::string CFG_HINTS;  // ("--cfgFile=<filename>");
     static const std::string SC_CFG_CONTENT;
 
-    static const std::vector< std::pair<std::string,unsigned int> > SC_DEBUG_OPTIONS_MAP;
-    static const std::vector< std::pair<std::string,unsigned int> > SC_FLAG_MAP;
+    static const std::vector< std::pair<std::string,unsigned long> > SC_DEBUG_OPTIONS_MAP;
+    static const std::vector< std::pair<std::string,unsigned long> > SC_FLAG_MAP;
 
 
 
