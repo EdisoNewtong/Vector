@@ -26,6 +26,8 @@ R"([DebugOption]
     TRACE_SUFFIXEXP_CHANGE=0
     TRACE_POSNEGAPROPERTY_CHANGE=0
     TRACE_TMPEXP_PROCESS=0
+    TRACE_FLOAT_NUMBER_ZERO_WHEN_OP_DIVIDE=0
+    PROCESS_TMP_EXPRESSION_WITHOUT_ASSIGNMENT=0
     TREAT_BLANK_STATEMENT_AS_WARNING=0
     TREAT_UNINITIALIZED_VARIBLE_AS_ERROR=0
     PRINT_PARSE_FILE_LENGTH=0
@@ -40,20 +42,21 @@ R"([DebugOption]
 
 
 const vector< pair<string,unsigned long> > CmdOptions::SC_DEBUG_OPTIONS_MAP{
-    { string("PRINT_RUNTIME_WARNING="),                    0UL  },
-    { string("PRINT_OPSTACK_ALL="),                        1UL  },
-    { string("PRINT_SUFFIXEXP_BEFORE="),                   2UL  },
-    { string("PRINT_SUFFIXEXP_AFTER_BUILD="),              3UL  },
-    { string("PRINT_SUFFIXEXP_AFTER_EVALUATE="),           4UL  },
-    { string("TRACE_OPSTACK_CHANGE="),                     5UL  },
-    { string("TRACE_SUFFIXEXP_CHANGE="),                   6UL  },
-    { string("TRACE_POSNEGAPROPERTY_CHANGE="),             7UL  },
-    { string("TRACE_TMPEXP_PROCESS="),                     8UL  },
-
-    { string("TREAT_BLANK_STATEMENT_AS_WARNING="),         12UL },
-    { string("TREAT_UNINITIALIZED_VARIBLE_AS_ERROR="),     13UL },
-    { string("PRINT_PARSE_FILE_LENGTH="),                  14UL },
-    { string("TRACE_PARSE_TIME_STEP="),                    15UL }
+    { string("PRINT_RUNTIME_WARNING="),                         0UL  },
+    { string("PRINT_OPSTACK_ALL="),                             1UL  },
+    { string("PRINT_SUFFIXEXP_BEFORE="),                        2UL  },
+    { string("PRINT_SUFFIXEXP_AFTER_BUILD="),                   3UL  },
+    { string("PRINT_SUFFIXEXP_AFTER_EVALUATE="),                4UL  },
+    { string("TRACE_OPSTACK_CHANGE="),                          5UL  },
+    { string("TRACE_SUFFIXEXP_CHANGE="),                        6UL  },
+    { string("TRACE_POSNEGAPROPERTY_CHANGE="),                  7UL  },
+    { string("TRACE_TMPEXP_PROCESS="),                          8UL  },
+    { string("TRACE_FLOAT_NUMBER_ZERO_WHEN_OP_DIVIDE="),        10UL },
+    { string("PROCESS_TMP_EXPRESSION_WITHOUT_ASSIGNMENT="),     11UL },
+    { string("TREAT_BLANK_STATEMENT_AS_WARNING="),              12UL },
+    { string("TREAT_UNINITIALIZED_VARIBLE_AS_ERROR="),          13UL },
+    { string("PRINT_PARSE_FILE_LENGTH="),                       14UL },
+    { string("TRACE_PARSE_TIME_STEP="),                         15UL }
 };
 
 
@@ -307,24 +310,25 @@ bool CmdOptions::needPrintVarible_8()      { return ( (s_flag >> 3UL) & 0x1UL) !
 //
 // Debug Intermediate Process
 //
-bool CmdOptions::needPrintParseRuntimeWarning()            { return  (  s_debugOption              & 0x1UL) != 0;  }
+bool CmdOptions::needPrintParseRuntimeWarning()                { return  (  s_debugOption              & 0x1UL) != 0;  }
 
-bool CmdOptions::needPrintOperatorStackAll()               { return  ( (s_debugOption >> 1UL)      & 0x1UL) != 0;  }
-bool CmdOptions::needPrintSuffixExpressionBefore()         { return  ( (s_debugOption >> 2UL)      & 0x1UL) != 0;  }
-bool CmdOptions::needPrintSuffixExpressionAfterBuild()     { return  ( (s_debugOption >> 3UL)      & 0x1UL) != 0;  }
-bool CmdOptions::needPrintSuffixExpressionAfterEvaluate()  { return  ( (s_debugOption >> 4UL)      & 0x1UL) != 0;  }
+bool CmdOptions::needPrintOperatorStackAll()                   { return  ( (s_debugOption >> 1UL)      & 0x1UL) != 0;  }
+bool CmdOptions::needPrintSuffixExpressionBefore()             { return  ( (s_debugOption >> 2UL)      & 0x1UL) != 0;  }
+bool CmdOptions::needPrintSuffixExpressionAfterBuild()         { return  ( (s_debugOption >> 3UL)      & 0x1UL) != 0;  }
+bool CmdOptions::needPrintSuffixExpressionAfterEvaluate()      { return  ( (s_debugOption >> 4UL)      & 0x1UL) != 0;  }
 
-bool CmdOptions::needTraceOperatorStackChange()            { return  ( (s_debugOption >> 5UL)      & 0x1UL) != 0;  }
-bool CmdOptions::needTraceSuffixExpressionChange()         { return  ( (s_debugOption >> 6UL)      & 0x1UL) != 0;  }
+bool CmdOptions::needTraceOperatorStackChange()                { return  ( (s_debugOption >> 5UL)      & 0x1UL) != 0;  }
+bool CmdOptions::needTraceSuffixExpressionChange()             { return  ( (s_debugOption >> 6UL)      & 0x1UL) != 0;  }
 
-bool CmdOptions::needTracePositiveNegativePropertyChange() { return  ( (s_debugOption >> 7UL)      & 0x1UL) != 0;  }
-bool CmdOptions::needTraceTmpExpressionProcess()           { return  ( (s_debugOption >> 8UL)      & 0x1UL) != 0;  }
+bool CmdOptions::needTracePositiveNegativePropertyChange()     { return  ( (s_debugOption >> 7UL)      & 0x1UL) != 0;  }
+bool CmdOptions::needTraceTmpExpressionProcess()               { return  ( (s_debugOption >> 8UL)      & 0x1UL) != 0;  }
 
-
-bool CmdOptions::needTreatBlankStatementAsWarning()        { return  ( (s_debugOption >> 12UL)     & 0x1UL) != 0;  }
-bool CmdOptions::needTreatUninitializedVaribleAsError()    { return  ( (s_debugOption >> 13UL)     & 0x1UL) != 0;  }
-bool CmdOptions::needPrintSrcCodeLength()                  { return  ( (s_debugOption >> 14UL)     & 0x1UL) != 0;  }
-bool CmdOptions::needTraceParseTimeStep()                  { return  ( (s_debugOption >> 15UL)     & 0x1UL) != 0;  }
+bool CmdOptions::needCheckFloatNumberZero()                    { return  ( (s_debugOption >> 10UL)     & 0x1UL) != 0;  }
+bool CmdOptions::needProcessTmpExpressionWithoutAssignment()   { return  ( (s_debugOption >> 11UL)     & 0x1UL) != 0;  }
+bool CmdOptions::needTreatBlankStatementAsWarning()            { return  ( (s_debugOption >> 12UL)     & 0x1UL) != 0;  }
+bool CmdOptions::needTreatUninitializedVaribleAsError()        { return  ( (s_debugOption >> 13UL)     & 0x1UL) != 0;  }
+bool CmdOptions::needPrintSrcCodeLength()                      { return  ( (s_debugOption >> 14UL)     & 0x1UL) != 0;  }
+bool CmdOptions::needTraceParseTimeStep()                      { return  ( (s_debugOption >> 15UL)     & 0x1UL) != 0;  }
 
 
 string CmdOptions::sampleCfgFile()

@@ -32,7 +32,7 @@ struct DataValue
     void doIntergerPromotion(E_DataType promotionTp);
     void doConvertion(E_DataType destinationTp);
     bool isIntZero() const;
-    bool isFloatZero();
+    bool isFloatZero() const;
     bool isNegative();
     bool isGreaterEqualBitsWidth(int bits);
     bool isMinimumNegativeNumber();
