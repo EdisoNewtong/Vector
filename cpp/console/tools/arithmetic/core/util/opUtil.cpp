@@ -2,6 +2,7 @@
 #include "myException.h"
 using namespace std;
 
+
 /*
 
 ____________________________________________________________________________________________________
@@ -44,10 +45,10 @@ The following table lists the precedence and associativity of C++ operators. Ope
 |------------|-----------------------------------------|--------------------------------------------------------------|                          |
 |    8       |     <=>                                 |  Three-way comparison operator (since C++20)                 |                          |
 |------------|-----------------------------------------|--------------------------------------------------------------|                          |
-|    9       |   <   <=                                |  For relational operators < and ≤ respectively               |                          |
-|            |   >   >=                                |  For relational operators > and ≥ respectively               |                          |
+|    9       |   <   <=                                |  For relational operators < and <= respectively              |                          |
+|            |   >   >=                                |  For relational operators > and >= respectively              |                          |
 |------------|-----------------------------------------|--------------------------------------------------------------|                          |
-|    10      |   ==   !=                               |  For relational operators = and ≠ respectively               |                          |
+|    10      |   ==   !=                               |  For relational operators = and != respectively              |                          |
 |------------|-----------------------------------------|--------------------------------------------------------------|                          |
 |    11      |      &                                  |  Bitwise AND                                                 |                          |
 |------------|-----------------------------------------|--------------------------------------------------------------|                          |
