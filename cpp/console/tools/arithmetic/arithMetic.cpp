@@ -28,27 +28,43 @@ using namespace std;
 string getBinaryPath()
 {
     string retPath;
+    string platformSeperate;
 
 #ifndef _WIN32 
     //  Unix/Linux Implementation Here
+    platformSeperate = "/";
+
     const size_t C_PATH_LEN = 1024;
     char bufPath[C_PATH_LEN] = { 0 };
     // get the abs path for the running bin   e.g.   /usr/bin/ll
-    size_t nn = readlink("/proc/self/exe", bufPath, C_PATH_LEN);
+    size_t nsize = readlink("/proc/self/exe", bufPath, C_PATH_LEN);
     if ( nn < C_PATH_LEN ) {
-        bufPath[nn] = '\0';
+        bufPath[nsize] = '\0';
     }
 
+#else
+    //  Windows  Implementation Here
+    platformSeperate = "\\";
+
+    constexpr size_t C_PATH_LEN = MAX_PATH + 1;
+    HMODULE handleModule = nullptr;
+    char bufPath[C_PATH_LEN] = { 0 };
+    size_t fileSz = static_cast<size_t>( ::GetModuleFileNameA(handleModule, bufPath, MAX_PATH) );
+    if ( fileSz < C_PATH_LEN ) {
+        bufPath[fileSz] = '\0';
+    }
+
+#endif
+
+
     string runningFullPath(bufPath);
-    auto pos = runningFullPath.rfind("/");
+    auto pos = runningFullPath.rfind(platformSeperate);
     string runningPath(runningFullPath);
     if ( pos != string::npos ) {
         runningPath = runningFullPath.substr(0, pos+1);
     }
+
     retPath = runningPath;
-#else
-    //  Windows  Implementation Here
-#endif
     return retPath;
 }
 
