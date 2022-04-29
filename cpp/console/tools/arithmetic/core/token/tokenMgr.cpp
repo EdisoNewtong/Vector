@@ -15,8 +15,6 @@ using namespace std;
 //////////////////////////////////////////////////////////////////////
 
 TokenMgr* TokenMgr::s_gInstance = nullptr;
-bool TokenMgr::s_treatUnInitializedVaribleAsError = false;
-bool TokenMgr::s_treatBlankStatementAsWarning     = false;
 
 
 const TokenMgr::OpPairCfg TokenMgr::s_OpPairCfgTable[s_TABLE_SIZE] = {
@@ -334,8 +332,6 @@ TokenMgr* TokenMgr::getInstance()
 }
 
 
-void TokenMgr::setUnInitializedVaribleAsError(bool flag)      { s_treatUnInitializedVaribleAsError = flag; }
-void TokenMgr::setNeedTreatBlankStatementAsWarning(bool flag) { s_treatBlankStatementAsWarning     = flag; }
 
 
 // static
@@ -423,33 +419,35 @@ void TokenMgr::pushToken(TokenBase* pToken)
         string detailstr;
         if ( previousToken == nullptr ) {
             detailstr += "nullptr";
-            detailstr += SPACE_4;
-            detailstr += pToken->getBeginPos().getPos();
+            detailstr += SPACE_2;
+            detailstr += "After '";
+            detailstr += (pToken->getTokenContent() + SPACE_1 + pToken->getBeginPos().getPos(0) + SINGLE_QUOTO);
         } else {
             //  previousToken != nullptr
             auto preTp = previousToken->getTokenType();
             auto leftContent = previousToken->getTokenContent();
-            if ( preTp  == E_TOKEN_OPERATOR ) {
-                detailstr += EnumUtil::enumName( previousToken->getOperatorType() );
-            } else {
-                detailstr += EnumUtil::enumName( preTp );
-            }
-            detailstr += (" \"" + leftContent + "\"");
+            //if ( preTp  == E_TOKEN_OPERATOR ) {
+            //    detailstr += EnumUtil::enumName( previousToken->getOperatorType() );
+            //} else {
+            //    detailstr += EnumUtil::enumName( preTp );
+            //}
+            detailstr += (SPACE_1 + SINGLE_QUOTO + leftContent + SINGLE_QUOTO);
             detailstr += " @";
             detailstr += previousToken->getBeginPos().getPos(0);
 
 
             auto rightContent = pToken->getTokenContent();
             detailstr += SPACE_1;
-            if ( tokenType == E_TOKEN_OPERATOR ) {
-                detailstr += EnumUtil::enumName( pToken->getOperatorType() );
-            } else {
-                detailstr += EnumUtil::enumName( tokenType );
-            }
-            detailstr += (SPACE_1 + DOUBLE_QUOTO + rightContent + DOUBLE_QUOTO);
+            //if ( tokenType == E_TOKEN_OPERATOR ) {
+            //    detailstr += EnumUtil::enumName( pToken->getOperatorType() );
+            //} else {
+            //    detailstr += EnumUtil::enumName( tokenType );
+            //}
+            detailstr += (SPACE_1 + SINGLE_QUOTO + rightContent + SINGLE_QUOTO);
             detailstr += " @";
             detailstr += pToken->getBeginPos().getPos(0);
         }
+        detailstr += " is not allowed";
         e.setDetail(detailstr);
         throw e;
     }
@@ -516,15 +514,14 @@ void TokenMgr::executeCode()
 
     // Sequence / operator   Only
     int vecSz = static_cast<int>( m_oneSentence.size() );
-    if ( vecSz < 2 ) {
-        MyException e(E_THROW_SENTENCE_TOO_LESS_TOKEN, m_oneSentence.front()->getBeginPos() );
-        // e.setDetail( m_oneSentence.front()->getBeginPos().getPos() );
-        throw e;
-    } 
+
+    // if ( vecSz < 2 ) {
+    //     MyException e(E_THROW_SENTENCE_TOO_LESS_TOKEN, m_oneSentence.front()->getBeginPos() );
+    //     // e.setDetail( m_oneSentence.front()->getBeginPos().getPos() );
+    //     throw e;
+    // } 
 
     // vecSz >=2
-    // vector<E_TokenType> tokenVec;
-    // listSz >= 2
     int equal1stIdx = -1;
     int equal2ndIdx = -1;
     int equalCnt = 0; // '=' count
@@ -554,10 +551,15 @@ void TokenMgr::executeCode()
     string varname;
     auto varIdx = 0;
     if ( equalCnt == 0 ) {
-        // 1. int a;
-        varIdx = (vecSz - 1);
-        defDt = checkPrefixKeyWordsAndGetDataType(varIdx, varname);
-        sentenceType = 1;
+        if ( is1stTokenKeyWord() ) {
+            // 1. int a;
+            varIdx = (vecSz - 1);
+            defDt = checkPrefixKeyWordsAndGetDataType(varIdx, varname);
+            sentenceType = 1;
+        } else {
+            varIdx = 0;
+            sentenceType = 4; // all token is either expression ( can't not be keyword ) or operator
+        }
     } else {
         // 1 '='
         // make sure  there must be at least 1 content before and after  '='
@@ -598,7 +600,8 @@ void TokenMgr::executeCode()
 
         1. DataType    varible                   (;)    type-id = 1
         2. DataType    varible = expression      (;)    type=id = 2
-        3              varible = expression      (;)    type-id = 3
+        3.             varible = expression      (;)    type-id = 3
+        4. Tmp expression                        (;)    such as     a + b * c;
 
         ///////////////////////////////////////////////////////////////////////
         //
@@ -607,6 +610,8 @@ void TokenMgr::executeCode()
         ///////////////////////////////////////////////////////////////////////
 
     */
+
+
     auto sentenceVarElement = m_oneSentence.at(varIdx);
     VaribleInfo* pVaribleInfo = nullptr;
     if ( sentenceType == 1 ) {
@@ -625,20 +630,24 @@ void TokenMgr::executeCode()
             e.setDetail( varname );
             throw e;
         }
-    }
+    } 
 
 
     if ( sentenceType != 1 ) {
-        buildSuffixExpression(sentenceType, pVaribleInfo, varIdx);
-        checkSuffixExpressionValid();
-        popAllOperatorStack();
+        //                              == 4 && set need process tmp expression as    true
+        if ( sentenceType != 4   ||   CmdOptions::needProcessTmpExpressionWithoutAssignment() ) {
+            buildSuffixExpression(sentenceType, varIdx);
+            checkSuffixExpressionValid();
+            popAllOperatorStack();
 
-        printSuffixExpression(2);
+            printSuffixExpression(2);
 
-        evaluateSuffixExpression();
+            evaluateSuffixExpression();
 
-        printSuffixExpression(3);
-        m_suffixExpression.clear(); // clear the only 1 element
+            printSuffixExpression(3);
+            m_suffixExpression.clear(); // clear the only 1 element
+        }
+
     }
 
 
@@ -651,12 +660,8 @@ void TokenMgr::executeCode()
 
 
 
-void TokenMgr::buildSuffixExpression(int sentenceType, VaribleInfo* pVarible, int varibleIdx)
+void TokenMgr::buildSuffixExpression(int sentenceType, int varibleIdx)
 {
-
-
-    auto varibleToken = m_oneSentence.at(varibleIdx);
-    string varibleName = varibleToken->getTokenContent();
     int sententSz = static_cast<int>( m_oneSentence.size() );
 
     for( int idx = varibleIdx; idx < sententSz; ++idx )
@@ -667,7 +672,6 @@ void TokenMgr::buildSuffixExpression(int sentenceType, VaribleInfo* pVarible, in
             // fixed literal / varible / KeyWord
             if ( pToken->isKeyword() ) {
                 MyException e(E_THROW_CANNOT_PUSH_TOKEN_KEYWORD, pToken->getBeginPos() );
-                // e.setDetail( pToken->getBeginPos().getPos() );
                 throw e;
             } else if ( pToken->isVarible() ) {
                 string pVisitVarName = pToken->getTokenContent();
@@ -679,8 +683,15 @@ void TokenMgr::buildSuffixExpression(int sentenceType, VaribleInfo* pVarible, in
                     throw e;
                 }
 
-                if ( idx > varibleIdx &&  !(pVisitedVaribleInfo->isInitialed) ) {
-                    if ( TokenMgr::s_treatUnInitializedVaribleAsError ) {
+                auto indexCheck = false;
+                if ( sentenceType == 4 ) {
+                    indexCheck = true;
+                } else {
+                    indexCheck = (idx > varibleIdx);
+                }
+
+                if ( indexCheck &&  !(pVisitedVaribleInfo->isInitialed) ) {
+                    if ( CmdOptions::needTreatUninitializedVaribleAsError()  ) {
                         MyException e(E_THROW_VARIBLE_NOT_INITIALIZED_BEFORE_USED, pToken->getBeginPos() );
                         throw e;
                     } else {
@@ -742,6 +753,17 @@ void TokenMgr::checkSuffixExpressionValid()
         throw e;
     }
 }
+
+
+bool TokenMgr::is1stTokenKeyWord()
+{
+    auto headtoken = m_oneSentence.front();
+    return headtoken->getTokenType() == E_TOKEN_EXPRESSION  &&   headtoken->isKeyword();
+}
+
+
+
+
 
 
 
@@ -1249,7 +1271,10 @@ pair<bool,TokenBase*> TokenMgr::checkTokenValidFromPreviousRelationship(TokenBas
             auto preTp = previousValidToken->getTokenType();
             if ( preTp == E_TOKEN_SEMICOLON ) {
                 previousToken = previousValidToken;
-                if ( curOpType == E_OPEN_PARENTHESES ) {
+                if (      curOpType == E_OPEN_PARENTHESES 
+                     ||  (curOpType == E_ADD   || curOpType == E_POSITIVE) 
+                     ||  (curOpType == E_MINUS || curOpType == E_NEGATIVE)  )
+                {
                     avaliable = true; // ;(
                 } else {
                     avaliable = false;
@@ -1318,14 +1343,16 @@ pair<TokenBase*,TokenBase*> TokenMgr::getPreviousToken()
         return make_pair(nullptr,nullptr);
     }
 
+    // closest
+
     auto hasbeenSet = false;
-    TokenBase* pCloseToken = nullptr;
+    TokenBase* pTheClosestToken = nullptr;
     TokenBase* pNoneBlankCommentToken = nullptr;
     for( auto rit = m_allTokenList.rbegin(); rit != m_allTokenList.rend(); ++rit )
     {
         auto pToken = *rit;
         if ( !hasbeenSet ) {
-            pCloseToken = pToken;
+            pTheClosestToken = pToken;
             hasbeenSet = true;
         }
 
@@ -1335,7 +1362,7 @@ pair<TokenBase*,TokenBase*> TokenMgr::getPreviousToken()
         }
     }
 
-    return make_pair(pNoneBlankCommentToken, pCloseToken);
+    return make_pair(pNoneBlankCommentToken, pTheClosestToken);
 }
 
 
@@ -2155,7 +2182,7 @@ void TokenMgr::traceBlankStatement()
 {
     using namespace charutil;
 
-    if ( CmdOptions::needPrintParseRuntimeWarning() &&  s_treatBlankStatementAsWarning ) {
+    if ( CmdOptions::needPrintParseRuntimeWarning() &&  CmdOptions::needTreatBlankStatementAsWarning()  ) {
         cerr << SC_WARNING_TITLE;
         cerr << " Blank Statement is skipped ! . such as    ; ; " << endl;
     }

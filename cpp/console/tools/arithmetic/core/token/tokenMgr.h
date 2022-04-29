@@ -60,9 +60,12 @@ protected:
     std::pair<bool,TokenBase*>        checkTokenValidFromPreviousRelationship(TokenBase* toBePushed);
     std::pair<TokenBase*,TokenBase*>  getPreviousToken();
 
+    // for tmp expression check use
+    bool is1stTokenKeyWord();
+
     E_DataType checkPrefixKeyWordsAndGetDataType(int varIdx, std::string& varname);
     void executeCode();
-    void buildSuffixExpression(int sentenceType, VaribleInfo* pVarible, int varibleIdx);
+    void buildSuffixExpression(int sentenceType, int varibleIdx);
     void checkSuffixExpressionValid();
     void evaluateSuffixExpression();
     void processOperatorStack(TokenBase* previousToken, TokenBase* pToken);
@@ -124,10 +127,6 @@ protected:
 
     static TokenBase* generateTmpExpression(E_DataType dt, const std::string& expression, TokenBase* begtoken, TokenBase* endtoken);
     static void clearTmpGenTokenPool();
-
-
-    static bool s_treatUnInitializedVaribleAsError;
-    static bool s_treatBlankStatementAsWarning;
 
 protected:
     std::vector<TokenBase*> m_allTokenList;

@@ -158,8 +158,6 @@ int main(int argc, char* argv[], char* env[])
     DataTypeUtil::init();
     VariblePool::init();
     TokenMgr::init();
-    TokenMgr::setUnInitializedVaribleAsError( CmdOptions::needTreatUninitializedVaribleAsError() );
-    TokenMgr::setNeedTreatBlankStatementAsWarning( CmdOptions::needTreatBlankStatementAsWarning() );
 
     // if ( !DataTypeUtil::testCase() ) {
     //     cout << "testCase Failed" << endl;

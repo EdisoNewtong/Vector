@@ -688,6 +688,11 @@ DataValue DataValue::operator / ( const DataValue& right)
             MyException e(E_THROW_DIVIDE_ZERO);
             throw e;
         }
+    } else {
+        if ( CmdOptions::needCheckFloatNumberZero()   &&   right.isFloatZero() ) {
+            MyException e(E_THROW_DIVIDE_ZERO);
+            throw e;
+        }
     }
 
 
@@ -1057,13 +1062,14 @@ bool DataValue::isIntZero() const
 }
 
 
-bool DataValue::isFloatZero()
+bool DataValue::isFloatZero() const
 {
+    // epsilon
     auto bret = false;
-    if ( this->type == E_TP_FLOAT ) {
-        bret = ( (this->value.float_val - 0.0f) < 1e-5f);
+    if ( this->type == E_TP_FLOAT ) { 
+        bret = ( (this->value.float_val - 0.0f) < numeric_limits<float>::epsilon() ); // FLT_EPSILON , need include <cfloat>
     } else if ( this->type == E_TP_DOUBLE ) {
-        bret = ( (this->value.double_val - 0.0) < 1e-5);
+        bret = ( (this->value.double_val - 0.0) < numeric_limits<double>::epsilon() );  // DBL_EPSILON
     }
 
     return bret;

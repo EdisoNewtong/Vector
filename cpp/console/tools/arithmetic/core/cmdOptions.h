@@ -37,6 +37,8 @@ public:
     static bool needTracePositiveNegativePropertyChange();
     static bool needTraceTmpExpressionProcess();
 
+    static bool needCheckFloatNumberZero();
+    static bool needProcessTmpExpressionWithoutAssignment();
     static bool needTreatBlankStatementAsWarning();
     static bool needTreatUninitializedVaribleAsError();
     static bool needTraceParseTimeStep();
@@ -47,16 +49,15 @@ protected:
     // static unsigned int  getDebugOption();
     // static unsigned int  getFlag();
 
-
-    CmdOptions() = delete;
-    virtual ~CmdOptions() = delete;
+    CmdOptions() { }
+    virtual ~CmdOptions() { }
 
     static unsigned long s_debugOption;
     static unsigned long s_flag;
 
     static const std::string SC_DEFAULT_FILENAME;
-    static const std::string CFG_PREFIX; // ("--cfgFile=");
-    static const std::string CFG_HINTS;  // ("--cfgFile=<filename>");
+    static const std::string CFG_PREFIX; 
+    static const std::string CFG_HINTS;
     static const std::string SC_CFG_CONTENT;
 
     static const std::vector< std::pair<std::string,unsigned long> > SC_DEBUG_OPTIONS_MAP;
