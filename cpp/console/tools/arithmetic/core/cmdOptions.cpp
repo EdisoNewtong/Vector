@@ -75,8 +75,8 @@ const vector< pair<string,unsigned long> > CmdOptions::SC_FLAG_MAP{
 //
 // static Member Data Init
 //
-unsigned long CmdOptions::s_debugOption = 0;
-unsigned long CmdOptions::s_flag = 1;
+unsigned long CmdOptions::s_debugOption = 1UL;
+unsigned long CmdOptions::s_flag = 1UL;
 
 string CmdOptions::getDefaultCfgFileName()
 {
