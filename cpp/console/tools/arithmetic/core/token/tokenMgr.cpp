@@ -424,8 +424,10 @@ void TokenMgr::pushToken(TokenBase* pToken)
             detailstr += (pToken->getTokenContent() + SPACE_1 + pToken->getBeginPos().getPos(0) + SINGLE_QUOTO);
         } else {
             //  previousToken != nullptr
-            auto preTp = previousToken->getTokenType();
+            // auto preTp = previousToken->getTokenType();
+
             auto leftContent = previousToken->getTokenContent();
+
             //if ( preTp  == E_TOKEN_OPERATOR ) {
             //    detailstr += EnumUtil::enumName( previousToken->getOperatorType() );
             //} else {
