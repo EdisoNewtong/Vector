@@ -16,12 +16,13 @@ using namespace std;
 
 TokenMgr* TokenMgr::s_gInstance = nullptr;
 bool TokenMgr::s_treatUnInitializedVaribleAsError = false;
+bool TokenMgr::s_treatBlankStatementAsWarning     = false;
 
 
 const TokenMgr::OpPairCfg TokenMgr::s_OpPairCfgTable[s_TABLE_SIZE] = {
     /* left,                right,  closeAvaliable,  seperateAvaliable  */
     // ?                      +
-    { E_ADD,                E_ADD,       false,         true },   // ++ is not avaliable ,    + + is avaliable
+    { E_ADD,                E_ADD,       false,         true  },   // ++ is not avaliable ,    + + is avaliable
     { E_MINUS,              E_ADD,       true,          true  },
     { E_MULTIPLY,           E_ADD,       true,          true  },
     { E_DIVIDE,             E_ADD,       true,          true  },
@@ -38,7 +39,7 @@ const TokenMgr::OpPairCfg TokenMgr::s_OpPairCfgTable[s_TABLE_SIZE] = {
 
     /* left,                right,  closeAvaliable,  seperateAvaliable  */
     // ?                      -
-    { E_ADD,                E_MINUS,     true,          true },
+    { E_ADD,                E_MINUS,     true,          true  },
     { E_MINUS,              E_MINUS,     false,         true  }, // -- is not allowed ,   - - is  avaliable
     { E_MULTIPLY,           E_MINUS,     true,          true  },
     { E_DIVIDE,             E_MINUS,     true,          true  },
@@ -333,6 +334,10 @@ TokenMgr* TokenMgr::getInstance()
 }
 
 
+void TokenMgr::setUnInitializedVaribleAsError(bool flag)      { s_treatUnInitializedVaribleAsError = flag; }
+void TokenMgr::setNeedTreatBlankStatementAsWarning(bool flag) { s_treatBlankStatementAsWarning     = flag; }
+
+
 // static
 bool TokenMgr::isCommentType(E_TokenType tp)
 {
@@ -503,7 +508,7 @@ void TokenMgr::executeCode()
     m_suffixExpression.clear();
 
     if ( m_oneSentence.empty() ) {
-        // TODO or not : create a warning : empty sentence , do nothing
+        traceBlankStatement();
         return;
     }
     
@@ -2143,3 +2148,19 @@ void TokenMgr::traceUnInitializedVarWhenUsed(TokenBase* pToken)
     }
 
 }
+
+
+
+void TokenMgr::traceBlankStatement()
+{
+    using namespace charutil;
+
+    if ( CmdOptions::needPrintParseRuntimeWarning() &&  s_treatBlankStatementAsWarning ) {
+        cerr << SC_WARNING_TITLE;
+        cerr << " Blank Statement is skipped ! . such as    ; ; " << endl;
+    }
+
+}
+
+
+

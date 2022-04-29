@@ -58,6 +58,7 @@ int main(int argc, char* argv[], char* env[])
     string runningPath = getBinaryPath();
 
     if ( argc < 2 ) {
+        cout << "[ERROR] : Missing a given file to parse !!" << endl;
         cout << CmdOptions::getUserManual() << endl;
         return -1;
     }
@@ -141,6 +142,8 @@ int main(int argc, char* argv[], char* env[])
     DataTypeUtil::init();
     VariblePool::init();
     TokenMgr::init();
+    TokenMgr::setUnInitializedVaribleAsError( CmdOptions::needTreatUninitializedVaribleAsError() );
+    TokenMgr::setNeedTreatBlankStatementAsWarning( CmdOptions::needTreatBlankStatementAsWarning() );
 
     // if ( !DataTypeUtil::testCase() ) {
     //     cout << "testCase Failed" << endl;
@@ -172,8 +175,8 @@ int main(int argc, char* argv[], char* env[])
         cout << "[ERROR] : Meet an unexpection exception : " << endl;
     }
 
-    VariblePool::finalize();
     TokenMgr::release();
+    VariblePool::finalize();
     DataTypeUtil::finalize();
 
     return 0;
