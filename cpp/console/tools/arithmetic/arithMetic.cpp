@@ -38,7 +38,7 @@ string getBinaryPath()
     char bufPath[C_PATH_LEN] = { 0 };
     // get the abs path for the running bin   e.g.   /usr/bin/ll
     size_t nsize = readlink("/proc/self/exe", bufPath, C_PATH_LEN);
-    if ( nn < C_PATH_LEN ) {
+    if ( nsize < C_PATH_LEN ) {
         bufPath[nsize] = '\0';
     }
 

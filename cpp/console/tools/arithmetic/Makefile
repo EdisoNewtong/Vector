@@ -8,8 +8,8 @@ DEFINED_MACRO :=
 INC_PATH := -Icore -Icore/util -Icore/token -Icore/parser -Icore/parser/blank -Icore/parser/comment -Icore/parser/operator -Icore/parser/sequence -Icore/parser/semicolon -Icore/variblePool
 
 
-COMPILE_OPT :=  -Wall --std=c++11 $(INC_PATH)  $(DEFINED_MACRO) -c -g3
-#COMPILE_OPT :=  -Wall --std=c++11 $(INC_PATH)  $(DEFINED_MACRO) -c
+COMPILE_OPT :=  -Wall --std=c++11 $(DEFINED_MACRO) $(INC_PATH)   -c -g3
+#COMPILE_OPT :=  -Wall --std=c++11 $(DEFINED_MACRO) $(INC_PATH) -O3  -c
 
 ####################################################################################################
 ####################################################################################################
