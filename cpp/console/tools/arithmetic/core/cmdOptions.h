@@ -19,9 +19,14 @@ public:
     // print varible flag
     //
     static bool needPrintVaribleFinally();
+
+    static bool needPrintVarible_10();
     static bool needPrintVarible_16();
     static bool needPrintVarible_2();
     static bool needPrintVarible_8();
+    static bool isPrintVaribleFormatValid();
+
+    static unsigned int  getFlag();
 
     //
     // debug intermediate process
@@ -37,6 +42,7 @@ public:
     static bool needTracePositiveNegativePropertyChange();
     static bool needTraceTmpExpressionProcess();
 
+    static bool needTreatSignedIntergerBitShiftAsWarning();
     static bool needCheckFloatNumberZero();
     static bool needProcessTmpExpressionWithoutAssignment();
     static bool needTreatBlankStatementAsWarning();

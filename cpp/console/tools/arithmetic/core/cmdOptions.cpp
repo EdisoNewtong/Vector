@@ -16,56 +16,64 @@ const string  CmdOptions::CFG_HINTS("--cfgFile=<FileName>");
 
 
 const string CmdOptions::SC_CFG_CONTENT{
-R"([DebugOption]
-    PRINT_RUNTIME_WARNING=0
-    PRINT_OPSTACK_ALL=0
-    PRINT_SUFFIXEXP_BEFORE=0
-    PRINT_SUFFIXEXP_AFTER_BUILD=0
-    PRINT_SUFFIXEXP_AFTER_EVALUATE=0
-    TRACE_OPSTACK_CHANGE=0
-    TRACE_SUFFIXEXP_CHANGE=0
-    TRACE_POSNEGAPROPERTY_CHANGE=0
-    TRACE_TMPEXP_PROCESS=0
-    TRACE_FLOAT_NUMBER_ZERO_WHEN_OP_DIVIDE=0
-    PROCESS_TMP_EXPRESSION_WITHOUT_ASSIGNMENT=0
-    TREAT_BLANK_STATEMENT_AS_WARNING=0
-    TREAT_UNINITIALIZED_VARIBLE_AS_ERROR=0
-    PRINT_PARSE_FILE_LENGTH=0
-    TRACE_PARSE_TIME_STEP=0
+R"([Flag]
+    ENABLE_PRINT_VARLIST_AT_LAST = 0
+    Dec = 1
+    Hex = 0
+    Bin = 0
+    Oct = 0
 
-[Flag]
-    Dec=1
-    Hex=0
-    Bin=0
-    Oct=0)"};
+[DebugOption]
+    PRINT_RUNTIME_WARNING = 1
+    PRINT_OPSTACK_ALL = 0
+    PRINT_SUFFIXEXP_BEFORE = 0
+    PRINT_SUFFIXEXP_AFTER_BUILD = 0
+    PRINT_SUFFIXEXP_AFTER_EVALUATE = 0
+    TRACE_OPSTACK_CHANGE = 0
+    TRACE_SUFFIXEXP_CHANGE = 0
+    TRACE_POSNEGAPROPERTY_CHANGE = 0
+    TRACE_TMPEXP_PROCESS = 0
 
+    NEED_TREAT_SIGNED_INTEGER_BIT_SHIFT_AS_WARING = 0
+    TRACE_FLOAT_NUMBER_ZERO_WHEN_OP_DIVIDE = 1
+    PROCESS_TMP_EXPRESSION_WITHOUT_ASSIGNMENT = 1
+    TREAT_BLANK_STATEMENT_AS_WARNING = 0
+    TREAT_UNINITIALIZED_VARIBLE_AS_ERROR = 0
+    PRINT_PARSE_FILE_LENGTH = 0
+    TRACE_PARSE_TIME_STEP = 0
+)"
+};
 
 
 const vector< pair<string,unsigned long> > CmdOptions::SC_DEBUG_OPTIONS_MAP{
-    { string("PRINT_RUNTIME_WARNING="),                         0UL  },
-    { string("PRINT_OPSTACK_ALL="),                             1UL  },
-    { string("PRINT_SUFFIXEXP_BEFORE="),                        2UL  },
-    { string("PRINT_SUFFIXEXP_AFTER_BUILD="),                   3UL  },
-    { string("PRINT_SUFFIXEXP_AFTER_EVALUATE="),                4UL  },
-    { string("TRACE_OPSTACK_CHANGE="),                          5UL  },
-    { string("TRACE_SUFFIXEXP_CHANGE="),                        6UL  },
-    { string("TRACE_POSNEGAPROPERTY_CHANGE="),                  7UL  },
-    { string("TRACE_TMPEXP_PROCESS="),                          8UL  },
-    { string("TRACE_FLOAT_NUMBER_ZERO_WHEN_OP_DIVIDE="),        10UL },
-    { string("PROCESS_TMP_EXPRESSION_WITHOUT_ASSIGNMENT="),     11UL },
-    { string("TREAT_BLANK_STATEMENT_AS_WARNING="),              12UL },
-    { string("TREAT_UNINITIALIZED_VARIBLE_AS_ERROR="),          13UL },
-    { string("PRINT_PARSE_FILE_LENGTH="),                       14UL },
-    { string("TRACE_PARSE_TIME_STEP="),                         15UL }
+    { string("PRINT_RUNTIME_WARNING = "),                              0UL  },
+    { string("PRINT_OPSTACK_ALL = "),                                  1UL  },
+    { string("PRINT_SUFFIXEXP_BEFORE = "),                             2UL  },
+    { string("PRINT_SUFFIXEXP_AFTER_BUILD = "),                        3UL  },
+    { string("PRINT_SUFFIXEXP_AFTER_EVALUATE = "),                     4UL  },
+    { string("TRACE_OPSTACK_CHANGE = "),                               5UL  },
+    { string("TRACE_SUFFIXEXP_CHANGE = "),                             6UL  },
+    { string("TRACE_POSNEGAPROPERTY_CHANGE = "),                       7UL  },
+    { string("TRACE_TMPEXP_PROCESS = "),                               8UL  },
+
+    { string("NEED_TREAT_SIGNED_INTEGER_BIT_SHIFT_AS_WARING = "),      9UL },
+    { string("TRACE_FLOAT_NUMBER_ZERO_WHEN_OP_DIVIDE = "),            10UL },
+    { string("PROCESS_TMP_EXPRESSION_WITHOUT_ASSIGNMENT = "),         11UL },
+    { string("TREAT_BLANK_STATEMENT_AS_WARNING = "),                  12UL },
+    { string("TREAT_UNINITIALIZED_VARIBLE_AS_ERROR = "),              13UL },
+    { string("PRINT_PARSE_FILE_LENGTH = "),                           14UL },
+
+    { string("TRACE_PARSE_TIME_STEP = "),                             23UL }
 };
 
 
  
 const vector< pair<string,unsigned long> > CmdOptions::SC_FLAG_MAP{
-    { string("Dec="), 0UL   },
-    { string("Hex="), 1UL   },
-    { string("Bin="), 2UL   },
-    { string("Oct="), 3UL   }
+    { string("ENABLE_PRINT_VARLIST_AT_LAST = "), 0UL   },
+    { string("Dec = "), 1UL   },
+    { string("Hex = "), 2UL   },
+    { string("Bin = "), 3UL   },
+    { string("Oct = "), 4UL   }
 };
 
 
@@ -80,7 +88,7 @@ unsigned long CmdOptions::s_flag = 1UL;
 
 string CmdOptions::getDefaultCfgFileName()
 {
-    return CmdOptions::SC_DEFAULT_FILENAME;
+    return SC_DEFAULT_FILENAME;
 }
 
 
@@ -98,9 +106,9 @@ pair<bool,string> CmdOptions::parseCmdArgs(const vector<string>& args)
 
     for ( const auto& sOption : args ) 
     {
-        auto pos = sOption.find( CmdOptions::CFG_PREFIX );
+        auto pos = sOption.find( CFG_PREFIX );
         if ( pos == 0 ) {
-            cfgfile = sOption.substr(  CmdOptions::CFG_PREFIX.size() );
+            cfgfile = sOption.substr(  CFG_PREFIX.size() );
             ++matchCnt;
         } else {
             unknowArgList.push_back(sOption);
@@ -146,8 +154,8 @@ pair<bool,string> CmdOptions::parseCfgFile(bool hasCmdArgs, const string& cfgfil
         abspath = cfgfile;
         realCfgPath = cfgfile;
     } else {
-        abspath = binPath + CmdOptions::SC_DEFAULT_FILENAME;
-        realCfgPath = CmdOptions::SC_DEFAULT_FILENAME;
+        abspath = binPath + SC_DEFAULT_FILENAME;
+        realCfgPath = SC_DEFAULT_FILENAME;
     }
 
     // try reading the cfg file in the running path
@@ -158,53 +166,44 @@ pair<bool,string> CmdOptions::parseCfgFile(bool hasCmdArgs, const string& cfgfil
         // Use original value
         inCfgfile.close();
     } else {
-        int printableFlag = -1;
         while ( !inCfgfile.eof() ) {
             string line;
             getline(inCfgfile, line);
 
             auto isMatched1Option = false;
+
             //
             // Set CmdOptions::s_flag
             //
-            if ( printableFlag != 0  ) {
-                auto fountIdx = -1;
-                unsigned int flagValue = 1;
-                for ( int idx = 0; idx < static_cast<int>( CmdOptions::SC_FLAG_MAP.size() ); ++idx ) 
-                {
-                    auto pr = CmdOptions::SC_FLAG_MAP.at(idx);
-                    auto pos = line.find(pr.first);
-                    if ( pos != string::npos ) {
-                        string restStr =  line.substr( pos + pr.first.size() );
-                        if ( restStr.empty() ) {
-                            flagValue = 0;
-                        } else {
-                            try {
-                                flagValue = static_cast<unsigned int>( stoi(restStr) );
-                            } catch ( const exception& /* e */ ) {
-                                flagValue = 0;
-                            }
-                        }
-
-                        fountIdx = idx;
-                        break;
-                    }
-                }
-
-                if ( fountIdx != -1 ) {
-                    isMatched1Option = true;
-                    if ( fountIdx == 0 ) {
-                        printableFlag = flagValue;
-                        if ( flagValue == 0 ) {
-                            CmdOptions::s_flag = 0UL;
-                        } else {
-                            CmdOptions::s_flag |= (1 << CmdOptions::SC_FLAG_MAP.at(fountIdx).second );
-                        }
+            auto foundIdx = -1;
+            unsigned int flagValue = 1;
+            for ( int idx = 0; idx < static_cast<int>( SC_FLAG_MAP.size() ); ++idx ) 
+            {
+                auto pr = SC_FLAG_MAP.at(idx);
+                auto pos = line.find(pr.first);
+                if ( pos != string::npos ) {
+                    string restStr =  line.substr( pos + pr.first.size() );
+                    if ( restStr.empty() ) {
+                        flagValue = 0;
                     } else {
-                        if ( flagValue != 0 ) {
-                            CmdOptions::s_flag |= (1UL << CmdOptions::SC_FLAG_MAP.at(fountIdx).second );
+                        try {
+                            flagValue = static_cast<unsigned int>( stoi(restStr) );
+                        } catch ( const exception& /* e */ ) {
+                            flagValue = 0;
                         }
                     }
+
+                    foundIdx = idx;
+                    break;
+                }
+            }
+
+            if ( foundIdx != -1 ) {
+                isMatched1Option = true;
+                if ( flagValue != 0 ) { // set a given bit to 1
+                    s_flag |= (1UL << SC_FLAG_MAP.at(foundIdx).second );
+                } else { // set a given bit to 0
+                    s_flag &= ( ~(1UL << SC_FLAG_MAP.at(foundIdx).second ) );
                 }
             }
 
@@ -213,11 +212,11 @@ pair<bool,string> CmdOptions::parseCfgFile(bool hasCmdArgs, const string& cfgfil
                 //
                 // Set CmdOptions::s_debugOption
                 //
-                auto fountIdx = -1;
+                auto foundIdx2 = -1;
                 unsigned int flagValue = 1;
-                for ( int idx = 0; idx < static_cast<int>( CmdOptions::SC_DEBUG_OPTIONS_MAP.size() ); ++idx ) 
+                for ( int idx = 0; idx < static_cast<int>( SC_DEBUG_OPTIONS_MAP.size() ); ++idx ) 
                 {
-                    auto pr = CmdOptions::SC_DEBUG_OPTIONS_MAP.at(idx);
+                    auto pr = SC_DEBUG_OPTIONS_MAP.at(idx);
                     auto pos = line.find(pr.first);
                     if ( pos != string::npos ) {
                         string restStr =  line.substr( pos + pr.first.size() );
@@ -231,14 +230,16 @@ pair<bool,string> CmdOptions::parseCfgFile(bool hasCmdArgs, const string& cfgfil
                             }
                         }
 
-                        fountIdx = idx;
+                        foundIdx2 = idx;
                         break;
                     }
                 }
 
-                if ( fountIdx != -1 ) {
+                if ( foundIdx2 != -1 ) {
                     if ( flagValue != 0 ) {
-                        s_debugOption  |= (1UL << CmdOptions::SC_DEBUG_OPTIONS_MAP.at(fountIdx).second );
+                        s_debugOption  |= (1UL << SC_DEBUG_OPTIONS_MAP.at(foundIdx2).second );
+                    } else {
+                        s_debugOption &= ( ~(1UL << SC_DEBUG_OPTIONS_MAP.at(foundIdx2).second ) );
                     }
                 }
             }
@@ -282,7 +283,7 @@ string CmdOptions::getUserManual()
     strUserManul += "Usage : \n";
     strUserManul += "\t<programName>   ";
     strUserManul += "[";
-    strUserManul += CmdOptions::CFG_HINTS;
+    strUserManul += CFG_HINTS;
     strUserManul += "]";
 
     strUserManul += SPACE_2;
@@ -300,10 +301,21 @@ string CmdOptions::getUserManual()
 // print varible flag
 //
 bool CmdOptions::needPrintVaribleFinally() { return (  s_flag         & 0x1UL) != 0; }
-bool CmdOptions::needPrintVarible_16()     { return ( (s_flag >> 1UL) & 0x1UL) != 0; }
-bool CmdOptions::needPrintVarible_2()      { return ( (s_flag >> 2UL) & 0x1UL) != 0; }
-bool CmdOptions::needPrintVarible_8()      { return ( (s_flag >> 3UL) & 0x1UL) != 0; }
 
+bool CmdOptions::needPrintVarible_10()     { return ( (s_flag >> 1UL) & 0x1UL) != 0; }
+bool CmdOptions::needPrintVarible_16()     { return ( (s_flag >> 2UL) & 0x1UL) != 0; }
+bool CmdOptions::needPrintVarible_2()      { return ( (s_flag >> 3UL) & 0x1UL) != 0; }
+bool CmdOptions::needPrintVarible_8()      { return ( (s_flag >> 4UL) & 0x1UL) != 0; }
+
+unsigned int CmdOptions::getFlag()        { return s_flag; }
+
+bool CmdOptions::isPrintVaribleFormatValid() 
+{ 
+   return    CmdOptions::needPrintVarible_10() 
+          || CmdOptions::needPrintVarible_16()
+          || CmdOptions::needPrintVarible_2()
+          || CmdOptions::needPrintVarible_8(); 
+}
 
 
 
@@ -323,15 +335,18 @@ bool CmdOptions::needTraceSuffixExpressionChange()             { return  ( (s_de
 bool CmdOptions::needTracePositiveNegativePropertyChange()     { return  ( (s_debugOption >> 7UL)      & 0x1UL) != 0;  }
 bool CmdOptions::needTraceTmpExpressionProcess()               { return  ( (s_debugOption >> 8UL)      & 0x1UL) != 0;  }
 
+
+bool CmdOptions::needTreatSignedIntergerBitShiftAsWarning()    { return  ( (s_debugOption >>  9UL)     & 0x1UL) != 0;  }
 bool CmdOptions::needCheckFloatNumberZero()                    { return  ( (s_debugOption >> 10UL)     & 0x1UL) != 0;  }
 bool CmdOptions::needProcessTmpExpressionWithoutAssignment()   { return  ( (s_debugOption >> 11UL)     & 0x1UL) != 0;  }
 bool CmdOptions::needTreatBlankStatementAsWarning()            { return  ( (s_debugOption >> 12UL)     & 0x1UL) != 0;  }
 bool CmdOptions::needTreatUninitializedVaribleAsError()        { return  ( (s_debugOption >> 13UL)     & 0x1UL) != 0;  }
 bool CmdOptions::needPrintSrcCodeLength()                      { return  ( (s_debugOption >> 14UL)     & 0x1UL) != 0;  }
-bool CmdOptions::needTraceParseTimeStep()                      { return  ( (s_debugOption >> 15UL)     & 0x1UL) != 0;  }
+
+bool CmdOptions::needTraceParseTimeStep()                      { return  ( (s_debugOption >> 23UL)     & 0x1UL) != 0;  }
 
 
 string CmdOptions::sampleCfgFile()
 {
-    return CmdOptions::SC_CFG_CONTENT;
+    return SC_CFG_CONTENT;
 }

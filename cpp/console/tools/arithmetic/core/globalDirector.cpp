@@ -208,8 +208,7 @@ void GlobalDirector::doParse()
 void GlobalDirector::printAllVaribles()
 {
     if ( CmdOptions::needPrintVaribleFinally() ) {
-        const unsigned int printFlag = 1U;
-        VariblePool::getPool()->printAllVaribles( printFlag );
+        VariblePool::getPool()->printAllVaribles( CmdOptions::getFlag() );
     }
 }
 
