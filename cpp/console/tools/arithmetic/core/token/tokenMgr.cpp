@@ -641,11 +641,9 @@ void TokenMgr::executeCode()
             buildSuffixExpression(sentenceType, varIdx);
             checkSuffixExpressionValid();
             popAllOperatorStack();
-
             printSuffixExpression(2);
 
             evaluateSuffixExpression();
-
             printSuffixExpression(3);
             m_suffixExpression.clear(); // clear the only 1 element
         }
@@ -911,6 +909,7 @@ void TokenMgr::processOperatorStack(TokenBase* previousToken, TokenBase* pToken)
 
 void TokenMgr::evaluateSuffixExpression()
 {
+    int operatorProcessCnt = 0; // count for do binaryOp/UnaryOp Cnt
     int previousExpCnt = 0;
     for( auto it = m_suffixExpression.begin(); it != m_suffixExpression.end(); ) 
     {
@@ -952,6 +951,7 @@ void TokenMgr::evaluateSuffixExpression()
                 leftOperand = *it;
 
                 auto genTmpExp = doBinaryOp(leftOperand, currentElement, rightOperand);
+                ++operatorProcessCnt;
 
                 it = m_suffixExpression.erase(it, nextIt);
                 it = m_suffixExpression.insert(it, genTmpExp);
@@ -973,6 +973,7 @@ void TokenMgr::evaluateSuffixExpression()
                 rightOperand = *it;
 
                 auto genTmpExp = doUnaryOp(currentElement, rightOperand);
+                ++operatorProcessCnt;
 
                 it = m_suffixExpression.erase(it, nextIt);
                 it = m_suffixExpression.insert(it, genTmpExp);
@@ -982,6 +983,24 @@ void TokenMgr::evaluateSuffixExpression()
                 --previousExpCnt;
             }
 
+        }
+    }
+
+    // special condition if tmp expression has no operator
+    if (  operatorProcessCnt == 0 ) {
+        for( auto it = m_suffixExpression.begin(); it != m_suffixExpression.end(); ++it ) 
+        {
+            auto currentElement = *it;
+            auto currentTokenType = currentElement->getTokenType();
+            if ( currentTokenType == E_TOKEN_EXPRESSION  ) {
+                auto content = currentElement->getTokenContent();
+                auto dataVal = currentElement->getRealValue();
+                traceTmpOpResult(content , dataVal);
+            } else {
+                MyException e(E_THROW_CODE_CANNOT_REACH_HERE, currentElement->getBeginPos()  );
+                e.setDetail(" When operatorStack is empty or binary/unary operator's count == 0 ");
+                throw e;
+            }
         }
     }
 }
@@ -2067,7 +2086,7 @@ void TokenMgr::tracebitShiftWarning(bool isLeftBitShift, TokenBase* left,  Token
         DataValue rightVal = right->getRealValue();
 
         auto leftusFlag = leftTpInfo.isUnsignedType();
-        if ( left->isVarible() &&  !leftusFlag ) {
+        if ( CmdOptions::needTreatSignedIntergerBitShiftAsWarning() &&  left->isVarible() &&  !leftusFlag ) {
             cerr << SC_WARNING_TITLE;
             cerr << " calculating : " << (isLeftBitShift ? "<<" : ">>") << endl;
             cerr << "leftOperand is not unsigned type : "  << EnumUtil::enumName(leftTpInfo.getType()) << " : " << left->getTokenContent() << SPACE_1 << "@" << left->getBeginPos().getPos(0) << endl;

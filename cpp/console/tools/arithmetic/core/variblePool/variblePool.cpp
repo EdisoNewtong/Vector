@@ -75,7 +75,7 @@ VaribleInfo* VariblePool::create_a_new_varible(E_DataType dt, const std::string&
     if ( foundIt != m_pool.end() ) {
         // already found it
         MyException e(E_THROW_VARIBLE_ALREADY_DEFINED);
-        e.setDetail( varname + std::string(" @") + std::to_string(defline) +  std::string(" has already been defined at line : ") + std::to_string( foundIt->second->definedLine) );
+        e.setDetail( varname + std::string(" @line : ") + std::to_string(defline) +  std::string(" has already been defined @line : ") + std::to_string( foundIt->second->definedLine) );
         throw e;
     }
 
@@ -107,7 +107,7 @@ void VariblePool::printAllVaribles(unsigned int flag)
         if ( it != m_pool.end() ) {
             VaribleInfo* pVarInfo = it->second;
             if ( pVarInfo != nullptr ) {
-                cout << (idx+1) << ".  " << EnumUtil::enumName(pVarInfo->dataVal.type) << " " << pVarInfo->varName << " = " << pVarInfo->dataVal.getPrintValue(flag) << endl;
+                cout << (idx+1) << ".  " << EnumUtil::enumName(pVarInfo->dataVal.type) << " " << pVarInfo->varName << " = " << pVarInfo->dataVal.getPrintValue(flag, true) << endl;
             }
         }
 

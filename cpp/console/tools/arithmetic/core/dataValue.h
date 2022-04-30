@@ -36,7 +36,7 @@ struct DataValue
     bool isNegative();
     bool isGreaterEqualBitsWidth(int bits);
     bool isMinimumNegativeNumber();
-    std::string getPrintValue(unsigned int flag);
+    std::string getPrintValue(unsigned int flag, bool hasPreviousWithEqual = false);
 
     void downerCast(E_DataType castTp);
 

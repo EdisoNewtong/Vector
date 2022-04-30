@@ -2061,234 +2061,311 @@ string DataValue::toBinary(const string& hex)
 
 
 
-string DataValue::getPrintValue(unsigned int flag)
+string DataValue::getPrintValue(unsigned int flag, bool hasPreviousWithEqual /* = false */ )
 {
     stringstream strValue;
     stringstream hexStr;
+
+    auto bDefaultPrintDecimal = CmdOptions::needPrintVarible_10() || !CmdOptions::isPrintVaribleFormatValid();
+    auto printBefore = false;
     switch( this->type )
     {
     case E_TP_CHAR:
         {
             int code = static_cast<int>(value.char_val);
-            strValue << value.char_val << " => " << code;
+            if ( flag==0   ||  bDefaultPrintDecimal ) { 
+                strValue << value.char_val << " => " << code;
+                printBefore = true;
+            }
+
             if ( flag!=0 &&    CmdOptions::needPrintVarible_16() ) {
                 // print hex
-                strValue << " = 0x" << std::hex << std::uppercase << code;
+                strValue << ((printBefore || !hasPreviousWithEqual) ? " = 0x" : "0x") << std::hex << std::uppercase << code;
+                printBefore = true;
             }
 
             if ( flag!=0 &&    CmdOptions::needPrintVarible_2() ) {
                 // print binary
                 hexStr << std::hex << std::uppercase << code;
-                strValue << " = " <<  DataValue::toBinary( hexStr.str() ) << " (B) ";
+                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = " : "") <<  DataValue::toBinary( hexStr.str() ) << " (B) ";
+                printBefore = true;
             }
 
             if ( flag!=0  &&   CmdOptions::needPrintVarible_8() ) {
                 // print oct
-                strValue << " = (0)" << std::oct << code;
+                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = (0)" : "") << std::oct << code;
+                printBefore = true;
             }
         }
         break;
     case E_TP_U_CHAR:
         {
             int code = static_cast<int>(value.uchar_val);
-            strValue << value.uchar_val << " => " << code;
+            if ( flag==0   ||  bDefaultPrintDecimal ) {
+                strValue << value.uchar_val << " => " << code;
+            }
 
             if ( flag!=0 &&    CmdOptions::needPrintVarible_16() ) {
                 // print hex
-                strValue << " = 0x" << std::hex << std::uppercase << code;
+                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = 0x" : "0x") << std::hex << std::uppercase << code;
+                printBefore = true;
             }
 
             if ( flag!=0 &&    CmdOptions::needPrintVarible_2() ) {
                 // print binary
                 hexStr << std::hex << std::uppercase << code;
-                strValue << " = " <<  DataValue::toBinary( hexStr.str() ) << " (B) ";
+                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = " : "") <<  DataValue::toBinary( hexStr.str() ) << " (B) ";
+                printBefore = true;
             }
 
             if ( flag!=0  &&   CmdOptions::needPrintVarible_8() ) {
                 // print oct
-                strValue << " = (0)" << std::oct << code;
+                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = (0)" : "") << std::oct << code;
+                printBefore = true;
             }
         }
         break;
     case E_TP_S_CHAR:
         {
             int code = static_cast<int>(value.schar_val);
-            strValue << value.schar_val << " => " << code;
+            if ( flag==0   ||  bDefaultPrintDecimal ) { 
+                strValue << value.schar_val << " => " << code;
+                printBefore = true;
+            }
 
             if ( flag!=0   &&   CmdOptions::needPrintVarible_16() ) {
                 // print hex
-                strValue << " = 0x" << std::hex << std::uppercase << code;
+                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = 0x" : "0x") << std::hex << std::uppercase << code;
+                printBefore = true;
             }
 
             if ( flag!=0   &&   CmdOptions::needPrintVarible_2() ) {
                 // print binary
                 hexStr << std::hex << std::uppercase << code;
-                strValue << " = " <<  DataValue::toBinary( hexStr.str() ) << " (B) ";
+                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = " : "") <<  DataValue::toBinary( hexStr.str() ) << " (B) ";
+                printBefore = true;
             }
 
             if ( flag!=0  &&   CmdOptions::needPrintVarible_8() ) {
                 // print oct
-                strValue << " = (0)" << std::oct << code;
+                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = (0)" : "") << std::oct << code;
+                printBefore = true;
             }
         }
         break;
     case E_TP_U_SHORT:
         {
-            strValue << value.ushort_val;
+            if ( flag==0   ||  bDefaultPrintDecimal ) { 
+                strValue << value.ushort_val;
+                printBefore = true;
+            }
+
             if ( flag!=0   &&   CmdOptions::needPrintVarible_16() ) {
                 // print hex
-                strValue << " = 0x" << std::hex << std::uppercase << value.ushort_val;
+                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = 0x" : "0x") << std::hex << std::uppercase << value.ushort_val;
+                printBefore = true;
             }
 
             if ( flag!=0   &&   CmdOptions::needPrintVarible_2() ) {
                 // print binary
                 hexStr << std::hex << std::uppercase << value.ushort_val;
-                strValue << " = " <<  DataValue::toBinary( hexStr.str() ) << " (B) ";
+                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = " : "") <<  DataValue::toBinary( hexStr.str() ) << " (B) ";
+                printBefore = true;
             }
 
             if ( flag!=0  &&   CmdOptions::needPrintVarible_8() ) {
                 // print oct
-                strValue << " = (0)" << std::oct << value.ushort_val;
+                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = (0)" : "") << std::oct << value.ushort_val;
+                printBefore = true;
             }
         }
         break;
     case E_TP_S_SHORT:
         {
-            strValue << value.sshort_val;
+            if ( flag==0   ||  bDefaultPrintDecimal ) { 
+                strValue << value.sshort_val;
+                printBefore = true;
+            }
+
             if ( flag!=0   &&   CmdOptions::needPrintVarible_16() ) {
                 // print hex
-                strValue << " = 0x" << std::hex << std::uppercase << value.sshort_val;
+                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = 0x" : "0x") << std::hex << std::uppercase << value.sshort_val;
+                printBefore = true;
             }
 
             if ( flag!=0   &&   CmdOptions::needPrintVarible_2() ) {
                 // print binary
                 hexStr << std::hex << std::uppercase << value.sshort_val;
-                strValue << " = " <<  DataValue::toBinary( hexStr.str() ) << " (B) ";
+                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = " : "") <<  DataValue::toBinary( hexStr.str() ) << " (B) ";
+                printBefore = true;
             }
 
             if ( flag!=0  &&   CmdOptions::needPrintVarible_8() ) {
                 // print oct
-                strValue << " = (0)" << std::oct << value.sshort_val;
+                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = (0)" : "") << std::oct << value.sshort_val;
+                printBefore = true;
             }
         }
         break;
     case E_TP_U_INT:
         {
-            strValue << value.uint_val;
+            if ( flag==0   ||    bDefaultPrintDecimal ) { 
+                strValue << value.uint_val;
+                printBefore = true;
+            }
+
             if ( flag!=0   &&   CmdOptions::needPrintVarible_16() ) {
                 // print hex
-                strValue << " = 0x" << std::hex << std::uppercase << value.uint_val;
+                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = 0x" : "0x") << std::hex << std::uppercase << value.uint_val;
+                printBefore = true;
             }
 
             if ( flag!=0   &&   CmdOptions::needPrintVarible_2() ) {
                 // print binary
                 hexStr << std::hex << std::uppercase << value.uint_val;
-                strValue << " = " <<  DataValue::toBinary( hexStr.str() ) << " (B) ";
+                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = " : "") <<  DataValue::toBinary( hexStr.str() ) << " (B) ";
+                printBefore = true;
             }
 
             if ( flag!=0  &&   CmdOptions::needPrintVarible_8() ) {
                 // print oct
-                strValue << " = (0)" << std::oct << value.uint_val;
+                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = (0)" : "") << std::oct << value.uint_val;
+                printBefore = true;
             }
         }
         break;
     case E_TP_S_INT:
         {
-            strValue << value.sint_val;
+            if ( flag==0   ||    bDefaultPrintDecimal ) { 
+                strValue << value.sint_val;
+                printBefore = true;
+            }
+
             if ( flag!=0   &&   CmdOptions::needPrintVarible_16() ) {
                 // print hex
-                strValue << " = 0x" << std::hex << std::uppercase << value.sint_val;
+                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = 0x" : "0x") << std::hex << std::uppercase << value.sint_val;
+                printBefore = true;
             }
 
             if ( flag!=0   &&   CmdOptions::needPrintVarible_2() ) {
                 // print binary
                 hexStr << std::hex << std::uppercase << value.sint_val;
-                strValue << " = " <<  DataValue::toBinary( hexStr.str() ) << " (B) ";
+                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = " : "") <<  DataValue::toBinary( hexStr.str() ) << " (B) ";
+                printBefore = true;
             }
 
             if ( flag!=0  &&   CmdOptions::needPrintVarible_8() ) {
                 // print oct
-                strValue << " = (0)" << std::oct << value.sint_val;
+                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = (0)" : "") << std::oct << value.sint_val;
+                printBefore = true;
             }
         }
         break;
     case E_TP_U_LONG:
         {
-            strValue << value.ulong_val;
+            if ( flag==0   ||    bDefaultPrintDecimal ) { 
+                strValue << value.ulong_val;
+                printBefore = true;
+            }
+
             if ( flag!=0   &&   CmdOptions::needPrintVarible_16() ) {
                 // print hex
-                strValue << " = 0x" << std::hex << std::uppercase << value.ulong_val;
+                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = 0x" : "0x") << std::hex << std::uppercase << value.ulong_val;
+                printBefore = true;
             }
 
             if ( flag!=0   &&   CmdOptions::needPrintVarible_2() ) {
                 // print binary
                 hexStr << std::hex << std::uppercase << value.ulong_val;
-                strValue << " = " <<  DataValue::toBinary( hexStr.str() ) << " (B) ";
+                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = " : "") <<  DataValue::toBinary( hexStr.str() ) << " (B) ";
+                printBefore = true;
             }
 
             if ( flag!=0  &&   CmdOptions::needPrintVarible_8() ) {
                 // print oct
-                strValue << " = (0)" << std::oct << value.ulong_val;
+                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = (0)" : "") << std::oct << value.ulong_val;
+                printBefore = true;
             }
         }
         break;
     case E_TP_S_LONG:
         {
-            strValue << value.slong_val;
+            if ( flag==0   ||     bDefaultPrintDecimal ) { 
+                strValue << value.slong_val;
+                printBefore = true;
+            }
+
             if ( flag!=0   &&   CmdOptions::needPrintVarible_16() ) {
                 // print hex
-                strValue << " = 0x" << std::hex << std::uppercase << value.slong_val;
+                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = 0x" : "0x") << std::hex << std::uppercase << value.slong_val;
+                printBefore = true;
             }
 
             if ( flag!=0   &&   CmdOptions::needPrintVarible_2() ) {
                 // print binary
                 hexStr << std::hex << std::uppercase << value.slong_val;
-                strValue << " = " <<  DataValue::toBinary( hexStr.str() ) << " (B) ";
+                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = " : "") <<  DataValue::toBinary( hexStr.str() ) << " (B) ";
+                printBefore = true;
             }
 
             if ( flag!=0  &&   CmdOptions::needPrintVarible_8() ) {
                 // print oct
-                strValue << " = (0)" << std::oct << value.slong_val;
+                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = (0)" : "") << std::oct << value.slong_val;
+                printBefore = true;
             }
         }
         break;
     case E_TP_U_LONG_LONG:
         {
-            strValue << value.ulonglong_val;
+            if ( flag==0   ||    bDefaultPrintDecimal ) { 
+                strValue << value.ulonglong_val;
+                printBefore = true;
+            }
+
             if ( flag!=0   &&   CmdOptions::needPrintVarible_16() ) {
                 // print hex
-                strValue << " = 0x" << std::hex << std::uppercase << value.ulonglong_val;
+                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = 0x" : "0x") << std::hex << std::uppercase << value.ulonglong_val;
+                printBefore = true;
             }
 
             if ( flag!=0   &&   CmdOptions::needPrintVarible_2() ) {
                 // print binary
                 hexStr << std::hex << std::uppercase << value.ulonglong_val;
-                strValue << " = " <<  DataValue::toBinary( hexStr.str() ) << " (B) ";
+                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = " : "") <<  DataValue::toBinary( hexStr.str() ) << " (B) ";
+                printBefore = true;
             }
 
             if ( flag!=0  &&   CmdOptions::needPrintVarible_8() ) {
                 // print oct
-                strValue << " = (0)" << std::oct << value.ulonglong_val;
+                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = (0)" : "") << std::oct << value.ulonglong_val;
+                printBefore = true;
             }
         }
         break;
     case E_TP_S_LONG_LONG:
         {
-            strValue << value.slonglong_val;
+            if ( flag==0   ||    bDefaultPrintDecimal ) { 
+                strValue << value.slonglong_val;
+                printBefore = true;
+            }
+
             if ( flag!=0   &&   CmdOptions::needPrintVarible_16() ) {
                 // print hex
-                strValue << " = 0x" << std::hex << std::uppercase << value.slonglong_val;
+                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = 0x" : "0x") << std::hex << std::uppercase << value.slonglong_val;
+                printBefore = true;
             }
 
             if ( flag!=0   &&   CmdOptions::needPrintVarible_2() ) {
                 // print binary
                 hexStr << std::hex << std::uppercase << value.slonglong_val;
-                strValue << " = " <<  DataValue::toBinary( hexStr.str() ) << " (B) ";
+                strValue << ((printBefore && !hasPreviousWithEqual) ? " = " : "") <<  DataValue::toBinary( hexStr.str() ) << " (B) ";
+                printBefore = true;
             }
 
             if ( flag!=0  &&   CmdOptions::needPrintVarible_8() ) {
                 // print oct
-                strValue << " = (0)" << std::oct << value.slonglong_val;
+                strValue << ((printBefore && !hasPreviousWithEqual) ? " = (0)" : "") << std::oct << value.slonglong_val;
+                printBefore = true;
             }
         }
         break;
