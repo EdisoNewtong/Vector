@@ -552,11 +552,12 @@ void TokenMgr::executeCode()
     E_DataType defDt = E_TP_UNKNOWN;
     string varname;
     auto varIdx = 0;
+    auto hasTokenEqual = (equalCnt != 0);
     if ( equalCnt == 0 ) {
         if ( is1stTokenKeyWord() ) {
             // 1. int a;
             varIdx = (vecSz - 1);
-            defDt = checkPrefixKeyWordsAndGetDataType(varIdx, varname);
+            defDt = checkPrefixKeyWordsAndGetDataType(varIdx, varname, hasTokenEqual);
             sentenceType = 1;
         } else {
             varIdx = 0;
@@ -578,7 +579,7 @@ void TokenMgr::executeCode()
         varIdx = (equal1stIdx - 1);
         // equal1stIdx >=1
         if ( equal1stIdx > 1 ) {
-            defDt  = checkPrefixKeyWordsAndGetDataType(varIdx, varname);
+            defDt  = checkPrefixKeyWordsAndGetDataType(varIdx, varname, hasTokenEqual);
             // 2. int a = 3;
             sentenceType = 2;
         } else {
@@ -1101,49 +1102,55 @@ void TokenMgr::popUntilOpenParentheses()
 
 
 
-E_DataType TokenMgr::checkPrefixKeyWordsAndGetDataType(int varIdx, string& varname)
+E_DataType TokenMgr::checkPrefixKeyWordsAndGetDataType(int varIdx, string& varname, bool hasTokenEqual )
 {
     using namespace charutil;
 
     E_DataType dt = E_TP_UNKNOWN;
 
-    auto isAllKeyWord = true;
-    auto errorIdx = -1;
+    auto isValid = true;
+    // auto errorIdx = -1;
     // auto lastIdx = vecSz - 1;
     auto keywordsCnt = 0;
     string keywordsSeq;
     for( auto idx = 0; idx < varIdx; ++idx )
     {
         auto pToken = m_oneSentence.at(idx);
+        auto content = pToken->getTokenContent();
+
         if ( !(pToken->getTokenType() == E_TOKEN_EXPRESSION  && pToken->isKeyword() ) ) {
-            errorIdx = idx;
-            isAllKeyWord = false;
+            // errorIdx = idx;
+            isValid = false;
             break;
         } else {
             ++keywordsCnt;
-            keywordsSeq += pToken->getTokenContent();
+            keywordsSeq += content;
             if ( idx != (varIdx-1) ) {
                 keywordsSeq += SPACE_1;
             }
         }
     }
 
-    if ( !isAllKeyWord ) {
-        MyException e(E_THROW_SENTENCE_DEFINITION_PREFIX_IS_NOT_ALL_KEYWORD , m_oneSentence.at(errorIdx)->getBeginPos() );
-        // e.setDetail( m_oneSentence.at(errorIdx)->getBeginPos().getPos() );
+    if ( !isValid ) {
+        string strWithVarible;
+        for( auto idx = 0; idx <= varIdx; ++idx ) { strWithVarible += m_oneSentence.at(idx)->getTokenContent(); }
+
+        E_ExceptionType errorCode = (hasTokenEqual  ? E_THROW_SENTENCE_PREFIX_TOKENS_BEFORE_EQUAL_ARE_INVALID 
+                                                    : E_THROW_SENTENCE_PREFIX_TOKENS_ARE_INVALID);
+        MyException e(errorCode);
+        string errorMsg = ( SINGLE_QUOTO + strWithVarible + SINGLE_QUOTO + " @line: " + to_string( m_oneSentence.at(varIdx)->getBeginPos().line ) ); 
+        e.setDetail(errorMsg);
         throw e;
     }
 
     if ( keywordsCnt > s_MAX_KEYWORDS_CNT ) {
         MyException e(E_THROW_SENTENCE_DEFINITION_TOO_MANY_KEYWORDS, m_oneSentence.at(0)->getBeginPos() );
-        // e.setDetail( m_oneSentence.at(0)->getBeginPos().getPos() );
         throw e;
     }
 
     auto varElement = m_oneSentence.at(varIdx);
     if ( !(varElement->getTokenType() == E_TOKEN_EXPRESSION    &&   varElement->isVarible()) ) {
         MyException e(E_THROW_SENTENCE_DEFINITION_SUFFIX_IS_NOT_VARIBLE , varElement->getBeginPos() );
-        // e.setDetail( varElement->getBeginPos().getPos() );
         throw e;
     }
     varname = varElement->getTokenContent();

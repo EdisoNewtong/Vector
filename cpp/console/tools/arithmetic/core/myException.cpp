@@ -46,7 +46,9 @@ unordered_map<MyException::ErrorType,string>    MyException::s_exceptionMap{
 
     { enumCvt(E_THROW_SENTENCE_TOO_LESS_TOKEN),                          "Sentence has too few tokens " },
     { enumCvt(E_THROW_SENTENCE_TOO_MORE_ASSIGNMENT),                     "Sentence has too more assignment " },
-    { enumCvt(E_THROW_SENTENCE_DEFINITION_PREFIX_IS_NOT_ALL_KEYWORD),    "Sentence definition prefix are not all keywords " },
+
+    { enumCvt(E_THROW_SENTENCE_PREFIX_TOKENS_ARE_INVALID),               "Sentence prefix tokens are too strange : " },
+    { enumCvt(E_THROW_SENTENCE_PREFIX_TOKENS_BEFORE_EQUAL_ARE_INVALID),  "Sentence prefix tokens before '=' are too strange : " },
     { enumCvt(E_THROW_SENTENCE_DEFINITION_SUFFIX_IS_NOT_VARIBLE),        "Sentence definition suffix is not a varible " },
     { enumCvt(E_THROW_SENTENCE_DEFINITION_TOO_MANY_KEYWORDS),            "Sentence definition has too many keywords " },
     { enumCvt(E_THROW_SENTENCE_NO_EXPR_BEFORE_ASSIGNMENT),               "Sentence no expression before assignment " },
@@ -137,12 +139,12 @@ string MyException::getExceptionDetail() const
 
     detail += SPACE_1;
     if ( m_hasSetCursor ) {
-        detail += m_cursor.getPos();
+        detail += m_cursor.getPos(0);
     }
 
     if ( !m_detail.empty() ) {
-        detail += SPACE_1;
-        detail += (DOUBLE_QUOTO + m_detail + DOUBLE_QUOTO);
+        // detail += SPACE_1;
+        detail += m_detail;
     }
 
     // MyException::s_retDetail = detail;

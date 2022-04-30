@@ -63,7 +63,7 @@ protected:
     // for tmp expression check use
     bool is1stTokenKeyWord();
 
-    E_DataType checkPrefixKeyWordsAndGetDataType(int varIdx, std::string& varname);
+    E_DataType checkPrefixKeyWordsAndGetDataType(int varIdx, std::string& varname, bool hasEqual);
     void executeCode();
     void buildSuffixExpression(int sentenceType, int varibleIdx);
     void checkSuffixExpressionValid();
