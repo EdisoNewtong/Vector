@@ -884,12 +884,12 @@ void TokenMgr::processOperatorStack(TokenBase* previousToken, TokenBase* pToken)
 
                     pushedFlag = true;
                 } else {
-                    m_suffixExpression.push_back( pVisitToken );
-                    traceSuffixExpression( pVisitToken, true );
-
                     forwardIt = m_opertorStack.erase( (++rit).base() );
                     rit = reverse_iterator< decltype(forwardIt) >( forwardIt );
                     traceOperatorStack( pVisitToken, false );
+
+                    m_suffixExpression.push_back( pVisitToken );
+                    traceSuffixExpression( pVisitToken, true );
                 }
             }
 
@@ -1993,11 +1993,13 @@ void TokenMgr::printSuffixExpression(int tag)
 
 void TokenMgr::popAllOperatorStack()
 {
+
     for( auto rit = m_opertorStack.rbegin(); rit != m_opertorStack.rend(); ++rit )
     {
         auto pToken = *rit;
 
         traceOperatorStack(pToken, false);
+
         m_suffixExpression.push_back( pToken );
         traceSuffixExpression(pToken, true);
     }
