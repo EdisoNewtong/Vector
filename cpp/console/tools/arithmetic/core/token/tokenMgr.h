@@ -106,6 +106,13 @@ protected:
 
     void traceOperatorStack(TokenBase* pToken, bool push);
     void traceSuffixExpression(TokenBase* pToken, bool push);
+
+    // move from OperatorStack to  -->   SuffixExpression
+    // pop from OpStack , push it into SuffixExpression list
+    void traceOpMove2SuffixExpression(TokenBase* pToken);
+    void traceSomeTokensFromOpMove2SuffixExpression(const std::list<TokenBase*>& lst, bool specialFlag);
+
+
     void tracePositiveNegativeFlag(TokenBase* pToken, E_OperatorType op);
 
     void traceNegativeOperation(TokenBase* right);
