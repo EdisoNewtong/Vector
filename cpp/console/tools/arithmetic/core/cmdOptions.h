@@ -37,8 +37,11 @@ public:
     static bool needPrintSuffixExpressionBefore();
     static bool needPrintSuffixExpressionAfterBuild();
     static bool needPrintSuffixExpressionAfterEvaluate();
-    static bool needTraceOperatorStackChange();
-    static bool needTraceSuffixExpressionChange();
+
+    static bool needTraceOperatorStackSuffixExpressionChange();
+    // static bool needTraceOperatorStackChange();
+    // static bool needTraceSuffixExpressionChange();
+
     static bool needTracePositiveNegativePropertyChange();
     static bool needTraceTmpExpressionProcess();
 

@@ -29,8 +29,7 @@ R"([Flag]
     PRINT_SUFFIXEXP_BEFORE = 0
     PRINT_SUFFIXEXP_AFTER_BUILD = 0
     PRINT_SUFFIXEXP_AFTER_EVALUATE = 0
-    TRACE_OPSTACK_CHANGE = 0
-    TRACE_SUFFIXEXP_CHANGE = 0
+    TRACE_OPSTACK_SUFFIXEXPR_CHANGE = 0
     TRACE_POSNEGAPROPERTY_CHANGE = 0
     TRACE_TMPEXP_PROCESS = 0
 
@@ -53,10 +52,9 @@ const vector< pair<string,unsigned long> > CmdOptions::SC_DEBUG_OPTIONS_MAP{
     { string("PRINT_SUFFIXEXP_BEFORE = "),                             2UL  },
     { string("PRINT_SUFFIXEXP_AFTER_BUILD = "),                        3UL  },
     { string("PRINT_SUFFIXEXP_AFTER_EVALUATE = "),                     4UL  },
-    { string("TRACE_OPSTACK_CHANGE = "),                               5UL  },
-    { string("TRACE_SUFFIXEXP_CHANGE = "),                             6UL  },
-    { string("TRACE_POSNEGAPROPERTY_CHANGE = "),                       7UL  },
-    { string("TRACE_TMPEXP_PROCESS = "),                               8UL  },
+    { string("TRACE_OPSTACK_SUFFIXEXPR_CHANGE = "),                    5UL  },
+    { string("TRACE_POSNEGAPROPERTY_CHANGE = "),                       6UL  },
+    { string("TRACE_TMPEXP_PROCESS = "),                               7UL  },
 
     { string("NEED_TREAT_SIGNED_INTEGER_BIT_SHIFT_AS_WARING = "),      9UL },
     { string("TRACE_FLOAT_NUMBER_ZERO_WHEN_OP_DIVIDE = "),            10UL },
@@ -331,12 +329,9 @@ bool CmdOptions::needPrintOperatorStackAll()                   { return  ( (s_de
 bool CmdOptions::needPrintSuffixExpressionBefore()             { return  ( (s_debugOption >> 2UL)      & 0x1UL) != 0;  }
 bool CmdOptions::needPrintSuffixExpressionAfterBuild()         { return  ( (s_debugOption >> 3UL)      & 0x1UL) != 0;  }
 bool CmdOptions::needPrintSuffixExpressionAfterEvaluate()      { return  ( (s_debugOption >> 4UL)      & 0x1UL) != 0;  }
-
-bool CmdOptions::needTraceOperatorStackChange()                { return  ( (s_debugOption >> 5UL)      & 0x1UL) != 0;  }
-bool CmdOptions::needTraceSuffixExpressionChange()             { return  ( (s_debugOption >> 6UL)      & 0x1UL) != 0;  }
-
-bool CmdOptions::needTracePositiveNegativePropertyChange()     { return  ( (s_debugOption >> 7UL)      & 0x1UL) != 0;  }
-bool CmdOptions::needTraceTmpExpressionProcess()               { return  ( (s_debugOption >> 8UL)      & 0x1UL) != 0;  }
+bool CmdOptions::needTraceOperatorStackSuffixExpressionChange(){ return  ( (s_debugOption >> 5UL)      & 0x1UL) != 0;  } 
+bool CmdOptions::needTracePositiveNegativePropertyChange()     { return  ( (s_debugOption >> 6UL)      & 0x1UL) != 0;  }
+bool CmdOptions::needTraceTmpExpressionProcess()               { return  ( (s_debugOption >> 7UL)      & 0x1UL) != 0;  }
 
 bool CmdOptions::needTreatSignedIntergerBitShiftAsWarning()    { return  ( (s_debugOption >>  9UL)     & 0x1UL) != 0;  }
 bool CmdOptions::needCheckFloatNumberZero()                    { return  ( (s_debugOption >> 10UL)     & 0x1UL) != 0;  }
