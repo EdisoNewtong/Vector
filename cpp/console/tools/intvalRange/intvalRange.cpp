@@ -99,32 +99,32 @@ int getBits()
 
 void printAll(bool b1,bool b2)
 {
-    cout <<  "===========================================================================" << endl << endl;
-    cout << "char Part : " << sizeof(char) << " byte , " << getBits<char>() << " bits" << endl << endl;
-    cout << "\t" << getTypeValueRange<unsigned char>("unsigned char",4, false) << endl;
-    cout << "\t" << getTypeValueRange<  signed char>("  signed char",4, false) << endl;
+    cout << "===========================================================================" << endl;
+    cout << "char Part : " << sizeof(char) << " byte , " << getBits<char>() << " bits" << endl;
     cout << "\t" << getTypeValueRange<         char>("         char",4, false) << endl;
-    cout << endl << "===========================================================================" << endl << endl;
-    cout << "short Part : " << sizeof(short) << " bytes , " << getBits<short>() << " bits" << endl << endl;
-    cout << "\t" << getTypeValueRange<unsigned short>("unsigned short",6, false) << endl;
+    cout << "\t" << getTypeValueRange<  signed char>("  signed char",4, false) << endl;
+    cout << "\t" << getTypeValueRange<unsigned char>("unsigned char",4, false) << endl;
+    cout << "===========================================================================" << endl;
+    cout << "short Part : " << sizeof(short) << " bytes , " << getBits<short>() << " bits" << endl;
     cout << "\t" << getTypeValueRange<  signed short>("  signed short",6, false) << endl;
-    cout << endl << "===========================================================================" << endl << endl;
+    cout << "\t" << getTypeValueRange<unsigned short>("unsigned short",6, false) << endl;
+    cout << "===========================================================================" << endl;
     if ( b1 ) {
-        cout << "int Part ( same as long ) : " << sizeof(int) << " bytes , " << getBits<int>() << " bits" << endl << endl;
+        cout << "int Part ( same as long ) : " << sizeof(int) << " bytes , " << getBits<int>() << " bits" << endl;
     } else {
-        cout << "int Part : " << sizeof(int) << " bytes , " << getBits<int>() << " bits" << endl << endl;
+        cout << "int Part : " << sizeof(int) << " bytes , " << getBits<int>() << " bits" << endl;
     } 
-    cout << "\t" << getTypeValueRange<unsigned int>("unsigned int",11, false) << endl;
     cout << "\t" << getTypeValueRange<  signed int>("  signed int",11, false) << endl;
-    cout << endl << "===========================================================================" << endl << endl;
+    cout << "\t" << getTypeValueRange<unsigned int>("unsigned int",11, false) << endl;
+    cout << "===========================================================================" << endl;
     if ( b2 ) {
-        cout << "long Part : ( Same as long long ) " << sizeof(long) << " bytes , " << getBits<long>() << " bits" << endl << endl;
+        cout << "long Part : ( Same as long long ) " << sizeof(long) << " bytes , " << getBits<long>() << " bits" << endl;
     } else {
-        cout << "long Part : " << sizeof(long) << " bytes , " << getBits<long>() << " bits" << endl << endl;
+        cout << "long Part : " << sizeof(long) << " bytes , " << getBits<long>() << " bits" << endl;
     }
-    cout << "\t" << getTypeValueRange<unsigned long>("unsigned long",20, false) << endl;
     cout << "\t" << getTypeValueRange<  signed long>("  signed long",20, false) << endl;
-    cout << endl << "===========================================================================" << endl << endl;
+    cout << "\t" << getTypeValueRange<unsigned long>("unsigned long",20, false) << endl;
+    cout << "===========================================================================" << endl;
 }
 
 
