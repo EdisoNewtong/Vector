@@ -1593,7 +1593,7 @@ E_DataType SequenceParser::calcFixedLiteralDataType()
 
             string stripSuffixULL = m_parsedSeq.substr(0, static_cast<int>( m_parsedSeq.size() - (uCnt + lCnt) ) );
 
-            int compareType = 1;
+            int compareType = 0;
             if ( lCnt == 0 ) { // only 1 'u'
                 // dt = E_TP_U_INT;
 
@@ -1612,6 +1612,7 @@ E_DataType SequenceParser::calcFixedLiteralDataType()
                             // larger than max number
                             ++m_warningCnt;
                             m_warningContent = m_parsedSeq + " (10) is out of max int : " + StringNumber::s_unsignedLongLongMax10.getStrNumber() + SPACE_1 + "@" + m_beginChPos.getPos(0);
+                            compareType = 4;
                         }
                     }
                     break;
@@ -1628,6 +1629,7 @@ E_DataType SequenceParser::calcFixedLiteralDataType()
                             // larger than max number
                             ++m_warningCnt;
                             m_warningContent = m_parsedSeq + " (8) is out of max int : " + StringNumber::s_unsignedLongLongMax8.getStrNumber() + SPACE_1 + "@" + m_beginChPos.getPos(0);
+                            compareType = 4;
                         }
                     }
                     break;
@@ -1644,6 +1646,7 @@ E_DataType SequenceParser::calcFixedLiteralDataType()
                             // larger than max number
                             ++m_warningCnt;
                             m_warningContent = m_parsedSeq + " (16) is out of max int : " + StringNumber::s_unsignedLongLongMax16.getStrNumber() + SPACE_1 + "@" + m_beginChPos.getPos(0);
+                            compareType = 4;
                         }
                     }
                     break;
@@ -1659,7 +1662,8 @@ E_DataType SequenceParser::calcFixedLiteralDataType()
                 } else if ( compareType == 3 ) {
                     dt = E_TP_U_LONG_LONG;
                 } else {
-                    dt = E_TP_U_INT;
+                    // compareType == 4;
+                    dt = E_TP_U_LONG_LONG;
                 }
 
             } else if ( lCnt == 1 ) {
@@ -1685,6 +1689,7 @@ E_DataType SequenceParser::calcFixedLiteralDataType()
                                 m_warningContent += (StringNumber::s_signedLongMax10.getStrNumber());
                             }
                             m_warningContent += (SPACE_1 + "@" + m_beginChPos.getPos(0) );
+                            compareType = 3;
                         }
 
                         /*
@@ -1717,6 +1722,7 @@ E_DataType SequenceParser::calcFixedLiteralDataType()
                                 m_warningContent += StringNumber::s_signedLongMax8.getStrNumber();
                             }
                             m_warningContent += (SPACE_1 + "@" + m_beginChPos.getPos(0) );
+                            compareType = 3;
                         }
 
                         /* 
@@ -1751,6 +1757,7 @@ E_DataType SequenceParser::calcFixedLiteralDataType()
                                 m_warningContent += StringNumber::s_signedLongMax16.getStrNumber();
                             }
                             m_warningContent += (SPACE_1 + "@" + m_beginChPos.getPos(0) );
+                            compareType = 3;
                         }
 
                         /*
@@ -1806,6 +1813,7 @@ E_DataType SequenceParser::calcFixedLiteralDataType()
                                 m_warningContent += StringNumber::s_signedLongLongMax10.getStrNumber();
                             }
                             m_warningContent += (SPACE_1 + "@" + m_beginChPos.getPos(0) );
+                            compareType = 4;
                         }
                     }
                     break;
@@ -1824,6 +1832,7 @@ E_DataType SequenceParser::calcFixedLiteralDataType()
                                 m_warningContent += StringNumber::s_signedLongLongMax8.getStrNumber();
                             }
                             m_warningContent += (SPACE_1 + "@" + m_beginChPos.getPos(0) );
+                            compareType = 4;
                         }
                     }
                     break;
@@ -1842,6 +1851,7 @@ E_DataType SequenceParser::calcFixedLiteralDataType()
                                 m_warningContent += StringNumber::s_signedLongLongMax16.getStrNumber();
                             }
                             m_warningContent += (SPACE_1 + "@" + m_beginChPos.getPos(0) );
+                            compareType = 4;
                         }
                     }
                     break;
@@ -1879,6 +1889,7 @@ E_DataType SequenceParser::calcFixedLiteralDataType()
                         ++m_warningCnt;
                         m_warningContent = m_parsedSeq + " (10) is out of max int : " + StringNumber::s_signedLongLongMax10.getStrNumber();
                         m_warningContent += (SPACE_1 + "@" + m_beginChPos.getPos(0) );
+                        compareType = 4;
                     }
                 }
                 break;
@@ -1896,6 +1907,7 @@ E_DataType SequenceParser::calcFixedLiteralDataType()
                         ++m_warningCnt;
                         m_warningContent = m_parsedSeq + " (8) is out of max int : " + StringNumber::s_signedLongLongMax8.getStrNumber();
                         m_warningContent += (SPACE_1 + "@" + m_beginChPos.getPos(0) );
+                        compareType = 4;
                     }
                 }
                 break;
@@ -1913,6 +1925,7 @@ E_DataType SequenceParser::calcFixedLiteralDataType()
                         ++m_warningCnt;
                         m_warningContent = m_parsedSeq + " (16) is out of max int : " + StringNumber::s_signedLongLongMax16.getStrNumber();
                         m_warningContent += (SPACE_1 + "@" + m_beginChPos.getPos(0) );
+                        compareType = 4;
                     }
                 }
                 break;
@@ -1928,7 +1941,8 @@ E_DataType SequenceParser::calcFixedLiteralDataType()
             } else if ( compareType == 3 ) {
                 dt = E_TP_S_LONG_LONG;
             } else {
-                dt = E_TP_S_INT;
+                // compareType == 4;
+                dt = E_TP_S_LONG_LONG;
             }
         }
     }

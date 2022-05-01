@@ -421,7 +421,7 @@ void TokenMgr::pushToken(TokenBase* pToken)
             detailstr += "nullptr";
             detailstr += SPACE_2;
             detailstr += "After '";
-            detailstr += (pToken->getTokenContent() + SPACE_1 + pToken->getBeginPos().getPos(0) + SINGLE_QUOTO);
+            detailstr += (pToken->getTokenContent() + SINGLE_QUOTO);
         } else {
             //  previousToken != nullptr
             // auto preTp = previousToken->getTokenType();
@@ -433,19 +433,22 @@ void TokenMgr::pushToken(TokenBase* pToken)
             //} else {
             //    detailstr += EnumUtil::enumName( preTp );
             //}
+
             detailstr += (SPACE_1 + SINGLE_QUOTO + leftContent + SINGLE_QUOTO);
-            detailstr += " @";
-            detailstr += previousToken->getBeginPos().getPos(0);
+            // detailstr += " @";
+            // detailstr += previousToken->getBeginPos().getPos(0);
 
 
             auto rightContent = pToken->getTokenContent();
-            detailstr += SPACE_1;
+            detailstr += " After ";
+
             //if ( tokenType == E_TOKEN_OPERATOR ) {
             //    detailstr += EnumUtil::enumName( pToken->getOperatorType() );
             //} else {
             //    detailstr += EnumUtil::enumName( tokenType );
             //}
-            detailstr += (SPACE_1 + SINGLE_QUOTO + rightContent + SINGLE_QUOTO);
+
+            detailstr += (SINGLE_QUOTO + rightContent + SINGLE_QUOTO);
             detailstr += " @";
             detailstr += pToken->getBeginPos().getPos(0);
         }
@@ -560,6 +563,7 @@ void TokenMgr::executeCode()
             defDt = checkPrefixKeyWordsAndGetDataType(varIdx, varname, hasTokenEqual);
             sentenceType = 1;
         } else {
+            //   e.g.  a+b;   3;
             varIdx = 0;
             sentenceType = 4; // all token is either expression ( can't not be keyword ) or operator
         }
@@ -620,10 +624,12 @@ void TokenMgr::executeCode()
     if ( sentenceType == 1 ) {
         // 1. e.g.  unsigned int a;
         pVaribleInfo = VariblePool::getPool()->create_a_new_varible(defDt, varname, sentenceVarElement->getBeginPos().line );
+        sentenceVarElement->setDataType( pVaribleInfo->dataVal.type );
         sentenceVarElement->setRealValue( pVaribleInfo->dataVal );
     } else if ( sentenceType == 2 ) {
         // 2. e.g.  unsigned int           a = 3;
         pVaribleInfo = VariblePool::getPool()->create_a_new_varible(defDt, varname, sentenceVarElement->getBeginPos().line );
+        sentenceVarElement->setDataType( pVaribleInfo->dataVal.type );
         sentenceVarElement->setRealValue( pVaribleInfo->dataVal );
     } else if ( sentenceType == 3 ) {
         // 3. e.g.               a   = 3;
@@ -701,6 +707,7 @@ void TokenMgr::buildSuffixExpression(int sentenceType, int varibleIdx)
 
                 }
 
+                pToken->setDataType( pVisitedVaribleInfo->dataVal.type );
                 pToken->setRealValue( pVisitedVaribleInfo->dataVal );
             }
 
@@ -812,9 +819,9 @@ void TokenMgr::processOperatorStack(TokenBase* previousToken, TokenBase* pToken)
             // e.setDetail( pToken->getBeginPos().getPos() );
             throw e;
         } else {
-            //  toPushed is ')' , 
+            //  toPushed token  is ')' , 
             //    Do not push ')'      
-            //    Pop previous operator till   '('
+            //    Pop the previous closest operator till   '('
             popUntilOpenParentheses();
         }
     } else {
@@ -1750,19 +1757,22 @@ TokenBase* TokenMgr::doAssignment(TokenBase* left, TokenBase* right)
         MyException e(E_THROW_VARIBLE_NOT_DEFINED, left->getBeginPos() );
         e.setDetail( content );
         throw e;
-    } 
-
+    }
 
     string leftContent  = left->getExpressionContent();
     string rightContent = right->getExpressionContent();
     string finalExpr = leftContent + SC_OP_BIT_ASSIGNMENT + rightContent;
 
+
     DataValue leftVal  = left->getRealValue();
     DataValue rightVal = right->getRealValue();
 
+    traceAssignOverFlow(left, right);
+
     //
     // Core Core Core :
-    // Can't use  assignment : Because the left operand and the right operand has different data type
+    // Can't use  assignment statement like the following :
+    //       Because the left operand and the right operand has different data type
     //
     //    leftVal = rightVal;
     //
@@ -2221,3 +2231,28 @@ void TokenMgr::traceBlankStatement()
 
 
 
+void TokenMgr::traceAssignOverFlow(TokenBase* leftVar, TokenBase* rightFixedInt)
+{
+    using namespace charutil;
+
+    if ( CmdOptions::needCheckFixedLiteralIntRangeWhenAssign()   &&   rightFixedInt->isFixedLiteral() ) {
+        TypeBaseInfo  leftVarTpInfo(  leftVar->getDataType() );
+        TypeBaseInfo rightFixTpInfo( rightFixedInt->getDataType() );
+        if (          leftVarTpInfo.isIntegerFamily()
+              &&     rightFixTpInfo.isIntegerFamily()  ) 
+        {
+            if ( rightFixTpInfo.getLevel() > leftVarTpInfo.getLevel() ) {
+                DataValue rVal = rightFixedInt->getRealValue();
+                string strMinVal("???_MinVal");
+                string strMaxVal("???_MaxVal");
+                if ( rVal.isIntOutOfRange( leftVar->getDataType(), strMinVal, strMaxVal ) ) {
+                    cerr << "Sentence : " << SINGLE_QUOTO << EnumUtil::enumName(leftVar->getDataType()) << SPACE_1 << leftVar->getTokenContent() << " = "
+                         << rightFixedInt->getTokenContent() << SINGLE_QUOTO << " is out of range ( " << strMinVal << " ~ " << strMaxVal << " ) " 
+                         << "@line : " << rightFixedInt->getBeginPos().line
+                         << endl;
+                }
+            }
+        }
+        
+    }
+}

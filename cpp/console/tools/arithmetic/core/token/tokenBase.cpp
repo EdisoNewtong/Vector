@@ -270,7 +270,7 @@ bool   TokenBase::isVarible()
 
 void   TokenBase::setAsVarible()
 {
-    //              | 0011 | 1000 |
+    //              | 0011 | 0000 |
     m_expTypeFlag = 0x30U;
 }
 

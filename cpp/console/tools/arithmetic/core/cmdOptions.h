@@ -42,6 +42,7 @@ public:
     static bool needTracePositiveNegativePropertyChange();
     static bool needTraceTmpExpressionProcess();
 
+    static bool needCheckFixedLiteralIntRangeWhenAssign();
     static bool needTreatSignedIntergerBitShiftAsWarning();
     static bool needCheckFloatNumberZero();
     static bool needProcessTmpExpressionWithoutAssignment();

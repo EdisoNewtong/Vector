@@ -40,6 +40,8 @@ R"([Flag]
     TREAT_BLANK_STATEMENT_AS_WARNING = 0
     TREAT_UNINITIALIZED_VARIBLE_AS_ERROR = 0
     PRINT_PARSE_FILE_LENGTH = 0
+    NEED_CHECK_FIXED_LITERAL_INT_RANGE_WHEN_ASSIGN = 1
+
     TRACE_PARSE_TIME_STEP = 0
 )"
 };
@@ -62,6 +64,7 @@ const vector< pair<string,unsigned long> > CmdOptions::SC_DEBUG_OPTIONS_MAP{
     { string("TREAT_BLANK_STATEMENT_AS_WARNING = "),                  12UL },
     { string("TREAT_UNINITIALIZED_VARIBLE_AS_ERROR = "),              13UL },
     { string("PRINT_PARSE_FILE_LENGTH = "),                           14UL },
+    { string("NEED_CHECK_FIXED_LITERAL_INT_RANGE_WHEN_ASSIGN = "),    15UL },
 
     { string("TRACE_PARSE_TIME_STEP = "),                             23UL }
 };
@@ -335,13 +338,13 @@ bool CmdOptions::needTraceSuffixExpressionChange()             { return  ( (s_de
 bool CmdOptions::needTracePositiveNegativePropertyChange()     { return  ( (s_debugOption >> 7UL)      & 0x1UL) != 0;  }
 bool CmdOptions::needTraceTmpExpressionProcess()               { return  ( (s_debugOption >> 8UL)      & 0x1UL) != 0;  }
 
-
 bool CmdOptions::needTreatSignedIntergerBitShiftAsWarning()    { return  ( (s_debugOption >>  9UL)     & 0x1UL) != 0;  }
 bool CmdOptions::needCheckFloatNumberZero()                    { return  ( (s_debugOption >> 10UL)     & 0x1UL) != 0;  }
 bool CmdOptions::needProcessTmpExpressionWithoutAssignment()   { return  ( (s_debugOption >> 11UL)     & 0x1UL) != 0;  }
 bool CmdOptions::needTreatBlankStatementAsWarning()            { return  ( (s_debugOption >> 12UL)     & 0x1UL) != 0;  }
 bool CmdOptions::needTreatUninitializedVaribleAsError()        { return  ( (s_debugOption >> 13UL)     & 0x1UL) != 0;  }
 bool CmdOptions::needPrintSrcCodeLength()                      { return  ( (s_debugOption >> 14UL)     & 0x1UL) != 0;  }
+bool CmdOptions::needCheckFixedLiteralIntRangeWhenAssign()     { return  ( (s_debugOption >> 15UL)     & 0x1UL) != 0;  }
 
 bool CmdOptions::needTraceParseTimeStep()                      { return  ( (s_debugOption >> 23UL)     & 0x1UL) != 0;  }
 
