@@ -115,6 +115,7 @@ protected:
 
     void traceTmpOpResult(const std::string& expr, DataValue& retValue);
     void traceUnInitializedVarWhenUsed(TokenBase* pToken);
+    void traceAssignOverFlow(TokenBase* leftVar, TokenBase* rightFixedInt);
 
     void traceBlankStatement();
 protected:

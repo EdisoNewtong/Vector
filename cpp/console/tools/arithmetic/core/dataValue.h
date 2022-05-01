@@ -4,6 +4,9 @@
 #include "commonEnum.h"
 #include <string>
 
+
+
+
 struct DataValue
 {
     E_DataType type;
@@ -36,6 +39,7 @@ struct DataValue
     bool isNegative();
     bool isGreaterEqualBitsWidth(int bits);
     bool isMinimumNegativeNumber();
+    bool isIntOutOfRange(E_DataType dt, std::string& strMinVal, std::string& strMaxVal);
     std::string getPrintValue(unsigned int flag, bool hasPreviousWithEqual = false);
 
     void downerCast(E_DataType castTp);

@@ -41,14 +41,14 @@ const StringNumber StringNumber::s_signedIntMax16( (sizeof(int) == 4 ? string("0
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // unsigned long
-const StringNumber StringNumber::s_unsignedLongMax8(  (sizeof(int) == 4 ? string("037777777777") : string("01777777777777777777777")), 8);
-const StringNumber StringNumber::s_unsignedLongMax10( (sizeof(int) == 4 ? string("4294967295")   : string("18446744073709551615")),   10);
-const StringNumber StringNumber::s_unsignedLongMax16( (sizeof(int) == 4 ? string("0xFFFFFFFF")   : string("0xFFFFFFFFFFFFFFFF")),     16);
+const StringNumber StringNumber::s_unsignedLongMax8(  (sizeof(long) == 4 ? string("037777777777") : string("01777777777777777777777")), 8);
+const StringNumber StringNumber::s_unsignedLongMax10( (sizeof(long) == 4 ? string("4294967295")   : string("18446744073709551615")),   10);
+const StringNumber StringNumber::s_unsignedLongMax16( (sizeof(long) == 4 ? string("0xFFFFFFFF")   : string("0xFFFFFFFFFFFFFFFF")),     16);
 
 // signed long
-const StringNumber StringNumber::s_signedLongMax8(  (sizeof(int) == 4 ? string("017777777777") : string("0777777777777777777777")), 8);
-const StringNumber StringNumber::s_signedLongMax10( (sizeof(int) == 4 ? string("2147483647")   : string("9223372036854775807")),   10);
-const StringNumber StringNumber::s_signedLongMax16( (sizeof(int) == 4 ? string("0x7FFFFFFF")   : string("0x7FFFFFFFFFFFFFFF")),    16);
+const StringNumber StringNumber::s_signedLongMax8(  (sizeof(long) == 4 ? string("017777777777") : string("0777777777777777777777")), 8);
+const StringNumber StringNumber::s_signedLongMax10( (sizeof(long) == 4 ? string("2147483647")   : string("9223372036854775807")),   10);
+const StringNumber StringNumber::s_signedLongMax16( (sizeof(long) == 4 ? string("0x7FFFFFFF")   : string("0x7FFFFFFFFFFFFFFF")),    16);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 // unsigned long long

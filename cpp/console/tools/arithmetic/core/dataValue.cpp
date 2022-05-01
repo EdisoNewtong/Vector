@@ -18,6 +18,38 @@ using namespace std;
 #pragma warning( disable : 4146 )
 #endif
 
+namespace intTypeRange
+{
+    // char
+    const          char ch_min = numeric_limits<char>::min();
+    const          char ch_max = numeric_limits<char>::max();
+    const unsigned char uch_min = numeric_limits<unsigned char>::min();
+    const unsigned char uch_max = numeric_limits<unsigned char>::max();
+    const   signed char sch_min = numeric_limits<signed char>::min();
+    const   signed char sch_max = numeric_limits<signed char>::max();
+    // short
+    const   unsigned short ushort_min = numeric_limits<unsigned short>::min();
+    const   unsigned short ushort_max = numeric_limits<unsigned short>::max();
+    const     signed short sshort_min = numeric_limits<signed short>::min();
+    const     signed short sshort_max = numeric_limits<signed short>::max();
+    // int
+    const   unsigned int uint_min = numeric_limits<unsigned int>::min();
+    const   unsigned int uint_max = numeric_limits<unsigned int>::max();
+    const     signed int sint_min = numeric_limits<signed int>::min();
+    const     signed int sint_max = numeric_limits<signed int>::max();
+    // long
+    const   unsigned long ulong_min = numeric_limits<unsigned long>::min();
+    const   unsigned long ulong_max = numeric_limits<unsigned long>::max();
+    const     signed long slong_min = numeric_limits<signed long>::min();
+    const     signed long slong_max = numeric_limits<signed long>::max();
+    // long long
+    const   unsigned long long ulonglong_min = numeric_limits<unsigned long long>::min();
+    const   unsigned long long ulonglong_max = numeric_limits<unsigned long long>::max();
+    const     signed long long slonglong_min = numeric_limits<signed long long>::min();
+    const     signed long long slonglong_max = numeric_limits<signed long long>::max();
+
+}
+
 
 void DataValue::doIntergerPromotion(E_DataType promotionTp)
 {
@@ -2501,5 +2533,313 @@ bool DataValue::isMinimumNegativeNumber()
 
     return bret;
 }
+
+
+bool DataValue::isIntOutOfRange(E_DataType leftDt, string& strMinVal, string& strMaxVal)
+{
+    using namespace intTypeRange;
+
+    bool isInRange = false;
+    E_DataType rightDt = this->type;
+
+    switch( leftDt )
+    {
+    case E_TP_CHAR:
+        {
+            strMinVal = to_string( static_cast<int>(ch_min) );
+            strMaxVal = to_string( static_cast<int>(ch_max) );
+            switch( rightDt )
+            {
+            case E_TP_U_INT:
+                isInRange = (value.uint_val >= static_cast<unsigned int>(ch_min) && value.uint_val <= static_cast<unsigned int>(ch_max) );
+                break;
+            case E_TP_S_INT:
+                isInRange = (value.sint_val >= ch_min && value.sint_val <= ch_max);
+                break;
+            case E_TP_U_LONG:
+                isInRange = (value.ulong_val >= static_cast<unsigned long>(ch_min) && value.ulong_val <= static_cast<unsigned long>(ch_max) );
+                break;
+            case E_TP_S_LONG:
+                isInRange = (value.slong_val >= ch_min && value.slong_val <= ch_max);
+                break;
+            case E_TP_U_LONG_LONG:
+                isInRange = (value.ulonglong_val >= static_cast<unsigned long long>(ch_min) && value.ulonglong_val <= static_cast<unsigned long long>(ch_max) );
+                break;
+            case E_TP_S_LONG_LONG:
+                isInRange = (value.slonglong_val >= ch_min && value.slonglong_val <= ch_max);
+                break;
+            default:
+                break;
+            }
+        }
+        break;
+    case E_TP_U_CHAR:
+        {
+            strMinVal = to_string( static_cast<int>(uch_min) );
+            strMaxVal = to_string( static_cast<int>(uch_max) );
+            switch( rightDt )
+            {
+            case E_TP_U_INT:
+                isInRange = (value.uint_val >= uch_min && value.uint_val <= uch_max );
+                break;
+            case E_TP_S_INT:
+                isInRange = (value.sint_val >= static_cast<int>(uch_min) && value.sint_val <= static_cast<int>(uch_max) );
+                break;
+            case E_TP_U_LONG:
+                isInRange = (value.ulong_val >= uch_min && value.ulong_val <= uch_max );
+                break;
+            case E_TP_S_LONG:
+                isInRange = (value.slong_val >= static_cast<long>(uch_min) && value.slong_val <= static_cast<long>(uch_max) );
+                break;
+            case E_TP_U_LONG_LONG:
+                isInRange = (value.ulonglong_val >= uch_min && value.ulonglong_val <= uch_max );
+                break;
+            case E_TP_S_LONG_LONG:
+                isInRange = (value.slonglong_val >= static_cast<long long>(uch_min) && value.slonglong_val <= static_cast<long long>(uch_max) );
+                break;
+            default:
+                break;
+            }
+        }
+        break;
+    case E_TP_S_CHAR:
+        {
+            strMinVal = to_string( static_cast<int>(sch_min) );
+            strMaxVal = to_string( static_cast<int>(sch_max) );
+            switch( rightDt )
+            {
+            case E_TP_U_INT:
+                isInRange = (value.uint_val >= static_cast<unsigned int>(sch_min) && value.uint_val <= static_cast<unsigned int>(sch_max) );
+                break;
+            case E_TP_S_INT:
+                isInRange = (value.sint_val >= sch_min && value.sint_val <= sch_max);
+                break;
+            case E_TP_U_LONG:
+                isInRange = (value.ulong_val >= static_cast<unsigned long>(sch_min) && value.ulong_val <= static_cast<unsigned long>(sch_max) );
+                break;
+            case E_TP_S_LONG:
+                isInRange = (value.slong_val >= sch_min && value.slong_val <= sch_max);
+                break;
+            case E_TP_U_LONG_LONG:
+                isInRange = (value.ulonglong_val >= static_cast<unsigned long long>(sch_min) && value.ulonglong_val <= static_cast<unsigned long long>(sch_max) );
+                break;
+            case E_TP_S_LONG_LONG:
+                isInRange = (value.slonglong_val >= sch_min && value.slonglong_val <= sch_max);
+                break;
+            default:
+                break;
+            }
+        }
+        break;
+    case E_TP_U_SHORT:
+        {
+            strMinVal = to_string( static_cast<int>(ushort_min) );
+            strMaxVal = to_string( static_cast<int>(ushort_max) );
+            switch( rightDt )
+            {
+            case E_TP_U_INT:
+                isInRange = (value.uint_val >= ushort_min && value.uint_val <= ushort_max);
+                break;
+            case E_TP_S_INT:
+                isInRange = (value.sint_val >= static_cast<int>(ushort_min) && value.sint_val <= static_cast<int>(ushort_max) );
+                break;
+            case E_TP_U_LONG:
+                isInRange = (value.ulong_val >= ushort_min && value.ulong_val <= ushort_max);
+                break;
+            case E_TP_S_LONG:
+                isInRange = (value.slong_val >= static_cast<signed long>(ushort_min) && value.slong_val <= static_cast<signed long>(ushort_max) );
+                break;
+            case E_TP_U_LONG_LONG:
+                isInRange = (value.ulonglong_val >= ushort_min && value.ulonglong_val <= ushort_max);
+                break;
+            case E_TP_S_LONG_LONG:
+                isInRange = (value.slonglong_val >= static_cast<long long>(ushort_min) && value.slonglong_val <= static_cast<long long>(ushort_max) );
+                break;
+            default:
+                break;
+            }
+        }
+        break;
+    case E_TP_S_SHORT:
+        {
+            strMinVal = to_string( static_cast<int>(sshort_min) );
+            strMaxVal = to_string( static_cast<int>(sshort_max) );
+            switch( rightDt )
+            {
+            case E_TP_U_INT:
+                isInRange = (value.uint_val >= static_cast<unsigned int>(sshort_min) && value.uint_val <= static_cast<unsigned int>(sshort_max) );
+                break;
+            case E_TP_S_INT:
+                isInRange = (value.sint_val >= sshort_min && value.sint_val <= sshort_max);
+                break;
+            case E_TP_U_LONG:
+                isInRange = (value.ulong_val >= static_cast<unsigned long>(sshort_min) && value.ulong_val <= static_cast<unsigned long>(sshort_max) );
+                break;
+            case E_TP_S_LONG:
+                isInRange = (value.slong_val >= sshort_min && value.slong_val <= sshort_max);
+                break;
+            case E_TP_U_LONG_LONG:
+                isInRange = (value.ulonglong_val >= static_cast<unsigned long long>(sshort_min) && value.ulonglong_val <= static_cast<unsigned long long>(sshort_max) );
+                break;
+            case E_TP_S_LONG_LONG:
+                isInRange = (value.slonglong_val >= sshort_min && value.slonglong_val <= sshort_max);
+                break;
+            default:
+                break;
+            }
+        }
+        break;
+    case E_TP_U_INT:
+        {
+            strMinVal = to_string( uint_min );
+            strMaxVal = to_string( uint_max );
+            switch( rightDt )
+            {
+            case E_TP_U_INT:
+                isInRange = (value.uint_val >= uint_min && value.uint_val <= uint_max);
+                break;
+            case E_TP_S_INT:
+                isInRange = (value.sint_val >= static_cast<int>(uint_min) && value.sint_val <= static_cast<int>(uint_max) );
+                break;
+            case E_TP_U_LONG:
+                isInRange = (value.ulong_val >= uint_min && value.ulong_val <= uint_max);
+                break;
+            case E_TP_S_LONG:
+                isInRange = (value.slong_val >= static_cast<long>(uint_min) && value.slong_val <= static_cast<long>(uint_max) );
+                break;
+            case E_TP_U_LONG_LONG:
+                isInRange = (value.ulonglong_val >= uint_min && value.ulonglong_val <= uint_max);
+                break;
+            case E_TP_S_LONG_LONG:
+                isInRange = (value.slonglong_val >= static_cast<long long>(uint_min) && value.slonglong_val <= static_cast<long long>(uint_max) );
+                break;
+            default:
+                break;
+            }
+        }
+        // value.uint_val 
+        break;
+    case E_TP_S_INT:
+        {
+            strMinVal = to_string( sint_min );
+            strMaxVal = to_string( sint_max );
+            switch( rightDt )
+            {
+            case E_TP_U_INT:
+                isInRange = (value.uint_val >= static_cast<unsigned int>(sint_min) && value.uint_val <= static_cast<unsigned int>(sint_max) );
+                break;
+            case E_TP_S_INT:
+                isInRange = (value.sint_val >= sint_min && value.sint_val <= sint_max);
+                break;
+            case E_TP_U_LONG:
+                isInRange = (value.ulong_val >= static_cast<unsigned long>(sint_min) && value.ulong_val <= static_cast<unsigned long>(sint_max) );
+                break;
+            case E_TP_S_LONG:
+                isInRange = (value.slong_val >= sint_min && value.slong_val <= sint_max);
+                break;
+            case E_TP_U_LONG_LONG:
+                isInRange = (value.ulonglong_val >= static_cast<unsigned long long>(sint_min) && value.ulonglong_val <= static_cast<unsigned long long>(sint_max) );
+                break;
+            case E_TP_S_LONG_LONG:
+                isInRange = (value.slonglong_val >= sint_min && value.slonglong_val <= sint_max);
+                break;
+            default:
+                break;
+            }
+        }
+        // value.sint_val 
+        break;
+    case E_TP_U_LONG:
+        {
+            strMinVal = to_string( ulong_min );
+            strMaxVal = to_string( ulong_max );
+            switch( rightDt )
+            {
+            case E_TP_U_LONG:
+                isInRange = (value.ulong_val >= ulong_min && value.ulong_val <= ulong_max);
+                break;
+            case E_TP_S_LONG:
+                isInRange = (value.slong_val >= static_cast<long>(ulong_min) && value.slong_val <= static_cast<long>(ulong_max) );
+                break;
+            case E_TP_U_LONG_LONG:
+                isInRange = (value.ulonglong_val >= ulong_min && value.ulonglong_val <= ulong_max);
+                break;
+            case E_TP_S_LONG_LONG:
+                isInRange = (value.slonglong_val >= static_cast<long long>(ulong_min) && value.slonglong_val <= static_cast<long long>(ulong_max) );
+                break;
+            default:
+                break;
+            }
+        }
+        // value.ulong_val 
+        break;
+    case E_TP_S_LONG:
+        {
+            strMinVal = to_string( slong_min );
+            strMaxVal = to_string( slong_max );
+            switch( rightDt )
+            {
+            case E_TP_U_LONG:
+                isInRange = (value.ulong_val >= static_cast<unsigned long>(slong_min) && value.ulong_val <= static_cast<unsigned long>(slong_max) );
+                break;
+            case E_TP_S_LONG:
+                isInRange = (value.slong_val >= slong_min && value.slong_val <= slong_max);
+                break;
+            case E_TP_U_LONG_LONG:
+                isInRange = (value.ulonglong_val >= static_cast<unsigned long long>(slong_min) && value.ulonglong_val <= static_cast<unsigned long long>(slong_max) );
+                break;
+            case E_TP_S_LONG_LONG:
+                isInRange = (value.slonglong_val >= slong_min && value.slonglong_val <= slong_max);
+                break;
+            default:
+                break;
+            }
+        }
+
+        // value.slong_val 
+        break;
+    case E_TP_U_LONG_LONG:
+        {
+            strMinVal = to_string( ulonglong_min );
+            strMaxVal = to_string( ulonglong_max );
+            switch( rightDt )
+            {
+            case E_TP_U_LONG_LONG:
+                isInRange = (value.ulonglong_val >= ulonglong_min && value.ulonglong_val <= ulonglong_max);
+                break;
+            case E_TP_S_LONG_LONG:
+                isInRange = (value.slonglong_val >= static_cast<long long>(ulonglong_min) && value.slonglong_val <= static_cast<long long>(ulonglong_max) );
+                break;
+            default:
+                break;
+            }
+        }
+        // value.ulonglong_val 
+        break;
+    case E_TP_S_LONG_LONG:
+        {
+            strMinVal = to_string( slonglong_min );
+            strMaxVal = to_string( slonglong_max );
+            switch( rightDt )
+            {
+            case E_TP_U_LONG_LONG:
+                isInRange = (value.ulonglong_val >= static_cast<unsigned long long>(slonglong_min) && value.ulonglong_val <= static_cast<unsigned long long>(slonglong_max) );
+                break;
+            case E_TP_S_LONG_LONG:
+                isInRange = (value.slonglong_val >= slonglong_min && value.slonglong_val <= slonglong_max);
+                break;
+            default:
+                break;
+            }
+        }
+        // value.slonglong_val 
+        break;
+    default:
+        break;
+    }
+
+    return !isInRange;
+}
+
 
 
