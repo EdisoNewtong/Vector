@@ -1799,6 +1799,7 @@ TokenBase* TokenMgr::doPositive(TokenBase* op, TokenBase* right)
 {
     using namespace charutil;
 
+
     string rightContent = right->getExpressionContent();
     string finalExpr = SC_OP_POSITIVE_BEGIN + rightContent;
 
@@ -1810,6 +1811,10 @@ TokenBase* TokenMgr::doPositive(TokenBase* op, TokenBase* right)
     traceTmpOpResult(finalExpr, positiveRet);
 
     TokenBase* ret = generateTmpExpression(rightPromotionDt, finalExpr, op, right);
+    if ( right->isFixedLiteral()  ) {
+        auto base = right->getFixedLiteralBase();
+        ret->setBaseAsFixedLiteral( base );
+    }
     ret->setRealValue( positiveRet );
 
     return ret;
@@ -1832,6 +1837,10 @@ TokenBase* TokenMgr::doNegative(TokenBase* op, TokenBase* right)
     traceTmpOpResult(finalExpr, negativeRet);
 
     TokenBase* ret = generateTmpExpression(rightPromotionDt, finalExpr, op, right);
+    if ( right->isFixedLiteral()  ) {
+        auto base = right->getFixedLiteralBase();
+        ret->setBaseAsFixedLiteral( base );
+    }
     ret->setRealValue( negativeRet  );
 
     return ret;
@@ -1903,7 +1912,6 @@ E_DataType TokenMgr::operatorPrepairDataTypeConversion1(DataValue* pRightVal)
         // set new data Type after finishing interger Promotion 
         retType = rightpr.second;
     } 
-
 
     return retType;
 
@@ -2246,7 +2254,8 @@ void TokenMgr::traceAssignOverFlow(TokenBase* leftVar, TokenBase* rightFixedInt)
                 string strMinVal("???_MinVal");
                 string strMaxVal("???_MaxVal");
                 if ( rVal.isIntOutOfRange( leftVar->getDataType(), strMinVal, strMaxVal ) ) {
-                    cerr << "Sentence : " << SINGLE_QUOTO << EnumUtil::enumName(leftVar->getDataType()) << SPACE_1 << leftVar->getTokenContent() << " = "
+                    cerr << SC_WARNING_TITLE;
+                    cerr << " Sentence : " << SINGLE_QUOTO << EnumUtil::enumName(leftVar->getDataType()) << SPACE_1 << leftVar->getTokenContent() << " = "
                          << rightFixedInt->getTokenContent() << SINGLE_QUOTO << " is out of range ( " << strMinVal << " ~ " << strMaxVal << " ) " 
                          << "@line : " << rightFixedInt->getBeginPos().line
                          << endl;
