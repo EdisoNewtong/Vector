@@ -126,6 +126,8 @@ int main(int argc, char* argv[], char* env[])
         cout << "----------------------------------------------------------------------------------------------------" << endl;
     }
 
+    CmdOptions::printDataTypeRangeIfNecessary();
+
 
     //
     // Read File from the last args

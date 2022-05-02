@@ -44,6 +44,7 @@ public:
 
     static bool needTracePositiveNegativePropertyChange();
     static bool needTraceTmpExpressionProcess();
+    static void printDataTypeRangeIfNecessary();
 
     static bool needCheckFixedLiteralIntRangeWhenAssign();
     static bool needTreatSignedIntergerBitShiftAsWarning();
@@ -54,7 +55,9 @@ public:
     static bool needTraceParseTimeStep();
     static bool needPrintSrcCodeLength();
 protected:
+    static bool needPrintDataTypeRange();
 
+protected:
     // get Option/Flag value
     // static unsigned int  getDebugOption();
     // static unsigned int  getFlag();
