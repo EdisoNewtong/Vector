@@ -1895,12 +1895,14 @@ E_DataType SequenceParser::calcFixedLiteralDataType()
                 break;
             case SequenceParser::E_GUESS_OCT:
                 {
+                    // because for octal code , the highest bit might be a sign bit rather than a value bit
+                    // so use 'unsigned' instead of 'signed'
                     StringNumber currentNumber8(m_parsedSeq, 8);
-                    if (          currentNumber8 <=  StringNumber::s_signedIntMax8 ) {
+                    if (          currentNumber8 <=  StringNumber::s_unsignedIntMax8 ) {
                         compareType = 1;
-                    } else if (   currentNumber8 <=  StringNumber::s_signedLongMax8 ) {
+                    } else if (   currentNumber8 <=  StringNumber::s_unsignedLongMax8 ) {
                         compareType = 2;
-                    } else if (   currentNumber8 <=  StringNumber::s_signedLongLongMax8 ) {
+                    } else if (   currentNumber8 <=  StringNumber::s_unsignedLongLongMax8 ) {
                         compareType = 3;
                     } else {
                         // larger than max number
@@ -1913,12 +1915,14 @@ E_DataType SequenceParser::calcFixedLiteralDataType()
                 break;
             case SequenceParser::E_GUESS_HEX:
                 {
+                    // because for hex code , the highest bit might be a sign bit rather than a value bit
+                    // so use 'unsigned' instead of 'signed'
                     StringNumber currentNumber16(m_parsedSeq, 16);
-                    if (          currentNumber16 <=  StringNumber::s_signedIntMax16 ) {
+                    if (          currentNumber16 <=  StringNumber::s_unsignedIntMax16 ) {
                         compareType = 1;
-                    } else if (   currentNumber16 <=  StringNumber::s_signedLongMax16 ) {
+                    } else if (   currentNumber16 <=  StringNumber::s_unsignedLongMax16 ) {
                         compareType = 2;
-                    } else if (   currentNumber16 <=  StringNumber::s_signedLongLongMax16 ) {
+                    } else if (   currentNumber16 <=  StringNumber::s_unsignedLongLongMax16 ) {
                         compareType = 3;
                     } else {
                         // larger than max number
