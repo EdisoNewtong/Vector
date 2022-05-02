@@ -1,9 +1,11 @@
 #include "cmdOptions.h"
 #include "charUtil.h"
+#include "dataValue.h"
 
 #include <iostream>
 #include <fstream>
 #include <exception>
+#include <limits>
 
 using namespace std;
 
@@ -32,6 +34,7 @@ R"([Flag]
     TRACE_OPSTACK_SUFFIXEXPR_CHANGE = 0
     TRACE_POSNEGAPROPERTY_CHANGE = 0
     TRACE_TMPEXP_PROCESS = 0
+    NEED_PRINT_DATA_TYPE_RANGE = 0
 
     NEED_TREAT_SIGNED_INTEGER_BIT_SHIFT_AS_WARING = 0
     TRACE_FLOAT_NUMBER_ZERO_WHEN_OP_DIVIDE = 1
@@ -55,6 +58,7 @@ const vector< pair<string,unsigned long> > CmdOptions::SC_DEBUG_OPTIONS_MAP{
     { string("TRACE_OPSTACK_SUFFIXEXPR_CHANGE = "),                    5UL  },
     { string("TRACE_POSNEGAPROPERTY_CHANGE = "),                       6UL  },
     { string("TRACE_TMPEXP_PROCESS = "),                               7UL  },
+    { string("NEED_PRINT_DATA_TYPE_RANGE = "),                         8UL  },
 
     { string("NEED_TREAT_SIGNED_INTEGER_BIT_SHIFT_AS_WARING = "),      9UL },
     { string("TRACE_FLOAT_NUMBER_ZERO_WHEN_OP_DIVIDE = "),            10UL },
@@ -273,6 +277,58 @@ pair<bool,string> CmdOptions::parseCfgFile(bool hasCmdArgs, const string& cfgfil
 // }
 
 
+// static 
+void CmdOptions::printDataTypeRangeIfNecessary()
+{
+    using namespace intTypeRange;
+
+    if ( needPrintDataTypeRange() ) {
+        cout << "===========================================================================" << endl;
+        size_t bytes = sizeof(char);
+        size_t bits = bytes * 8;
+        cout << "char : " << bytes << (bytes > 1 ? " bytes" : " byte") << " => "<< bits << " bits. " 
+             << "char is" << (numeric_limits<char>::is_signed ? " <S>igned " : " <Un>signed .") << endl
+             << "\t" << "signed  : "    << static_cast<int>(sch_min) << " ~ " << static_cast<int>(sch_max)
+             << "\t" << ", unsigned  : " << static_cast<int>(uch_min) << " ~ " << static_cast<int>(uch_max) 
+             << endl;
+
+        bytes = sizeof(short);
+        bits = bytes * 8;
+        cout << "short : " << bytes << (bytes > 1 ? " bytes" : " byte") << " => " << bits << " bits. " << endl
+             << "\t" << "signed : "      << sshort_min << " ~ " << sshort_max
+             << "\t" << " , unsigned  : " << ushort_min << " ~ " << ushort_max
+             << endl;
+
+
+        auto equal1 =  (sizeof(int) == sizeof(long) );
+        bytes = sizeof(int);
+        bits = bytes * 8;
+        cout << "int : " << bytes << (bytes > 1 ? " bytes" : " byte") << " => " << bits << " bits. ";
+        if ( equal1 ) {
+            cout << "| int <--> long | are same size. " << endl;
+        } else {
+            cout << endl;
+        }
+        cout << "\t" << "signed : " << sint_min << " ~ " << sint_max
+             << "\t" << " , unsigned : " << uint_min << " ~ " << uint_max
+             << endl;
+
+        auto equal2 = ( sizeof(long) == sizeof(long long) );
+        bytes = sizeof(long long);
+        bits = bytes * 8;
+        cout << "long long : " << bytes << (bytes > 1 ? " bytes" : " byte") << " => " << bits << " bits. ";
+        if ( equal2 ) {
+            cout << "| long long <--> long | are same size. " << endl;
+        } else {
+            cout << endl;
+        }
+        cout << "\t" << "signed : "      << slonglong_min << " ~ " << slonglong_max
+             << "\t" << " , unsigned : " << ulonglong_min << " ~ " << ulonglong_max
+             << endl;
+        cout << "===========================================================================" << endl;
+    }
+}
+
 
 // static 
 string CmdOptions::getUserManual()
@@ -332,6 +388,8 @@ bool CmdOptions::needPrintSuffixExpressionAfterEvaluate()      { return  ( (s_de
 bool CmdOptions::needTraceOperatorStackSuffixExpressionChange(){ return  ( (s_debugOption >> 5UL)      & 0x1UL) != 0;  } 
 bool CmdOptions::needTracePositiveNegativePropertyChange()     { return  ( (s_debugOption >> 6UL)      & 0x1UL) != 0;  }
 bool CmdOptions::needTraceTmpExpressionProcess()               { return  ( (s_debugOption >> 7UL)      & 0x1UL) != 0;  }
+bool CmdOptions::needPrintDataTypeRange()                      { return  ( (s_debugOption >> 8UL)      & 0x1UL) != 0;  }
+
 
 bool CmdOptions::needTreatSignedIntergerBitShiftAsWarning()    { return  ( (s_debugOption >>  9UL)     & 0x1UL) != 0;  }
 bool CmdOptions::needCheckFloatNumberZero()                    { return  ( (s_debugOption >> 10UL)     & 0x1UL) != 0;  }

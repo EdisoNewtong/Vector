@@ -5,7 +5,36 @@
 #include <string>
 
 
-
+namespace intTypeRange
+{
+    // char
+    extern const          char ch_min;
+    extern const          char ch_max;
+    extern const unsigned char uch_min;
+    extern const unsigned char uch_max;
+    extern const   signed char sch_min; 
+    extern const   signed char sch_max;
+    // short
+    extern const   unsigned short ushort_min;
+    extern const   unsigned short ushort_max;
+    extern const     signed short sshort_min;
+    extern const     signed short sshort_max;
+    // int
+    extern const   unsigned int uint_min;
+    extern const   unsigned int uint_max;
+    extern const     signed int sint_min;
+    extern const     signed int sint_max;
+    // long
+    extern const   unsigned long ulong_min;
+    extern const   unsigned long ulong_max;
+    extern const     signed long slong_min;
+    extern const     signed long slong_max;
+    // long long
+    extern const   unsigned long long ulonglong_min; 
+    extern const   unsigned long long ulonglong_max; 
+    extern const     signed long long slonglong_min;
+    extern const     signed long long slonglong_max;
+}
 
 struct DataValue
 {
@@ -68,6 +97,10 @@ struct DataValue
     static std::string toBinary(const std::string& hex);
 
 };
+
+
+
+
 
 
 #endif

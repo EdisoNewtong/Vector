@@ -8,15 +8,15 @@ DEFINED_MACRO :=
 INC_PATH := -Icore -Icore/util -Icore/token -Icore/parser -Icore/parser/blank -Icore/parser/comment -Icore/parser/operator -Icore/parser/sequence -Icore/parser/semicolon -Icore/variblePool
 
 
-COMPILE_OPT :=  -Wall --std=c++11 $(DEFINED_MACRO) $(INC_PATH)   -c -g3
-#COMPILE_OPT :=  -Wall --std=c++11 $(DEFINED_MACRO) $(INC_PATH) -O3  -c
+#COMPILE_OPT :=  -Wall --std=c++11 $(DEFINED_MACRO) $(INC_PATH)   -c -g3
+COMPILE_OPT :=  -Wall --std=c++11 $(DEFINED_MACRO) $(INC_PATH) -O3  -c
 
 ####################################################################################################
 ####################################################################################################
 ####################################################################################################
 
-LINK_OPT := -Wall --std=c++11
-#LINK_OPT := -Wall --std=c++11  -O3
+#LINK_OPT := -Wall --std=c++11
+LINK_OPT := -Wall --std=c++11  -O3
 
 
 
@@ -30,7 +30,7 @@ build/arithMetic:build/arithMetic.o build/buff.o build/enumUtil.o build/keywordL
 	@echo "----------------------------------------------------------------------------------------------------"
 
 
-build/arithMetic.o:arithMetic.cpp core/commonEnum.h core/myException.h core/buff.h core/globalDirector.h core/cmdOptions.h  core/token/tokenMgr.h  core/variblePool/variblePool.h  core/util/dataTypeUtil.h
+build/arithMetic.o:arithMetic.cpp core/commonEnum.h core/myException.h core/buff.h core/globalDirector.h core/cmdOptions.h  core/token/tokenMgr.h  core/variblePool/variblePool.h  core/util/dataTypeUtil.h  
 	g++    $(COMPILE_OPT)  -o  build/arithMetic.o   arithMetic.cpp
 
 
@@ -106,7 +106,7 @@ build/semicolonParser.o:core/parser/semicolon/semicolonParser.cpp  core/parser/s
 	g++    $(COMPILE_OPT)  -o  build/semicolonParser.o    core/parser/semicolon/semicolonParser.cpp 
 
 
-build/cmdOptions.o:core/cmdOptions.cpp  core/cmdOptions.h core/util/charUtil.h
+build/cmdOptions.o:core/cmdOptions.cpp  core/cmdOptions.h core/util/charUtil.h  core/dataValue.h
 	g++    $(COMPILE_OPT)  -o  build/cmdOptions.o    core/cmdOptions.cpp
 
 
