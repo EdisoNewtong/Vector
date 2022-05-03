@@ -265,7 +265,7 @@ int main(int argc, char* argv[], char* env[])
 
     }
     catch( const MyException& e ) {
-        cout << "[ERROR] : Meet a self-defined exception : " << e.what() << endl;
+        cout << "[ERROR] : Meet a self-defined exception : " << e.getDetail() << endl;
     }
     catch( const exception& e ) {
         cout << "[ERROR] : Meet a normal exception : " << e.what() << endl;

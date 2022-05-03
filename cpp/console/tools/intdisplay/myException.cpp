@@ -1,8 +1,8 @@
 #include "myException.h"
 
 MyException::MyException(const std::string& desc) 
-	: std::exception() 
-	, m_description(desc) 
+    : std::exception() 
+    , m_description(desc) 
 {
 
 }
@@ -11,6 +11,12 @@ MyException::MyException(const std::string& desc)
 // virtual 
 const char* MyException::what() const noexcept // override 
 {
-	return m_description.c_str();
+    return m_description.c_str();
+}
+
+
+std::string  MyException::getDetail()  const
+{
+    return m_description;
 }
 

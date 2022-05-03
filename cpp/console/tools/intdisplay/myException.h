@@ -13,8 +13,9 @@ public:
     MyException(const MyException& r) = default;
 
     virtual const char* what() const noexcept override;
+    std::string  getDetail() const;
 protected:
-	std::string m_description;
+    std::string m_description;
 };
 
 #endif
