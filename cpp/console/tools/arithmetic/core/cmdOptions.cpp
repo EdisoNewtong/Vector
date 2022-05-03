@@ -286,10 +286,11 @@ void CmdOptions::printDataTypeRangeIfNecessary()
         cout << "===========================================================================" << endl;
         size_t bytes = sizeof(char);
         size_t bits = bytes * 8;
-        cout << "char : " << bytes << (bytes > 1 ? " bytes" : " byte") << " => "<< bits << " bits. " 
+        cout << "char : " << bytes << (bytes > 1 ? " bytes" : " byte") << " => "<< bits << " bits. "
              << "char is" << (numeric_limits<char>::is_signed ? " <S>igned " : " <Un>signed .") << endl
              << "\t" << "signed  : "    << static_cast<int>(sch_min) << " ~ " << static_cast<int>(sch_max)
              << "\t" << ", unsigned  : " << static_cast<int>(uch_min) << " ~ " << static_cast<int>(uch_max) 
+             << endl
              << endl;
 
         bytes = sizeof(short);
@@ -297,6 +298,7 @@ void CmdOptions::printDataTypeRangeIfNecessary()
         cout << "short : " << bytes << (bytes > 1 ? " bytes" : " byte") << " => " << bits << " bits. " << endl
              << "\t" << "signed : "      << sshort_min << " ~ " << sshort_max
              << "\t" << " , unsigned  : " << ushort_min << " ~ " << ushort_max
+             << endl
              << endl;
 
 
@@ -311,6 +313,7 @@ void CmdOptions::printDataTypeRangeIfNecessary()
         }
         cout << "\t" << "signed : " << sint_min << " ~ " << sint_max
              << "\t" << " , unsigned : " << uint_min << " ~ " << uint_max
+             << endl
              << endl;
 
         auto equal2 = ( sizeof(long) == sizeof(long long) );
@@ -324,6 +327,7 @@ void CmdOptions::printDataTypeRangeIfNecessary()
         }
         cout << "\t" << "signed : "      << slonglong_min << " ~ " << slonglong_max
              << "\t" << " , unsigned : " << ulonglong_min << " ~ " << ulonglong_max
+             << endl
              << endl;
         cout << "===========================================================================" << endl;
     }
