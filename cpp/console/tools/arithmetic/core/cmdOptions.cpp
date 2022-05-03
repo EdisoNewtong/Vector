@@ -373,7 +373,8 @@ bool CmdOptions::needPrintVarible_10()     { return ( (s_flag >> 1UL) & 0x1UL) !
 bool CmdOptions::needPrintVarible_16()     { return ( (s_flag >> 2UL) & 0x1UL) != 0; }
 bool CmdOptions::needPrintVarible_2()      { return ( (s_flag >> 3UL) & 0x1UL) != 0; }
 bool CmdOptions::needPrintVarible_8()      { return ( (s_flag >> 4UL) & 0x1UL) != 0; }
-bool CmdOptions::isOctalDefaultStyle()     { return ( (s_flag >> 5UL) & 0x1UL) != 0; }
+// 0 : default  0xxxxx    1: special format (0)xxxx
+bool CmdOptions::isOctalDefaultStyle()     { return ( (s_flag >> 5UL) & 0x1UL) == 0; }
 
 unsigned int CmdOptions::getFlag()        { return s_flag; }
 
