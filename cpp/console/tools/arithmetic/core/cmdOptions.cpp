@@ -24,6 +24,9 @@ R"([Flag]
     Hex = 0
     Bin = 0
     Oct = 0
+    // OctStyle : 0   =>     0xxxx    
+    // OctStyle : 1   =>   (0)xxxx
+    OctStyle = 0
 
 [DebugOption]
     PRINT_RUNTIME_WARNING = 1
@@ -75,10 +78,13 @@ const vector< pair<string,unsigned long> > CmdOptions::SC_DEBUG_OPTIONS_MAP{
  
 const vector< pair<string,unsigned long> > CmdOptions::SC_FLAG_MAP{
     { string("ENABLE_PRINT_VARLIST_AT_LAST = "), 0UL   },
-    { string("Dec = "), 1UL   },
-    { string("Hex = "), 2UL   },
-    { string("Bin = "), 3UL   },
-    { string("Oct = "), 4UL   }
+    { string("Dec = "),      1UL   },
+    { string("Hex = "),      2UL   },
+    { string("Bin = "),      3UL   },
+    { string("Oct = "),      4UL   }
+    { string("OctStyle = "), 5UL   }
+
+    // OctStyle = 0
 };
 
 
@@ -367,6 +373,7 @@ bool CmdOptions::needPrintVarible_10()     { return ( (s_flag >> 1UL) & 0x1UL) !
 bool CmdOptions::needPrintVarible_16()     { return ( (s_flag >> 2UL) & 0x1UL) != 0; }
 bool CmdOptions::needPrintVarible_2()      { return ( (s_flag >> 3UL) & 0x1UL) != 0; }
 bool CmdOptions::needPrintVarible_8()      { return ( (s_flag >> 4UL) & 0x1UL) != 0; }
+bool CmdOptions::isOctalDefaultStyle()     { return ( (s_flag >> 5UL) & 0x1UL) != 0; }
 
 unsigned int CmdOptions::getFlag()        { return s_flag; }
 

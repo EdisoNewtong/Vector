@@ -95,6 +95,8 @@ VaribleInfo* VariblePool::create_a_new_varible(E_DataType dt, const std::string&
 
 void VariblePool::printAllVaribles(unsigned int flag)
 {
+    static const bool previousHasEqual = true;
+
     if ( m_varDefinedOrder.empty() ) {
         cout << "<Empty> VariblePool" << endl;
         return;
@@ -107,7 +109,7 @@ void VariblePool::printAllVaribles(unsigned int flag)
         if ( it != m_pool.end() ) {
             VaribleInfo* pVarInfo = it->second;
             if ( pVarInfo != nullptr ) {
-                cout << (idx+1) << ".  " << EnumUtil::enumName(pVarInfo->dataVal.type) << " " << pVarInfo->varName << " = " << pVarInfo->dataVal.getPrintValue(flag, true) << endl;
+                cout << (idx+1) << ".  " << EnumUtil::enumName(pVarInfo->dataVal.type) << " " << pVarInfo->varName << " = " << pVarInfo->dataVal.getPrintValue(flag, previousHasEqual) << endl;
             }
         }
 
