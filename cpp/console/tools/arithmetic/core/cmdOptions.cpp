@@ -81,7 +81,7 @@ const vector< pair<string,unsigned long> > CmdOptions::SC_FLAG_MAP{
     { string("Dec = "),      1UL   },
     { string("Hex = "),      2UL   },
     { string("Bin = "),      3UL   },
-    { string("Oct = "),      4UL   }
+    { string("Oct = "),      4UL   },
     { string("OctStyle = "), 5UL   }
 
     // OctStyle = 0
