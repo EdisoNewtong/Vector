@@ -136,29 +136,29 @@ bool           OpInfo::isUnaryOp()
 */
 
 // static 
-unordered_map<E_OperatorType, OpInfo> OpUtil::s_operatorMap{
+unordered_map<OpUtil::OpType, OpInfo> OpUtil::s_operatorMap{
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /*                                   ( Bin 0/Un:1     |      LR:0 RL:1   |  Priority          |                      Op Type     )     */
-    make_pair(E_ADD,               OpInfo( BINARY_OP_MASK | ASS_LEFT_2_RIGHT | PRIORITY_MASK(6U)  | static_cast<unsigned int>(E_ADD)               ) ),
-     make_pair(E_POSITIVE,         OpInfo(  UNARY_OP_MASK | ASS_RIGHT_2_LEFT | PRIORITY_MASK(3U)  | static_cast<unsigned int>(E_POSITIVE)          ) ),
-    make_pair(E_MINUS,             OpInfo( BINARY_OP_MASK | ASS_LEFT_2_RIGHT | PRIORITY_MASK(6U)  | static_cast<unsigned int>(E_MINUS)             ) ),
-     make_pair(E_NEGATIVE,         OpInfo(  UNARY_OP_MASK | ASS_RIGHT_2_LEFT | PRIORITY_MASK(3U)  | static_cast<unsigned int>(E_NEGATIVE)          ) ),
-    make_pair(E_MULTIPLY,          OpInfo( BINARY_OP_MASK | ASS_LEFT_2_RIGHT | PRIORITY_MASK(5U)  | static_cast<unsigned int>(E_MULTIPLY)          ) ),
-    make_pair(E_DIVIDE,            OpInfo( BINARY_OP_MASK | ASS_LEFT_2_RIGHT | PRIORITY_MASK(5U)  | static_cast<unsigned int>(E_DIVIDE)            ) ),
-    make_pair(E_MOD,               OpInfo( BINARY_OP_MASK | ASS_LEFT_2_RIGHT | PRIORITY_MASK(5U)  | static_cast<unsigned int>(E_MOD)            ) ),
+    make_pair(enumCvt(E_ADD),               OpInfo( BINARY_OP_MASK | ASS_LEFT_2_RIGHT | PRIORITY_MASK(6U)  | static_cast<unsigned int>(E_ADD)               ) ),
+     make_pair(enumCvt(E_POSITIVE),         OpInfo(  UNARY_OP_MASK | ASS_RIGHT_2_LEFT | PRIORITY_MASK(3U)  | static_cast<unsigned int>(E_POSITIVE)          ) ),
+    make_pair(enumCvt(E_MINUS),             OpInfo( BINARY_OP_MASK | ASS_LEFT_2_RIGHT | PRIORITY_MASK(6U)  | static_cast<unsigned int>(E_MINUS)             ) ),
+     make_pair(enumCvt(E_NEGATIVE),         OpInfo(  UNARY_OP_MASK | ASS_RIGHT_2_LEFT | PRIORITY_MASK(3U)  | static_cast<unsigned int>(E_NEGATIVE)          ) ),
+    make_pair(enumCvt(E_MULTIPLY),          OpInfo( BINARY_OP_MASK | ASS_LEFT_2_RIGHT | PRIORITY_MASK(5U)  | static_cast<unsigned int>(E_MULTIPLY)          ) ),
+    make_pair(enumCvt(E_DIVIDE),            OpInfo( BINARY_OP_MASK | ASS_LEFT_2_RIGHT | PRIORITY_MASK(5U)  | static_cast<unsigned int>(E_DIVIDE)            ) ),
+    make_pair(enumCvt(E_MOD),               OpInfo( BINARY_OP_MASK | ASS_LEFT_2_RIGHT | PRIORITY_MASK(5U)  | static_cast<unsigned int>(E_MOD)            ) ),
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    make_pair(E_BIT_AND,           OpInfo( BINARY_OP_MASK | ASS_LEFT_2_RIGHT | PRIORITY_MASK(11U) | static_cast<unsigned int>(E_BIT_AND)           ) ),
-    make_pair(E_BIT_OR,            OpInfo( BINARY_OP_MASK | ASS_LEFT_2_RIGHT | PRIORITY_MASK(13U) | static_cast<unsigned int>(E_BIT_OR)            ) ),
-    make_pair(E_BIT_XOR,           OpInfo( BINARY_OP_MASK | ASS_LEFT_2_RIGHT | PRIORITY_MASK(12U) | static_cast<unsigned int>(E_BIT_XOR)           ) ),
-    make_pair(E_BIT_NOT,           OpInfo(  UNARY_OP_MASK | ASS_RIGHT_2_LEFT | PRIORITY_MASK(3U)  | static_cast<unsigned int>(E_BIT_NOT)           ) ),
+    make_pair(enumCvt(E_BIT_AND),           OpInfo( BINARY_OP_MASK | ASS_LEFT_2_RIGHT | PRIORITY_MASK(11U) | static_cast<unsigned int>(E_BIT_AND)           ) ),
+    make_pair(enumCvt(E_BIT_OR),            OpInfo( BINARY_OP_MASK | ASS_LEFT_2_RIGHT | PRIORITY_MASK(13U) | static_cast<unsigned int>(E_BIT_OR)            ) ),
+    make_pair(enumCvt(E_BIT_XOR),           OpInfo( BINARY_OP_MASK | ASS_LEFT_2_RIGHT | PRIORITY_MASK(12U) | static_cast<unsigned int>(E_BIT_XOR)           ) ),
+    make_pair(enumCvt(E_BIT_NOT),           OpInfo(  UNARY_OP_MASK | ASS_RIGHT_2_LEFT | PRIORITY_MASK(3U)  | static_cast<unsigned int>(E_BIT_NOT)           ) ),
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    make_pair(E_BIT_LEFT_SHIFT,    OpInfo( BINARY_OP_MASK | ASS_LEFT_2_RIGHT | PRIORITY_MASK(7U)  | static_cast<unsigned int>(E_BIT_LEFT_SHIFT)    ) ),
-    make_pair(E_BIT_RIGHT_SHIFT,   OpInfo( BINARY_OP_MASK | ASS_LEFT_2_RIGHT | PRIORITY_MASK(7U)  | static_cast<unsigned int>(E_BIT_RIGHT_SHIFT)   ) ),
+    make_pair(enumCvt(E_BIT_LEFT_SHIFT),    OpInfo( BINARY_OP_MASK | ASS_LEFT_2_RIGHT | PRIORITY_MASK(7U)  | static_cast<unsigned int>(E_BIT_LEFT_SHIFT)    ) ),
+    make_pair(enumCvt(E_BIT_RIGHT_SHIFT),   OpInfo( BINARY_OP_MASK | ASS_LEFT_2_RIGHT | PRIORITY_MASK(7U)  | static_cast<unsigned int>(E_BIT_RIGHT_SHIFT)   ) ),
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    make_pair(E_OPEN_PARENTHESES,  OpInfo( BINARY_OP_MASK | ASS_RIGHT_2_LEFT | PRIORITY_MASK(2U)  | static_cast<unsigned int>(E_OPEN_PARENTHESES)  ) ),
-    make_pair(E_CLOSE_PARENTHESES, OpInfo( BINARY_OP_MASK | ASS_RIGHT_2_LEFT | PRIORITY_MASK(2U)  | static_cast<unsigned int>(E_CLOSE_PARENTHESES) ) ),
+    make_pair(enumCvt(E_OPEN_PARENTHESES),  OpInfo( BINARY_OP_MASK | ASS_RIGHT_2_LEFT | PRIORITY_MASK(2U)  | static_cast<unsigned int>(E_OPEN_PARENTHESES)  ) ),
+    make_pair(enumCvt(E_CLOSE_PARENTHESES), OpInfo( BINARY_OP_MASK | ASS_RIGHT_2_LEFT | PRIORITY_MASK(2U)  | static_cast<unsigned int>(E_CLOSE_PARENTHESES) ) ),
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    make_pair(E_ASSIGNMENT,        OpInfo( BINARY_OP_MASK | ASS_RIGHT_2_LEFT | PRIORITY_MASK(16U) | static_cast<unsigned int>(E_ASSIGNMENT)        ) )
+    make_pair(enumCvt(E_ASSIGNMENT),        OpInfo( BINARY_OP_MASK | ASS_RIGHT_2_LEFT | PRIORITY_MASK(16U) | static_cast<unsigned int>(E_ASSIGNMENT)        ) )
 };
 
 

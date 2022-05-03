@@ -25,7 +25,7 @@ using namespace std;
 // get the abs path for the current running process :
 // e.g.    "/usr/bin/ls"    =>   "/usr/bin/"  ( result path contains the last seperate char   '/' )
 //
-string getBinaryPath()
+string getBinaryPath(const string& strProgName, char* env[])
 {
     string retPath;
     string platformSeperate;
@@ -38,11 +38,57 @@ string getBinaryPath()
     char bufPath[C_PATH_LEN] = { 0 };
     // get the abs path for the running bin   e.g.   /usr/bin/ll
     size_t nsize = readlink("/proc/self/exe", bufPath, C_PATH_LEN);
-    if ( nsize < C_PATH_LEN ) {
-        bufPath[nsize] = '\0';
+    // cout << "nsize = " << std::dec << nsize << endl;
+    // cout << "bufPath = " << std::dec << bufPath << endl;
+    if ( bufPath[0] != 0 ) {
+        if ( nsize < C_PATH_LEN ) {
+            bufPath[nsize] = '\0';
+        }
+    } else {
+        // in MacOS Platform , the prog : '/proc/self/exe' is not existed , so use char* env[] to get the prog running path
+        int foundIdx = -1;
+        int iidx = 0;
+        const string searchHead("_=");
+        string pathprefix;
+        while ( env[iidx] ) {
+            string sOpt(env[iidx]);
+            auto foundpos = sOpt.find(searchHead);
+            if ( foundpos == 0 ) {
+                foundIdx = iidx;
+                pathprefix = sOpt.substr( searchHead.size() );
+                break;
+            }
+            ++iidx;
+        }
+
+        auto sz = 0;
+        if ( foundIdx != -1 ) {
+            sz = static_cast<int>(pathprefix.size());
+            for( int idx = 0; idx < sz; ++idx ) 
+            {
+                bufPath[idx] = pathprefix.at(idx);
+            }
+            bufPath[sz] = '\0';
+        } else { // foundIdx == -1
+            auto fSlashPos = strProgName.find("/");
+            if ( fSlashPos == string::npos ) {
+                bufPath[0] = '.';
+                bufPath[1] = '/';
+                bufPath[2] = '\0';
+            } else {
+                sz = static_cast<int>(strProgName.size());
+                for( int idx = 0; idx < sz; ++idx ) 
+                {
+                    bufPath[idx] = strProgName.at(idx);
+                }
+                bufPath[sz] = '\0';
+            }
+        }
     }
 
 #else
+    (void)strProgName;
+    (void)env;
     //  Windows  Implementation Here
     platformSeperate = "\\";
 
@@ -71,7 +117,7 @@ string getBinaryPath()
 
 int main(int argc, char* argv[], char* env[])
 {
-    string runningPath = getBinaryPath();
+    string runningPath = getBinaryPath(string(argv[0]), env);
 
     if ( argc < 2 ) {
         cout << "[ERROR] : Missing a given file to parse !!" << endl;
