@@ -24,6 +24,8 @@ public:
     static bool needPrintVarible_16();
     static bool needPrintVarible_2();
     static bool needPrintVarible_8();
+    static bool isOctalDefaultStyle();
+
     static bool isPrintVaribleFormatValid();
 
     static unsigned int  getFlag();

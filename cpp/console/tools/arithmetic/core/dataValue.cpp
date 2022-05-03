@@ -2098,21 +2098,24 @@ string DataValue::getPrintValue(unsigned int flag, bool hasPreviousWithEqual /* 
     stringstream strValue;
     stringstream hexStr;
 
+    static const string hexPrefix = "0x";
+    static const string octPrefix = (CmdOptions::isOctalDefaultStyle() ? "0" : "(0)");
     auto bDefaultPrintDecimal = CmdOptions::needPrintVarible_10() || !CmdOptions::isPrintVaribleFormatValid();
     auto printBefore = false;
+
     switch( this->type )
     {
     case E_TP_CHAR:
         {
             int code = static_cast<int>(value.char_val);
             if ( flag==0   ||  bDefaultPrintDecimal ) { 
-                strValue << value.char_val << " => " << code;
+                strValue << value.char_val << " => " << std::dec << code;
                 printBefore = true;
             }
 
             if ( flag!=0 &&    CmdOptions::needPrintVarible_16() ) {
                 // print hex
-                strValue << ((printBefore || !hasPreviousWithEqual) ? " = 0x" : "0x") << std::hex << std::uppercase << code;
+                strValue << ((printBefore || !hasPreviousWithEqual) ? " = " : "") << hexPrefix << std::hex << std::uppercase << code;
                 printBefore = true;
             }
 
@@ -2125,7 +2128,7 @@ string DataValue::getPrintValue(unsigned int flag, bool hasPreviousWithEqual /* 
 
             if ( flag!=0  &&   CmdOptions::needPrintVarible_8() ) {
                 // print oct
-                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = (0)" : "") << std::oct << code;
+                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = " : "") << octPrefix << std::oct << code;
                 printBefore = true;
             }
         }
@@ -2134,12 +2137,13 @@ string DataValue::getPrintValue(unsigned int flag, bool hasPreviousWithEqual /* 
         {
             int code = static_cast<int>(value.uchar_val);
             if ( flag==0   ||  bDefaultPrintDecimal ) {
-                strValue << value.uchar_val << " => " << code;
+                strValue << value.uchar_val << " => " << std::dec << code;
+                printBefore = true;
             }
 
             if ( flag!=0 &&    CmdOptions::needPrintVarible_16() ) {
                 // print hex
-                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = 0x" : "0x") << std::hex << std::uppercase << code;
+                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = " : "") << hexPrefix << std::hex << std::uppercase << code;
                 printBefore = true;
             }
 
@@ -2152,7 +2156,7 @@ string DataValue::getPrintValue(unsigned int flag, bool hasPreviousWithEqual /* 
 
             if ( flag!=0  &&   CmdOptions::needPrintVarible_8() ) {
                 // print oct
-                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = (0)" : "") << std::oct << code;
+                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = " : "") << octPrefix << std::oct << code;
                 printBefore = true;
             }
         }
@@ -2161,13 +2165,13 @@ string DataValue::getPrintValue(unsigned int flag, bool hasPreviousWithEqual /* 
         {
             int code = static_cast<int>(value.schar_val);
             if ( flag==0   ||  bDefaultPrintDecimal ) { 
-                strValue << value.schar_val << " => " << code;
+                strValue << value.schar_val << " => " << std::dec << code;
                 printBefore = true;
             }
 
             if ( flag!=0   &&   CmdOptions::needPrintVarible_16() ) {
                 // print hex
-                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = 0x" : "0x") << std::hex << std::uppercase << code;
+                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = " : "") << hexPrefix << std::hex << std::uppercase << code;
                 printBefore = true;
             }
 
@@ -2180,7 +2184,7 @@ string DataValue::getPrintValue(unsigned int flag, bool hasPreviousWithEqual /* 
 
             if ( flag!=0  &&   CmdOptions::needPrintVarible_8() ) {
                 // print oct
-                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = (0)" : "") << std::oct << code;
+                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = " : "") << octPrefix << std::oct << code;
                 printBefore = true;
             }
         }
@@ -2188,13 +2192,13 @@ string DataValue::getPrintValue(unsigned int flag, bool hasPreviousWithEqual /* 
     case E_TP_U_SHORT:
         {
             if ( flag==0   ||  bDefaultPrintDecimal ) { 
-                strValue << value.ushort_val;
+                strValue << std::dec << value.ushort_val;
                 printBefore = true;
             }
 
             if ( flag!=0   &&   CmdOptions::needPrintVarible_16() ) {
                 // print hex
-                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = 0x" : "0x") << std::hex << std::uppercase << value.ushort_val;
+                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = " : "") << hexPrefix << std::hex << std::uppercase << value.ushort_val;
                 printBefore = true;
             }
 
@@ -2207,7 +2211,7 @@ string DataValue::getPrintValue(unsigned int flag, bool hasPreviousWithEqual /* 
 
             if ( flag!=0  &&   CmdOptions::needPrintVarible_8() ) {
                 // print oct
-                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = (0)" : "") << std::oct << value.ushort_val;
+                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = " : "") << octPrefix << std::oct << value.ushort_val;
                 printBefore = true;
             }
         }
@@ -2215,13 +2219,13 @@ string DataValue::getPrintValue(unsigned int flag, bool hasPreviousWithEqual /* 
     case E_TP_S_SHORT:
         {
             if ( flag==0   ||  bDefaultPrintDecimal ) { 
-                strValue << value.sshort_val;
+                strValue << std::dec <<  value.sshort_val;
                 printBefore = true;
             }
 
             if ( flag!=0   &&   CmdOptions::needPrintVarible_16() ) {
                 // print hex
-                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = 0x" : "0x") << std::hex << std::uppercase << value.sshort_val;
+                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = " : "") << hexPrefix << std::hex << std::uppercase << value.sshort_val;
                 printBefore = true;
             }
 
@@ -2234,7 +2238,7 @@ string DataValue::getPrintValue(unsigned int flag, bool hasPreviousWithEqual /* 
 
             if ( flag!=0  &&   CmdOptions::needPrintVarible_8() ) {
                 // print oct
-                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = (0)" : "") << std::oct << value.sshort_val;
+                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = " : "") << octPrefix << std::oct << value.sshort_val;
                 printBefore = true;
             }
         }
@@ -2242,13 +2246,13 @@ string DataValue::getPrintValue(unsigned int flag, bool hasPreviousWithEqual /* 
     case E_TP_U_INT:
         {
             if ( flag==0   ||    bDefaultPrintDecimal ) { 
-                strValue << value.uint_val;
+                strValue << std::dec <<  value.uint_val;
                 printBefore = true;
             }
 
             if ( flag!=0   &&   CmdOptions::needPrintVarible_16() ) {
                 // print hex
-                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = 0x" : "0x") << std::hex << std::uppercase << value.uint_val;
+                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = " : "") << hexPrefix << std::hex << std::uppercase << value.uint_val;
                 printBefore = true;
             }
 
@@ -2261,7 +2265,7 @@ string DataValue::getPrintValue(unsigned int flag, bool hasPreviousWithEqual /* 
 
             if ( flag!=0  &&   CmdOptions::needPrintVarible_8() ) {
                 // print oct
-                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = (0)" : "") << std::oct << value.uint_val;
+                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = " : "") << octPrefix << std::oct << value.uint_val;
                 printBefore = true;
             }
         }
@@ -2269,13 +2273,13 @@ string DataValue::getPrintValue(unsigned int flag, bool hasPreviousWithEqual /* 
     case E_TP_S_INT:
         {
             if ( flag==0   ||    bDefaultPrintDecimal ) { 
-                strValue << value.sint_val;
+                strValue << std::dec <<  value.sint_val;
                 printBefore = true;
             }
 
             if ( flag!=0   &&   CmdOptions::needPrintVarible_16() ) {
                 // print hex
-                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = 0x" : "0x") << std::hex << std::uppercase << value.sint_val;
+                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = " : "") << hexPrefix << std::hex << std::uppercase << value.sint_val;
                 printBefore = true;
             }
 
@@ -2288,7 +2292,7 @@ string DataValue::getPrintValue(unsigned int flag, bool hasPreviousWithEqual /* 
 
             if ( flag!=0  &&   CmdOptions::needPrintVarible_8() ) {
                 // print oct
-                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = (0)" : "") << std::oct << value.sint_val;
+                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = " : "") << octPrefix << std::oct << value.sint_val;
                 printBefore = true;
             }
         }
@@ -2296,13 +2300,13 @@ string DataValue::getPrintValue(unsigned int flag, bool hasPreviousWithEqual /* 
     case E_TP_U_LONG:
         {
             if ( flag==0   ||    bDefaultPrintDecimal ) { 
-                strValue << value.ulong_val;
+                strValue << std::dec <<  value.ulong_val;
                 printBefore = true;
             }
 
             if ( flag!=0   &&   CmdOptions::needPrintVarible_16() ) {
                 // print hex
-                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = 0x" : "0x") << std::hex << std::uppercase << value.ulong_val;
+                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = " : "") << hexPrefix << std::hex << std::uppercase << value.ulong_val;
                 printBefore = true;
             }
 
@@ -2315,7 +2319,7 @@ string DataValue::getPrintValue(unsigned int flag, bool hasPreviousWithEqual /* 
 
             if ( flag!=0  &&   CmdOptions::needPrintVarible_8() ) {
                 // print oct
-                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = (0)" : "") << std::oct << value.ulong_val;
+                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = " : "") << octPrefix << std::oct << value.ulong_val;
                 printBefore = true;
             }
         }
@@ -2323,13 +2327,13 @@ string DataValue::getPrintValue(unsigned int flag, bool hasPreviousWithEqual /* 
     case E_TP_S_LONG:
         {
             if ( flag==0   ||     bDefaultPrintDecimal ) { 
-                strValue << value.slong_val;
+                strValue << std::dec <<  value.slong_val;
                 printBefore = true;
             }
 
             if ( flag!=0   &&   CmdOptions::needPrintVarible_16() ) {
                 // print hex
-                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = 0x" : "0x") << std::hex << std::uppercase << value.slong_val;
+                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = " : "") << hexPrefix << std::hex << std::uppercase << value.slong_val;
                 printBefore = true;
             }
 
@@ -2342,7 +2346,7 @@ string DataValue::getPrintValue(unsigned int flag, bool hasPreviousWithEqual /* 
 
             if ( flag!=0  &&   CmdOptions::needPrintVarible_8() ) {
                 // print oct
-                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = (0)" : "") << std::oct << value.slong_val;
+                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = " : "") << octPrefix << std::oct << value.slong_val;
                 printBefore = true;
             }
         }
@@ -2350,13 +2354,13 @@ string DataValue::getPrintValue(unsigned int flag, bool hasPreviousWithEqual /* 
     case E_TP_U_LONG_LONG:
         {
             if ( flag==0   ||    bDefaultPrintDecimal ) { 
-                strValue << value.ulonglong_val;
+                strValue << std::dec <<  value.ulonglong_val;
                 printBefore = true;
             }
 
             if ( flag!=0   &&   CmdOptions::needPrintVarible_16() ) {
                 // print hex
-                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = 0x" : "0x") << std::hex << std::uppercase << value.ulonglong_val;
+                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = " : "") << hexPrefix << std::hex << std::uppercase << value.ulonglong_val;
                 printBefore = true;
             }
 
@@ -2369,7 +2373,7 @@ string DataValue::getPrintValue(unsigned int flag, bool hasPreviousWithEqual /* 
 
             if ( flag!=0  &&   CmdOptions::needPrintVarible_8() ) {
                 // print oct
-                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = (0)" : "") << std::oct << value.ulonglong_val;
+                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = " : "") << octPrefix << std::oct << value.ulonglong_val;
                 printBefore = true;
             }
         }
@@ -2377,26 +2381,26 @@ string DataValue::getPrintValue(unsigned int flag, bool hasPreviousWithEqual /* 
     case E_TP_S_LONG_LONG:
         {
             if ( flag==0   ||    bDefaultPrintDecimal ) { 
-                strValue << value.slonglong_val;
+                strValue << std::dec <<  value.slonglong_val;
                 printBefore = true;
             }
 
             if ( flag!=0   &&   CmdOptions::needPrintVarible_16() ) {
                 // print hex
-                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = 0x" : "0x") << std::hex << std::uppercase << value.slonglong_val;
+                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = " : "") << hexPrefix << std::hex << std::uppercase << value.slonglong_val;
                 printBefore = true;
             }
 
             if ( flag!=0   &&   CmdOptions::needPrintVarible_2() ) {
                 // print binary
                 hexStr << std::hex << std::uppercase << value.slonglong_val;
-                strValue << ((printBefore && !hasPreviousWithEqual) ? " = " : "") <<  DataValue::toBinary( hexStr.str() ) << " (B) ";
+                strValue << ((printBefore || !hasPreviousWithEqual) ? " = " : "") <<  DataValue::toBinary( hexStr.str() ) << " (B) ";
                 printBefore = true;
             }
 
             if ( flag!=0  &&   CmdOptions::needPrintVarible_8() ) {
                 // print oct
-                strValue << ((printBefore && !hasPreviousWithEqual) ? " = (0)" : "") << std::oct << value.slonglong_val;
+                strValue << ((printBefore  ||  !hasPreviousWithEqual) ? " = " : "") << octPrefix << std::oct << value.slonglong_val;
                 printBefore = true;
             }
         }
