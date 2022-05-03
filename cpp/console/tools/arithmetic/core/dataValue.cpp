@@ -2575,24 +2575,28 @@ bool DataValue::isIntOutOfRange(E_DataType leftDt, string& strMinVal, string& st
         break;
     case E_TP_U_CHAR:
         {
+
             strMinVal = to_string( static_cast<int>(uch_min) );
             strMaxVal = to_string( static_cast<int>(uch_max) );
             switch( rightDt )
             {
             case E_TP_U_INT:
-                isInRange = (value.uint_val >= uch_min && value.uint_val <= uch_max );
+                /********************************************************************************************************************************************
+                    warning: comparison of unsigned expression >= 0 is always true [-Wtautological-compare]
+                *********************************************************************************************************************************************/
+                isInRange = ( /* value.uint_val >= uch_min && */ value.uint_val <= uch_max );
                 break;
             case E_TP_S_INT:
                 isInRange = (value.sint_val >= static_cast<int>(uch_min) && value.sint_val <= static_cast<int>(uch_max) );
                 break;
             case E_TP_U_LONG:
-                isInRange = (value.ulong_val >= uch_min && value.ulong_val <= uch_max );
+                isInRange = ( /* value.ulong_val >= uch_min && */ value.ulong_val <= uch_max );
                 break;
             case E_TP_S_LONG:
                 isInRange = (value.slong_val >= static_cast<long>(uch_min) && value.slong_val <= static_cast<long>(uch_max) );
                 break;
             case E_TP_U_LONG_LONG:
-                isInRange = (value.ulonglong_val >= uch_min && value.ulonglong_val <= uch_max );
+                isInRange = ( /* value.ulonglong_val >= uch_min && */ value.ulonglong_val <= uch_max );
                 break;
             case E_TP_S_LONG_LONG:
                 isInRange = (value.slonglong_val >= static_cast<long long>(uch_min) && value.slonglong_val <= static_cast<long long>(uch_max) );
@@ -2638,19 +2642,19 @@ bool DataValue::isIntOutOfRange(E_DataType leftDt, string& strMinVal, string& st
             switch( rightDt )
             {
             case E_TP_U_INT:
-                isInRange = (value.uint_val >= ushort_min && value.uint_val <= ushort_max);
+                isInRange = ( /* value.uint_val >= ushort_min && */  value.uint_val <= ushort_max);
                 break;
             case E_TP_S_INT:
                 isInRange = (value.sint_val >= static_cast<int>(ushort_min) && value.sint_val <= static_cast<int>(ushort_max) );
                 break;
             case E_TP_U_LONG:
-                isInRange = (value.ulong_val >= ushort_min && value.ulong_val <= ushort_max);
+                isInRange = ( /* value.ulong_val >= ushort_min && */  value.ulong_val <= ushort_max);
                 break;
             case E_TP_S_LONG:
                 isInRange = (value.slong_val >= static_cast<signed long>(ushort_min) && value.slong_val <= static_cast<signed long>(ushort_max) );
                 break;
             case E_TP_U_LONG_LONG:
-                isInRange = (value.ulonglong_val >= ushort_min && value.ulonglong_val <= ushort_max);
+                isInRange = ( /* value.ulonglong_val >= ushort_min && */  value.ulonglong_val <= ushort_max);
                 break;
             case E_TP_S_LONG_LONG:
                 isInRange = (value.slonglong_val >= static_cast<long long>(ushort_min) && value.slonglong_val <= static_cast<long long>(ushort_max) );
@@ -2696,19 +2700,19 @@ bool DataValue::isIntOutOfRange(E_DataType leftDt, string& strMinVal, string& st
             switch( rightDt )
             {
             case E_TP_U_INT:
-                isInRange = (value.uint_val >= uint_min && value.uint_val <= uint_max);
+                isInRange = ( /* value.uint_val >= uint_min && */  value.uint_val <= uint_max);
                 break;
             case E_TP_S_INT:
                 isInRange = (value.sint_val >= static_cast<int>(uint_min) && value.sint_val <= static_cast<int>(uint_max) );
                 break;
             case E_TP_U_LONG:
-                isInRange = (value.ulong_val >= uint_min && value.ulong_val <= uint_max);
+                isInRange = ( /* value.ulong_val >= uint_min && */  value.ulong_val <= uint_max);
                 break;
             case E_TP_S_LONG:
                 isInRange = (value.slong_val >= static_cast<long>(uint_min) && value.slong_val <= static_cast<long>(uint_max) );
                 break;
             case E_TP_U_LONG_LONG:
-                isInRange = (value.ulonglong_val >= uint_min && value.ulonglong_val <= uint_max);
+                isInRange = ( /* value.ulonglong_val >= uint_min && */  value.ulonglong_val <= uint_max);
                 break;
             case E_TP_S_LONG_LONG:
                 isInRange = (value.slonglong_val >= static_cast<long long>(uint_min) && value.slonglong_val <= static_cast<long long>(uint_max) );
@@ -2756,13 +2760,13 @@ bool DataValue::isIntOutOfRange(E_DataType leftDt, string& strMinVal, string& st
             switch( rightDt )
             {
             case E_TP_U_LONG:
-                isInRange = (value.ulong_val >= ulong_min && value.ulong_val <= ulong_max);
+                isInRange = ( /* value.ulong_val >= ulong_min && */  value.ulong_val <= ulong_max);
                 break;
             case E_TP_S_LONG:
                 isInRange = (value.slong_val >= static_cast<long>(ulong_min) && value.slong_val <= static_cast<long>(ulong_max) );
                 break;
             case E_TP_U_LONG_LONG:
-                isInRange = (value.ulonglong_val >= ulong_min && value.ulonglong_val <= ulong_max);
+                isInRange = ( /* value.ulonglong_val >= ulong_min && */  value.ulonglong_val <= ulong_max);
                 break;
             case E_TP_S_LONG_LONG:
                 isInRange = (value.slonglong_val >= static_cast<long long>(ulong_min) && value.slonglong_val <= static_cast<long long>(ulong_max) );
@@ -2805,7 +2809,7 @@ bool DataValue::isIntOutOfRange(E_DataType leftDt, string& strMinVal, string& st
             switch( rightDt )
             {
             case E_TP_U_LONG_LONG:
-                isInRange = (value.ulonglong_val >= ulonglong_min && value.ulonglong_val <= ulonglong_max);
+                isInRange = ( /* value.ulonglong_val >= ulonglong_min && */  value.ulonglong_val <= ulonglong_max);
                 break;
             case E_TP_S_LONG_LONG:
                 isInRange = (value.slonglong_val >= static_cast<long long>(ulonglong_min) && value.slonglong_val <= static_cast<long long>(ulonglong_max) );

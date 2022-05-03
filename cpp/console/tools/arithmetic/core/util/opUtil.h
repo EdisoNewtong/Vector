@@ -32,7 +32,16 @@ class OpUtil
 public:
     static OpInfo getOpInfo(E_OperatorType dp);
 protected:
-    static std::unordered_map<E_OperatorType, OpInfo> s_operatorMap;
+
+
+#ifdef USE_INT_INSTEAD_OF_ENUM
+    typedef int OpType;
+#else
+    typedef E_OperatorType OpType;
+#endif
+
+
+    static std::unordered_map<OpType, OpInfo> s_operatorMap;
     
 };
 
