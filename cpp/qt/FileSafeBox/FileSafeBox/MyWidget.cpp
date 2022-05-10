@@ -3,10 +3,11 @@
 
 #include "MyWidget.h"
 
-MyWidget::MyWidget(QWidget* parent /* = nullptr */)
+MyWidget::MyWidget(QWidget* parent, int tag)
 	: QWidget(parent)
+    , m_tag(tag)
 {
-
+    this->setStyleSheet("QWidget { background : rgb(240,240,240); }" );
 }
 
 
@@ -42,3 +43,8 @@ void	MyWidget::paintEvent(QPaintEvent * event) // Q_DECL_OVERRIDE;
     style()->drawPrimitive(QStyle::PE_Widget, &opt, &p, this);
 }
 
+
+int MyWidget::getTag()
+{
+    return m_tag;
+}

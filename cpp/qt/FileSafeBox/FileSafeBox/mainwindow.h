@@ -4,6 +4,11 @@
 #include <QMainWindow>
 
 
+#define    WIDGETS_CNT    (4)
+
+
+
+
 namespace Ui {
 class MainWindow;
 }
@@ -21,32 +26,68 @@ public:
     static const size_t  SC_TOTAL_CNT = 4;
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();
+    explicit MainWindow(QWidget *parent = nullptr);
+    virtual ~MainWindow() Q_DECL_OVERRIDE;
 
 protected:
     virtual void	resizeEvent(QResizeEvent * event) Q_DECL_OVERRIDE;
-	virtual void	mouseMoveEvent(QMouseEvent * event) Q_DECL_OVERRIDE;
+	// virtual void	mouseMoveEvent(QMouseEvent * event) Q_DECL_OVERRIDE;
+
+    void showBDWidgets(bool show);
 public slots:
 	void onMouseEnterWidget(MyWidget* w);
 	void onMouseLeaveWidget(MyWidget* w);
 	void onTimeOut();
 
+private slots:
+    void on_openFileButton_clicked();
+
+    void on_encdecButton_clicked();
+
+private:
+	void setPosAndSize(const QSize& sz);
+    int  getWidgetTag( );
+
+    void onBDTakeAction();
+
+    void closeBD();
+    void lauchBD();
+
+    void testEncDec();
+    void testEncDec2();
+    void getBitAry(char ch, int* bitAry8);
+    void getBitAry2(char ch1, char ch2, int* bitAry16);
+
+    QString getStrForAry8(int* ary);
+    QString getStrForAry16(int* ary);
+
+
+    // Test Case
+    void testCaseEncAndDecFile();
 private:
     Ui::MainWindow *ui;
 
-    MyWidget* m_lt;	// 0
-    MyWidget* m_rt; // 1
-    MyWidget* m_lb; // 2
-    MyWidget* m_rb; // 3
+    MyWidget* m_lt;
+    MyWidget* m_rt;
+    MyWidget* m_lb;
+    MyWidget* m_rb;
 	QTimer*   m_timer;
 
+    MyWidget* m_widgetAry[ WIDGETS_CNT];
+    const QString   m_colorStyleAry[ WIDGETS_CNT ];
 
-	unsigned char m_order[SC_TOTAL_CNT];
-	unsigned char m_fixedTag;
-	short m_current;
 
-	void setPosAndSize(const QSize& sz);
+    const int m_hoverDuring; // in ms
+    const int m_slotDoneDuring; // in ms
+    const int m_passwordshowDuring; // in ms
+    const int m_attemptCnt; // attempt the password time
+
+    const  unsigned char m_bdOrderAry[WIDGETS_CNT];
+    unsigned int m_currentTargetIdx;
+    bool         m_bBDUnlocked;
+    bool         m_bNextEnable;
+
+
 
 };
 

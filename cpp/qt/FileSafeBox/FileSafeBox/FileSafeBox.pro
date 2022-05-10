@@ -16,12 +16,12 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp\
         MyWidget.cpp \
-        my_encrypt.cpp \
-        my_decrypt.cpp
+        EncdecUtil.cpp \
+        FileencdecUtil.cpp
 
 HEADERS  += mainwindow.h\
             MyWidget.h \
-            my_encrypt.h \
-            my_decrypt.h
+            EncdecUtil.h \
+            FileencdecUtil.h
 
 FORMS    += mainwindow.ui

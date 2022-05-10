@@ -9,8 +9,10 @@ class MyWidget : public QWidget
     Q_OBJECT
 
 public:
-	explicit MyWidget(QWidget* parent = nullptr);
-    virtual ~MyWidget();
+    explicit MyWidget(QWidget* parent, int tag);
+    virtual ~MyWidget() Q_DECL_OVERRIDE;
+
+    int getTag();
 
 protected:
 	virtual  void  enterEvent(QEvent* event)  Q_DECL_OVERRIDE;
@@ -20,6 +22,9 @@ protected:
 signals:
     void onMouseEnter(MyWidget* self);
     void onMouseLeave(MyWidget* self);
+
+private:
+    const int m_tag;
 
 };
 
