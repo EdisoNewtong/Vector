@@ -24,18 +24,18 @@ static const auto basedOn0 = true;
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
-	, m_visitValue(nullptr)
-	, m_pDoc(nullptr)
-	, m_eleIt(nullptr)
+    , m_visitValue(nullptr)
+    , m_pDoc(nullptr)
+    , m_eleIt(nullptr)
     , m_isParseOK(false)
-	, m_visitTag(E_NONE)
-	, m_visitStep(-1)
+    , m_visitTag(E_NONE)
+    , m_visitStep(-1)
     , m_enableResponseTextCursorChanged( true )
     , m_enableResponseTreeItemSelected( true )
-	, m_pTreeModel(nullptr)
+    , m_pTreeModel(nullptr)
 {
     ui->setupUi(this);
-	m_visitStack.clear();
+    m_visitStack.clear();
     m_itemPositionMap.clear();
 
     connect( ui->plainTextEdit, SIGNAL( cursorPositionChanged() ), this, SLOT( onJsonTextBoxCursorChanged() ) );
@@ -79,8 +79,8 @@ MainWindow::~MainWindow()
 void MainWindow::on_pushButton_clicked()
 {
     auto txt = ui->plainTextEdit->toPlainText();
-	ui->plainTextEdit_2->setPlainText("Parsing ... ");
-	do_Parse(txt.toStdString().c_str());
+    ui->plainTextEdit_2->setPlainText("Parsing ... ");
+    do_Parse(txt.toStdString().c_str());
 }
 
 // Read From File
@@ -108,45 +108,45 @@ void MainWindow::on_pushButton_3_clicked()
     if( m_pDoc!=nullptr ) {
         if( m_isParseOK ) {
 #ifdef EDISON_LINE_INFO_TRACE
-			printValueDetail(m_visitValue, m_visitStep);
+            printValueDetail(m_visitValue, m_visitStep);
 #endif
         } else {
             qDebug() << "Sorry , Parse Error , can't visit";
-		}
-	} 
+        }
+    } 
 }
 
 // Build Tree View
 void MainWindow::on_pushButton_4_clicked()
 {
-	if( m_isParseOK ) {
-		clearTree();
-		setupTreeModel();
+    if( m_isParseOK ) {
+        clearTree();
+        setupTreeModel();
 
-		QStandardItem* rootNode = m_pTreeModel->invisibleRootItem();
+        QStandardItem* rootNode = m_pTreeModel->invisibleRootItem();
         m_itemPositionMap.clear();
 
-		fillDataIntoModel(rootNode, m_pDoc, -1);	// -1 : root is Doc
+        fillDataIntoModel(rootNode, m_pDoc, -1);    // -1 : root is Doc
         ui->treeView->expandAll();
         ui->treeView->update();
-	}
+    }
 }
 
 
 // Pretty Writer
 void MainWindow::on_pushButton_5_clicked()
 {
-	if( m_pDoc!=nullptr && m_isParseOK ) {
-		rapidjson::StringBuffer buffer;
-		rapidjson::PrettyWriter<rapidjson::StringBuffer> pretty_writer(buffer);
-		m_pDoc->Accept(pretty_writer);
+    if( m_pDoc!=nullptr && m_isParseOK ) {
+        rapidjson::StringBuffer buffer;
+        rapidjson::PrettyWriter<rapidjson::StringBuffer> pretty_writer(buffer);
+        m_pDoc->Accept(pretty_writer);
 
         const char* str = buffer.GetString();
         QString formated_prettyTxt(str);
         ui->plainTextEdit->setPlainText( formated_prettyTxt );
-	} else {
-		qDebug() << "Doc is nullptr or  Parse Error";
-	}
+    } else {
+        qDebug() << "Doc is nullptr or  Parse Error";
+    }
 
 
 }
@@ -155,36 +155,36 @@ void MainWindow::on_pushButton_5_clicked()
 
 void MainWindow::clearDoc()
 {
-	if( m_pDoc!=nullptr ) {
-		delete m_pDoc;
-		m_pDoc = nullptr;
-	}
+    if( m_pDoc!=nullptr ) {
+        delete m_pDoc;
+        m_pDoc = nullptr;
+    }
 }
 
 
 void MainWindow::do_Parse(const char* content)
 {
-	m_visitValue = nullptr;
-	m_visitTag = E_NONE;
-	m_visitStack.clear();
+    m_visitValue = nullptr;
+    m_visitTag = E_NONE;
+    m_visitStack.clear();
 
-	clearDoc();
-	m_pDoc = new rapidjson::Document;
+    clearDoc();
+    m_pDoc = new rapidjson::Document;
 
     rapidjson::GenericStringStream< rapidjson::UTF8<> >::s_bQt4BytesSupportFlag = ui->checkBox->isChecked();
     // rapidjson::ParseResult ok = d.Parse( txt.toStdString().c_str() );
     rapidjson::ParseResult ok = m_pDoc->Parse( content );
 
-	ui->plainTextEdit_2->setPlainText("");
+    ui->plainTextEdit_2->setPlainText("");
     if( ok ) {
         // auto tp = m_pDoc->GetType();
         // qDebug() << "tp = " << tp;
-		ui->plainTextEdit_2->setPlainText("Parsing Successful");
-		m_isParseOK = true;
+        ui->plainTextEdit_2->setPlainText("Parsing Successful");
+        m_isParseOK = true;
 
-		m_visitValue = m_pDoc;
-		m_visitStep = 0;	// ready to visit , Layer = 0
-		m_visitTag = E_VISIT_NEXT;
+        m_visitValue = m_pDoc;
+        m_visitStep = 0;    // ready to visit , Layer = 0
+        m_visitTag = E_VISIT_NEXT;
     } else {
         QString errorStr = QStringLiteral("Reason = %1 \n"
                                           "Offset = %2 \n").arg(GetParseError_En(ok.Code())).arg(ok.Offset());
@@ -195,10 +195,10 @@ void MainWindow::do_Parse(const char* content)
             errorStr += str_ErrorlineCol_info;
         #endif
 
-		ui->plainTextEdit_2->setPlainText(QStringLiteral("Parsing Failed\n") +  errorStr);
-		m_isParseOK = false;
-		m_visitStep = -2;
-		m_visitTag = E_NONE;
+        ui->plainTextEdit_2->setPlainText(QStringLiteral("Parsing Failed\n") +  errorStr);
+        m_isParseOK = false;
+        m_visitStep = -2;
+        m_visitTag = E_NONE;
 
         highLightText( ok.getLineInfo().cursorOffset -2, ok.getLineInfo().cursorOffset);
     }
@@ -208,184 +208,184 @@ void MainWindow::do_Parse(const char* content)
 void MainWindow::printValueDetail(rapidjson::Value* jsonValue,int nStep)
 {
 #ifdef EDISON_LINE_INFO_TRACE
-	if( nStep <= -1) {
-		qDebug() << "Visit Finished";
-		return;
-	}
+    if( nStep <= -1) {
+        qDebug() << "Visit Finished";
+        return;
+    }
 
-	if( jsonValue == nullptr ) {
-		qDebug() << "nullptr json Value";
-		return;
-	}
+    if( jsonValue == nullptr ) {
+        qDebug() << "nullptr json Value";
+        return;
+    }
 
     auto s = jsonValue->getLineStartInfo();
     auto e = jsonValue->getLineEndInfo();
 
-	if( jsonValue->IsObject() || jsonValue->IsArray()  ) {
-		//
-		// Type == Object or Array , both is compound data type
-		//
+    if( jsonValue->IsObject() || jsonValue->IsArray()  ) {
+        //
+        // Type == Object or Array , both is compound data type
+        //
 
         // if( !m_visitStack.empty() ) {
-		// 	if( m_visitTag == E_VISIT_OBJECT_VALUE || m_visitTag == E_VISIT_ARRAY_ELEMENT  ) {
-		// 		m_tag = -1;
-		// 	}
+        //  if( m_visitTag == E_VISIT_OBJECT_VALUE || m_visitTag == E_VISIT_ARRAY_ELEMENT  ) {
+        //      m_tag = -1;
+        //  }
         // }
 
-		if( jsonValue->IsObject() ) {
-			// Type is Object
+        if( jsonValue->IsObject() ) {
+            // Type is Object
 
-			// newTxt = QStringLiteral("type = Object | %1:%2 ~ %3:%4").arg(s.lineNo).arg(s.colNo).arg(e.lineNo).arg(e.colNo);
+            // newTxt = QStringLiteral("type = Object | %1:%2 ~ %3:%4").arg(s.lineNo).arg(s.colNo).arg(e.lineNo).arg(e.colNo);
             // highLightText(s.cursorOffset, e.cursorOffset);
-			////  Loop Visit
-			// for(auto it = jsonValue.MemberBegin(); it!=jsonValue.MemberEnd(); ++it )
-			// {
-			// 	// it->name
-			// 	// it->value
-			// }
+            ////  Loop Visit
+            // for(auto it = jsonValue.MemberBegin(); it!=jsonValue.MemberEnd(); ++it )
+            // {
+            //  // it->name
+            //  // it->value
+            // }
 
-			// Step by Step
-			// 1. {
-			// 2.    member1::name
-			// 3.    member1::value
-			// 4.    member2::name
-			// 5.    member2::value
-			//     ...
-			//     ...
-			//     ...
-			// Last.   }
-		
-			if( m_visitTag == E_VISIT_NEXT  ) {
-				// It's the time that the type is not decide
-				//
-				// 1. LH --> {
+            // Step by Step
+            // 1. {
+            // 2.    member1::name
+            // 3.    member1::value
+            // 4.    member2::name
+            // 5.    member2::value
+            //     ...
+            //     ...
+            //     ...
+            // Last.   }
+
+            if( m_visitTag == E_VISIT_NEXT  ) {
+                // It's the time that the type is not decide
+                //
+                // 1. LH --> {
                 highLightText(s.cursorOffset , s.cursorOffset );
-				m_visitTag = E_VISIT_OBJECT_KEY;	// next step , visit key
-				m_it = jsonValue->MemberBegin();	// pointer to 1st KV member
-			} else if( m_visitTag == E_VISIT_OBJECT_KEY ) {
-				// LH -> Visit 1st. Key
-				if( m_it != jsonValue->MemberEnd() ) {
+                m_visitTag = E_VISIT_OBJECT_KEY;    // next step , visit key
+                m_it = jsonValue->MemberBegin();    // pointer to 1st KV member
+            } else if( m_visitTag == E_VISIT_OBJECT_KEY ) {
+                // LH -> Visit 1st. Key
+                if( m_it != jsonValue->MemberEnd() ) {
                     // m_visitStep = nStep + 1;
 
                     printValueDetail(&(m_it->name), m_visitStep);   // key must be string
                     m_visitTag = E_VISIT_OBJECT_VALUE;
-				} else {
-					// Last but one  --> LH -> }
+                } else {
+                    // Last but one  --> LH -> }
                     highLightText(e.cursorOffset-1 , e.cursorOffset);
-					m_visitTag = E_VISIT_OBJECT_ALL;
-				}
-			} else if( m_visitTag == E_VISIT_OBJECT_VALUE ) {
-				// Visit KV's  Value
+                    m_visitTag = E_VISIT_OBJECT_ALL;
+                }
+            } else if( m_visitTag == E_VISIT_OBJECT_VALUE ) {
+                // Visit KV's  Value
 
-				auto vOfKey = &(m_it->value);
-				if(    vOfKey!=nullptr 
-					&& (vOfKey->IsObject() || vOfKey->IsArray() ) ) {
-					m_visitStep = nStep + 1;
+                auto vOfKey = &(m_it->value);
+                if(    vOfKey!=nullptr 
+                    && (vOfKey->IsObject() || vOfKey->IsArray() ) ) {
+                    m_visitStep = nStep + 1;
 
-					VisitInfo v_Info;
+                    VisitInfo v_Info;
                     v_Info.tag = E_VISIT_OBJECT_KEY;    // next to visit next key-value of this object , visit key first
-					v_Info.member_iter = m_it;
-					v_Info.visitValue = jsonValue;
-					m_visitStack.push( v_Info );
+                    v_Info.member_iter = m_it;
+                    v_Info.visitValue = jsonValue;
+                    m_visitStack.push( v_Info );
 
-					m_visitValue = &(m_it->value);
+                    m_visitValue = &(m_it->value);
                     m_visitTag = E_VISIT_NEXT;
 
-					printValueDetail(m_visitValue, m_visitStep);
-				} else {
+                    printValueDetail(m_visitValue, m_visitStep);
+                } else {
                     printValueDetail(vOfKey, m_visitStep);
-					++m_it;		// move to next
-                    m_visitTag = E_VISIT_OBJECT_KEY;	// visit next key (not 1st)
-				}
-			} else if( m_visitTag == E_VISIT_OBJECT_ALL ) {
-				// Last : LH the whole object -> { ... } 
+                    ++m_it;     // move to next
+                    m_visitTag = E_VISIT_OBJECT_KEY;    // visit next key (not 1st)
+                }
+            } else if( m_visitTag == E_VISIT_OBJECT_ALL ) {
+                // Last : LH the whole object -> { ... } 
                 highLightText(s.cursorOffset , e.cursorOffset);
-				m_visitStep = nStep - 1;
+                m_visitStep = nStep - 1;
 
-				if( !m_visitStack.empty() ) {
-					auto topElement = m_visitStack.pop();
-					if( topElement.tag == E_VISIT_OBJECT_KEY ) {
-						m_it = topElement.member_iter;
-						++m_it;		// move to next
-						m_visitTag = E_VISIT_OBJECT_KEY;	// visit next key (not 1st)
-					} else {
-						m_eleIt = topElement.element_iter;
-						++m_eleIt;
-						m_visitTag = E_VISIT_ARRAY_ELEMENT;  // after read , set from -1 --> 4 , to read next Array Element
-					}
+                if( !m_visitStack.empty() ) {
+                    auto topElement = m_visitStack.pop();
+                    if( topElement.tag == E_VISIT_OBJECT_KEY ) {
+                        m_it = topElement.member_iter;
+                        ++m_it;     // move to next
+                        m_visitTag = E_VISIT_OBJECT_KEY;    // visit next key (not 1st)
+                    } else {
+                        m_eleIt = topElement.element_iter;
+                        ++m_eleIt;
+                        m_visitTag = E_VISIT_ARRAY_ELEMENT;  // after read , set from -1 --> 4 , to read next Array Element
+                    }
 
-					m_visitValue = topElement.visitValue;
+                    m_visitValue = topElement.visitValue;
                 } else {
                     m_visitTag = E_VISIT_NEXT;
                 }
-			}
-		} else {
+            }
+        } else {
             //
             // Type is Array
             //
-			if( m_visitTag == E_VISIT_NEXT  ) {
-                highLightText(s.cursorOffset , s.cursorOffset );	// LH --> [
-				m_eleIt = jsonValue->Begin();	// pointer to the 1st element if existed
-				m_visitTag = E_VISIT_ARRAY_ELEMENT;
-			} else if( m_visitTag == E_VISIT_ARRAY_ELEMENT ) {
-				if( m_eleIt != jsonValue->End() ) {
-					auto eleOfArray = m_eleIt;
-					if(    eleOfArray!=nullptr 
-						&& (eleOfArray->IsObject() || eleOfArray->IsArray())) {
-						m_visitStep = nStep + 1;
-
-						VisitInfo v_Info;
+            if( m_visitTag == E_VISIT_NEXT  ) {
+                highLightText(s.cursorOffset , s.cursorOffset );    // LH --> [
+                m_eleIt = jsonValue->Begin();   // pointer to the 1st element if existed
+                m_visitTag = E_VISIT_ARRAY_ELEMENT;
+            } else if( m_visitTag == E_VISIT_ARRAY_ELEMENT ) {
+                if( m_eleIt != jsonValue->End() ) {
+                    auto eleOfArray = m_eleIt;
+                    if(    eleOfArray!=nullptr 
+                        && (eleOfArray->IsObject() || eleOfArray->IsArray())) {
+                        m_visitStep = nStep + 1;
+            
+                        VisitInfo v_Info;
                         v_Info.tag = E_VISIT_ARRAY_ELEMENT; // next to visit next element of this array
-						v_Info.element_iter = m_eleIt;
-						v_Info.visitValue = jsonValue;
-						m_visitStack.push( v_Info );
-
-						m_visitValue = m_eleIt;
+                        v_Info.element_iter = m_eleIt;
+                        v_Info.visitValue = jsonValue;
+                        m_visitStack.push( v_Info );
+            
+                        m_visitValue = m_eleIt;
                         m_visitTag = E_VISIT_NEXT;
-
-						printValueDetail(m_eleIt, m_visitStep);
-					} else {
+            
+                        printValueDetail(m_eleIt, m_visitStep);
+                    } else {
                         printValueDetail(eleOfArray, m_visitStep);
-						++m_eleIt;
-						m_visitTag = E_VISIT_ARRAY_ELEMENT;  // after read , set from -1 --> 4 , to read next Array Element
-					}
-
-				} else {
-                    highLightText(e.cursorOffset , e.cursorOffset);	// LH --> ]
-					m_visitTag = E_VISIT_ARRAY_ALL;
-
-				}
-			} else if( m_visitTag == E_VISIT_ARRAY_ALL ) {
-				// Last : LH the whole Array -> [ ... ] 
+                        ++m_eleIt;
+                        m_visitTag = E_VISIT_ARRAY_ELEMENT;  // after read , set from -1 --> 4 , to read next Array Element
+                    }
+            
+                } else {
+                    highLightText(e.cursorOffset , e.cursorOffset); // LH --> ]
+                    m_visitTag = E_VISIT_ARRAY_ALL;
+            
+                }
+            } else if( m_visitTag == E_VISIT_ARRAY_ALL ) {
+                // Last : LH the whole Array -> [ ... ] 
                 highLightText(s.cursorOffset , e.cursorOffset);
-				m_visitStep = nStep - 1;
-
-				if( !m_visitStack.empty() ) {
-					auto topElement = m_visitStack.pop();
-					if( topElement.tag == E_VISIT_OBJECT_KEY ) {
-						m_it = topElement.member_iter;
-						++m_it;		// move to next
-						m_visitTag = E_VISIT_OBJECT_KEY;	// visit next key (not 1st)
-					} else {
-						m_eleIt = topElement.element_iter;
-						++m_eleIt;
-						m_visitTag = E_VISIT_ARRAY_ELEMENT;  // after read , set from -1 --> 4 , to read next Array Element
-					}
-
-					m_visitValue = topElement.visitValue;
+                m_visitStep = nStep - 1;
+            
+                if( !m_visitStack.empty() ) {
+                    auto topElement = m_visitStack.pop();
+                    if( topElement.tag == E_VISIT_OBJECT_KEY ) {
+                        m_it = topElement.member_iter;
+                        ++m_it; // move to next
+                        m_visitTag = E_VISIT_OBJECT_KEY;    // visit next key (not 1st)
+                    } else {
+                        m_eleIt = topElement.element_iter;
+                        ++m_eleIt;
+                        m_visitTag = E_VISIT_ARRAY_ELEMENT;  // after read , set from -1 --> 4 , to read next Array Element
+                    }
+            
+                    m_visitValue = topElement.visitValue;
                 } else {
                     m_visitTag = E_VISIT_NEXT;
                 }
-			}
+            }
 
-		}
-	} else if( jsonValue->IsNull() || jsonValue->IsBool() || jsonValue->IsString() || jsonValue->IsNumber() ) {
-		// Basic Type
+        }
+    } else if( jsonValue->IsNull() || jsonValue->IsBool() || jsonValue->IsString() || jsonValue->IsNumber() ) {
+        // Basic Type
         highLightText(s.cursorOffset, e.cursorOffset);
-		if( nStep == 0 && jsonValue == m_pDoc &&  m_visitTag != E_VISIT_OBJECT_KEY  ) {
-			m_visitStep = nStep - 1;
-		}
-	}
+        if( nStep == 0 && jsonValue == m_pDoc &&  m_visitTag != E_VISIT_OBJECT_KEY  ) {
+            m_visitStep = nStep - 1;
+        }
+    }
 #endif
 }
 
@@ -393,20 +393,20 @@ void MainWindow::printValueDetail(rapidjson::Value* jsonValue,int nStep)
 void MainWindow::highLightText(int startpos,int endpos)
 {
     // qDebug() <<QStringLiteral("startpos = %1, endpos = %2").arg(startpos).arg(endpos);
-	// plainTextEdit
+    // plainTextEdit
     if( startpos>=0 &&  endpos>=0 && endpos>=startpos ) {
-		auto delta = endpos - startpos;
+        auto delta = endpos - startpos;
         auto cursor = ui->plainTextEdit->textCursor();
         //
-        //	Core
+        //  Core
         //
         // 移动当前的光标到指定的位置 , 这个操作会触发 QPlainTextEdit 的滚动条的移动(如果当前的设置的光标位置不在当前的可视区域时，会立即滚动(不带动画的)到设置的位置)
         QTextCursor currentCursor(cursor);
-        currentCursor.setPosition((int)startpos, QTextCursor::MoveAnchor);
+        currentCursor.setPosition(startpos, QTextCursor::MoveAnchor);
 
         QTextEdit::ExtraSelection selection;
         cursor.setPosition(startpos-1, QTextCursor::MoveAnchor);
-        cursor.movePosition( QTextCursor::Right, QTextCursor::KeepAnchor,  (int)(delta+1) );
+        cursor.movePosition( QTextCursor::Right, QTextCursor::KeepAnchor,  delta+1 );
 
         selection.cursor = cursor;
         selection.format.setBackground( QBrush(Qt::yellow) );
@@ -430,35 +430,35 @@ void MainWindow::highLightText(int startpos,int endpos)
 
 void MainWindow::clearTree()
 {
-	if( m_pTreeModel!=nullptr ) {
+    if( m_pTreeModel!=nullptr ) {
         auto selectionModel = ui->treeView->selectionModel();
         if( selectionModel!=nullptr ) {
-			disconnect(selectionModel,&QItemSelectionModel::selectionChanged, this, &MainWindow::onTreeItemSelectionChanged);
+            disconnect(selectionModel,&QItemSelectionModel::selectionChanged, this, &MainWindow::onTreeItemSelectionChanged);
             // qDebug() << "EdisonLog : Delete selectionModel : " << selectionModel;
             delete selectionModel;
         }
-		ui->treeView->setModel(nullptr);
+        ui->treeView->setModel(nullptr);
 
-		delete m_pTreeModel;
-		m_pTreeModel = nullptr;
-	}
+        delete m_pTreeModel;
+        m_pTreeModel = nullptr;
+    }
 }
 
 void MainWindow::setupTreeModel()
 {
-	m_pTreeModel = new  QStandardItemModel();
-	QStringList headLabelList;
-	headLabelList.push_back("No. / Key");
-	headLabelList.push_back("Value");
-	headLabelList.push_back("Type");
+    m_pTreeModel = new  QStandardItemModel();
+    QStringList headLabelList;
+    headLabelList.push_back("No. / Key");
+    headLabelList.push_back("Value");
+    headLabelList.push_back("Type");
     m_pTreeModel->setHorizontalHeaderLabels(headLabelList);
 
-	ui->treeView->setModel(m_pTreeModel);
-	auto selectionModel = ui->treeView->selectionModel();
-	if( selectionModel!=nullptr ) {
-		connect(selectionModel,&QItemSelectionModel::selectionChanged, this, &MainWindow::onTreeItemSelectionChanged);
-	}
-	
+    ui->treeView->setModel(m_pTreeModel);
+    auto selectionModel = ui->treeView->selectionModel();
+    if( selectionModel!=nullptr ) {
+        connect(selectionModel,&QItemSelectionModel::selectionChanged, this, &MainWindow::onTreeItemSelectionChanged);
+    }
+
 }
 
 
@@ -469,14 +469,14 @@ void MainWindow::fillDataIntoModel(QStandardItem* parent, rapidjson::Value* json
     // Q_UNUSED(tag);
 
     // JSonStandardItem* wholeRoot1 = new JSonStandardItem("Root",nullptr); 
-	// ("No. / Key");
-	// ("Value");
-	// ("Type");
+    // ("No. / Key");
+    // ("Value");
+    // ("Type");
     auto currentParent = parent;
 
-	if( jsonValue==nullptr ) {
-		return;
-	}
+    if( jsonValue==nullptr ) {
+        return;
+    }
 
     JSonStandardItem* newRoot = nullptr;
     if( tag == -1) {
@@ -485,7 +485,7 @@ void MainWindow::fillDataIntoModel(QStandardItem* parent, rapidjson::Value* json
         currentParent->setChild(0, 0, newRoot);
     }
 
-	if( jsonValue->IsObject() || jsonValue->IsArray()  ) {
+    if( jsonValue->IsObject() || jsonValue->IsArray()  ) {
         QString type = QStringLiteral("%1").arg(jsonValue->IsObject() ? "Object" : "Array");
         auto isObjFlag = jsonValue->IsObject();
         QString displaystr;
@@ -514,12 +514,12 @@ void MainWindow::fillDataIntoModel(QStandardItem* parent, rapidjson::Value* json
         }
 
         auto idx = 0;
-		if( jsonValue->IsObject() ) {
+        if( jsonValue->IsObject() ) {
             // Object
             // new JSonStandardItem(QStringLiteral("number"), jsonValue)
             // currentParent->setChild(0, 1, new JSonStandardItem(QStringLiteral("..."), jsonValue)
             idx = 0;
-			for( auto iter = jsonValue->MemberBegin(); iter!=jsonValue->MemberEnd(); ++iter, ++idx) {
+            for( auto iter = jsonValue->MemberBegin(); iter!=jsonValue->MemberEnd(); ++iter, ++idx) {
                 // Key
                 auto key_Object = &(iter->name);
                 auto key_treeItem = new JSonStandardItem(key_Object->GetString() , key_Object);
@@ -533,11 +533,11 @@ void MainWindow::fillDataIntoModel(QStandardItem* parent, rapidjson::Value* json
                 // Core Code : Recursively
                 auto isCompoundType = value_Object->IsObject() || value_Object->IsArray();
                 fillDataIntoModel(isCompoundType ? key_treeItem : currentParent, value_Object, idx);
-			}
-		} else {
+            }
+        } else {
             // Array
             idx = 0;
-			for(auto eleIt = jsonValue->Begin(); eleIt!=jsonValue->End(); ++eleIt, ++idx) {
+            for(auto eleIt = jsonValue->Begin(); eleIt!=jsonValue->End(); ++eleIt, ++idx) {
                 // Idx
                 auto real_idx = basedOn0 ? idx : idx+1;
                 auto idx_treeItem = new JSonStandardItem(QStringLiteral("%1").arg(real_idx) , eleIt);
@@ -548,10 +548,10 @@ void MainWindow::fillDataIntoModel(QStandardItem* parent, rapidjson::Value* json
                 // Core Code : Recursively
                 auto isCompoundType = eleIt->IsObject() || eleIt->IsArray();
                 fillDataIntoModel(isCompoundType ? idx_treeItem : currentParent , eleIt, idx);
-			}
-		}
-	} else if( jsonValue->IsNull() || jsonValue->IsBool() || jsonValue->IsString() || jsonValue->IsNumber() ) {
-		// not Object / Array
+            }
+        }
+    } else if( jsonValue->IsNull() || jsonValue->IsBool() || jsonValue->IsString() || jsonValue->IsNumber() ) {
+        // not Object / Array
         auto child_idx = (tag==-1 ? 0 : tag);
         // auto child_idx = 0;
         if( jsonValue->IsNull() ) {
@@ -592,16 +592,18 @@ void MainWindow::fillDataIntoModel(QStandardItem* parent, rapidjson::Value* json
             currentParent->setChild(child_idx,2, new JSonStandardItem(QStringLiteral("number"), jsonValue) );
             // refreshPostionMap( numjsitem );
         }
-	}
+    }
 #endif
 }
 
 
 void MainWindow::onTreeItemSelectionChanged(const QItemSelection & selected, const QItemSelection & deselected)
 {
-    auto selModel = ui->treeView->selectionModel();
+    // auto selModel = ui->treeView->selectionModel();
+    // Q_UNUSED(selModel)
 
-    Q_UNUSED(deselected);
+    Q_UNUSED(deselected)
+
     if( m_pTreeModel!=nullptr &&  m_enableResponseTreeItemSelected ) {
         auto selectList = selected.indexes();
         if( selectList.empty() ) {

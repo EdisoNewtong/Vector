@@ -879,7 +879,7 @@ void MainWindow::setXMLCurrentTextCursor(int cursorIdx)
 void MainWindow::onTreeItemSelectionChanged(const QItemSelection & selected, const QItemSelection & deselected)
 {
 
-    Q_UNUSED(deselected);
+    Q_UNUSED(deselected)
     if ( m_pXMLTreeModel!=nullptr &&  m_bIsEnableResponseTreeSelected ) {
         auto selectList = selected.indexes();
         if( selectList.empty() ) {
@@ -912,7 +912,7 @@ void MainWindow::onTreeItemSelectionChanged(const QItemSelection & selected, con
 
 void MainWindow::onAttributeItemSelectionChanged(const QItemSelection & selected, const QItemSelection & deselected)
 {
-    Q_UNUSED(deselected);
+    Q_UNUSED(deselected)
     if ( m_pXMLAttrTreeModel!=nullptr ) {
         auto selectList = selected.indexes();
         if( selectList.empty() ) {
