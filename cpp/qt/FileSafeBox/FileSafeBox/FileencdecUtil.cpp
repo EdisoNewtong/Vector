@@ -510,13 +510,20 @@ int FileEncDecUtil::decFileContent(QByteArray* outBuf, const QByteArray& inputPw
         if ( ENABLE_DEBUG ) {
             qDebug() << "[DEC] : Checked ! File Content is normal , no need to decrypt ";
         }
-        return 0;
+        return 3;
     }
 
     
     int requiredMetaBits   = m_metaInfoCnt * m_nCharMetaBits;
     bool needFill = (requiredMetaBits % m_nBits != 0);
     int requiredMetaBytes  = (requiredMetaBits  / m_nBits) + ( needFill ?  1 : 0);
+
+    if( (requiredMetaBytes + m_metaInfoCnt) != m_stripHeaderBuf.size()  ) {
+        if ( ENABLE_DEBUG ) {
+            qDebug() << "[DEC] :  (requiredMetaBytes + m_metaInfoCnt) != m_stripHeaderBuf.size()  " << m_metaInfoCnt;
+        }
+        return 3;
+    }
 
     if ( ENABLE_DEBUG ) {
         qDebug() << "[DEC] : m_metaInfoCnt = " << m_metaInfoCnt;
@@ -564,10 +571,6 @@ int FileEncDecUtil::decFileContent(QByteArray* outBuf, const QByteArray& inputPw
     }
 
 
-
-
-
-
     QByteArray realContentWithPwd_DummyBuf = m_stripHeaderBuf.mid(requiredMetaBytes);
     if ( pCoreData != nullptr ) {
         pCoreData->contentPwdPuzzle_enc = realContentWithPwd_DummyBuf;
@@ -577,10 +580,8 @@ int FileEncDecUtil::decFileContent(QByteArray* outBuf, const QByteArray& inputPw
         if ( ENABLE_DEBUG ) {
             qDebug() << "[DEC] : metaList.size() != realContentWithPwd_DummyBuf.size() ";
         }
-        return 0;
+        return 3;
     }
-
-
 
 
     QByteArray randomBuf;
@@ -634,7 +635,7 @@ int FileEncDecUtil::decFileContent(QByteArray* outBuf, const QByteArray& inputPw
         if ( ENABLE_DEBUG ) {
             qDebug() << "[DEC] : Password is incorrected. decPassword = " << realPwd << " , inputPwd = " << inputPwd;
         }
-        return 0;
+        return 2; // password is incorrect
     }
 
     if ( outBuf != nullptr ) {

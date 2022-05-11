@@ -62,6 +62,9 @@ private:
     QString getStrForAry16(int* ary);
 
 
+    void setFileContentLockState(bool locked, const QString& filecontent);
+    void setBtnState(bool isEncryptState);
+
     // Test Case
     void testCaseEncAndDecFile();
 private:
@@ -75,17 +78,22 @@ private:
 
     MyWidget* m_widgetAry[ WIDGETS_CNT];
     const QString   m_colorStyleAry[ WIDGETS_CNT ];
+    QString         m_openedFileName;
+    QByteArray      m_encryptedFileBuf;
 
 
     const int m_hoverDuring; // in ms
     const int m_slotDoneDuring; // in ms
     const int m_passwordshowDuring; // in ms
-    const int m_attemptCnt; // attempt the password time
+    const int m_infoMsgShowDuring; // in ms
+    const int m_attemptCntMax; // attempt the password time
 
     const  unsigned char m_bdOrderAry[WIDGETS_CNT];
     unsigned int m_currentTargetIdx;
     bool         m_bBDUnlocked;
     bool         m_bNextEnable;
+    int          m_attemptCnt;
+    int          m_btnState; // 0:Invalid ,   1: Normal File , Do Encrypt     2: Locked File , Do Decrypt ( need Password )
 
 
 
