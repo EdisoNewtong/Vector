@@ -44,6 +44,8 @@ private slots:
 
     void on_encdecButton_clicked();
 
+    void on_saveBtn_clicked();
+
 private:
 	void setPosAndSize(const QSize& sz);
     int  getWidgetTag( );

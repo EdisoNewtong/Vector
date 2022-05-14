@@ -234,6 +234,8 @@ void MainWindow::closeBD()
 
     ui->passwordInput->setReadOnly( false );
     ui->fileContent->setReadOnly( false ); 
+
+    ui->saveBtn->hide();
 }
 
 
@@ -547,7 +549,6 @@ void MainWindow::on_openFileButton_clicked()
     ui->fileContent->setPlainText("");
 
     QString strfileToOpen = QFileDialog::getOpenFileName(this, QStringLiteral("Pick a file to open") );
-    qDebug() << "File to open : " << strfileToOpen;
     if ( strfileToOpen.isNull() ) {
         return;
     }
@@ -690,6 +691,8 @@ void MainWindow::on_encdecButton_clicked()
                 ui->encdecButton->setText("Decrypted Done");
 
                 ui->statusBar->showMessage( QStringLiteral("Decrypt Successful :)"), m_infoMsgShowDuring);
+
+                ui->saveBtn->show();
             } else if ( decRet == 2 ) {
                 ++m_attemptCnt;
                 QMessageBox::warning(this, QStringLiteral("ERROR"), QStringLiteral("Password incorrected") );
@@ -815,3 +818,33 @@ void MainWindow::setBtnState(bool isEncryptState)
     }
 }
 
+
+void MainWindow::on_saveBtn_clicked()
+{
+    if ( ui->fileContent->isReadOnly() ) {
+        ui->statusBar->showMessage( QStringLiteral("File Content is ReadOnly "),   m_infoMsgShowDuring );
+        return;
+    }
+
+
+    auto fileSaveName = QFileDialog::getSaveFileName( this , "Clear File Password " );
+    qDebug() << fileSaveName;
+    if ( fileSaveName.isNull() || fileSaveName.isEmpty() ) {
+        ui->statusBar->showMessage( QStringLiteral("User Cancel "),   m_infoMsgShowDuring );
+        return;
+    }
+
+    QFile fToWrite( fileSaveName );
+    if ( fToWrite.open( QIODevice::WriteOnly ) ) {
+        auto content = ui->fileContent->toPlainText();
+        QByteArray ba;
+        ba.append(content);
+
+        fToWrite.write(ba);
+        fToWrite.flush();
+        ui->statusBar->showMessage( QStringLiteral("File Save Success :) "),   m_infoMsgShowDuring );
+    } else {
+        QMessageBox::warning(this, QStringLiteral("Open File Failed"), QStringLiteral("Can't Open this file") );
+    }
+    fToWrite.close();
+}
