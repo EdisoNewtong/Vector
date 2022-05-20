@@ -179,28 +179,46 @@ int main(int argc, char* argv[], char* env[])
     // Read File from the last args
     //
     string fname(argv[argc-1]);
-    ifstream file(fname.c_str(), ios::in | ios::binary);
-    if ( !file ) {
-        cout << "[ERROR] : File < " << fname << "> not found " << endl;
-        return -1;
+    int fnamesz = static_cast<int>( fname.size() );
+    bool bIsFile = false;
+    // cout << "fname = |\"" << fname << "\"|" << endl;
+    if ( fnamesz >=1   &&  (fname.find(';') != string::npos) ) {
+        bIsFile = false;
+    } else {
+        bIsFile = true;
     }
+    // cout << "bIsFile = " << (bIsFile ? "true" : "false") << endl;
 
-    file.seekg(0, ios::end); // file-pointer move to the end of file
-    auto filelen = static_cast<int>( file.tellg() );
-    file.seekg(0, ios::beg); // file-pointer move to the begin of file
 
-    if ( CmdOptions::needPrintSrcCodeLength()  ) {
-        cout << endl;
-        cout << "==================================================" << endl;
-        cout << "file.length = " << filelen << " byte(s)" << endl;
-        cout << "==================================================" << endl
-             << endl;
-    }
+    ifstream file;
+    auto filelen = 0;
+    if ( bIsFile ) {
+        file.open(fname.c_str(), ios::in | ios::binary);
+        if ( !file.is_open() ) {
+            cout << "[ERROR] : File < " << fname << "> not found " << endl;
+            return -1;
+        }
 
-    if ( filelen == 0 ) {
-        cout << "[DONE] : Nothing to Do , File has 0 byte " << endl;
+        file.seekg(0, ios::end); // file-pointer move to the end of file
+        filelen = static_cast<int>( file.tellg() );
+        file.seekg(0, ios::beg); // file-pointer move to the begin of file
+
+        if ( CmdOptions::needPrintSrcCodeLength()  ) {
+            cout << endl;
+            cout << "==================================================" << endl;
+            cout << "file.length = " << filelen << " byte(s)" << endl;
+            cout << "==================================================" << endl
+                 << endl;
+        }
+
+        if ( filelen == 0 ) {
+            cout << "[DONE] : Nothing to Do , File has 0 byte " << endl;
+            file.close();
+            return 0;
+        }
+    } else {
         file.close();
-        return 0;
+        filelen = fnamesz;
     }
 
     DataTypeUtil::init();
@@ -222,8 +240,17 @@ int main(int argc, char* argv[], char* env[])
     try {
         // prepare file Buff
         char* filebuf = new char[filelen];
-        file.read(filebuf, filelen);
-        file.close();
+        if ( bIsFile ) {
+            file.read(filebuf, filelen);
+            file.close();
+        } else {
+            // copy the content
+            for( int idx = 0; idx < filelen; ++idx ) {
+                filebuf[idx] = fname.at(idx);
+            }
+        }
+
+
         Buff* fileBuff = new Buff(filebuf,filelen);
 
         director.setData(fileBuff);
