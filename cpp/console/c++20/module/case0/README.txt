@@ -21,3 +21,12 @@ Thread model: posix
 Supported LTO compression algorithms: zlib
 gcc version 11.2.1 20210728 (Red Hat 11.2.1-1) (GCC) 
 
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+$ make
+g++  -Wall -std=c++20 -x  c++-system-header  -std=c++20   -fmodule-header  /opt/rh/devtoolset-11/root/usr/include/c++/11/iostream
+g++  -Wall -std=c++20 -fmodules-ts  -c -o hello.o     hello.cpp
+g++  -Wall -std=c++20 -fmodules-ts  -c -o main.o      main.cpp
+g++  -Wall -std=c++20 -fmodules-ts     -o main        main.o hello.o
+
+

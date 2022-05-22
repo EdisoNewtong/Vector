@@ -20,19 +20,21 @@ option0 := -Wall
 option1 := -Wall -std=c++20
 option2 := -fmodules-ts
 
-allopt := $(option0) $(option1) $(option2)
+allopt := $(option1) $(option2)
 # allopt := $(option2) 
 
 
 
 
+#main:hello.cpp   main.cpp
 main:hello.cpp $(newPreBuildOutputName) main.cpp
 	g++  -Wall  $(allopt)  -c -o hello.o     hello.cpp
 	g++  -Wall  $(allopt)  -c -o main.o      main.cpp
 	g++  -Wall  $(allopt)     -o main        main.o hello.o
 
+
 $(newPreBuildOutputName):$(systemHeaderFile)
-	g++  -Wall -std=c++20 -x  c++-system-header  -std=c++20   -fmodule-header  $(systemHeaderFile)
+	g++  -Wall -std=c++20 -x  c++-system-header -fmodule-header  $(systemHeaderFile)
 
 
 
