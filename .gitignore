@@ -9,6 +9,9 @@ main
 main.exe
 build-*
 
+
+
+
 cpp/console/tools/binarycmp/binarycmp
 cpp/console/tools/binarywrite/binarywrite
 cpp/console/tools/deletelasteol/deletelasteol
@@ -36,7 +39,5 @@ lua/sourceCodeStudy/xcodeLuaStudy
 **/build/*
 *.pro.user
 
-!cpp/console/mathOperatation/build/**
-cpp/console/mathOperatation/build/*.o
 
 
