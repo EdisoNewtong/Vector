@@ -28,9 +28,9 @@ allopt := $(option1) $(option2)
 
 #main:hello.cpp   main.cpp
 main:hello.cpp $(newPreBuildOutputName) main.cpp
-	g++  -Wall  $(allopt)  -c -o hello.o     hello.cpp
-	g++  -Wall  $(allopt)  -c -o main.o      main.cpp
-	g++  -Wall  $(allopt)     -o main        main.o hello.o
+	g++  $(allopt)  -c -o hello.o     hello.cpp
+	g++  $(allopt)  -c -o main.o      main.cpp
+	g++  $(allopt)     -o main        main.o hello.o
 
 
 $(newPreBuildOutputName):$(systemHeaderFile)
