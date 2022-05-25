@@ -1,6 +1,6 @@
 # makefile
 
-all clean:
+linux all clean:
 	cd src && $(MAKE) $@
 
 

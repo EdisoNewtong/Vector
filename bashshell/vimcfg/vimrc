@@ -5,6 +5,12 @@
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
+# Fix a bug about <BackSpace> doesn't work since  Vim  v8.2.xxxx ? 
+set backspace=2
+
+
+
+
 set nu
 set ruler
 set showcmd
@@ -52,10 +58,11 @@ set cinkeys-=0#
 	set guioptions-=e
 	set guioptions-=T
 	" set gvim transpancy
-	set transparency=25
+	" set transparency=25
 
-	"colorscheme evening
-	colorscheme desert
+	" colorscheme evening
+	" colorscheme desert
+	colorscheme ron
 	" set guifont=Fixedsys:h16
 
 	map <MiddleMouse> <Nop>
