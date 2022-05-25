@@ -7,7 +7,7 @@ floatNumberConverter.o:core/floatNumberConverter.cpp core/floatNumberConverter.h
 	g++   -Wall   -std=c++11   -Icore -c -o    floatNumberConverter.o    core/floatNumberConverter.cpp
 
 ieee754:floatNumberConverter.o ieee754.cpp
-	@echo "=============== Build <unitTest> project ==============="
+	@echo "=============== Build <ieee754> project ==============="
 	g++   -Wall   -std=c++11   -Icore -c -o    ieee754.o    ieee754.cpp
 	g++   -Wall   -std=c++11      -o    ieee754    ieee754.o floatNumberConverter.o
 
