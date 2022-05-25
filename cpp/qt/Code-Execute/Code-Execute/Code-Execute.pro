@@ -18,11 +18,78 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
-	typemetainfo.cpp
+    ##################################################
+    core/buff.cpp \
+    core/cmdOptions.cpp \
+    core/dataValue.cpp \
+    core/globalDirector.cpp \
+    core/myException.cpp \
+    ##################################################
+    core/parser/parserBase.cpp \
+    core/parser/blank/blankParser.cpp \
+    core/parser/comment/singlelineCommentParser.cpp \
+    core/parser/comment/multilineCommentParser.cpp \
+    core/parser/operator/operatorParser.cpp \
+    core/parser/semicolon/semicolonParser.cpp \
+    core/parser/sequence/sequenceParser.cpp \
+    ##################################################
+    core/token/tokenBase.cpp \
+    core/token/tokenMgr.cpp \
+    ##################################################
+    core/util/dataTypeUtil.cpp \
+    core/util/enumUtil.cpp \
+    core/util/keywordList.cpp \
+    core/util/opUtil.cpp \
+    core/util/stringNumber.cpp \
+    ##################################################
+    core/variblePool/variblePool.cpp
+
 
 HEADERS += \
     mainwindow.h \
-    typemetainfo.h
+    ##################################################
+    core/buff.h \
+    core/cmdOptions.h \
+    core/commonEnum.h \
+    core/dataValue.h \
+    core/globalDirector.h \
+    core/myException.h \
+    ##################################################
+    core/parser/parserBase.h \
+    core/parser/blank/blankParser.h \
+    core/parser/comment/singlelineCommentParser.h \
+    core/parser/comment/multilineCommentParser.h \
+    core/parser/operator/operatorParser.h \
+    core/parser/semicolon/semicolonParser.h \
+    core/parser/sequence/sequenceParser.h \
+    ##################################################
+    core/token/tokenBase.h \
+    core/token/tokenMgr.h \
+    ##################################################
+    core/util/charUtil.h \
+    core/util/dataTypeUtil.h \
+    core/util/enumUtil.h \
+    core/util/keywordList.h \
+    core/util/opUtil.h \
+    core/util/stringNumber.h \
+    ##################################################
+    core/variblePool/variblePool.h
+
+INCLUDEPATH += \
+    core \
+    ##################################################
+    core/parser \
+    core/parser/blank \
+    core/parser/comment \
+    core/parser/operator \
+    core/parser/semicolon \
+    core/parser/sequence \
+    ##################################################
+    core/token \
+    ##################################################
+    core/util \
+    ##################################################
+    core/variblePool
 
 FORMS += \
     mainwindow.ui
