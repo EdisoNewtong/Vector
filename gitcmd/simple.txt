@@ -1,0 +1,24 @@
+$ eval "$(ssh-agent -s)"
+
+$ ssh-add -l  // to list the key which is added already
+
+// e.g.    ssh-keygen -t ed25519   -C  "edisonewtong@163.com"
+$ ssh-keygen -t [dsa|rsa|ed25519|  -C  "Comment-Msg"
+
+
+
+//
+// list the config table that is set already 
+//
+$ git config --global  --list
+
+
+
+
+
+$ git config --global  user.name            "Edison Zhang"
+$ git config --global  user.email           "edisonewtong@163.com"
+$ git config --global  pull.rebase          false
+$ git config --global  core.editor          vim
+$ git config --global  init.defaultbranch   master
+
