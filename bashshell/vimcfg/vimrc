@@ -5,7 +5,7 @@
 "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-# Fix a bug about <BackSpace> doesn't work since  Vim  v8.2.xxxx ? 
+" Fix a bug about <BackSpace> doesn't work since  Vim  v8.2.xxxx ? 
 set backspace=2
 
 
