@@ -31,7 +31,7 @@ genCode:floatNumberConverter.o   genCode.cpp
 
 
 demo:floatNumberConverter.o   demo.cpp
-	@echo "=============== Build <Demo> project ==============="
+	@echo "=============== Build <demo> project ==============="
 	g++   -Wall   -std=c++11   -Icore   -c -o    demo.o    demo.cpp
 	g++   -Wall   -std=c++11      -o    demo    demo.o floatNumberConverter.o
 
