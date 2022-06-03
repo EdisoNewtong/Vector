@@ -5,8 +5,6 @@
 #include "tokenMgr.h"
 #include "variblePool.h"
 #include "tokenMgr.h"
-using namespace std;
-
 
 #include <QDebug>
 
