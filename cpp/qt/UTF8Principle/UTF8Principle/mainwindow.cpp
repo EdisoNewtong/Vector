@@ -343,7 +343,7 @@ QString MainWindow::auxOutput(const QString& singleCh, unsigned int u32code)
     hexAry = hexAry.rightJustified(2,'0');
     hexAry = hexAry.toUpper();
     // qDebug() << "ba = " << QString(ba);
-    retstr += QString(", u32 : U+%1").arg( QString(hexAry) );
+    retstr += QString(", u32 : U+%1 = %2").arg( QString(hexAry) ).arg(u32code);
 
     return retstr;
 
