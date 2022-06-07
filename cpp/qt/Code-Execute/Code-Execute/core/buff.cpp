@@ -10,7 +10,11 @@ ChInfo::ChInfo()
     , cursorIdx(0)
     , line(1)
     , column(1)
+    , qtCursorIdx(0)
     , isLastCh(false)
+    , _bIsMultiBytesLeader( false )
+    , _nCurByteCnt( 0 )
+    , _nContainBytes( 0 )
 {
 }
 
@@ -61,7 +65,11 @@ Buff::Buff(const char* fileContent, int length)
 // virtual 
 Buff::~Buff()
 {
-    INNER_SAFE_DELETE( m_fileContent )
+    //
+    // Added by Edison : 
+    //      m_fileContent is not a kind of heap memory , so do not delete
+    //
+    // INNER_SAFE_DELETE( m_fileContent )
 }
 
 void Buff::moveNext()
@@ -101,6 +109,44 @@ void Buff::moveNext()
     } else {
         ++m_chCursor.column;
     }
+
+
+    if ( !m_chCursor._bIsMultiBytesLeader ) {
+        unsigned int code = static_cast<unsigned int>(curCh & 0xFFU);
+        if ( (code >> 7) == 0 ) {
+            // ascii 
+            m_chCursor._nContainBytes = 1;
+            m_chCursor._bIsMultiBytesLeader = false;
+            m_chCursor.qtCursorIdx += 1;
+        } else if ( (code >> 5) == 0x06U ) {
+            m_chCursor._nContainBytes = 2;
+            m_chCursor._bIsMultiBytesLeader = true;
+        } else if ( (code >> 4) == 0x0EU ) {
+            m_chCursor._nContainBytes = 3;
+            m_chCursor._bIsMultiBytesLeader = true;
+        } else if ( (code >> 3) == 0x1EU ) {
+            m_chCursor._nContainBytes = 4;
+            m_chCursor._bIsMultiBytesLeader = true;
+        }
+
+        m_chCursor._nCurByteCnt   = 1;
+    } else {
+        // _bIsMultiBytesLeader ==> true
+        ++m_chCursor._nCurByteCnt;
+        if ( m_chCursor._nCurByteCnt == m_chCursor._nContainBytes ) {
+            m_chCursor._bIsMultiBytesLeader = false;
+
+            if ( m_chCursor._nContainBytes == 4 ) {
+                m_chCursor.qtCursorIdx += 2;
+            } else {
+                m_chCursor.qtCursorIdx += 1;
+            }
+
+            m_chCursor._nCurByteCnt = 0;
+            m_chCursor._nContainBytes = 0;
+        }
+    }
+
 }
 
 

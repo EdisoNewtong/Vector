@@ -54,7 +54,7 @@ R"([Flag]
 };
 
 
-const vector< pair<string,unsigned long> > CmdOptions::SC_DEBUG_OPTIONS_MAP{
+const vector< pair<string,quint32> > CmdOptions::SC_DEBUG_OPTIONS_MAP{
     { string("PRINT_RUNTIME_WARNING = "),                              0UL  },
     { string("PRINT_OPSTACK_ALL = "),                                  1UL  },
     { string("PRINT_SUFFIXEXP_BEFORE = "),                             2UL  },
@@ -78,7 +78,7 @@ const vector< pair<string,unsigned long> > CmdOptions::SC_DEBUG_OPTIONS_MAP{
 
 
  
-const vector< pair<string,unsigned long> > CmdOptions::SC_FLAG_MAP{
+const vector< pair<string,quint32> > CmdOptions::SC_FLAG_MAP{
     { string("ENABLE_PRINT_VARLIST_AT_LAST = "), 0UL   },
     { string("Dec = "),      1UL   },
     { string("Hex = "),      2UL   },
@@ -96,8 +96,8 @@ const vector< pair<string,unsigned long> > CmdOptions::SC_FLAG_MAP{
 //
 // static Member Data Init
 //
-unsigned long CmdOptions::s_debugOption = 1UL;
-unsigned long CmdOptions::s_flag = 1UL;
+quint32 CmdOptions::s_debugOption = 0x8001UL;
+quint32 CmdOptions::s_flag = 3UL;
 
 string CmdOptions::getDefaultCfgFileName()
 {
@@ -189,7 +189,7 @@ pair<bool,string> CmdOptions::parseCfgFile(bool hasCmdArgs, const string& cfgfil
             // Set CmdOptions::s_flag
             //
             auto foundIdx = -1;
-            unsigned int flagValue = 1;
+            quint32 flagValue = 1;
             for ( int idx = 0; idx < static_cast<int>( SC_FLAG_MAP.size() ); ++idx ) 
             {
                 auto pr = SC_FLAG_MAP.at(idx);
@@ -200,7 +200,7 @@ pair<bool,string> CmdOptions::parseCfgFile(bool hasCmdArgs, const string& cfgfil
                         flagValue = 0;
                     } else {
                         try {
-                            flagValue = static_cast<unsigned int>( stoi(restStr) );
+                            flagValue = static_cast<quint32>( stoi(restStr) );
                         } catch ( const exception& /* e */ ) {
                             flagValue = 0;
                         }
@@ -226,7 +226,7 @@ pair<bool,string> CmdOptions::parseCfgFile(bool hasCmdArgs, const string& cfgfil
                 // Set CmdOptions::s_debugOption
                 //
                 auto foundIdx2 = -1;
-                unsigned int flagValue = 1;
+                quint32 flagValue = 1;
                 for ( int idx = 0; idx < static_cast<int>( SC_DEBUG_OPTIONS_MAP.size() ); ++idx ) 
                 {
                     auto pr = SC_DEBUG_OPTIONS_MAP.at(idx);
@@ -237,7 +237,7 @@ pair<bool,string> CmdOptions::parseCfgFile(bool hasCmdArgs, const string& cfgfil
                             flagValue = 0;
                         } else {
                             try {
-                                flagValue = static_cast<unsigned int>( stoi(restStr) );
+                                flagValue = static_cast<quint32>( stoi(restStr) );
                             } catch ( const exception& /* e */ ) {
                                 flagValue = 0;
                             }
@@ -272,10 +272,6 @@ pair<bool,string> CmdOptions::parseCfgFile(bool hasCmdArgs, const string& cfgfil
 
 
 
-// unsigned int  CmdOptions::getDebugOption()
-// {
-//     return s_debugOption;
-// }
 
 
 
@@ -386,7 +382,14 @@ bool CmdOptions::needPrintVarible_8()      { return ( (s_flag >> 4UL) & 0x1UL) !
 // 0 : default  0xxxxx    1: special format (0)xxxx
 bool CmdOptions::isOctalDefaultStyle()     { return ( (s_flag >> 5UL) & 0x1UL) == 0; }
 
-unsigned int CmdOptions::getFlag()        { return s_flag; }
+quint32 CmdOptions::getFlag()         { return s_flag; }
+quint32 CmdOptions::getDebugOption() { return s_debugOption; }
+
+void CmdOptions::forceSetFlag(quint32 val)   { s_flag = val; }
+void CmdOptions::forceSetOption(quint32 val) { s_debugOption = val; }
+
+void CmdOptions::toggleFlagBit(quint32 iBit)        { s_flag ^= (1UL << iBit); }
+void CmdOptions::toggleDebugOptionBit(quint32 iBit) { s_debugOption ^= (1UL << iBit); }
 
 bool CmdOptions::isPrintVaribleFormatValid() 
 { 

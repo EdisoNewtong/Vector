@@ -26,6 +26,9 @@
 
 
 #include <QString>
+// #include <QPlainTextEdit>
+
+class QPlainTextEdit;
 
 class TokenMgr
 {
@@ -52,6 +55,8 @@ public:
     std::pair<bool,std::string> isLastValidTokenSemicolonOrEmpty();
     static void setUnInitializedVaribleAsError(bool flag);
     static void setNeedTreatBlankStatementAsWarning(bool flag);
+
+    void setTextEdit(QPlainTextEdit* pEdit);
 protected:
     TokenMgr();
     virtual ~TokenMgr();
@@ -149,6 +154,8 @@ protected:
     std::list<TokenBase*>   m_suffixExpression;
 
     int m_execodeIdx;
+
+    QPlainTextEdit*          m_pTextEdit;
 
 };
 

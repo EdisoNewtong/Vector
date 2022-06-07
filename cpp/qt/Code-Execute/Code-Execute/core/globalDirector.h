@@ -16,6 +16,8 @@
 
 #include <QString>
 
+class QPlainTextEdit;
+
 class GlobalDirector
 {
 public:
@@ -25,6 +27,8 @@ public:
     void setData(Buff* data);
 
     void doParse();
+
+    void setTextEditor(QPlainTextEdit* pEdit);
 protected:
     void switchParser(ParserBase::E_PARSER_TYPE type);
     QString inneralLog0(ChInfo& chInfo);
@@ -43,8 +47,10 @@ protected:
     SemiColonParser*  m_pSemicolonParser;  // 6
 
     Buff*            m_buff;
+    QPlainTextEdit*  m_pTextEdit;
 
     ParserBase::E_PARSER_TYPE  m_currentParserType;
+
 
 };
 

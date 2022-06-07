@@ -12,6 +12,7 @@
 using namespace std;
 
 #include <QTextStream>
+#include <QPlainTextEdit>
 
 GlobalDirector::GlobalDirector()
     //-------------------------------------
@@ -26,6 +27,7 @@ GlobalDirector::GlobalDirector()
     , m_pSemicolonParser(nullptr)
     //-------------------------------------
     , m_buff( nullptr )
+    , m_pTextEdit( nullptr )
     , m_currentParserType(ParserBase::E_BASE)
 {
     m_pBaseParser = new ParserBase();         // 0
@@ -100,6 +102,7 @@ void GlobalDirector::doParse()
         return;
     }
 
+    TokenMgr::getInstance()->setTextEdit( m_pTextEdit );
 
     auto needMove2Next = true;
     ChInfo& rChInfo = m_buff->getCursor();
@@ -210,7 +213,13 @@ void GlobalDirector::doParse()
 void GlobalDirector::printAllVaribles()
 {
     if ( CmdOptions::needPrintVaribleFinally() ) {
-        VariblePool::getPool()->printAllVaribles( CmdOptions::getFlag() );
+        auto varibleListOutput = VariblePool::getPool()->printAllVaribles( CmdOptions::getFlag() );
+
+        if ( m_pTextEdit != nullptr ) {
+            auto outputstr = m_pTextEdit->toPlainText();
+            outputstr += varibleListOutput;
+            m_pTextEdit->setPlainText(  outputstr );
+        }
     }
 }
 
@@ -224,6 +233,11 @@ QString GlobalDirector::inneralLog0(ChInfo& chInfo)
     }
 
     ts.flush();
+    if ( m_pTextEdit != nullptr ) {
+        auto outputstr = m_pTextEdit->toPlainText();
+        outputstr += retstr;
+        m_pTextEdit->setPlainText(  outputstr );
+    }
     return retstr;
 
 }
@@ -244,6 +258,13 @@ QString GlobalDirector::inneralLog1(ParserBase::E_PARSER_TYPE oldtp, ParserBase:
         }
     }
 
+    ts.flush();
+    if ( m_pTextEdit != nullptr ) {
+        auto outputstr = m_pTextEdit->toPlainText();
+        outputstr += retstr;
+        m_pTextEdit->setPlainText(  outputstr );
+    }
+
     return retstr;
 }
 
@@ -257,6 +278,20 @@ QString GlobalDirector::inneralLog2(bool moveNext)
         ts << (moveNext ? " Keep " : " Next ") << endl;
     }
 
+    ts.flush();
+    if ( m_pTextEdit != nullptr ) {
+        auto outputstr = m_pTextEdit->toPlainText();
+        outputstr += retstr;
+        m_pTextEdit->setPlainText(  outputstr );
+    }
+
     return retstr;
 }
+
+
+void GlobalDirector::setTextEditor(QPlainTextEdit* pEdit)
+{
+    m_pTextEdit = pEdit;
+}
+
 

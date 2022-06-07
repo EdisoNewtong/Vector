@@ -5,6 +5,7 @@
 #include <string>
 #include <utility>
 
+#include <QtGlobal>
 #include <QString>
 
 class CmdOptions
@@ -30,7 +31,14 @@ public:
 
     static bool isPrintVaribleFormatValid();
 
-    static unsigned int  getFlag();
+    static quint32  getFlag();
+    static quint32  getDebugOption();
+
+    static void     forceSetFlag(quint32 val);
+    static void     forceSetOption(quint32 val);
+
+    static void          toggleFlagBit(quint32 iBit);
+    static void          toggleDebugOptionBit(quint32 iBit);
 
     //
     // debug intermediate process
@@ -58,27 +66,27 @@ public:
     static bool needTreatUninitializedVaribleAsError();
     static bool needTraceParseTimeStep();
     static bool needPrintSrcCodeLength();
-protected:
+
     static bool needPrintDataTypeRange();
+protected:
 
 protected:
     // get Option/Flag value
-    // static unsigned int  getDebugOption();
     // static unsigned int  getFlag();
 
     CmdOptions() { }
     virtual ~CmdOptions() { }
 
-    static unsigned long s_debugOption;
-    static unsigned long s_flag;
+    static quint32 s_debugOption;
+    static quint32 s_flag;
 
     static const std::string SC_DEFAULT_FILENAME;
     static const std::string CFG_PREFIX; 
     static const std::string CFG_HINTS;
     static const std::string SC_CFG_CONTENT;
 
-    static const std::vector< std::pair<std::string,unsigned long> > SC_DEBUG_OPTIONS_MAP;
-    static const std::vector< std::pair<std::string,unsigned long> > SC_FLAG_MAP;
+    static const std::vector< std::pair<std::string, quint32> > SC_DEBUG_OPTIONS_MAP;
+    static const std::vector< std::pair<std::string, quint32> > SC_FLAG_MAP;
 
 
 

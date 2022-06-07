@@ -9,6 +9,7 @@
 using namespace std;
 
 #include <QTextStream>
+#include <QPlainTextEdit>
 
 //////////////////////////////////////////////////////////////////////
 //
@@ -1990,6 +1991,12 @@ QString TokenMgr::printOperatorStack()
         }
     }
 
+    ts.flush();
+    if ( m_pTextEdit != nullptr ) {
+        auto outputstr = m_pTextEdit->toPlainText();
+        outputstr += retstr;
+        m_pTextEdit->setPlainText(  outputstr );
+    }
     return retstr;
 }
 
@@ -2029,6 +2036,13 @@ QString TokenMgr::printSuffixExpression(int tag)
             ts << endl;
         }
 
+    }
+
+    ts.flush();
+    if ( m_pTextEdit != nullptr ) {
+        auto outputstr = m_pTextEdit->toPlainText();
+        outputstr += retstr;
+        m_pTextEdit->setPlainText(  outputstr );
     }
 
     return retstr;
@@ -2071,6 +2085,12 @@ QString TokenMgr::traceOperatorStack(TokenBase* pToken, bool push)
 
     }
 
+    ts.flush();
+    if ( m_pTextEdit != nullptr ) {
+        auto outputstr = m_pTextEdit->toPlainText();
+        outputstr += retstr;
+        m_pTextEdit->setPlainText(  outputstr );
+    }
     return retstr;
 
 }
@@ -2090,7 +2110,13 @@ QString TokenMgr::traceSuffixExpression(TokenBase* pToken, bool push)
         }
     }
 
+
     ts.flush();
+    if ( m_pTextEdit != nullptr ) {
+        auto outputstr = m_pTextEdit->toPlainText();
+        outputstr += retstr;
+        m_pTextEdit->setPlainText(  outputstr );
+    }
     return retstr;
 }
 
@@ -2111,6 +2137,11 @@ QString TokenMgr::traceOpMove2SuffixExpression(TokenBase* pToken)
     }
 
     ts.flush();
+    if ( m_pTextEdit != nullptr ) {
+        auto outputstr = m_pTextEdit->toPlainText();
+        outputstr += retstr;
+        m_pTextEdit->setPlainText(  outputstr );
+    }
     return retstr;
 }
 
@@ -2174,6 +2205,11 @@ QString TokenMgr::traceSomeTokensFromOpMove2SuffixExpression(const list<TokenBas
     }
 
     ts.flush();
+    if ( m_pTextEdit != nullptr ) {
+        auto outputstr = m_pTextEdit->toPlainText();
+        outputstr += retstr;
+        m_pTextEdit->setPlainText(  outputstr );
+    }
     return retstr;
 }
 
@@ -2195,6 +2231,11 @@ QString TokenMgr::tracePositiveNegativeFlag(TokenBase* pToken, E_OperatorType op
     }
 
     ts.flush();
+    if ( m_pTextEdit != nullptr ) {
+        auto outputstr = m_pTextEdit->toPlainText();
+        outputstr += retstr;
+        m_pTextEdit->setPlainText(  outputstr );
+    }
     return retstr;
 
 }
@@ -2223,6 +2264,11 @@ QString TokenMgr::tracePushedTokenWarning(TokenBase* pToken)
     }
 
     ts.flush();
+    if ( m_pTextEdit != nullptr ) {
+        auto outputstr = m_pTextEdit->toPlainText();
+        outputstr += retstr;
+        m_pTextEdit->setPlainText(  outputstr );
+    }
     return retstr;
 }
 
@@ -2308,6 +2354,12 @@ QString TokenMgr::tracebitShiftWarning(bool isLeftBitShift, TokenBase* left,  To
         }
     }
 
+    ts.flush();
+    if ( m_pTextEdit != nullptr ) {
+        auto outputstr = m_pTextEdit->toPlainText();
+        outputstr += retstr;
+        m_pTextEdit->setPlainText(  outputstr );
+    }
 
     return retstr;
 }
@@ -2339,6 +2391,11 @@ QString TokenMgr::traceNegativeOperation(TokenBase* right)
     }
 
     ts.flush();
+    if ( m_pTextEdit != nullptr ) {
+        auto outputstr = m_pTextEdit->toPlainText();
+        outputstr += retstr;
+        m_pTextEdit->setPlainText(  outputstr );
+    }
     return retstr;
 
 }
@@ -2355,6 +2412,11 @@ QString TokenMgr::traceTmpOpResult(const std::string& expr, DataValue& retValue)
     }
 
     ts.flush();
+    if ( m_pTextEdit != nullptr ) {
+        auto outputstr = m_pTextEdit->toPlainText();
+        outputstr += retstr;
+        m_pTextEdit->setPlainText(  outputstr );
+    }
     return retstr;
 }
 
@@ -2374,6 +2436,12 @@ QString TokenMgr::traceUnInitializedVarWhenUsed(TokenBase* pToken)
         ts << " varible named " << SINGLE_QUOTO.c_str() << pToken->getTokenContent().c_str() << SINGLE_QUOTO.c_str() << " is not initialized before used " << endl;
     }
 
+    ts.flush();
+    if ( m_pTextEdit != nullptr ) {
+        auto outputstr = m_pTextEdit->toPlainText();
+        outputstr += retstr;
+        m_pTextEdit->setPlainText(  outputstr );
+    }
     return retstr;
 }
 
@@ -2392,6 +2460,11 @@ QString TokenMgr::traceBlankStatement()
     }
 
     ts.flush();
+    if ( m_pTextEdit != nullptr ) {
+        auto outputstr = m_pTextEdit->toPlainText();
+        outputstr += retstr;
+        m_pTextEdit->setPlainText(  outputstr );
+    }
     return retstr;
 }
 
@@ -2427,5 +2500,17 @@ QString TokenMgr::traceAssignOverFlow(TokenBase* leftVar, TokenBase* rightFixedI
     }
 
     ts.flush();
+    if ( m_pTextEdit != nullptr ) {
+        auto outputstr = m_pTextEdit->toPlainText();
+        outputstr += retstr;
+        m_pTextEdit->setPlainText(  outputstr );
+    }
     return retstr;
 }
+
+
+void TokenMgr::setTextEdit(QPlainTextEdit* pEdit)
+{
+    m_pTextEdit = pEdit;
+}
+

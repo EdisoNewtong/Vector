@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QFile>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -15,7 +16,22 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+private slots:
+    void onMenu0ItemTriggered(bool checked);
+    void onMenu1ItemTriggered(bool checked);
+    void on_pushButton_clicked();
+
+private:
+    void initMenuBar();
+    void initMenuBar0();
+    void initMenuBar1();
+
+    void initCfgFile();
+
+    void saveToFile(bool needDelete);
 private:
     Ui::MainWindow *ui;
+    QMenu*         m_pPrintSubMenu;
+    QFile*         m_pCfgFile;
 };
 #endif // MAINWINDOW_H

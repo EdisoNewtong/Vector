@@ -14,10 +14,16 @@ struct ChInfo
     int cursorIdx;
     int line;
     int column;
+    int qtCursorIdx;
 
     bool isLastCh;
 
     std::string getPos(int flag = 1) const;
+
+// private:
+    bool _bIsMultiBytesLeader;
+    int  _nCurByteCnt;
+    int  _nContainBytes;
 };
 
 
