@@ -19,6 +19,8 @@ public:
 private slots:
     void onMenu0ItemTriggered(bool checked);
     void onMenu1ItemTriggered(bool checked);
+
+    void onSaveToCfg(bool checked);
     void on_pushButton_clicked();
 
 private:

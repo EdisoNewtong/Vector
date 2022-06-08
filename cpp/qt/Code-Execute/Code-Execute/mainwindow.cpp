@@ -42,8 +42,12 @@ MainWindow::~MainWindow()
     //
     // sync when program is quit
     //
-    saveToFile(true);
+    if ( m_pCfgFile != nullptr ) {
+        m_pCfgFile->close();
 
+        delete m_pCfgFile;
+        m_pCfgFile = nullptr;
+    }
 }
 
 
@@ -84,6 +88,12 @@ void MainWindow::initMenuBar0()
     for( cIndex = 0; cIndex < cMenuCnt; ++cIndex ) {
         connect( pActionAry[cIndex], SIGNAL( toggled(bool) ), this, SLOT(onMenu0ItemTriggered(bool)) );
     }
+
+    //
+    menu0->addSeparator();
+    act = menu0->addAction("Save all preferences into cfg file");
+    connect(act, SIGNAL( triggered(bool) ), this, SLOT( onSaveToCfg(bool) ) );
+
 }
 
 
@@ -148,7 +158,9 @@ void MainWindow::onMenu0ItemTriggered(bool checked)
                  m_pPrintSubMenu->setEnabled( CmdOptions::needPrintVaribleFinally() );
             }
 
-            saveToFile(false);
+            // if ( CmdOptions::s_needSaveToCfgAtOnce ) {
+            //     saveToFile(false);
+            // }
         }
     }
 }
@@ -164,7 +176,10 @@ void MainWindow::onMenu1ItemTriggered(bool checked)
         auto tag = pClickedMenu->data().toInt(&bCastSuccessful);
         if ( bCastSuccessful ) {
             CmdOptions::toggleDebugOptionBit( static_cast<quint32>(tag) );
-            saveToFile(false);
+
+            // if ( CmdOptions::s_needSaveToCfgAtOnce ) {
+            //     saveToFile(false);
+            // }
         }
     }
 }
@@ -320,4 +335,15 @@ void MainWindow::de_highlight()
 {
     QList<QTextEdit::ExtraSelection> lst;
     ui->codeEdit->setExtraSelections(lst);
+}
+
+
+void MainWindow::onSaveToCfg(bool checked)
+{
+    Q_UNUSED(checked)
+
+    saveToFile(false);
+
+    ui->statusbar->showMessage( QString("Save to \"%1\" Done").arg( QString(CmdOptions::getDefaultCfgFileName().c_str()) ),  2000 );
+
 }
