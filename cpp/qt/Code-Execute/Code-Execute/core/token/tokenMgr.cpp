@@ -1467,8 +1467,8 @@ TokenBase* TokenMgr::doMinus(TokenBase* left, TokenBase* right)
     traceTmpOpResult(finalExpr, substractRet);
 
     TokenBase* ret = generateTmpExpression(retDt, finalExpr, left, right);
-    ret->setBeginPos( left->getBeginPos() );
-    ret->setEndPos(   right->getBeginPos() );
+    // ret->setBeginPos( left->getBeginPos() );
+    // ret->setEndPos(   right->getBeginPos() );
     ret->setRealValue( substractRet );
 
     return ret;
