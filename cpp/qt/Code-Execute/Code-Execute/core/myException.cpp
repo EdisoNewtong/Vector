@@ -191,3 +191,23 @@ const char* MyException::what() const noexcept // throw()
 }
 */
 
+
+bool MyException::hasCursorInfo(ChInfo* pChInfo) const
+{
+    if ( !m_hasSetCursor ) {
+        return false;
+    } 
+    
+    if ( pChInfo != nullptr ) {
+        *pChInfo = m_cursor;
+    }
+    return true;
+}
+
+
+void MyException::setChInfo(ChInfo cur)
+{
+    m_cursor = cur;
+    m_hasSetCursor = true;
+}
+

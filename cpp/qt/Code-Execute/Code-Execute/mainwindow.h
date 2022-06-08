@@ -29,6 +29,8 @@ private:
     void initCfgFile();
 
     void saveToFile(bool needDelete);
+    void highLightCatchedPosition(int startCursorPos);
+    void de_highlight();
 private:
     Ui::MainWindow *ui;
     QMenu*         m_pPrintSubMenu;

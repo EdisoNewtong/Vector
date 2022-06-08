@@ -13,6 +13,8 @@
 #include <QDebug>
 #include <QDataStream>
 #include <QByteArray>
+#include <QList>
+#include <QTextEdit>
 
 static auto SG_debugFlag = true;
 
@@ -170,6 +172,8 @@ void MainWindow::onMenu1ItemTriggered(bool checked)
 
 void MainWindow::on_pushButton_clicked()
 {
+    de_highlight();
+
     DataTypeUtil::init();
     VariblePool::init();
     TokenMgr::init();
@@ -213,6 +217,13 @@ void MainWindow::on_pushButton_clicked()
     } catch( const MyException& e ) { 
         // TODO : high-light
         outstr += QString("[ERROR] : Meet a self-defined exception : %1\n").arg( e.getExceptionDetail().c_str() );
+        ChInfo cursor;
+        if ( e.hasCursorInfo(&cursor) ) {
+            qDebug() << "HighLight cursor : " << cursor.qtCursorIdx;
+            highLightCatchedPosition(cursor.qtCursorIdx);
+        } else {
+             qDebug() << "No Cursor info ";
+        }
     } catch(const std::exception& e) {
         outstr += QString("[ERROR] : Meet a common exception : %1\n").arg( e.what() );
     } catch( ... ) {
@@ -276,8 +287,37 @@ void MainWindow::saveToFile(bool needDelete)
             m_pCfgFile = nullptr;
         }
     }
-
-
 }
 
 
+void MainWindow::highLightCatchedPosition(int startCursorPos)
+{
+    QList<QTextEdit::ExtraSelection> lst;
+
+    //
+    //  Core
+    //
+    // 移动当前的光标到指定的位置 , 这个操作会触发 QPlainTextEdit 的滚动条的移动(如果当前的设置的光标位置不在当前的可视区域时，会立即滚动(不带动画的)到设置的位置)
+    auto cursor = ui->codeEdit->textCursor();
+    QTextCursor currentCursor(cursor);
+    currentCursor.setPosition(startCursorPos, QTextCursor::MoveAnchor);
+
+    QTextEdit::ExtraSelection selection;
+    cursor.setPosition(startCursorPos, QTextCursor::MoveAnchor);
+    cursor.movePosition( QTextCursor::Right, QTextCursor::KeepAnchor,  1 );
+
+    selection.cursor = cursor;
+    selection.format.setBackground( QBrush(Qt::yellow) );
+    lst.push_back(selection);
+
+    ui->codeEdit->setExtraSelections(lst);
+
+    ui->codeEdit->setTextCursor(currentCursor);
+}
+
+
+void MainWindow::de_highlight()
+{
+    QList<QTextEdit::ExtraSelection> lst;
+    ui->codeEdit->setExtraSelections(lst);
+}

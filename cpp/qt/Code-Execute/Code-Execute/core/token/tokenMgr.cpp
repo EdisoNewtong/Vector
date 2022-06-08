@@ -1520,6 +1520,7 @@ TokenBase* TokenMgr::doDivide(TokenBase* left, TokenBase* right)
         // if ( detailstr.empty() ) {
         //     e.setDetail( rightContent + " is zero Value ( in Divide ) @"  +  right->getBeginPos().getPos() );
         // } 
+        e.setChInfo( right->getBeginPos() );
         e.setDetail( rightContent + " is zero Value ( in Divide ) @"  +  right->getBeginPos().getPos(0) );
         throw;
     }
@@ -1562,6 +1563,7 @@ TokenBase* TokenMgr::doMod(TokenBase* left, TokenBase* right)
         modRet  = (leftVal % rightVal);
     } catch ( MyException& e ) {
         if ( e.getDetail().empty() ) {
+            e.setChInfo( right->getBeginPos() );
             e.setDetail( rightContent + " is zero Value ( in Modulo ) @" + right->getBeginPos().getPos(0) );
         }
         throw;

@@ -18,9 +18,11 @@ public:
 
     std::string getDetail();
     void setDetail(const std::string& detail);
+    void setChInfo(ChInfo cur);
     // virtual const char* what() const noexcept override; // throw();
 
     std::string getExceptionDetail() const;
+    bool hasCursorInfo(ChInfo* pChInfo) const;
 protected:
     E_ExceptionType m_errorCode;
     std::string     m_detail;
