@@ -29,10 +29,12 @@ cpp/console/tools/mathOperatation/mathCalc
 cpp/console/tools/mathOperatation/build/*.o
 !cpp/console/tools/mathOperatation/build/**
 cpp/console/tools/**/*.exe
+
 cpp/console/tools/arithMetic/build/*.o
 !cpp/console/tools/arithmetic/build/tmp.txt
 cpp/console/tools/arithmetic/arithMetic
 cpp/console/tools/arithmetic/build/arithMetic
+
 
 lua/sourceCodeStudy/lua-5.1.5/src/lua
 lua/sourceCodeStudy/lua-5.1.5/src/luac
