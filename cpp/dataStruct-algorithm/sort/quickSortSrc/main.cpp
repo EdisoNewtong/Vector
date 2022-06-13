@@ -130,7 +130,6 @@ void qSortSimpleVersionHead(int* ary, int begIdx, int endIdx, int sz, bool isAsc
 		sepIdx = i - 1;
 	}
 
-	// getArrayElement(ary, j, begIdx, endIdx, __LINE__)
 	// auto condition = isAscendOrder ? ary[sepIdx] >= povitNumber 
 	// 	                           : ary[sepIdx] <= povitNumber;
     
@@ -250,12 +249,14 @@ void testSort(bool isAscOrder, int useHeadVersion)
 
 	if ( g_sortingFunctionVersion == 1 ) {
 		cout << "Use Pick <Head> Number <== as the povit Number " << endl;
-	} else {
+	} else if ( g_sortingFunctionVersion == 2 ) {
 		cout << "Use Pick <Tail> Number <== as the povit Number " << endl;
-	}
+	} else {
+		cout << "Use Pick < Old-Version > ??? Number <== as the povit Number " << endl;
+    }
 	cout << "==================================================" << endl;
 
-	const char* FILENAME = "1_5.txt";
+	const char* FILENAME = "1_6.txt";
 
 	ifstream fobj(FILENAME ,ios::in);
 	if ( !fobj ) {
