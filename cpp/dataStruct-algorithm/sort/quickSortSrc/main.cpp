@@ -33,6 +33,20 @@ bool checkIsInArrayRange(int idx, int sz, const char* varname)
 }
 
 
+//
+// Get Array's element by index (idx)
+//
+int getArrayElement(int* ary,int idx, int minIdx,int maxIdx, int lineNo)
+{
+    if ( idx >= minIdx   &&    idx <= maxIdx ) {
+        return ary[idx];
+    } else {
+        cout << "[ERROR] : @" << lineNo << " , " << idx << " is out of range [ " << minIdx << " , " << maxIdx << " ] " << endl;
+        return -999;
+    }
+}
+
+
 
 void swap2Numbers(int* ary, int idx1, int idx2, int sz)
 {
@@ -63,6 +77,10 @@ void reverseAry(int* ary,int sz)
 		swap2Numbers(ary, headidx, tailidx, sz);
 	}
 }
+
+//
+// use the 1st number ( whose index is 0 ) as the pivot number
+//
 void qSortSimpleVersionHead(int* ary, int begIdx, int endIdx, int sz, bool isAscendOrder)
 {
 	if ( g_checkBoundFlag ) {
@@ -77,17 +95,26 @@ void qSortSimpleVersionHead(int* ary, int begIdx, int endIdx, int sz, bool isAsc
 		return;
 	}
 
-	int povitNumber = ary[begIdx];
+	// int povitNumber = ary[begIdx];
+	int povitNumber = getArrayElement(ary, begIdx, begIdx, endIdx, __LINE__);
 	int i = begIdx + 1;
 	int j = endIdx;
 	while ( i < j ) 
 	{
-		for ( ; i < j && (isAscendOrder ? ary[i] <= povitNumber
-				                        : ary[i] >= povitNumber); ++i )
+		// for ( ; i < j && (isAscendOrder ? ary[i] <= povitNumber
+		// 		                        : ary[i] >= povitNumber); ++i )
+		// { ; }
+        
+		for ( ; i < j && (isAscendOrder ? getArrayElement(ary, i, begIdx, endIdx, __LINE__) <= povitNumber
+				                        : getArrayElement(ary, i, begIdx, endIdx, __LINE__) >= povitNumber); ++i )
 		{ ; }
 
-		for ( ; j > i && (isAscendOrder ? ary[j] >= povitNumber 
-				                        : ary[j] <= povitNumber); --j )
+		// for ( ; j > i && (isAscendOrder ? ary[j] >= povitNumber 
+		// 		                        : ary[j] <= povitNumber); --j )
+		// { ; }
+        
+		for ( ; j > i && (isAscendOrder ? getArrayElement(ary, j, begIdx, endIdx, __LINE__) >= povitNumber 
+				                        : getArrayElement(ary, j, begIdx, endIdx, __LINE__) <= povitNumber); --j )
 		{ ; }
 
 		swap2Numbers(ary,i,j,sz);
@@ -103,8 +130,12 @@ void qSortSimpleVersionHead(int* ary, int begIdx, int endIdx, int sz, bool isAsc
 		sepIdx = i - 1;
 	}
 
-	auto condition = isAscendOrder ? ary[sepIdx] >= povitNumber 
-		                           : ary[sepIdx] <= povitNumber;
+	// getArrayElement(ary, j, begIdx, endIdx, __LINE__)
+	// auto condition = isAscendOrder ? ary[sepIdx] >= povitNumber 
+	// 	                           : ary[sepIdx] <= povitNumber;
+    
+	auto condition = isAscendOrder ? getArrayElement(ary, sepIdx, begIdx, endIdx, __LINE__) >= povitNumber 
+		                           : getArrayElement(ary, sepIdx, begIdx, endIdx, __LINE__) <= povitNumber;
 	if ( condition ) {
 		sepIdx = sepIdx - 1;
 	}
@@ -117,6 +148,10 @@ void qSortSimpleVersionHead(int* ary, int begIdx, int endIdx, int sz, bool isAsc
 	qSortSimpleVersionHead(ary, sepIdx + 1, endIdx, sz, isAscendOrder);
 }
 
+
+//
+// use the last number ( whose index is endIdx ) as the pivot number
+//
 void qSortSimpleVersionTail(int* ary, int begIdx, int endIdx, int sz, bool isAscendOrder)
 {
 
@@ -132,17 +167,26 @@ void qSortSimpleVersionTail(int* ary, int begIdx, int endIdx, int sz, bool isAsc
 		return;
 	}
 
-	int povitNumber = ary[endIdx];
+	// int povitNumber = ary[endIdx];
+	int povitNumber = getArrayElement(ary, endIdx, begIdx, endIdx, __LINE__);
 	int i = begIdx;
 	int j = endIdx-1;
 	while ( i < j ) 
 	{
-		for ( ; i < j && (isAscendOrder ? ary[i] <= povitNumber
-				                        : ary[i] >= povitNumber); ++i )
+		// for ( ; i < j && (isAscendOrder ? ary[i] <= povitNumber
+		// 		                        : ary[i] >= povitNumber); ++i )
+		// { ; }
+        
+		for ( ; i < j && (isAscendOrder ? getArrayElement(ary, i, begIdx, endIdx, __LINE__) <= povitNumber
+				                        : getArrayElement(ary, i, begIdx, endIdx, __LINE__) >= povitNumber); ++i )
 		{ ; }
 
-		for ( ; j > i && (isAscendOrder ? ary[j] >= povitNumber 
-				                        : ary[j] <= povitNumber); --j )
+		// for ( ; j > i && (isAscendOrder ? ary[j] >= povitNumber 
+		// 		                        : ary[j] <= povitNumber); --j )
+		// { ; }
+
+		for ( ; j > i && (isAscendOrder ? getArrayElement(ary, j, begIdx, endIdx, __LINE__) >= povitNumber 
+				                        : getArrayElement(ary, j, begIdx, endIdx, __LINE__) <= povitNumber); --j )
 		{ ; }
 
 		swap2Numbers(ary,i,j,sz);
@@ -158,8 +202,10 @@ void qSortSimpleVersionTail(int* ary, int begIdx, int endIdx, int sz, bool isAsc
 		sepIdx = i - 1;
 	}
 
-	auto condition = isAscendOrder ? ary[sepIdx] <= povitNumber 
-		                           : ary[sepIdx] >= povitNumber;
+	// auto condition = isAscendOrder ? ary[sepIdx] <= povitNumber 
+	// 	                           : ary[sepIdx] >= povitNumber;
+	auto condition = isAscendOrder ? getArrayElement(ary, sepIdx, begIdx, endIdx, __LINE__) <= povitNumber 
+	 	                           : getArrayElement(ary, sepIdx, begIdx, endIdx, __LINE__) >= povitNumber;
 	if ( condition ) {
 		sepIdx = sepIdx + 1;
 	}
