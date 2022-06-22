@@ -27,10 +27,8 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    initMenuBar();
     initCfgFile();
-
-
+    initMenuBar();
 }
 
 MainWindow::~MainWindow()
