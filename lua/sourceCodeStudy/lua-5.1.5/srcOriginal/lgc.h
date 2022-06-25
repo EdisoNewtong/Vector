@@ -14,11 +14,11 @@
 /*
 ** Possible states of the Garbage Collector
 */
-#define GCSpause        0
-#define GCSpropagate    1
-#define GCSsweepstring  2
-#define GCSsweep        3
-#define GCSfinalize     4
+#define GCSpause	0
+#define GCSpropagate	1
+#define GCSsweepstring	2
+#define GCSsweep	3
+#define GCSfinalize	4
 
 
 /*
@@ -51,14 +51,14 @@
 */
 
 
-#define WHITE0BIT       0
-#define WHITE1BIT       1
-#define BLACKBIT        2
-#define FINALIZEDBIT    3
-#define KEYWEAKBIT      3
-#define VALUEWEAKBIT    4
-#define FIXEDBIT        5
-#define SFIXEDBIT       6
+#define WHITE0BIT	0
+#define WHITE1BIT	1
+#define BLACKBIT	2
+#define FINALIZEDBIT	3
+#define KEYWEAKBIT	3
+#define VALUEWEAKBIT	4
+#define FIXEDBIT	5
+#define SFIXEDBIT	6
 #define WHITEBITS	bit2mask(WHITE0BIT, WHITE1BIT)
 
 

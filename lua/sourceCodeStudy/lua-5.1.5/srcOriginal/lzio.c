@@ -25,9 +25,7 @@ int luaZ_fill (ZIO *z) {
   lua_unlock(L);
   buff = z->reader(L, z->data, &size);
   lua_lock(L);
-  if (buff == NULL || size == 0) { 
-    return EOZ;
-  }
+  if (buff == NULL || size == 0) return EOZ;
   z->n = size - 1;
   z->p = buff;
   return char2int(*(z->p++));
@@ -36,9 +34,9 @@ int luaZ_fill (ZIO *z) {
 
 int luaZ_lookahead (ZIO *z) {
   if (z->n == 0) {
-    if (luaZ_fill(z) == EOZ) {
+    if (luaZ_fill(z) == EOZ)
       return EOZ;
-    } else {
+    else {
       z->n++;  /* luaZ_fill removed first byte; put back it */
       z->p--;
     }
@@ -60,9 +58,8 @@ void luaZ_init (lua_State *L, ZIO *z, lua_Reader reader, void *data) {
 size_t luaZ_read (ZIO *z, void *b, size_t n) {
   while (n) {
     size_t m;
-    if (luaZ_lookahead(z) == EOZ) {
+    if (luaZ_lookahead(z) == EOZ)
       return n;  /* return number of missing bytes */
-    }
     m = (n <= z->n) ? n : z->n;  /* min. between n and z->n */
     memcpy(b, z->p, m);
     z->n -= m;
@@ -76,9 +73,7 @@ size_t luaZ_read (ZIO *z, void *b, size_t n) {
 /* ------------------------------------------------------------------------ */
 char *luaZ_openspace (lua_State *L, Mbuffer *buff, size_t n) {
   if (n > buff->buffsize) {
-    if (n < LUA_MINBUFFER) { 
-      n = LUA_MINBUFFER;
-    }
+    if (n < LUA_MINBUFFER) n = LUA_MINBUFFER;
     luaZ_resizebuffer(L, buff, n);
   }
   return buff->buffer;
