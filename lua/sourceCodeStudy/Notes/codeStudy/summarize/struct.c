@@ -8,11 +8,25 @@ struct Table;       // lobject.h:338
 struct Proto;       // lobject.h:231
 struct UpVal;       // lobject.h:274
 struct lua_State;   // lstate.h:100
+struct Mbuffer;     // lzio.h:24
+struct lua_longjmp; // ldo.c:44
+
+/*
+
+lu_mem   => size_t
+lu_int32 => unsigned int
+lu_byte  => unsigned char
+
+*/
 
 struct CallInfo;                // lstate.h:48
 typedef TValue *StkId;          /* index to stack elements */ // lobject.h:193
 typedef lu_int32 Instruction;   // llimits.h:84
 typedef unsigned char lu_byte;  // llimits.h:27
+typedef void * (*lua_Alloc) (void *ud, void *ptr, size_t osize, size_t nsize); // lua.h:66
+typedef int (*lua_CFunction) (lua_State *L); // lua.h:52
+typedef void (*lua_Hook) (lua_State *L, lua_Debug *ar); // lua.h:330
+
 
 typedef struct stringtable {
   GCObject **hash;
@@ -257,40 +271,19 @@ typedef struct global_State {
 } global_State;
 
 
-/*
-** `per thread' state
-*/
-struct lua_State {
-  GCObject *next; 
-  lu_byte tt; 
-  lu_byte marked;
-  // CommonHeader;
 
-  lu_byte status;
-  StkId top;  /* first free slot in the stack */
-  StkId base;  /* base of current function */
-  global_State *l_G;
-  CallInfo *ci;  /* call info for current function */
-  const Instruction *savedpc;  /* `savedpc' of current function */
-  StkId stack_last;  /* last free slot in the stack */
-  StkId stack;  /* stack base */
-  CallInfo *end_ci;  /* points after end of ci array*/
-  CallInfo *base_ci;  /* array of CallInfo's */
-  int stacksize;
-  int size_ci;  /* size of array `base_ci' */
-  unsigned short nCcalls;  /* number of nested C calls */
-  unsigned short baseCcalls;  /* nested C calls when resuming coroutine */
-  lu_byte hookmask;
-  lu_byte allowhook;
-  int basehookcount;
-  int hookcount;
-  lua_Hook hook;
-  TValue l_gt;  /* table of globals */
-  TValue env;  /* temporary place for environments */
-  GCObject *openupval;  /* list of open upvalues in this stack */
-  GCObject *gclist;
-  struct lua_longjmp *errorJmp;  /* current error recover point */
-  ptrdiff_t errfunc;  /* current error handling function (stack index) */
+
+
+typedef struct Mbuffer {
+  char *buffer;
+  size_t n;
+  size_t buffsize;
+} Mbuffer;
+
+
+/* chain list of long jump buffers */
+struct lua_longjmp {
+  struct lua_longjmp *previous;
+  jmp_buf b;      /*  luai_jmpbuf b; */
+  volatile int status; /* error code */
 };
-
-

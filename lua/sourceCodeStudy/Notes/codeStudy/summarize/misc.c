@@ -15,3 +15,12 @@ lu_int32 <==> unsigned int
 /* chars used as small naturals (so that `char' is reserved for characters) */
 typedef unsigned char lu_byte;  // llimits.h:27
 lu_byte  => unsigned char
+
+
+
+//////////////////////////////////////////////////
+// ?? lu_mem  => size_t
+//////////////////////////////////////////////////
+typedef LUAI_UMEM lu_mem;  // llimits.h:20
+#define LUAI_UMEM	size_t // luaconf.h:417
+
