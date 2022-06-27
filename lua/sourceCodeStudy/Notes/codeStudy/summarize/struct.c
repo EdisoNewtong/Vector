@@ -266,8 +266,9 @@ typedef struct global_State {
   TValue l_registry;
   struct lua_State *mainthread;
   UpVal uvhead;  /* head of double-linked list of all open upvalues */
-  struct Table *mt[NUM_TAGS];  /* metatables for basic types */
-  TString *tmname[TM_N];  /* array with tag-method names */
+  /*                                                                                  1        ~              4      |     5                 ~            9    */
+  struct Table *mt[NUM_TAGS];  /* metatables for basic types      NUM_TAGS = 8+1 = 9 (nil,bool,lightuserdata,number,    string,table,function,userdata,thread )*/
+  TString *tmname[TM_N];  /* array with tag-method names          TM_N = 17 (__index, __newindex, __gc, __mode, __eq, ... , __concat , __call ) */
 } global_State;
 
 
