@@ -117,9 +117,10 @@ static void f_luaopen (lua_State *L, void *ud) {
       ((void)0); 
   }; /* registry */
 
+  // alloc a string table with 32 TString elements
   /*             32            MINSTRTABSIZE */
   luaS_resize(L, MINSTRTABSIZE); /* initial size of string table */
-  luaT_init(L);
+  luaT_init(L); // ltm.c:38   init tag-method's reservered key-word :  e.g.  __index, __newindex , __eq , ...
   luaX_init(L);
 
   /* luaS_fix(luaS_newliteral(L, MEMERRMSG)); */
