@@ -41,7 +41,7 @@ int luaO_int2fb (unsigned int x) {
   if (x < 8) {
     return x;
   } else {
-	/* ((int)((x))) */
+	/*                     ((int)((x))) */
     return ((e+1) << 3) | (cast_int(x) - 8);
   }
 }

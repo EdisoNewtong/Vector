@@ -101,6 +101,8 @@ static void f_luaopen (lua_State *L, void *ud) {
   { 
       /*             gt(L)  */
       TValue *i_o = (&L->l_gt); 
+      //                                   with 0 elements in array part , 
+      //                                      with 2 key-value pairs in hash part
       i_o->value.gc = (GCObject *)( luaH_new(L, 0, 2) ); 
       i_o->tt = LUA_TTABLE;
       ((void)0); 

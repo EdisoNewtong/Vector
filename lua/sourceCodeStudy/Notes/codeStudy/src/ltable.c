@@ -347,7 +347,9 @@ static int numusehash (const Table *t, int *nums, int *pnasize) {
   return totaluse;
 }
 
-
+/*
+    Alloc an array with n element(s) whose value is specified by the 3rd arg   `size`
+*/
 static void setarrayvector (lua_State *L, Table *t, int size) {
   int i;
   /* luaM_reallocvector(L, t->array, t->sizearray, size, TValue); */
@@ -361,7 +363,9 @@ static void setarrayvector (lua_State *L, Table *t, int size) {
   t->sizearray = size;
 }
 
-
+/*
+    Alloc a hash table with n key-value pair(s) whose value is specified by the 3rd arg   `size`
+*/
 static void setnodevector (lua_State *L, Table *t, int size) {
   int lsize;
   if (size == 0) { /* no elements to hash part? */
@@ -370,14 +374,43 @@ static void setnodevector (lua_State *L, Table *t, int size) {
     lsize = 0;
   }
   else {
+    //
+    // hash elements count >= 1
+    //
+
     int i;
-    /*      ceillog2(size); */
+    /*
+         ceillog2(size) 的功能
+              计算出这样一个数 :
+              如果 : log2(size) 的值是整数    , 则取这个整数作为结果
+              否则 : log2(size) 的值是非整数  , 一个比 log2(size) 大，而且大刚刚好1级("向上整数" : 英语用 ceil 来表示 )  的 整数次幂的数值
+
+         ceillog2(1) =  0    => 2^0 = 1 ( 幂数为整数 )
+         ceillog2(2) =  1    => 2^1 = 2 ( 幂数为整数 )
+         ceillog2(3) =  2    => 2^2 = 4 ( 幂数为[非]整数, 2 < 3 < 4 )
+         ceillog2(4) =  2    => 2^2 = 4 ( 幂数为整数 )
+         ceillog2(5) =  3    => 2^3 = 8 ( 幂数为[非]整数, 4 < 5 < 8 )
+         ceillog2(6) =  3    => 2^3 = 8 ( 幂数为[非]整数, 4 < 6 < 8 )
+         ceillog2(7) =  3    => 2^3 = 8 ( 幂数为[非]整数, 4 < 7 < 8 )
+
+                 ...
+
+         ceillog2(255) =  8    => 2^8 = 256 ( 幂数为[非]整数, 128 < 255 < 256 )
+         ceillog2(256) =  8    => 2^8 = 256 ( 幂数为整数 )
+         ceillog2(257) =  9    => 2^9 = 512 ( 幂数为[非]整数, 256 < 257 < 512 )
+
+    */
+
+    /*      
+       luaO_log2(...) lobject.c:62
+            ceillog2(size);   lobject.h:367 
+    */
     lsize = luaO_log2(size-1) + 1;
     /*             26      MAXBITS */
     if (lsize > MAXBITS) {
       luaG_runerror(L, "table overflow");
     }
-    /*     twoto(lsize); */
+    /*     twoto(lsize);     lobject.h:359  */
     size = 1<< lsize;
     /*         luaM_newvector(L, size, Node); */
     t->node = (Node *)(   ((size_t)(size+1)) <= MAX_SIZET/sizeof(Node)
@@ -395,8 +428,15 @@ static void setnodevector (lua_State *L, Table *t, int size) {
     }
   }
   /*              cast_byte(lsize); */
+  /* 
+      lsizenode :     log2 of size of `node' array 
+      log size of node
+  */
   t->lsizenode = (lu_byte)(lsize);
+
   /*             gnode(t, size); */
+  // lastfree : any free position is before this position 
+  // node[size] may be out of range
   t->lastfree = &(t)->node[size]; /* all positions are free */
 }
 
@@ -502,14 +542,20 @@ Table *luaH_new (lua_State *L, int narray, int nhash) {
   /*              obj2gco(t)           5  LUA_TTABLE */
   luaC_link(L, (GCObject *)(t), LUA_TTABLE);
   t->metatable = NULL;
+
+  // flags : 1<<p means tagmethod(p) is not present 
+  // | 1111 1111 |(B) = 0xFF :     all MetaMethod is not present at all
   /*          cast_byte(~0) */
   t->flags = (lu_byte)(~0);
   /* temporary values (kept only if some malloc fails) */
+
+  // Core Core Core :
+  //    must set t->array as NULL, otherwise setarrayvector(L,t,0) will reach an unexpected behavior when executing free( t->array )
   t->array = NULL;
   t->sizearray = 0;
   t->lsizenode = 0;
   /*          cast(Node *, dummynode); */
-  t->node = (Node *)(&dummynode_);
+  t->node = (Node *)(&dummynode_); // no elements in hash part of a lua table , set it as  `nil`
   setarrayvector(L, t, narray);
   setnodevector(L, t, nhash);
   return t;
