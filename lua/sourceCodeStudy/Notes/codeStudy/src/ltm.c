@@ -38,7 +38,7 @@ const char *const luaT_typenames[] = {
 void luaT_init (lua_State *L) {
   //                                    17 tag-method allow user to self-defined
   static const char *const luaT_eventname[] = { /* ORDER TM */
-    "__index",
+    "__index",    // [0]
     "__newindex",
     "__gc",
     "__mode",
@@ -54,13 +54,16 @@ void luaT_init (lua_State *L) {
     "__lt",
     "__le",
     "__concat",
-    "__call"
+    "__call"      // [16]
   };
   int i;
   for (i=0; i<TM_N; i++) {
     /*  G(L)->tmname[i] =      luaS_new(L, luaT_eventname[i]); */
+    // alloc  tag method's keywords , and push them into global string table
     (L->l_G)->tmname[i] = (luaS_newlstr(L, luaT_eventname[i], strlen(luaT_eventname[i])));
     /*  luaS_fix(G(L)->tmname[i]); */
+    // set the reserved keywords as never collectable flag
+    //                                     5 is FIXEDBIT
     (L->l_G->tmname[i]->tsv.marked) |= (1<<5); /* never collect these names */
   }
 }

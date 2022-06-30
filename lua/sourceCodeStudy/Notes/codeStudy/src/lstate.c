@@ -111,7 +111,7 @@ static void f_luaopen (lua_State *L, void *ud) {
   /* sethvalue(L, registry(L), luaH_new(L, 0, 2)); */
   { 
       /*            registry(L) */
-      TValue *i_o = &(L->l_G)->l_registry; 
+      TValue *i_o = &(L->l_G)->l_registry;
       i_o->value.gc = (GCObject *)( luaH_new(L, 0, 2) ); 
       i_o->tt = LUA_TTABLE; 
       ((void)0); 
@@ -120,12 +120,15 @@ static void f_luaopen (lua_State *L, void *ud) {
   // alloc a string table with 32 TString elements
   /*             32            MINSTRTABSIZE */
   luaS_resize(L, MINSTRTABSIZE); /* initial size of string table */
-  luaT_init(L); // ltm.c:38   init tag-method's reservered key-word :  e.g.  __index, __newindex , __eq , ...
-  luaX_init(L);
+  luaT_init(L); // ltm.c:38   alloc tag-method's reservered keywords TString and set flags :  e.g.  __index, __newindex , __eq , ...
+  luaX_init(L); // llex.c:77  alloc lua keyword TStrings and set flags
 
+  // push a new TString "not enough memory" into global stringtable 
   /* luaS_fix(luaS_newliteral(L, MEMERRMSG)); */
   /*  MEMERRMSG    "not enough memory"         */
   ((luaS_newlstr(L, MEMERRMSG, (sizeof(MEMERRMSG)/sizeof(char))-1)))->tsv.marked  |=  (1<<5);
+
+  // set the threshold as 4 times of the current alloced memory size
   g->GCthreshold = 4*g->totalbytes;
 }
 

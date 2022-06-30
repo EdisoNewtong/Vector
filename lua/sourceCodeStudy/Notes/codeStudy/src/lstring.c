@@ -78,18 +78,18 @@ void luaS_resize (lua_State *L, int newsize) {
 
 /*
     alloc a TString with 
-    2nd arg : str's content
-    3rd arg : str's length
 
+        2nd arg : str's content
+        3rd arg : str's length
+        4th arg : str's hash code
 
 */
 static TString *newlstr (lua_State *L, const char *str, size_t l,
                                        unsigned int h) {
   TString *ts;
   stringtable *tb;
-  //
+  
   // l is the length of the content of "str" ,    (l+1) means "str" + '\0'
-  //
   if ( l+1 > (MAX_SIZET - sizeof(TString)) / sizeof(char) ) {
     luaM_toobig(L);
   }
@@ -128,13 +128,50 @@ static TString *newlstr (lua_State *L, const char *str, size_t l,
   // use modulo value as the slot index to be placed ( for performance aspect use  & op rather than  % )
   //  but    tb->size must be a number whose value is power(2,n) , otherwise can't use op & instead of op %
   //
-  // TODO : make the algorithm more detail than before
+  // TODO : make the algorithm more detailed than before
+  //
+  // Notes : 
+  //        tb->size is container's capacity rather than the element's count
   //
   /*    lmod(h, tb->size); */
   h = (int)( h & (tb->size-1) );
+
+  /*
+    Core Core Core:
+                        <Install> chain
+
+        另外 ： 根据如下算法，很容易制造出2个字符串内容不同，但是Hash值相同的2个字符串
+
+    // get the char every 2 step
+     2 4 6 8 0 2 4 6 8 0 2 4 6 8 0 2        
+    12345678901234567890123456789012		// 32位，从最后一位开始计算，每隔2位计算1次 
+    a2a4a6a8a0a2a4a6a8a0a2a4a6a8a0a2		// 32位，从最后一位开始计算，每隔2位计算1次
+
+    
+    hash1 == hash2   =>   true
+
+    // insert str1 : "12345678901234567890123456789012"
+    newlstr(L, 
+                   "12345678901234567890123456789012", 
+            strlen("12345678901234567890123456789012"), 
+            hash1 );
+    // tb->hash[hash1] -> str1 -> NULL
+
+    // insert str2 : "a2a4a6a8a0a2a4a6a8a0a2a4a6a8a0a2"
+    newlstr(L, 
+                   "a2a4a6a8a0a2a4a6a8a0a2a4a6a8a0a2", 
+            strlen("a2a4a6a8a0a2a4a6a8a0a2a4a6a8a0a2"), 
+            hash2 );
+
+    // tb->hash[hash2] -> str2 -> str1 -> NULL
+
+
+
+
+  */
   ts->tsv.next = tb->hash[h]; /* chain new entry */
 
-  // place the alloced ts into the property slot 
+  // place the alloced ts object into the property slot 
   /*             obj2gco(ts); */
   tb->hash[h] = (GCObject *)(ts);
   tb->nuse++;
@@ -150,6 +187,11 @@ static TString *newlstr (lua_State *L, const char *str, size_t l,
 TString *luaS_newlstr (lua_State *L, const char *str, size_t l) {
   GCObject *o;
   unsigned int h = ((unsigned int)(l)); /* seed */
+
+  // if str.length >=32 , partially hash the character step by step ( depand on the value of varible step )
+  // if len == 32  , every 2 (1+1) step
+  // if len == 64  , every 3 (2+1) step
+  // if len == 128 , every 4 (3+1) step
   size_t step = (l>>5)+1; /* if string is too long, don't hash all its chars */
   size_t l1;
   for (l1=l; l1>=step; l1-=step) { /* compute hash */
@@ -170,8 +212,8 @@ TString *luaS_newlstr (lua_State *L, const char *str, size_t l) {
       /*   isdead(G(L), o)  */
       if (     o->gch.marked 
             /*    G(L)      */
-			& ( (L->l_G)->currentwhite ^ ( (1<<0) | (1<<1) ) ) 
-			& ( (1<<0) | (1<<1) ) 
+			& ( (L->l_G)->currentwhite ^ ( (1<<0) | (1<<1) ) ) // otherwhite(g)
+			& ( (1<<0) | (1<<1) )  // WHITEBITS   =>    bit2mask(WHITE0BIT, WHITE1BIT)
 		) 
 	  {
         /* changewhite(o); */

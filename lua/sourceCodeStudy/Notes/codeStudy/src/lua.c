@@ -13,6 +13,7 @@ int main (int argc, char **argv) {
   }
   s.argc = argc;
   s.argv = argv;
+  //       lua_cpcall( ... )   =>    lapi.c:1134 
   status = lua_cpcall(L, &pmain, &s);
   report(L, status);
   lua_close(L);
