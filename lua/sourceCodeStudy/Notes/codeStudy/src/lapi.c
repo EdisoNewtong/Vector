@@ -1114,10 +1114,18 @@ struct CCallS { /* data to `f_Ccall' */
 
 
 static void f_Ccall (lua_State *L, void *ud) {
+  /* unwrap ud ==> original type  CCallS* ( also see line:1135 )  
+          
+        struct CCallS c;
+        c.func = func;
+        c.ud = ud;
+  */
   /* struct CCallS *c = ((struct CCallS *)(ud)); */
   struct CCallS *c = cast(struct CCallS *, ud);
+
   Closure *cl;
   cl = luaF_newCclosure(L, 0, getcurrenv(L));
+  // set function address by member cl->c.f    from the passed argument     `c` struct
   cl->c.f = c->func;
   /* { TValue *i_o=(L->top); i_o->value.gc=((GCObject *)((cl))); i_o->tt=LUA_TFUNCTION; ((void)0); }; */ /* push function */
   setclvalue(L, L->top, cl);  /* push function */
@@ -1132,7 +1140,7 @@ static void f_Ccall (lua_State *L, void *ud) {
 
 
 /*
-    cpcall means <c> language function call under   <p>rotected mode
+               cpcall  :  <c> language function call under   <p>rotected mode
 */
 extern int lua_cpcall (lua_State *L, lua_CFunction func, void *ud) {
   struct CCallS c;
@@ -1140,12 +1148,11 @@ extern int lua_cpcall (lua_State *L, lua_CFunction func, void *ud) {
   lua_lock(L); /* ((void) 0); */
   c.func = func; // set the callback's function
   c.ud = ud;     // set the callback's executing arg struct
-  // luaD_pcall(...)    ldo.c:663
-  //                                   savestack(...)
-  //                                  the delta between   L->top  and   L->stack   in  char  unit
-  
 
-  // luaD_pcall(...)      ldo.c:663
+  // luaD_pcall(...)    ldo.c:663
+  //                                  savestack(...)
+  //                                      the delta between   L->top  and   L->stack   in  char  unit
+  //                        f_Ccall lapi.c:1116
   /* status = luaD_pcall(L, f_Ccall, &c, ((char *)(L->top) - (char *)L->stack), 0); */
   status = luaD_pcall(L, f_Ccall, &c, savestack(L, L->top), 0);
   lua_unlock(L); /* ((void) 0); */

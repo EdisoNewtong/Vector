@@ -663,12 +663,16 @@ extern int lua_yield (lua_State *L, int nresults) {
 int luaD_pcall (lua_State *L, Pfunc func, void *u,
                 ptrdiff_t old_top, ptrdiff_t ef) {
   int status;
+  // cache the previous          nCcalls value
   unsigned short oldnCcalls = L->nCcalls;
+  //                  save the delta between   L->ci &&  L->base_ci in char unit rather struct unit
   /*                  saveci(L, L->ci); */
   ptrdiff_t old_ci = ((char *)(L->ci) - (char *)L->base_ci);
   lu_byte old_allowhooks = L->allowhook;
   ptrdiff_t old_errfunc = L->errfunc;
   L->errfunc = ef;
+  //         func : may be implement in   lapi.c:1116    static void f_Ccall (lua_State *L, void *ud) {
+  // execute it in protected mode ( if there is some runtime error occurs , force interrupt the execution of following code , and  throw an exception
   status = luaD_rawrunprotected(L, func, u);
   if (status != 0) { /* an error occurred? */
     /*              restorestack(L, old_top);                */
