@@ -52,7 +52,15 @@ set fileencoding=utf-8
 set fileencodings=ucs-bom,utf-8,default,latin1,cp936,gbk,gb2312,gb18030
 
 
+" to prevent autoindent  to line's   beginning    such as   python   and    shell-bash    whose use comment by character   # ,
 set cinkeys-=0#
+
+
+
+set fileformat=unix
+set fileformats=unix,dos
+set noendofline
+
 
 " if has("gui_running")
 	set guioptions-=e
@@ -89,14 +97,11 @@ set cinkeys-=0#
 
 	" highlight
 	highlight  StatusLineNC ctermbg=LightGray ctermfg=DarkGrey guibg=LightGray guifg=DarkGrey 
-	" highlight  StatusLine ctermfg=Green ctermbg=Red guibg=#EEEE00 guifg=Red
+	highlight  StatusLine ctermfg=Green ctermbg=Red guibg=White guifg=#FF8040
 	"highlight  StatusLine ctermfg=Green ctermbg=Red guibg=White guifg=Red
-	highlight  StatusLine ctermfg=Green ctermbg=Red guibg=Green guifg=Red
-	highlight  TabLineSel ctermbg=Red ctermfg=White guibg=Red guifg=White
+	highlight  TabLineSel ctermbg=Red ctermfg=White guibg=#FF8040 guifg=White
 	highlight  TabLine ctermbg=LightGray ctermfg=DarkGrey guibg=LightGray guifg=DarkGrey
 
-	highlight  TabLineSel guibg=Red guifg=White
-	highlight  TabLine  guibg=LightGray guifg=DarkGrey
 	set guifont=Menlo\ Regular:h22
 " endif
 
