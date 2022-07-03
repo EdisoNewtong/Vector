@@ -20,7 +20,8 @@ systemHeaderFile := /opt/rh/devtoolset-11/root/usr/include/c++/11/iostream
 # systemHeaderFile := /usr/include/c++/12.1.0/iostream
 
 
-option0 := -Wall
+
+
 option1 := -Wall -std=c++20
 option2 := -fmodules-ts
 
