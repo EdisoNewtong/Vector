@@ -9,27 +9,27 @@ struct Slot
 	vector<string> pool;
 };
 
-void enumerateSlot(const vector<Slot*>& slotAry, int deep, vector< vector<int> >& used, vector<string>& grp, vector<vector<string>>& pp) 
+void enumerateSlot(const vector<Slot*>& slotAry, int slotIdx, vector< vector<int> >& used, vector<string>& grp, vector<vector<string>>& pp)
 {
 	int slotSz = static_cast<int>( slotAry.size() );
 	// recursive end condition
-	if ( deep == slotSz ) {
+	if ( slotIdx == slotSz ) {
 		pp.push_back( grp );
 		return;
 	}
 
-	for ( size_t i = 0; i < slotAry.at(deep)->pool.size(); ++i ) {
-		string content = slotAry.at(deep)->pool.at(i);
-		if ( used[deep][i] == 0 ) {
+	for ( size_t elementIdx = 0; elementIdx < slotAry.at(slotIdx)->pool.size(); ++elementIdx ) {
+		string content = slotAry.at(slotIdx)->pool.at(elementIdx);
+		if ( used[slotIdx][elementIdx] == 0 ) {
 			// Core Core Core 
 			//     <Set> used flag ### Before ### recursive function
-			used[deep][i] = 1;
-			grp[deep] = content;
+			used[slotIdx][elementIdx] = 1;
+			grp[slotIdx] = content;
 
-			enumerateSlot(slotAry, deep + 1, used, grp, pp);
+			enumerateSlot(slotAry, slotIdx + 1, used, grp, pp);
 
 			//     <Unset>  used flag ### After ### recursive function
-			used[deep][i] = 0;
+			used[slotIdx][elementIdx] = 0;
 		}
 	}
 }
@@ -89,7 +89,8 @@ void enumerateSlotAry(const vector<Slot*>& slotAry)
 	//
 	// Core Core Core , Do real permutation function
 	//
-	enumerateSlot(slotAry, 0,   usedStatus, possibilityGrp, possibilityPool);
+	int initSlotIdx = 0;
+	enumerateSlot(slotAry, initSlotIdx,   usedStatus, possibilityGrp, possibilityPool);
 
 	// print possibilityPool;
 	unsigned long long cnt = possibilityPool.size();
@@ -146,7 +147,8 @@ void permutationDemo()
 	slotAry.push_back(s3);
 
 	
-	// Key function
+	// Core Core Core :
+	//      Key function
 	enumerateSlotAry(slotAry);
 
 	// release
