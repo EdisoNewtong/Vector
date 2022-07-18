@@ -21,6 +21,12 @@ namespace
 	// true  , smaller --> bigger
 	// false , bigger  --> smaller
 	static bool g_isAscendOrder = true;
+
+    static unsigned long long g_CaseCnt     = 0ULL;
+    static unsigned long long g_CaseSuccCnt = 0ULL;
+    static unsigned long long g_CaseFailed  = 0ULL;
+    static list< list<int> >  g_CaseFailedCollection;
+
 }
 
 bool checkIsInArrayRange(int idx, int sz, const char* varname)
@@ -264,6 +270,7 @@ void testSort(bool isAscOrder, int useHeadVersion)
 		return;
 	}
 
+    g_CaseFailedCollection.clear();
 	int lineNo = 0;
 	while ( !fobj.eof() ) 
 	{
@@ -319,20 +326,29 @@ void testSort(bool isAscOrder, int useHeadVersion)
 			}
 		}
 
+        ++g_CaseCnt;
 		auto bIsSorted = checkIsSorted( pary, arysz , g_isAscendOrder);
 		if ( bIsSorted ) {
+            ++g_CaseSuccCnt;
+
 			cout << "=> Sort SUCC : contains " << arysz << " elements. " << endl;
 		} else {
+            ++g_CaseFailed;
+
 			cout << "=> Sort Failed   :(   ==> contains " << arysz << " elements" << endl;
 			cout << "After Sort : " << endl;
 			cout << "\t [ ";
+            list<int> failedAry;
 			for ( int i = 0; i < arysz; ++i ) {
 				cout << pary[i];
+                failedAry.push_back( pbackupAry[i] );
+
 				if ( i < arysz-1 ) {
 					cout << ", ";
 				}
 			}
 			cout << " ]    " << endl;
+            g_CaseFailedCollection.push_back(  failedAry );
 		}
 
 		delete [] pbackupAry;
@@ -340,6 +356,26 @@ void testSort(bool isAscOrder, int useHeadVersion)
 	}
 
 	fobj.close();
+
+    cout << "==================================================" << endl;
+    cout << "Total " << g_CaseCnt << " case(s) : " << endl;
+    cout << "\tSucc   : " << g_CaseSuccCnt << " / " << g_CaseCnt << endl;
+    cout << "\tFailed : " << g_CaseFailed << " / " << g_CaseCnt << endl;
+    if ( g_CaseFailed > 0 ) {
+        cout << "\t\t[Error-Case-List] : " << endl;
+        int idx = 0;
+
+        for( const auto& failary : g_CaseFailedCollection ) {
+            cout << "\t\t\t" << idx << ". [ ";
+            for( const auto num : failary  ) {
+                cout << num << " ";
+            }
+            cout << " ] " <<endl;
+            ++idx;
+        }
+    }
+
+    cout << "==================================================" << endl;
 }
 
 
@@ -347,11 +383,11 @@ void printUsage()
 {
 	cout << "Usage : " << endl
 		 << "==================================================" << endl
-		 << " $ ./v2 asc  head" << endl
-		 << "or ./v2 asc  tail" << endl
-		 << "or ./v2 desc head" << endl
-		 << "or ./v2 desc tail" << endl
-		 << "or ./v2 asc other" << endl
+		 << " $ ./main asc  head" << endl
+		 << "or ./main asc  tail" << endl
+		 << "or ./main desc head" << endl
+		 << "or ./main desc tail" << endl
+		 << "or ./main asc other" << endl
 		 << "==================================================" << endl
 		 << endl;
 }
