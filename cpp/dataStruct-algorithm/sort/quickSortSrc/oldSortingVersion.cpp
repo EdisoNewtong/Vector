@@ -1,7 +1,6 @@
 
 
-
-extern void swap2Numbers(int* ary, int idx1, int idx2, int sz);
+extern void swap2numbers(int* ary, int idx1, int idx2, int sz);
 
 /*
     先说一下，用程序实现快速排序的基本思路
@@ -302,7 +301,7 @@ void quickSort_OldVersion(int* pAry, int startIdx, int endIdx,int sz)
     //if ( startIdx+1 == endIdx ) {
     //    // only 2 numbers
     //    if ( pAry[startIdx] > pAry[endIdx] ) {
-    //        swap2Numbers(pAry,startIdx,endIdx,sz);
+    //        swap2numbers(pAry,startIdx,endIdx,sz);
     //    }
     //    return;   
     //}
@@ -393,13 +392,13 @@ void quickSort_OldVersion(int* pAry, int startIdx, int endIdx,int sz)
         //         同时，退出 外侧的大的 while 循环
         if ( j == i ) {
             if ( pAry[i] < povitNum ) {
-                swap2Numbers(pAry,startIdx,i,sz);
+                swap2numbers(pAry,startIdx,i,sz);
                 sepIdx = i;
             } else {
                 // pAry[i] >= povitNum
                 int swapIdx = i - 1;
                 if ( swapIdx != startIdx )  {
-                    swap2Numbers(pAry,startIdx,swapIdx,sz);
+                    swap2numbers(pAry,startIdx,swapIdx,sz);
                 }
                 sepIdx = swapIdx;
             }
@@ -408,7 +407,7 @@ void quickSort_OldVersion(int* pAry, int startIdx, int endIdx,int sz)
 
         // 否则 , 在 i 与j 还没有碰头时， 交换2个数的位置，这里不用担心，i 与 j 是否相等，即指向同一个元素，对同一位置的元素，进行位置交换是没有意义的, 当然，即使进行了交换后，也无妨, 因为不起作用 ， 如对 i == 3 , 与 j == 3 的2个数进行交换，则交换前后，不影响数组的大小排布
         // swap
-        swap2Numbers(pAry,i,j,sz);
+        swap2numbers(pAry,i,j,sz);
         // 这里的步进是必须的。因为经过了某一次交换后, 需要进行后续的流程，找出下一组的  大数小数(当然，可能找到，也可能没有找到，也可能只找到大数，没有找到小数)，然后进行位置交换
         //  因为假定一种最为特殊的情况，   5,   5,5,5, 5,5,5
         // 如果有人写前2个for循环时  ，都不加 等于的情况下 ，
@@ -425,8 +424,8 @@ void quickSort_OldVersion(int* pAry, int startIdx, int endIdx,int sz)
         if ( i > j ) {
             // 因为在上面的代码中，已经进行了位置的交换, 保证了左小右大的情况，那么 ++i; --j; 错位后， j 所在的就是交换之前i所在的位置，交换后i处的数字一定 < povitNum
             // 因此: 此时的j 就是 , 中枢数的归位索引处, 无须判定 j 是否 与 startIdx 相等 ,    
-            // if ( j == startIdx ) { swap2Numbers(pAry,startIdx,j,sz); } 多此一举, 也不可能 出现 j == startIdx 的情况
-            swap2Numbers(pAry,startIdx,j,sz);
+            // if ( j == startIdx ) { swap2numbers(pAry,startIdx,j,sz); } 多此一举, 也不可能 出现 j == startIdx 的情况
+            swap2numbers(pAry,startIdx,j,sz);
             sepIdx = j;
             break;
         }

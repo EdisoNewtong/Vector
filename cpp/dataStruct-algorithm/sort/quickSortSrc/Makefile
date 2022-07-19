@@ -5,14 +5,16 @@
 
 
 
-main:main.cpp 
-	g++   -Wall  -std=c++11   -c -o   main.o    main.cpp
+main:main.cpp sortUtil.cpp sortUtil.h oldSortingVersion.cpp
+	g++   -Wall  -std=c++11   -c -o   sortUtil.o    sortUtil.cpp
 	g++   -Wall  -std=c++11   -c -o   oldSortingVersion.o    oldSortingVersion.cpp
-	g++   -Wall  -std=c++11   -o main  main.o oldSortingVersion.o
+	g++   -Wall  -std=c++11   -c -o   main.o    main.cpp
+	g++   -Wall  -std=c++11      -o   main     main.o oldSortingVersion.o sortUtil.o
+
 
 
 
 
 .PHONY:clean
 clean:
-	-rm  -Rf  main *.o *.exe main.dSYM
+	-rm  -Rf  *.o*    *.exe   *.dSYM    main

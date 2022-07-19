@@ -3,15 +3,26 @@
 #include <iomanip>
 #include <list>
 #include <fstream>
+
+#include "sortUtil.h"
 using namespace std;
 
-extern void quickSort_OldVersion(int* pAry, int startIdx, int endIdx,int sz);
+///////////////////////////////////////////////////////////////////////////
+//
+// Global debug flag varible
+//
+///////////////////////////////////////////////////////////////////////////
+bool G_checkArrayBoundFlag = true;     // default , Switch check array index   flag  is  [ON]
+unsigned long long G_indexOutBoundCnt = 0;
+
+bool G_quickSortRangeCheck = false;
+bool G_quickSortOutOfRange_return = false;
+unsigned long long G_quickSortRangesOutOfBoundCnt = 0;
+
+
 
 namespace 
 {
-	static bool g_checkBoundFlag = false;
-	static bool g_checkBoundLogFlag = false;
-	static bool g_checkOutOfBoundReturnFlag = false;
 
 	// 1 : qSortSimpleVersionHead(...) 
 	// 2 : qSortSimpleVersionTail(...)
@@ -29,217 +40,6 @@ namespace
 
 }
 
-bool checkIsInArrayRange(int idx, int sz, const char* varname)
-{
-	auto isInRange = (idx >=0 && idx < sz);
-	if ( !isInRange && g_checkBoundLogFlag ) {
-		cout << "[WARING] : " << varname << " is out of range [ 0, " << sz  << " ] , " << varname << " = " << idx << endl;
-	}
-	return isInRange;
-}
-
-
-//
-// Get Array's element by index (idx)
-//
-int getArrayElement(int* ary,int idx, int minIdx,int maxIdx, int lineNo)
-{
-    if ( idx >= minIdx   &&    idx <= maxIdx ) {
-        return ary[idx];
-    } else {
-        cout << "[ERROR] : @" << lineNo << " , " << idx << " is out of range [ " << minIdx << " , " << maxIdx << " ] " << endl;
-        return -999;
-    }
-}
-
-
-
-void swap2Numbers(int* ary, int idx1, int idx2, int sz)
-{
-	if ( g_checkBoundFlag ) {
-		auto b1 = checkIsInArrayRange(idx1,sz, "idx-1");
-		auto b2 = checkIsInArrayRange(idx2,sz, "idx-2");
-		if ( g_checkOutOfBoundReturnFlag && (!b1 || !b2) ) {
-			return;
-		}
-	}
-	
-	if ( idx1 == idx2 ) {
-		return;
-	}
-
-	int backupNum = ary[idx1];
-	ary[idx1] = ary[idx2];
-	ary[idx2] = backupNum;
-}
-
-
-// make array [1,2,3,4] =>  [4,3,2,1]
-void reverseAry(int* ary,int sz)
-{
-	for( int i = 0; i < sz/2; ++i ) {
-		int headidx = i;
-		int tailidx = (sz-1) -i;
-		swap2Numbers(ary, headidx, tailidx, sz);
-	}
-}
-
-//
-// use the 1st number ( whose index is 0 ) as the pivot number
-//
-void qSortSimpleVersionHead(int* ary, int begIdx, int endIdx, int sz, bool isAscendOrder)
-{
-	if ( g_checkBoundFlag ) {
-		auto b1 = checkIsInArrayRange(begIdx,sz, "begIdx");
-		auto b2 = checkIsInArrayRange(endIdx,sz, "endIdx");
-		if ( g_checkOutOfBoundReturnFlag && (!b1 || !b2) ) {
-			return;
-		}
-	}
-
-	if ( endIdx <= begIdx ) {
-		return;
-	}
-
-	// int povitNumber = ary[begIdx];
-	int povitNumber = getArrayElement(ary, begIdx, begIdx, endIdx, __LINE__);
-	int i = begIdx + 1;
-	int j = endIdx;
-	while ( i < j ) 
-	{
-		// for ( ; i < j && (isAscendOrder ? ary[i] <= povitNumber
-		// 		                        : ary[i] >= povitNumber); ++i )
-		// { ; }
-        
-		for ( ; i < j && (isAscendOrder ? getArrayElement(ary, i, begIdx, endIdx, __LINE__) <= povitNumber
-				                        : getArrayElement(ary, i, begIdx, endIdx, __LINE__) >= povitNumber); ++i )
-		{ ; }
-
-		// for ( ; j > i && (isAscendOrder ? ary[j] >= povitNumber 
-		// 		                        : ary[j] <= povitNumber); --j )
-		// { ; }
-        
-		for ( ; j > i && (isAscendOrder ? getArrayElement(ary, j, begIdx, endIdx, __LINE__) >= povitNumber 
-				                        : getArrayElement(ary, j, begIdx, endIdx, __LINE__) <= povitNumber); --j )
-		{ ; }
-
-		swap2Numbers(ary,i,j,sz);
-		++i;
-		--j;
-	}
-
-	int sepIdx = 0;
-	if ( i == j ) {
-		sepIdx = i;
-	} else {
-		// i > j
-		sepIdx = i - 1;
-	}
-
-	// auto condition = isAscendOrder ? ary[sepIdx] >= povitNumber 
-	// 	                           : ary[sepIdx] <= povitNumber;
-    
-	auto condition = isAscendOrder ? getArrayElement(ary, sepIdx, begIdx, endIdx, __LINE__) >= povitNumber 
-		                           : getArrayElement(ary, sepIdx, begIdx, endIdx, __LINE__) <= povitNumber;
-	if ( condition ) {
-		sepIdx = sepIdx - 1;
-	}
-
-	swap2Numbers(ary,begIdx,sepIdx,sz);
-
-	// sort left
-	qSortSimpleVersionHead(ary, begIdx, sepIdx - 1, sz, isAscendOrder);
-	// sort right
-	qSortSimpleVersionHead(ary, sepIdx + 1, endIdx, sz, isAscendOrder);
-}
-
-
-//
-// use the last number ( whose index is endIdx ) as the pivot number
-//
-void qSortSimpleVersionTail(int* ary, int begIdx, int endIdx, int sz, bool isAscendOrder)
-{
-
-	if ( g_checkBoundFlag ) {
-		auto b1 = checkIsInArrayRange(begIdx,sz, "begIdx");
-		auto b2 = checkIsInArrayRange(endIdx,sz, "endIdx");
-		if ( g_checkOutOfBoundReturnFlag && (!b1 || !b2) ) {
-			return;
-		}
-	}
-
-	if ( endIdx <= begIdx ) {
-		return;
-	}
-
-	// int povitNumber = ary[endIdx];
-	int povitNumber = getArrayElement(ary, endIdx, begIdx, endIdx, __LINE__);
-	int i = begIdx;
-	int j = endIdx-1;
-	while ( i < j ) 
-	{
-		// for ( ; i < j && (isAscendOrder ? ary[i] <= povitNumber
-		// 		                        : ary[i] >= povitNumber); ++i )
-		// { ; }
-        
-		for ( ; i < j && (isAscendOrder ? getArrayElement(ary, i, begIdx, endIdx, __LINE__) <= povitNumber
-				                        : getArrayElement(ary, i, begIdx, endIdx, __LINE__) >= povitNumber); ++i )
-		{ ; }
-
-		// for ( ; j > i && (isAscendOrder ? ary[j] >= povitNumber 
-		// 		                        : ary[j] <= povitNumber); --j )
-		// { ; }
-
-		for ( ; j > i && (isAscendOrder ? getArrayElement(ary, j, begIdx, endIdx, __LINE__) >= povitNumber 
-				                        : getArrayElement(ary, j, begIdx, endIdx, __LINE__) <= povitNumber); --j )
-		{ ; }
-
-		swap2Numbers(ary,i,j,sz);
-		++i;
-		--j;
-	}
-
-	int sepIdx = 0;
-	if ( i == j ) {
-		sepIdx = i;
-	} else {
-		// i > j
-		sepIdx = i - 1;
-	}
-
-	// auto condition = isAscendOrder ? ary[sepIdx] <= povitNumber 
-	// 	                           : ary[sepIdx] >= povitNumber;
-	auto condition = isAscendOrder ? getArrayElement(ary, sepIdx, begIdx, endIdx, __LINE__) <= povitNumber 
-	 	                           : getArrayElement(ary, sepIdx, begIdx, endIdx, __LINE__) >= povitNumber;
-	if ( condition ) {
-		sepIdx = sepIdx + 1;
-	}
-
-	swap2Numbers(ary,endIdx,sepIdx,sz);
-
-	// sort left
-	qSortSimpleVersionTail(ary, begIdx, sepIdx - 1, sz, isAscendOrder);
-	// sort right
-	qSortSimpleVersionTail(ary, sepIdx + 1, endIdx, sz, isAscendOrder);
-}
-
-
-bool checkIsSorted(int* ary,int sz,bool isAscendOrder)
-{
-	auto isSort = true;
-	for ( auto i = 0; i < sz-1 ; ++i ) {
-		bool meetError = isAscendOrder 
-				         ?  ary[i] > ary[i+1]
-				         :  ary[i] < ary[i+1];
-
-		if ( meetError ) {
-			isSort = false;
-			break;
-		}
-	}
-
-	return isSort;
-}
 
 void testSort(bool isAscOrder, int useHeadVersion)
 {
@@ -258,10 +58,14 @@ void testSort(bool isAscOrder, int useHeadVersion)
 	} else if ( g_sortingFunctionVersion == 2 ) {
 		cout << "Use Pick <Tail> Number <== as the povit Number " << endl;
 	} else {
-		cout << "Use Pick < Old-Version > ??? Number <== as the povit Number " << endl;
+		cout << "[ERROR] : Unknown SortFunction Version " << endl;
     }
 	cout << "==================================================" << endl;
 
+    const int   C_FORMAT_WIDTH = 7;
+    const string C_LINE_TITLE  = "Line ";
+    const string C_COLON_FORMAT  = " : ";
+    const int C_NEXT_LINE_INDENT_CNT = C_FORMAT_WIDTH + C_LINE_TITLE.size() + C_COLON_FORMAT.size();
 	const char* FILENAME = "1_6.txt";
 
 	ifstream fobj(FILENAME ,ios::in);
@@ -306,7 +110,7 @@ void testSort(bool isAscOrder, int useHeadVersion)
 			++idx;
 		}
 
-		cout << "Line " << setw(5) << lineNo << " : [ ";
+		cout << C_LINE_TITLE << setw(C_FORMAT_WIDTH) << lineNo << C_COLON_FORMAT <<"[ ";
 		for ( int i = 0; i < arysz; ++i ) {
 			cout << pbackupAry[i];
 			if ( i < arysz-1 ) {
@@ -316,18 +120,15 @@ void testSort(bool isAscOrder, int useHeadVersion)
 		cout << " ]    "; // << endl;
 
 		if ( g_sortingFunctionVersion == 1 ) {
-			qSortSimpleVersionHead(pary, 0, arysz-1, arysz, g_isAscendOrder);
-		} else if ( g_sortingFunctionVersion == 2 ) {
-			qSortSimpleVersionTail(pary, 0, arysz-1, arysz, g_isAscendOrder);
+			// qSortSimpleVersionHead(pary, 0, arysz-1, arysz, g_isAscendOrder);
+            quickSortHead(pary, 0, arysz-1, arysz, g_isAscendOrder);
 		} else {
-			quickSort_OldVersion(pary, 0, arysz-1, arysz);
-			if ( !g_isAscendOrder ) {
-				reverseAry(pary, arysz);
-			}
-		}
+			// qSortSimpleVersionTail(pary, 0, arysz-1, arysz, g_isAscendOrder);
+            quickSortTail(pary, 0, arysz-1, arysz, g_isAscendOrder);
+		} 
 
         ++g_CaseCnt;
-		auto bIsSorted = checkIsSorted( pary, arysz , g_isAscendOrder);
+		auto bIsSorted = isArrayWellSorted( pary, arysz , g_isAscendOrder);
 		if ( bIsSorted ) {
             ++g_CaseSuccCnt;
 
@@ -335,9 +136,10 @@ void testSort(bool isAscOrder, int useHeadVersion)
 		} else {
             ++g_CaseFailed;
 
-			cout << "=> Sort Failed   :(   ==> contains " << arysz << " elements" << endl;
-			cout << "After Sort : " << endl;
-			cout << "\t [ ";
+			cout << "=> Sort Failed   :(   ==> contains " << arysz << " elements. " << endl;
+			cout << "    " << "After Sort : " << endl;
+			cout << setw(C_NEXT_LINE_INDENT_CNT) << setfill(' ') << ""
+                 << "[ ";
             list<int> failedAry;
 			for ( int i = 0; i < arysz; ++i ) {
 				cout << pary[i];
@@ -357,7 +159,28 @@ void testSort(bool isAscOrder, int useHeadVersion)
 
 	fobj.close();
 
+
+
     cout << "==================================================" << endl;
+    if ( G_checkArrayBoundFlag ) {
+        cout << " Index Check : " << endl;
+        if ( G_indexOutBoundCnt > 0 ) {
+            cout << "\t[ERROR] : ";
+        } else {
+            cout << "\t";
+        }
+        cout << "G_indexOutBoundCnt = " << G_indexOutBoundCnt 
+             << endl;
+        cout << (G_quickSortRangeCheck  ? "" : "\n");
+    }
+
+    if ( G_quickSortRangeCheck ) {
+        cout << "\t G_quickSortRangesOutOfBoundCnt = " << G_quickSortRangesOutOfBoundCnt
+             << endl
+             << endl;
+    }
+
+
     cout << "Total " << g_CaseCnt << " case(s) : " << endl;
     cout << "\tSucc   : " << g_CaseSuccCnt << " / " << g_CaseCnt << endl;
     cout << "\tFailed : " << g_CaseFailed << " / " << g_CaseCnt << endl;
@@ -367,9 +190,7 @@ void testSort(bool isAscOrder, int useHeadVersion)
 
         for( const auto& failary : g_CaseFailedCollection ) {
             cout << "\t\t\t" << idx << ". [ ";
-            for( const auto num : failary  ) {
-                cout << num << " ";
-            }
+            for( const auto num : failary  ) { cout << num << " "; }
             cout << " ] " <<endl;
             ++idx;
         }
@@ -383,11 +204,7 @@ void printUsage()
 {
 	cout << "Usage : " << endl
 		 << "==================================================" << endl
-		 << " $ ./main asc  head" << endl
-		 << "or ./main asc  tail" << endl
-		 << "or ./main desc head" << endl
-		 << "or ./main desc tail" << endl
-		 << "or ./main asc other" << endl
+		 << " $ ./main [asc|desc]   [head|tail]  --checkIndex=[true|false]" << endl
 		 << "==================================================" << endl
 		 << endl;
 }
@@ -396,7 +213,7 @@ void printUsage()
 
 int main(int argc, char* argv[], char* env[])
 {
-	if ( argc != 3 ) {
+	if ( argc < 3 ) {
 		cout << "[ERROR] : Missing args!!!" << endl;
 		printUsage();
 		return -1;
@@ -415,14 +232,35 @@ int main(int argc, char* argv[], char* env[])
 	} else if ( arg2 == "tail" ) {
 		useWhichVersion = 2;
 	} else {
-		useWhichVersion = 3;
-	}
+        printUsage();
+        cout << "[ERROR] : Unknown Sort Version \"" << arg2 << "\"  , program exit. " << endl
+             << endl
+             << "   ByeBye !!! " << endl;
+        return -1;
+    } 
+
+    if ( argc > 3 ) {
+        string arg3(argv[3]);
+        if ( arg3 == "--checkIndex=true" ) {
+            G_checkArrayBoundFlag = true;
+        } else if ( arg3 == "--checkIndex=false" ) {
+            G_checkArrayBoundFlag = false;
+        } else {
+            printUsage();
+            cout << "[ERROR] : Unknown argument \"" << arg3 << "\"  , program exit. " << endl
+                 << endl
+                 << "   ByeBye !!! " << endl;
+            return -1;
+        }
+    }
+
+    cout << "[INFO] Check index is out of range : " << (G_checkArrayBoundFlag ?  "[ON]" : "[OFF]") << endl;
+    cout << endl;
 
 	testSort(isAsc, useWhichVersion);
 
 	return 0;
 }
-
 
 
 
