@@ -4,7 +4,16 @@
 #include <list>
 #include <fstream>
 
-#include "sortUtil_safe.h"
+
+#define  INDEX_CHECK_SAFE
+
+
+#ifdef INDEX_CHECK_SAFE
+    #include "sortUtil_safe.h"
+#else
+    #include "sortUtil.h"
+#endif
+
 using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////
@@ -119,6 +128,9 @@ void testSort(bool isAscOrder, int useHeadVersion)
 		}
 		cout << " ]    "; // << endl;
 
+
+
+#ifdef INDEX_CHECK_SAFE
 		if ( g_sortingFunctionVersion == 1 ) {
 			// qSortSimpleVersionHead(pary, 0, arysz-1, arysz, g_isAscendOrder);
             quickSortHead(pary, 0, arysz-1, arysz, g_isAscendOrder);
@@ -126,9 +138,36 @@ void testSort(bool isAscOrder, int useHeadVersion)
 			// qSortSimpleVersionTail(pary, 0, arysz-1, arysz, g_isAscendOrder);
             quickSortTail(pary, 0, arysz-1, arysz, g_isAscendOrder);
 		} 
+#else
+        if (  g_isAscendOrder ) {
+            if (  g_sortingFunctionVersion == 1 ) {
+                // Pick <Head> as Pivot Number
+                quickSortHead_AscendOrder(pary, 0, arysz-1, arysz);
+            } else {
+                // Pick <Tail> as Pivot Number
+                quickSortTail_AscendOrder(pary, 0, arysz-1, arysz);
+            }
+        } else {
+            if (  g_sortingFunctionVersion == 1 ) {
+                // Pick <Head> as Pivot Number
+                quickSortHead_DescendOrder(pary, 0, arysz-1, arysz);
+            } else {
+                // Pick <Tail> as Pivot Number
+                quickSortTail_DescendOrder(pary, 0, arysz-1, arysz);
+            }
+        }
+#endif
+
+
+#ifdef INDEX_CHECK_SAFE
+		auto bIsSorted = isArrayWellSorted( pary, arysz , g_isAscendOrder);
+#else
+		auto bIsSorted = g_isAscendOrder
+                         ? isArray_AscendOrdered(pary, arysz) 
+                         : isArray_DescendOrdered(pary, arysz);
+#endif
 
         ++g_CaseCnt;
-		auto bIsSorted = isArrayWellSorted( pary, arysz , g_isAscendOrder);
 		if ( bIsSorted ) {
             ++g_CaseSuccCnt;
 
