@@ -4,7 +4,7 @@
 #include <list>
 #include <fstream>
 
-#include "sortUtil.h"
+#include "sortUtil_safe.h"
 using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////
@@ -172,6 +172,8 @@ void testSort(bool isAscOrder, int useHeadVersion)
         cout << "G_indexOutBoundCnt = " << G_indexOutBoundCnt 
              << endl;
         cout << (G_quickSortRangeCheck  ? "" : "\n");
+    } else {
+        cout << " [INFO] : Index Check is [ OFF ] " << endl;
     }
 
     if ( G_quickSortRangeCheck ) {
