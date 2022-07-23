@@ -5,7 +5,7 @@
 #include <fstream>
 
 
-#define  INDEX_CHECK_SAFE
+// #define  INDEX_CHECK_SAFE
 
 
 #ifdef INDEX_CHECK_SAFE
@@ -200,6 +200,22 @@ void testSort(bool isAscOrder, int useHeadVersion)
 
 
 
+
+
+    cout << "==================================================" << endl;
+    if ( g_CaseFailed > 0 ) {
+        cout << "\t\t[Error-Case-List] : " << endl;
+        int idx = 0;
+
+        for( const auto& failary : g_CaseFailedCollection ) {
+            cout << "\t\t\t" << idx << ". [ ";
+            for( const auto num : failary  ) { cout << num << " "; }
+            cout << " ] " <<endl;
+            ++idx;
+        }
+    }
+    cout << endl << endl;
+
     cout << "==================================================" << endl;
     if ( G_checkArrayBoundFlag ) {
         cout << " Index Check : " << endl;
@@ -212,7 +228,7 @@ void testSort(bool isAscOrder, int useHeadVersion)
              << endl;
         cout << (G_quickSortRangeCheck  ? "" : "\n");
     } else {
-        cout << " [INFO] : Index Check is [ OFF ] " << endl;
+        cout << "[INFO] : Index Check is [ OFF ] " << endl;
     }
 
     if ( G_quickSortRangeCheck ) {
@@ -220,22 +236,9 @@ void testSort(bool isAscOrder, int useHeadVersion)
              << endl
              << endl;
     }
-
-
     cout << "Total " << g_CaseCnt << " case(s) : " << endl;
     cout << "\tSucc   : " << g_CaseSuccCnt << " / " << g_CaseCnt << endl;
-    cout << "\tFailed : " << g_CaseFailed << " / " << g_CaseCnt << endl;
-    if ( g_CaseFailed > 0 ) {
-        cout << "\t\t[Error-Case-List] : " << endl;
-        int idx = 0;
-
-        for( const auto& failary : g_CaseFailedCollection ) {
-            cout << "\t\t\t" << idx << ". [ ";
-            for( const auto num : failary  ) { cout << num << " "; }
-            cout << " ] " <<endl;
-            ++idx;
-        }
-    }
+    cout << "\tFailed : " << g_CaseFailed  << " / " << g_CaseCnt << endl;
 
     cout << "==================================================" << endl;
 }
@@ -294,6 +297,10 @@ int main(int argc, char* argv[], char* env[])
             return -1;
         }
     }
+
+#ifndef INDEX_CHECK_SAFE
+    G_checkArrayBoundFlag = false;
+#endif
 
     cout << "[INFO] Check index is out of range : " << (G_checkArrayBoundFlag ?  "[ON]" : "[OFF]") << endl;
     cout << endl;
