@@ -1,0 +1,44 @@
+11. 设 n 为正整数，给出下列3个算法关于问题规模n的时间复杂度
+
+1) 
+void fun1(int n)
+{
+    int i = 1, k = 100;
+    while ( i<=n ) 
+    {
+        k = k + 1;
+        i += 2;
+    }
+}
+// ：
+
+
+2)
+void fun2(int b[], int n)
+{
+    int i,j,k,x;
+    for( i = 0; i < n-1; ++i)
+    {
+        k = i;
+        for( j = i+1; j < n; ++j )
+            if ( b[k] > b[j] ) k = j;
+
+        x = b[i];
+        b[i] = b[k];
+        b[k] = x;
+    }
+}
+
+
+3)
+void fun3(int n)
+{
+    int i = 0, s = 0;
+    while ( s <=n )
+    {
+        i++;
+        s = s + i;
+    }
+}
+
+
