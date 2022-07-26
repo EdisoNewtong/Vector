@@ -1,5 +1,8 @@
 #include "sortUtil.h"
 
+/* value can be                  1  or  2      */
+static const int G_METHOD_TYPE = 1;
+
 
 void swap2Elements(int ary[], int idx1, int idx2)
 {
@@ -334,12 +337,21 @@ void quickSortHead_AscendOrder(int ary[], int begIdx, int endIdx, int arySz)
     int j = endIdx;
     while ( i < j )
     {
-        while ( i < j  &&    ary[j] >   pivotNum )  { --j; }
+        while ( i < j  &&    ary[j] >   pivotNum ) { --j; }
+        if ( G_METHOD_TYPE == 2 ) { ary[i] = ary[j]; }
+
         while ( i < j  &&    ary[i] <=  pivotNum ) { ++i; } 
-        swap2Elements(ary, i, j);
+        if ( G_METHOD_TYPE == 2 ) { ary[j] = ary[i]; }
+
+        if ( G_METHOD_TYPE == 1 ) { swap2Elements(ary, i, j); }
     }
 
-    swap2Elements(ary, pivotIdx, i);
+    if ( G_METHOD_TYPE == 2 ) {
+        ary[i] = pivotNum;
+    } else if ( G_METHOD_TYPE == 1 ) { 
+        swap2Elements(ary, pivotIdx, i);
+    }
+
     quickSortHead_AscendOrder(ary, begIdx, i-1, arySz);   // quickSort left  part
     quickSortHead_AscendOrder(ary, i+1, endIdx, arySz);   // quickSort right part
 }
@@ -360,11 +372,20 @@ void quickSortHead_DescendOrder(int ary[], int begIdx, int endIdx, int arySz)
     while ( i < j )
     {
         while ( i < j  &&    ary[j] <  pivotNum ) { --j; } 
+        if ( G_METHOD_TYPE == 2 ) { ary[i] = ary[j]; }
+
         while ( i < j  &&    ary[i] >= pivotNum ) { ++i; }
-        swap2Elements(ary, i, j);
+        if ( G_METHOD_TYPE == 2 ) { ary[j] = ary[i]; }
+        
+        if ( G_METHOD_TYPE == 1 ) { swap2Elements(ary, i, j); }
     }
 
-    swap2Elements(ary, pivotIdx, i);
+    if ( G_METHOD_TYPE == 2 ) {
+        ary[i] = pivotNum;
+    } else if ( G_METHOD_TYPE == 1 ) {
+        swap2Elements(ary, pivotIdx, i);
+    }
+
     quickSortHead_DescendOrder(ary, begIdx, i-1, arySz);   // quickSort left  part
     quickSortHead_DescendOrder(ary, i+1, endIdx, arySz);   // quickSort right part
 
@@ -387,11 +408,22 @@ void quickSortTail_AscendOrder(int ary[], int begIdx, int endIdx, int arySz)
     while ( i < j )
     {
         while ( i < j  &&    ary[i] <  pivotNum ) { ++i; }
+        if ( G_METHOD_TYPE == 2 ) { ary[j] = ary[i]; }
+
         while ( i < j  &&    ary[j] >= pivotNum ) { --j; }
-        swap2Elements(ary, i, j);
+        if ( G_METHOD_TYPE == 2 ) { ary[i] = ary[j]; }
+
+        if ( G_METHOD_TYPE == 1 ) {
+            swap2Elements(ary, i, j);
+        }
     }
 
-    swap2Elements(ary, pivotIdx, j);
+    if ( G_METHOD_TYPE == 2 ) {
+        ary[j] = pivotNum;
+    } else if ( G_METHOD_TYPE == 1 ){
+        swap2Elements(ary, pivotIdx, j);
+    }
+
     quickSortTail_AscendOrder(ary, begIdx, j-1, arySz);   // quickSort left  part
     quickSortTail_AscendOrder(ary, j+1, endIdx, arySz);   // quickSort right part
 }
@@ -411,11 +443,19 @@ void quickSortTail_DescendOrder(int ary[], int begIdx, int endIdx, int arySz)
     while ( i < j )
     {
         while ( i < j  &&    ary[i] >  pivotNum ) { ++i; }
+        if ( G_METHOD_TYPE == 2 ) { ary[j] = ary[i]; }
+
         while ( i < j  &&    ary[j] <= pivotNum ) { --j; }
-        swap2Elements(ary, i, j);
+        if ( G_METHOD_TYPE == 2 ) { ary[i] = ary[j]; }
+
+        if ( G_METHOD_TYPE == 1 ) { swap2Elements(ary, i, j); }
     }
 
-    swap2Elements(ary, pivotIdx, j);
+    if ( G_METHOD_TYPE == 2 ) {
+        ary[j] = pivotNum;
+    } else if( G_METHOD_TYPE == 1 ) {
+        swap2Elements(ary, pivotIdx, j);
+    }
     quickSortTail_DescendOrder(ary, begIdx, j-1, arySz);   // quickSort left  part
     quickSortTail_DescendOrder(ary, j+1, endIdx, arySz);   // quickSort right part
 }
