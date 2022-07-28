@@ -107,13 +107,17 @@ void LocateNode(DNode* head, DataType x)
     DNode* preIt = pXPosition;
     while ( preIt != head ) 
     {
-        if ( preIt->prev != head    &&   preIt->prev->freq < curFreq ) {
-             DataType v = preIt->data;
-             preIt->data = preIt->prev->data;
-             preIt->prev->data = v;
+        if ( preIt->prev != head   ) {
+            if ( preIt->prev->freq < curFreq ) {
+                DataType v = preIt->data;
+                preIt->data = preIt->prev->data;
+                preIt->prev->data = v;
 
-             preIt->freq = preIt->prev->freq;
-             preIt->prev->freq = curFreq;
+                preIt->freq = preIt->prev->freq;
+                preIt->prev->freq = curFreq;
+            } else {
+                break;
+            }
         }
 
         preIt = preIt->prev;
@@ -148,6 +152,19 @@ int main(int argc, char* argv[])
     printf("\n\n");
     LocateNode(head, 2);
     printTb("After Locate (2) Link Table : ", head);
+    printf("\n\n");
+
+
+    LocateNode(head, 100);
+    printTb("After Locate (100) Link Table : ", head);
+    printf("\n\n");
+
+    LocateNode(head, 100);
+    printTb("After Locate (100) Link Table : ", head);
+    printf("\n\n");
+
+    LocateNode(head, 100);
+    printTb("After Locate (100) Link Table : ", head);
     printf("\n\n");
 
     freeTable(head); head = NULL;
