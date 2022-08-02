@@ -1,6 +1,29 @@
 #!/bin/bash
 
 
+##################################################
+#
+# if you use 
+#
+#    #import <iostream>;   // Note the semicolon ';' is a must at the end of the line , otherwise it raise a compile error
+#
+#      Notes: 
+#
+#              You must pre-compile the c++ system-header file  at first by the following command-line in order to generate a module file named   "iostream.gcm"
+#
+#          $ g++  -Wall -std=c++20 -x  c++-system-header -fmodule-header  /usr/include/c++/12.1.0/iostream
+# 
+#
+#  Otherwise :
+#
+#    #include <iostream>
+#
+# You can <Skip> the pre-compilation step
+##################################################
+
+
+
+
 preBuildFileName := iostream.gcm
 
 
