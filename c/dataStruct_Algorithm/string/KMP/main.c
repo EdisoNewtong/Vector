@@ -80,7 +80,12 @@ void calcNextValArray(const char* pattern, int nextval[], int aryLen)
     int i = 0;
     int k = -1;
     nextval[0] = -1;
-    while ( i < (aryLen-1) )
+
+    /*  
+    compare with calcNextArray(...)
+
+    while ( i < (aryLen-1) )   is an ERROR compare expression  */
+    while ( i <  aryLen    )
     {
         if ( k == -1 || pattern[i] == pattern[k] )
         {
