@@ -49,11 +49,11 @@ int BruteForceSearch(const char* src, const char* pattern)
 
 
 
-/*
-**************************************************
+/***************************************************
+
   KMP (Knuth-Morris-Pratt) algorithm
-**************************************************
-*/
+
+***************************************************/
 void calcNextArray(const char* pattern, int next[], int aryLen)
 {
     int i = 0;
@@ -152,6 +152,9 @@ int KMPSearch_NextValueArray(const char* src, const char* pattern)
 
     int* nextValue_Array = (int*)malloc( sizeof(int) * patternLen);
     calcNextValArray(pattern, nextValue_Array, patternLen);
+    for( int idx = 0; idx < patternLen; ++idx ) {
+        printf("%d. '%c' -> nextval = %d\n",idx+1, pattern[idx], nextValue_Array[idx] );
+    }
 
     int i = 0;
     int j = 0;
@@ -190,6 +193,7 @@ int main(int argc, char* argv[])
 
     int foundPos = 0;   // BruteForce_1(searchString, patternString);
     
+    /*
     printf("[TEST] : foundPos = %d , found \"\" from \"\"\n", BruteForceSearch("",""));
 
     printf("[TEST] : foundPos = %d , found \"a\" from \"\"\n", BruteForceSearch("","a"));
@@ -202,6 +206,8 @@ int main(int argc, char* argv[])
     printf("[TEST] : foundPos = %d , found \"abc\" from \"adacab\"\n\n", BruteForceSearch("adacab","abc"));
 
     foundPos = BruteForceSearch(searchString, patternString);
+    */
+    foundPos = KMPSearch_NextValueArray(searchString, patternString);
     if ( foundPos == -1 ) {
         printf("[INFO] : Can't found \"%s\" inside \"%s\"\n", patternString, searchString );
     } else {
