@@ -51,9 +51,9 @@ void swap2Numbers(int* ary, int idx1, int idx2, int sz)
 
 
 /*
-   Pick the min/max number , the place it into the 1st/2nd/3rd/ ... slot at the end of each turn
+   Pick the min (the 2nd min, the 3rd min)    (or max) number , the place it into the 1st/2nd/3rd/ ... slot at the end of each turn
 
-   After that the 1st/2nd/3rd slot must be the min/max , the 2nd min/max ,the 3rd min/max number among the array
+   After that the 1st/2nd/3rd slot must be the min (or max) , the 2nd min/max ,the 3rd min/max number among the array
 
    Iterator pointer move the the next through the whole array
 
