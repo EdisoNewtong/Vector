@@ -88,7 +88,7 @@ last pair's right :  |    4     |    3     |    2     |     1    |
 void bubbleSort(int* ary, int sz, bool isAscendOrder)
 {
     
-    for ( int iTurnIdx = 0; iTurnIdx < sz-1; ++iTurnIdx )
+    for ( int iTurnIdx = 0; iTurnIdx < (sz-1); ++iTurnIdx )
     {
         for ( int i = 0; i < ((sz - 1) - iTurnIdx); ++i )
         {
