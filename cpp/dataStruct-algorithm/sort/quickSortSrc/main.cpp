@@ -6,12 +6,18 @@
 
 
 // #define  INDEX_CHECK_SAFE
+// #define SORT_TYPE    1  or 2     // set @ Makefile
+
 
 
 #ifdef INDEX_CHECK_SAFE
     #include "sortUtil_safe.h"
 #else
-    #include "sortUtil.h"
+    #if SORT_TYPE == 1
+        #include "sortUtil.h"
+    #else
+        #include "sortUtil2.h"
+    #endif
 #endif
 
 using namespace std;

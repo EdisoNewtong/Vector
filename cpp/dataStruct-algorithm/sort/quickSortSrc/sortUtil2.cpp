@@ -1,7 +1,4 @@
-#include "sortUtil.h"
-
-/* value can be                  1  or  2      */
-static const int G_METHOD_TYPE = 1;
+#include "sortUtil2.h"
 
 
 void swap2Elements(int ary[], int idx1, int idx2)
@@ -335,23 +332,16 @@ void quickSortHead_AscendOrder(int ary[], int begIdx, int endIdx, int arySz)
 
     int i = begIdx;
     int j = endIdx;
-
-    /************************************************** 
-     * Core Core Core : Pick the 1st number as pivot Number   ,   j goes 1st , i 2nd   */
     while ( i < j )
     {
-        /* Descend Use
-        while ( i < j  &&    ary[j] <   pivotNum ) { --j; } */
         while ( i < j  &&    ary[j] >   pivotNum ) { --j; }
+        ary[i] = ary[j];
 
-        /* Descend Use
-        while ( i < j  &&    ary[j] >=  pivotNum ) { ++i; } */
         while ( i < j  &&    ary[i] <=  pivotNum ) { ++i; } 
-
-        swap2Elements(ary, i, j);
+        ary[j] = ary[i];
     }
 
-    swap2Elements(ary, pivotIdx, i);
+    ary[i] = pivotNum;
 
     quickSortHead_AscendOrder(ary, begIdx, i-1, arySz);   // quickSort left  part
     quickSortHead_AscendOrder(ary, i+1, endIdx, arySz);   // quickSort right part
@@ -370,24 +360,16 @@ void quickSortHead_DescendOrder(int ary[], int begIdx, int endIdx, int arySz)
 
     int i = begIdx;
     int j = endIdx;
-
-    /************************************************** 
-     * Core Core Core : Pick the 1st number as pivot Number   ,   j goes 1st , i 2nd   */
     while ( i < j )
     {
-
-        /* Ascend Use
-        while ( i < j  &&    ary[j] >  pivotNum ) { --j; } */
         while ( i < j  &&    ary[j] <  pivotNum ) { --j; } 
+        ary[i] = ary[j];
 
-        /* Ascend Use
-        while ( i < j  &&    ary[j] <= pivotNum ) { ++i; } */
         while ( i < j  &&    ary[i] >= pivotNum ) { ++i; }
-        
-        swap2Elements(ary, i, j);
+        ary[j] = ary[i];
     }
 
-    swap2Elements(ary, pivotIdx, i);
+    ary[i] = pivotNum;
 
     quickSortHead_DescendOrder(ary, begIdx, i-1, arySz);   // quickSort left  part
     quickSortHead_DescendOrder(ary, i+1, endIdx, arySz);   // quickSort right part
@@ -408,23 +390,16 @@ void quickSortTail_AscendOrder(int ary[], int begIdx, int endIdx, int arySz)
 
     int i = begIdx;
     int j = endIdx;
-
-    /************************************************** 
-     * Core Core Core : Pick the last number as pivot Number   ,   i goes 1st , j 2nd   */
     while ( i < j )
     {
-        /* Descend Use
-        while ( i < j  &&    ary[i] >  pivotNum ) { ++i; } */
         while ( i < j  &&    ary[i] <  pivotNum ) { ++i; }
+        ary[j] = ary[i];
 
-        /* Descend Use
-        while ( i < j  &&    ary[j] <= pivotNum ) { --j; } */
         while ( i < j  &&    ary[j] >= pivotNum ) { --j; }
-
-        swap2Elements(ary, i, j);
+        ary[i] = ary[j];
     }
 
-    swap2Elements(ary, pivotIdx, j);
+    ary[j] = pivotNum;
 
     quickSortTail_AscendOrder(ary, begIdx, j-1, arySz);   // quickSort left  part
     quickSortTail_AscendOrder(ary, j+1, endIdx, arySz);   // quickSort right part
@@ -442,27 +417,19 @@ void quickSortTail_DescendOrder(int ary[], int begIdx, int endIdx, int arySz)
 
     int i = begIdx;
     int j = endIdx;
-
-    /************************************************** 
-     * Core Core Core : Pick the last number as pivot Number   ,   i goes 1st , j 2nd   */
     while ( i < j )
     {
-
-        /* Asc Use
-        while ( i < j  &&    ary[i] <  pivotNum ) { ++i; } */
         while ( i < j  &&    ary[i] >  pivotNum ) { ++i; }
+        ary[j] = ary[i];
 
-
-        /* Asc Use
-        while ( i < j  &&    ary[j] >= pivotNum ) { --j; } */
         while ( i < j  &&    ary[j] <= pivotNum ) { --j; }
-
-        swap2Elements(ary, i, j);
+        ary[i] = ary[j];
     }
 
-    swap2Elements(ary, pivotIdx, j);
+    ary[j] = pivotNum;
 
     quickSortTail_DescendOrder(ary, begIdx, j-1, arySz);   // quickSort left  part
     quickSortTail_DescendOrder(ary, j+1, endIdx, arySz);   // quickSort right part
 }
+
 
