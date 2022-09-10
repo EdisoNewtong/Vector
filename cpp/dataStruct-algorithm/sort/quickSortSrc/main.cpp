@@ -6,7 +6,7 @@
 
 
 // #define  INDEX_CHECK_SAFE
-// #define SORT_TYPE    1  or 2     // set @ Makefile
+// #define SORT_TYPE    1  or 2 or 3     // set @ Makefile
 
 
 
@@ -15,8 +15,12 @@
 #else
     #if SORT_TYPE == 1
         #include "sortUtil.h"
-    #else
+    #elif SORT_TYPE == 2
         #include "sortUtil2.h"
+    #elif SORT_TYPE == 3
+        #include "sortUtil3.h"
+    #else
+        #error "SORT_TYPE is out of range : Compile ERROR !!!"
     #endif
 #endif
 
@@ -72,6 +76,8 @@ void testSort(bool isAscOrder, int useHeadVersion)
 		cout << "Use Pick <Head> Number <== as the povit Number " << endl;
 	} else if ( g_sortingFunctionVersion == 2 ) {
 		cout << "Use Pick <Tail> Number <== as the povit Number " << endl;
+	} else if ( g_sortingFunctionVersion == 3 ) {
+		cout << "Use Pick <RandomIndex> (Neither Head nor Tail) Number as the povit Number " << endl;
 	} else {
 		cout << "[ERROR] : Unknown SortFunction Version " << endl;
     }
@@ -140,26 +146,53 @@ void testSort(bool isAscOrder, int useHeadVersion)
 		if ( g_sortingFunctionVersion == 1 ) {
 			// qSortSimpleVersionHead(pary, 0, arysz-1, arysz, g_isAscendOrder);
             quickSortHead(pary, 0, arysz-1, arysz, g_isAscendOrder);
-		} else {
+		} else if ( g_sortingFunctionVersion == 2 ) {
 			// qSortSimpleVersionTail(pary, 0, arysz-1, arysz, g_isAscendOrder);
             quickSortTail(pary, 0, arysz-1, arysz, g_isAscendOrder);
+		} else if ( g_sortingFunctionVersion == 3 ) {
+			// qSortSimpleVersionTail(pary, 0, arysz-1, arysz, g_isAscendOrder);
+            cout << "[Error] : Random Version Sort is not supported ! " << endl;
 		} 
 #else
+
+
+
+        
+
         if (  g_isAscendOrder ) {
             if (  g_sortingFunctionVersion == 1 ) {
                 // Pick <Head> as Pivot Number
+
+#if SORT_TYPE == 1 || SORT_TYPE == 2
                 quickSortHead_AscendOrder(pary, 0, arysz-1, arysz);
-            } else {
+#endif
+            } else if ( g_sortingFunctionVersion == 2) {
                 // Pick <Tail> as Pivot Number
+#if SORT_TYPE == 1 || SORT_TYPE == 2
                 quickSortTail_AscendOrder(pary, 0, arysz-1, arysz);
+#endif
+            } else if ( g_sortingFunctionVersion == 3 ) {
+                // Pick <Random> as Pivot Number
+#if SORT_TYPE == 3
+                quickSortRandom_AscendOrder(pary, 0, arysz-1, arysz);
+#endif
             }
         } else {
             if (  g_sortingFunctionVersion == 1 ) {
                 // Pick <Head> as Pivot Number
+#if SORT_TYPE == 1 || SORT_TYPE == 2
                 quickSortHead_DescendOrder(pary, 0, arysz-1, arysz);
-            } else {
+#endif
+            } else if ( g_sortingFunctionVersion == 2 ) {
                 // Pick <Tail> as Pivot Number
+#if SORT_TYPE == 1 || SORT_TYPE == 2
                 quickSortTail_DescendOrder(pary, 0, arysz-1, arysz);
+#endif
+            } else if ( g_sortingFunctionVersion == 3 ) {
+                // Pick <Random> as Pivot Number
+#if SORT_TYPE == 3
+                quickSortRandom_DescendOrder(pary, 0, arysz-1, arysz);
+#endif
             }
         }
 #endif
@@ -254,7 +287,7 @@ void printUsage()
 {
 	cout << "Usage : " << endl
 		 << "==================================================" << endl
-		 << " $ ./main [asc|desc]   [head|tail]  --checkIndex=[true|false]" << endl
+		 << " $ ./main [asc|desc]   [head|tail|random]  --checkIndex=[true|false]" << endl
 		 << "==================================================" << endl
 		 << endl;
 }
@@ -281,7 +314,9 @@ int main(int argc, char* argv[], char* env[])
 		useWhichVersion = 1;
 	} else if ( arg2 == "tail" ) {
 		useWhichVersion = 2;
-	} else {
+	} else if ( arg2 == "random" ) {
+		useWhichVersion = 3;
+    } else {
         printUsage();
         cout << "[ERROR] : Unknown Sort Version \"" << arg2 << "\"  , program exit. " << endl
              << endl

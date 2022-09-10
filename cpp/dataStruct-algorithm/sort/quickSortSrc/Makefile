@@ -23,6 +23,8 @@
 
 USE_SORT_TYPE_1_FLAG := -DSORT_TYPE=1
 USE_SORT_TYPE_2_FLAG := -DSORT_TYPE=2
+USE_SORT_TYPE_3_FLAG := -DSORT_TYPE=3
+USE_SORT_TYPE_4_FLAG := -DSORT_TYPE=4
 USE_SORT_SAFELY      := -DINDEX_CHECK_SAFE
 
 
@@ -42,6 +44,14 @@ main2:main.cpp  sortUtil2.h  sortUtil2.cpp
 	g++   -Wall  -std=c++11   $(USE_SORT_TYPE_2_FLAG)     -o   main2     main.o    sortUtil2.o
 
 
+main3:main.cpp  sortUtil3.h  sortUtil3.cpp  
+	@echo "Build Quick-Sort Version-3"
+	g++   -Wall  -std=c++11   $(USE_SORT_TYPE_3_FLAG)  -c -o   sortUtil3.o         sortUtil3.cpp
+	g++   -Wall  -std=c++11   $(USE_SORT_TYPE_3_FLAG)  -c -o   main.o    main.cpp
+	g++   -Wall  -std=c++11   $(USE_SORT_TYPE_3_FLAG)     -o   main3     main.o    sortUtil3.o
+
+
+
 
 mainSafe:main.cpp sortUtil_safe.h  sortUtil_safe.cpp
 	@echo "Build Quick-Sort Safely Check Index Version"
@@ -54,4 +64,4 @@ mainSafe:main.cpp sortUtil_safe.h  sortUtil_safe.cpp
 
 .PHONY:clean
 clean:
-	-rm  -Rf  *.o*    *.exe   *.dSYM    main1 main2   mainSafe
+	-rm  -Rf  *.o*    *.exe   *.dSYM    main1  main2  main3  mainSafe

@@ -1,7 +1,5 @@
 #include "sortUtil.h"
 
-/* value can be                  1  or  2      */
-static const int G_METHOD_TYPE = 1;
 
 
 void swap2Elements(int ary[], int idx1, int idx2)
@@ -348,7 +346,9 @@ void quickSortHead_AscendOrder(int ary[], int begIdx, int endIdx, int arySz)
         while ( i < j  &&    ary[j] >=  pivotNum ) { ++i; } */
         while ( i < j  &&    ary[i] <=  pivotNum ) { ++i; } 
 
-        swap2Elements(ary, i, j);
+        if ( i < j ) {
+            swap2Elements(ary, i, j);
+        }
     }
 
     swap2Elements(ary, pivotIdx, i);
@@ -384,7 +384,9 @@ void quickSortHead_DescendOrder(int ary[], int begIdx, int endIdx, int arySz)
         while ( i < j  &&    ary[j] <= pivotNum ) { ++i; } */
         while ( i < j  &&    ary[i] >= pivotNum ) { ++i; }
         
-        swap2Elements(ary, i, j);
+        if ( i < j ) {
+            swap2Elements(ary, i, j);
+        }
     }
 
     swap2Elements(ary, pivotIdx, i);
@@ -421,7 +423,9 @@ void quickSortTail_AscendOrder(int ary[], int begIdx, int endIdx, int arySz)
         while ( i < j  &&    ary[j] <= pivotNum ) { --j; } */
         while ( i < j  &&    ary[j] >= pivotNum ) { --j; }
 
-        swap2Elements(ary, i, j);
+        if ( i < j ) {
+            swap2Elements(ary, i, j);
+        }
     }
 
     swap2Elements(ary, pivotIdx, j);
@@ -457,7 +461,9 @@ void quickSortTail_DescendOrder(int ary[], int begIdx, int endIdx, int arySz)
         while ( i < j  &&    ary[j] >= pivotNum ) { --j; } */
         while ( i < j  &&    ary[j] <= pivotNum ) { --j; }
 
-        swap2Elements(ary, i, j);
+        if ( i < j ) {
+            swap2Elements(ary, i, j);
+        }
     }
 
     swap2Elements(ary, pivotIdx, j);
