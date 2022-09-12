@@ -5,6 +5,36 @@
 namespace v3
 {
 
+/**
+ 
+
+
+     变量 j 是一个循环变量，用于遍历除去 pivotNumber 以外的数组的区别中的元素
+
+######################################################################################################################################################	
+
+     变量 i 始终指向(更新数值后指向) 比 pivotNumber 大(或相等) 的数组区间的第1个元素的   <<前面>> 一个位置 ( 有可能就是povitNumber 自身所在的位置 )
+
+	 这样子的区别可能有如下2种情况
+
+possiblility   A: 
+
+	 pivot  ||    smallerNumber-1, smallerNumber-2, smallerNumber-3, ... smallerNumber-n,   |    biggerNumber-1,   biggerNumber-2, biggerNumber-3, ... , biggerNumber-nth
+
+	   ^                                                                       i
+
+possiblility   B: 
+
+      i
+	 pivot  ||    (empty smaller part)   |    biggerNumber-1,   biggerNumber-2, biggerNumber-3, ... , biggerNumber-nth
+
+	   ^                            
+
+
+######################################################################################################################################################	
+
+*/
+
 void quickSortHead_AscendOrder(int ary[], int begIdx, int endIdx, int arySz)
 {
     if (  begIdx >= endIdx  ) {
@@ -17,6 +47,8 @@ void quickSortHead_AscendOrder(int ary[], int begIdx, int endIdx, int arySz)
     int i = begIdx;
     for( int j = begIdx+1; j <= endIdx; ++j )
     {
+		// both   ary[j] <  pivotNum
+		// and    ary[j] <= pivotNum    are   collect
         if ( ary[j] < pivotNum ) {
             ++i;
             if ( i != j ) {
@@ -231,4 +263,3 @@ void quickSortTail_DescendOrder_Safe(int ary[], int begIdx, int endIdx, int aryS
 
 
 } // using namespace v3
-
