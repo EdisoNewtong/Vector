@@ -416,7 +416,7 @@ void testSortWithNumber(bool isAscOrder, int headOrTailOrRandom, int version, bo
 			for( int idx = 0; idx < arysz; ++idx ) {
 				cout << pAry[idx] << (idx!=arysz-1 ? ", " : " ");
 			}
-			_cout << " ] " << endl;
+			cout << " ] " << endl;
 		} else {
             ++g_CaseFailed;
 
