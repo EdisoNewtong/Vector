@@ -1,167 +1,234 @@
+#include "common.h"
 #include "sortUtil3.h"
-#include <cstdlib>
 
 
-
-
-void swap2Elements(int ary[], int idx1, int idx2)
+namespace v3
 {
-    int tmp = ary[idx1];
-    ary[idx1] = ary[idx2];
-    ary[idx2] = tmp;
-}
 
-bool isArray_AscendOrdered(int ary[], int sz)
-{
-    bool isSorted = true;
-    for( int i = 0; i < sz-1; ++i)
-    {
-        if ( ary[i] > ary[i+1] ) {
-            isSorted = false;
-            break;
-        }
-    }
-
-    return isSorted;
-}
-
-bool isArray_DescendOrdered(int ary[], int sz)
-{
-    bool isSorted = true;
-    for( int i = 0; i < sz-1; ++i)
-    {
-        if ( ary[i] < ary[i+1] ) {
-            isSorted = false;
-            break;
-        }
-    }
-
-    return isSorted;
-}
-
-
-void quickSortRandom_AscendOrder(int ary[], int begIdx, int endIdx, int arySz)
+void quickSortHead_AscendOrder(int ary[], int begIdx, int endIdx, int arySz)
 {
     if (  begIdx >= endIdx  ) {
         return;
     }
 
-    if ( begIdx+1 == endIdx ) {
-        // only 2 numbers in the passed range 
-        if ( ary[begIdx] > ary[endIdx] ) {
-            swap2Elements(ary, begIdx, endIdx);
-        }
-        return;
-    }
-
-    // at least 3 elements in the range
-    int lIndex = begIdx + 1;
-    int rIndex = endIdx - 1;
-    int lenOfCenterRange = rIndex - lIndex + 1;
-
-    // int dt = 0;
-    // if ( lenOfCenterRange == 0 ) { dt = std::abs(std::rand()) % 2; } else { dt = std::abs(std::rand()) % lenOfCenterRange; }
-    // int pivotIdx = lIndex +  dt; // std::abs(std::rand()) % lenOfCenterRange; // random the pivot position at the center position of given range 
-
-    int pivotIdx = lIndex +  std::abs(std::rand()) % lenOfCenterRange; // random the pivot position at the center position of given range 
+    int pivotIdx = begIdx; // set pivot number as the head number
     int pivotNum = ary[pivotIdx]; 
 
     int i = begIdx;
-    int j = endIdx;
-
-    while ( i < j )
+    for( int j = begIdx+1; j <= endIdx; ++j )
     {
-        int jcmp = (j > pivotIdx && i < pivotIdx) ? pivotIdx : i;
-        int icmp = (i < pivotIdx && j > pivotIdx) ? pivotIdx : j;
-
-        while ( j > jcmp  &&  ary[j] >  pivotNum ) { --j; }
-        while ( i < icmp  &&  ary[i] <= pivotNum ) { ++i; }
-
-        bool bNeedSwap = true;
-        if ( j == pivotIdx ) {
-            bNeedSwap = false;
-            j = pivotIdx - 1;
-        } else if ( i == pivotIdx ) {
-            bNeedSwap = false;
-            i = pivotIdx + 1;
-        }
-
-        if ( bNeedSwap &&  i < j ) {
-            swap2Elements(ary, i, j);
+        if ( ary[j] < pivotNum ) {
+            ++i;
+            if ( i != j ) {
+                swap2Elements(ary, i,j);
+            }
         }
     }
+    swap2Elements(ary, i , pivotIdx);
 
-    if (  j > pivotIdx ) {
-        swap2Elements(ary, pivotIdx, j);
-        i = j;
-    } else if ( ary[i] > pivotNum ) { 
-        swap2Elements(ary, pivotIdx, i);
-    }
-
-    quickSortRandom_AscendOrder(ary, begIdx, i-1, arySz);   // quickSort left  part
-    quickSortRandom_AscendOrder(ary, i+1, endIdx, arySz);   // quickSort right part
-
+    quickSortHead_AscendOrder(ary, begIdx, i-1, arySz);   // quickSort left  part
+    quickSortHead_AscendOrder(ary, i+1, endIdx, arySz);   // quickSort right part
 }
 
-
-void quickSortRandom_DescendOrder(int ary[], int begIdx, int endIdx, int arySz)
+void quickSortHead_AscendOrder_Safe(int ary[], int begIdx, int endIdx, int arySz)
 {
     if (  begIdx >= endIdx  ) {
         return;
     }
 
-    if ( begIdx+1 == endIdx ) {
-        // only 2 numbers in the passed range 
-        if ( ary[begIdx] < ary[endIdx] ) {
-            swap2Elements(ary, begIdx, endIdx);
+    int pivotIdx = begIdx; // set pivot number as the head number
+    int pivotNum = getElementSafely(ary, pivotIdx, arySz); // ary[pivotIdx]; 
+
+    int i = begIdx;
+    for( int j = begIdx+1; j <= endIdx; ++j )
+    {
+        if ( getElementSafely(ary, j, arySz) < pivotNum ) {
+            ++i;
+            if ( i != j ) {
+                swap2Elements_Safe(ary, i,j, arySz);
+            }
         }
+    }
+    swap2Elements_Safe(ary, i , pivotIdx, arySz);
+
+	quickSortHead_AscendOrder_Safe(ary, begIdx, i-1, arySz);   // quickSort left  part
+    quickSortHead_AscendOrder_Safe(ary, i+1, endIdx, arySz);   // quickSort right part
+}
+
+
+
+
+void quickSortHead_DescendOrder(int ary[], int begIdx, int endIdx, int arySz)
+{
+
+    if (  begIdx >= endIdx  ) {
         return;
     }
 
-    // at least 3 elements in the range
-    int lIndex = begIdx + 1;
-    int rIndex = endIdx - 1;
-    int lenOfCenterRange = rIndex - lIndex + 1;
-
-    // int dt = 0;
-    // if ( lenOfCenterRange == 0 ) { dt = std::abs(std::rand()) % 2; } else { dt = std::abs(std::rand()) % lenOfCenterRange; }
-    // int pivotIdx = lIndex +  dt; // std::abs(std::rand()) % lenOfCenterRange; // random the pivot position at the center position of given range 
-
-    int pivotIdx = lIndex +  std::abs(std::rand()) % lenOfCenterRange; // random the pivot position at the center position of given range 
+    int pivotIdx = begIdx; // set pivot number as the head number
     int pivotNum = ary[pivotIdx]; 
 
     int i = begIdx;
-    int j = endIdx;
-
-    while ( i < j )
+    for( int j = begIdx+1; j <= endIdx; ++j )
     {
-        int jcmp = (j > pivotIdx && i < pivotIdx) ? pivotIdx : i;
-        int icmp = (i < pivotIdx && j > pivotIdx) ? pivotIdx : j;
-
-        while ( j > jcmp  &&  ary[j] <  pivotNum ) { --j; }
-        while ( i < icmp  &&  ary[i] >= pivotNum ) { ++i; }
-
-        bool bNeedSwap = true;
-        if ( j == pivotIdx ) {
-            bNeedSwap = false;
-            j = pivotIdx - 1;
-        } else if ( i == pivotIdx ) {
-            bNeedSwap = false;
-            i = pivotIdx + 1;
-        }
-
-        if ( bNeedSwap &&  i < j ) {
-            swap2Elements(ary, i, j);
+        if ( ary[j] > pivotNum ) {
+            ++i;
+            if ( i != j ) {
+                swap2Elements(ary, i,j);
+            }
         }
     }
+    swap2Elements(ary, i , pivotIdx);
 
-    if (  j > pivotIdx ) {
-        swap2Elements(ary, pivotIdx, j);
-        i = j;
-    } else if ( ary[i] < pivotNum ) { 
-        swap2Elements(ary, pivotIdx, i);
-    }
-
-    quickSortRandom_DescendOrder(ary, begIdx, i-1, arySz);   // quickSort left  part
-    quickSortRandom_DescendOrder(ary, i+1, endIdx, arySz);   // quickSort right part
+    quickSortHead_DescendOrder(ary, begIdx, i-1, arySz);   // quickSort left  part
+    quickSortHead_DescendOrder(ary, i+1, endIdx, arySz);   // quickSort right part
 }
+
+
+void quickSortHead_DescendOrder_Safe(int ary[], int begIdx, int endIdx, int arySz)
+{
+
+    if (  begIdx >= endIdx  ) {
+        return;
+    }
+
+    int pivotIdx = begIdx; // set pivot number as the head number
+    int pivotNum = getElementSafely(ary, pivotIdx, arySz); // ary[pivotIdx]; 
+
+    int i = begIdx;
+    for( int j = begIdx+1; j <= endIdx; ++j )
+    {
+        if ( getElementSafely(ary, j, arySz) > pivotNum ) {
+            ++i;
+            if ( i != j ) {
+                swap2Elements_Safe(ary, i,j, arySz);
+            }
+        }
+    }
+    swap2Elements_Safe(ary, i , pivotIdx ,arySz);
+
+	quickSortHead_DescendOrder_Safe(ary, begIdx, i-1, arySz);   // quickSort left  part
+    quickSortHead_DescendOrder_Safe(ary, i+1, endIdx, arySz);   // quickSort right part
+
+}
+
+
+
+
+
+void quickSortTail_AscendOrder(int ary[], int begIdx, int endIdx, int arySz)
+{
+    if (  begIdx >= endIdx  ) {
+        return;
+    }
+
+    int pivotIdx = endIdx; // set pivot number as the head number
+    int pivotNum = ary[pivotIdx]; 
+
+    int i = begIdx-1;
+    for( int j = begIdx; j < endIdx; ++j )
+    {
+        if ( ary[j] < pivotNum ) {
+            ++i;
+            if ( i != j ) {
+                swap2Elements(ary, i,j);
+            }
+        }
+    }
+    ++i;
+    swap2Elements(ary, i , pivotIdx);
+
+    quickSortTail_AscendOrder(ary, begIdx, i-1, arySz);   // quickSort left  part
+    quickSortTail_AscendOrder(ary, i+1, endIdx, arySz);   // quickSort right part
+
+}
+
+void quickSortTail_AscendOrder_Safe(int ary[], int begIdx, int endIdx, int arySz)
+{
+    if (  begIdx >= endIdx  ) {
+        return;
+    }
+
+    int pivotIdx = endIdx; // set pivot number as the head number
+    int pivotNum = getElementSafely(ary, pivotIdx, arySz); // ary[pivotIdx]; 
+
+    int i = begIdx-1;
+    for( int j = begIdx; j < endIdx; ++j )
+    {
+        if ( getElementSafely(ary, j, arySz)  < pivotNum ) {
+            ++i;
+            if ( i != j ) {
+                swap2Elements_Safe(ary, i,j, arySz);
+            }
+        }
+    }
+    ++i;
+    swap2Elements_Safe(ary, i , pivotIdx, arySz);
+
+	quickSortTail_AscendOrder_Safe(ary, begIdx, i-1, arySz);   // quickSort left  part
+    quickSortTail_AscendOrder_Safe(ary, i+1, endIdx, arySz);   // quickSort right part
+
+}
+
+
+
+void quickSortTail_DescendOrder(int ary[], int begIdx, int endIdx, int arySz)
+{
+    if (  begIdx >= endIdx  ) {
+        return;
+    }
+
+    int pivotIdx = endIdx; // set pivot number as the head number
+    int pivotNum = ary[pivotIdx]; 
+
+    int i = begIdx-1;
+    for( int j = begIdx; j < endIdx; ++j )
+    {
+        if ( ary[j] > pivotNum ) {
+            ++i;
+            if ( i != j ) {
+                swap2Elements(ary, i,j);
+            }
+        }
+    }
+    ++i;
+    swap2Elements(ary, i , pivotIdx);
+
+    quickSortTail_DescendOrder(ary, begIdx, i-1, arySz);   // quickSort left  part
+    quickSortTail_DescendOrder(ary, i+1, endIdx, arySz);   // quickSort right part
+														   //
+}
+
+void quickSortTail_DescendOrder_Safe(int ary[], int begIdx, int endIdx, int arySz)
+{
+    if (  begIdx >= endIdx  ) {
+        return;
+    }
+
+    int pivotIdx = endIdx; // set pivot number as the head number
+    int pivotNum = getElementSafely(ary, pivotIdx, arySz); // ary[pivotIdx]; 
+
+    int i = begIdx-1;
+    for( int j = begIdx; j < endIdx; ++j )
+    {
+        if ( getElementSafely(ary, j, arySz) > pivotNum ) {
+            ++i;
+            if ( i != j ) {
+                swap2Elements_Safe(ary, i,j, arySz);
+            }
+        }
+    }
+    ++i;
+    swap2Elements_Safe(ary, i , pivotIdx, arySz);
+
+	quickSortTail_DescendOrder_Safe(ary, begIdx, i-1, arySz);   // quickSort left  part
+    quickSortTail_DescendOrder_Safe(ary, i+1, endIdx, arySz);   // quickSort right part
+																
+}
+
+
+
+
+
+} // using namespace v3
+

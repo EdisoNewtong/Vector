@@ -1,41 +1,5 @@
+#include "common.h"
 #include "sortUtil2.h"
-
-
-void swap2Elements(int ary[], int idx1, int idx2)
-{
-    int tmp = ary[idx1];
-    ary[idx1] = ary[idx2];
-    ary[idx2] = tmp;
-}
-
-bool isArray_AscendOrdered(int ary[], int sz)
-{
-    bool isSorted = true;
-    for( int i = 0; i < sz-1; ++i)
-    {
-        if ( ary[i] > ary[i+1] ) {
-            isSorted = false;
-            break;
-        }
-    }
-
-    return isSorted;
-}
-
-bool isArray_DescendOrdered(int ary[], int sz)
-{
-    bool isSorted = true;
-    for( int i = 0; i < sz-1; ++i)
-    {
-        if ( ary[i] < ary[i+1] ) {
-            isSorted = false;
-            break;
-        }
-    }
-
-    return isSorted;
-}
-
 
 /********************************************************************************
  
@@ -316,13 +280,17 @@ e.g.
 
 
 
-
-
-void quickSortHead_AscendOrder(int ary[], int begIdx, int endIdx, int arySz)
+namespace v2
 {
 
-    //////////////////////////////////////////////////
-    //      Real code execute from here
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Head Version
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void quickSortHead_AscendOrder(int* ary, int begIdx, int endIdx, int arySz)
+{
     if (  begIdx >= endIdx  ) {
         return;
     }
@@ -340,7 +308,6 @@ void quickSortHead_AscendOrder(int ary[], int begIdx, int endIdx, int arySz)
         while ( i < j  &&    ary[i] <=  pivotNum ) { ++i; } 
         ary[j] = ary[i];
     }
-
     ary[i] = pivotNum;
 
     quickSortHead_AscendOrder(ary, begIdx, i-1, arySz);   // quickSort left  part
@@ -348,8 +315,36 @@ void quickSortHead_AscendOrder(int ary[], int begIdx, int endIdx, int arySz)
 }
 
 
+void quickSortHead_AscendOrder_Safe(int* ary, int begIdx, int endIdx, int arySz)
+{
+    if (  begIdx >= endIdx  ) {
+        return;
+    }
 
-void quickSortHead_DescendOrder(int ary[], int begIdx, int endIdx, int arySz)
+    int pivotIdx = begIdx; // set pivot number as the head number
+    int pivotNum = getElementSafely(ary, pivotIdx, arySz); 
+
+    int i = begIdx;
+    int j = endIdx;
+    while ( i < j )
+    {
+        while ( i < j  &&   ( getElementSafely(ary,j,arySz) )  >   pivotNum ) { --j; }
+		getElementSafely(ary,i, arySz); 
+        ary[i] = getElementSafely(ary,j, arySz);
+
+        while ( i < j  &&   ( getElementSafely(ary,i,arySz) )  <=  pivotNum ) { ++i; } 
+		getElementSafely(ary,j, arySz);
+        ary[j] = getElementSafely(ary,i, arySz);
+    }
+	getElementSafely(ary,i, arySz);
+    ary[i] = pivotNum;
+
+    quickSortHead_AscendOrder_Safe(ary, begIdx, i-1, arySz);   // quickSort left  part
+    quickSortHead_AscendOrder_Safe(ary, i+1, endIdx, arySz);   // quickSort right part
+}
+
+
+void quickSortHead_DescendOrder(int* ary, int begIdx, int endIdx, int arySz)
 {
     if (  begIdx >= endIdx  ) {
         return;
@@ -368,7 +363,6 @@ void quickSortHead_DescendOrder(int ary[], int begIdx, int endIdx, int arySz)
         while ( i < j  &&    ary[i] >= pivotNum ) { ++i; }
         ary[j] = ary[i];
     }
-
     ary[i] = pivotNum;
 
     quickSortHead_DescendOrder(ary, begIdx, i-1, arySz);   // quickSort left  part
@@ -377,9 +371,45 @@ void quickSortHead_DescendOrder(int ary[], int begIdx, int endIdx, int arySz)
 }
 
 
+void quickSortHead_DescendOrder_Safe(int* ary, int begIdx, int endIdx, int arySz)
+{
+    if (  begIdx >= endIdx  ) {
+        return;
+    }
+
+    int pivotIdx = begIdx; // set pivot number as the head number
+    int pivotNum = getElementSafely(ary, pivotIdx, arySz);
+
+    int i = begIdx;
+    int j = endIdx;
+    while ( i < j )
+    {
+        while ( i < j  &&    ( getElementSafely(ary, j, arySz) <  pivotNum ) ) { --j; } 
+		getElementSafely(ary, i, arySz);
+        ary[i] = getElementSafely(ary, j, arySz); // ary[j];
+
+        while ( i < j  &&    ( getElementSafely(ary, i, arySz) >= pivotNum ) ) { ++i; }
+		getElementSafely(ary, j, arySz);
+        ary[j] = getElementSafely(ary, i, arySz); // ary[i];
+    }
+	getElementSafely(ary, i, arySz);
+    ary[i] = pivotNum;
+
+    quickSortHead_DescendOrder_Safe(ary, begIdx, i-1, arySz);   // quickSort left  part
+    quickSortHead_DescendOrder_Safe(ary, i+1, endIdx, arySz);   // quickSort right part
+
+}
 
 
-void quickSortTail_AscendOrder(int ary[], int begIdx, int endIdx, int arySz)
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Tail Version
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void quickSortTail_AscendOrder(int* ary, int begIdx, int endIdx, int arySz)
 {
     if ( begIdx >= endIdx  ) {
         return;
@@ -398,15 +428,43 @@ void quickSortTail_AscendOrder(int ary[], int begIdx, int endIdx, int arySz)
         while ( i < j  &&    ary[j] >= pivotNum ) { --j; }
         ary[i] = ary[j];
     }
-
     ary[j] = pivotNum;
 
     quickSortTail_AscendOrder(ary, begIdx, j-1, arySz);   // quickSort left  part
     quickSortTail_AscendOrder(ary, j+1, endIdx, arySz);   // quickSort right part
 }
 
+void quickSortTail_AscendOrder_Safe(int* ary, int begIdx, int endIdx, int arySz)
+{
+    if ( begIdx >= endIdx  ) {
+        return;
+    }
 
-void quickSortTail_DescendOrder(int ary[], int begIdx, int endIdx, int arySz)
+    int pivotIdx = endIdx; // set pivot number as the tail number
+    int pivotNum = getElementSafely(ary, pivotIdx, arySz); // ary[pivotIdx];
+
+    int i = begIdx;
+    int j = endIdx;
+    while ( i < j )
+    {
+        while ( i < j  &&   ( getElementSafely(ary, i, arySz) <   pivotNum ) ) { ++i; }
+		getElementSafely(ary, j, arySz);
+        ary[j] = getElementSafely(ary, i, arySz); // ary[i];
+
+        while ( i < j  &&   ( getElementSafely(ary, j, arySz) >=  pivotNum ) ) { --j; }
+		getElementSafely(ary, i, arySz);
+        ary[i] = getElementSafely(ary, j, arySz); // ary[j];
+    }
+	getElementSafely(ary, j, arySz);
+    ary[j] = pivotNum;
+
+	quickSortTail_AscendOrder_Safe(ary, begIdx, j-1, arySz);   // quickSort left  part
+	quickSortTail_AscendOrder_Safe(ary, j+1, endIdx, arySz);   // quickSort right part
+}
+
+
+
+void quickSortTail_DescendOrder(int* ary, int begIdx, int endIdx, int arySz)
 {    
     if ( begIdx >= endIdx  ) {
         return;
@@ -425,11 +483,41 @@ void quickSortTail_DescendOrder(int ary[], int begIdx, int endIdx, int arySz)
         while ( i < j  &&    ary[j] <= pivotNum ) { --j; }
         ary[i] = ary[j];
     }
-
     ary[j] = pivotNum;
 
     quickSortTail_DescendOrder(ary, begIdx, j-1, arySz);   // quickSort left  part
     quickSortTail_DescendOrder(ary, j+1, endIdx, arySz);   // quickSort right part
 }
 
+void quickSortTail_DescendOrder_Safe(int* ary, int begIdx, int endIdx, int arySz)
+{    
+    if ( begIdx >= endIdx  ) {
+        return;
+    }
 
+    int pivotIdx = endIdx; // set pivot number as the tail number
+    int pivotNum = getElementSafely(ary, pivotIdx, arySz); // ary[pivotIdx];
+
+    int i = begIdx;
+    int j = endIdx;
+    while ( i < j )
+    {
+        while ( i < j  &&   ( getElementSafely(ary, i, arySz) >  pivotNum ) ) { ++i; }
+		getElementSafely(ary, j, arySz);
+        ary[j] = getElementSafely(ary, i, arySz); // ary[i];
+
+        while ( i < j  &&   ( getElementSafely(ary, j, arySz) <= pivotNum ) ) { --j; }
+		getElementSafely(ary, i, arySz);
+        ary[i] = getElementSafely(ary, j, arySz); // ary[j];
+    }
+	getElementSafely(ary, j, arySz);
+    ary[j] = pivotNum;
+
+	quickSortTail_DescendOrder_Safe(ary, begIdx, j-1, arySz);   // quickSort left  part
+    quickSortTail_DescendOrder_Safe(ary, j+1, endIdx, arySz);   // quickSort right part
+}
+
+
+
+} // end namespace v2
+  

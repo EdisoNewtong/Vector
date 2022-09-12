@@ -5,63 +5,26 @@
 
 
 
-############################################################################################################################################
-# 
-# main:main.cpp sortUtil.h  sortUtil.cpp     sortUtil_safe.cpp sortUtil_safe.h    oldSortingVersion.cpp
-# 	g++   -Wall  -std=c++11   -c -o   sortUtil.o         sortUtil.cpp
-# 	g++   -Wall  -std=c++11   -c -o   sortUtil_safe.o    sortUtil_safe.cpp
-# 	g++   -Wall  -std=c++11   -c -o   oldSortingVersion.o    oldSortingVersion.cpp
-# 	g++   -Wall  -std=c++11   -c -o   main.o    main.cpp
-# 	g++   -Wall  -std=c++11      -o   main     main.o oldSortingVersion.o sortUtil.o  sortUtil_safe.o
-# 
-############################################################################################################################################
+# DBG_FLAG := -g3
+DBG_FLAG :=
 
 
 
 
 
 
-USE_SORT_TYPE_1_FLAG := -DSORT_TYPE=1
-USE_SORT_TYPE_2_FLAG := -DSORT_TYPE=2
-USE_SORT_TYPE_3_FLAG := -DSORT_TYPE=3
-USE_SORT_TYPE_4_FLAG := -DSORT_TYPE=4
-USE_SORT_SAFELY      := -DINDEX_CHECK_SAFE
 
 
-
-
-main1:main.cpp  sortUtil.h  sortUtil.cpp  
-	@echo "Build Quick-Sort Version-1"
-	g++   -Wall  -std=c++11   $(USE_SORT_TYPE_1_FLAG)  -c -o   sortUtil.o         sortUtil.cpp
-	g++   -Wall  -std=c++11   $(USE_SORT_TYPE_1_FLAG)  -c -o   main.o    main.cpp
-	g++   -Wall  -std=c++11   $(USE_SORT_TYPE_1_FLAG)     -o   main1      main.o    sortUtil.o
-
-
-main2:main.cpp  sortUtil2.h  sortUtil2.cpp  
-	@echo "Build Quick-Sort Version-2"
-	g++   -Wall  -std=c++11   $(USE_SORT_TYPE_2_FLAG)  -c -o   sortUtil2.o         sortUtil2.cpp
-	g++   -Wall  -std=c++11   $(USE_SORT_TYPE_2_FLAG)  -c -o   main.o    main.cpp
-	g++   -Wall  -std=c++11   $(USE_SORT_TYPE_2_FLAG)     -o   main2     main.o    sortUtil2.o
-
-
-main3:main.cpp  sortUtil3.h  sortUtil3.cpp  
-	@echo "Build Quick-Sort Version-3"
-	g++   -Wall  -std=c++11   $(USE_SORT_TYPE_3_FLAG)  -c -o   sortUtil3.o         sortUtil3.cpp
-	g++   -Wall  -std=c++11   $(USE_SORT_TYPE_3_FLAG)  -c -o   main.o    main.cpp
-	g++   -Wall  -std=c++11   $(USE_SORT_TYPE_3_FLAG)     -o   main3     main.o    sortUtil3.o
-
-
-
-
-mainSafe:main.cpp sortUtil_safe.h  sortUtil_safe.cpp
-	@echo "Build Quick-Sort Safely Check Index Version"
-	g++   -Wall  -std=c++11   $(USE_SORT_SAFELY)  -c -o   sortUtil_safe.o         sortUtil_safe.cpp
-	g++   -Wall  -std=c++11   $(USE_SORT_SAFELY)  -c -o   main.o    main.cpp
-	g++   -Wall  -std=c++11   $(USE_SORT_SAFELY)     -o   mainSafe     main.o    sortUtil_safe.o
-
-
+main:main.cpp  sortUtil1.h  sortUtil1.cpp  sortUtil2.h  sortUtil2.cpp   sortUtil3.h  sortUtil3.cpp   sortUtilRandom.h  sortUtilRandom.cpp  common.h   common.cpp
+	g++   -Wall  -std=c++11  $(DBG_FLAG)   -c -o   sortUtil1.o sortUtil1.cpp
+	g++   -Wall  -std=c++11  $(DBG_FLAG)   -c -o   sortUtil2.o sortUtil2.cpp
+	g++   -Wall  -std=c++11  $(DBG_FLAG)   -c -o   sortUtil3.o sortUtil3.cpp
+	g++   -Wall  -std=c++11  $(DBG_FLAG)   -c -o   sortUtilRandom.o  sortUtilRandom.cpp
+	g++   -Wall  -std=c++11  $(DBG_FLAG)   -c -o   common.o    common.cpp
+	g++   -Wall  -std=c++11  $(DBG_FLAG)   -c -o   main.o      main.cpp
+	g++   -Wall  -std=c++11  $(DBG_FLAG)      -o   main        *.o
 
 
 .PHONY:clean
 clean:
-	-rm  -Rf  *.o*    *.exe   *.dSYM    main1  main2  main3  mainSafe
+	-rm  -Rf  *.o*    *.exe   *.dSYM    main1  main2  main3  mainSafe  TestCase_*.txt
