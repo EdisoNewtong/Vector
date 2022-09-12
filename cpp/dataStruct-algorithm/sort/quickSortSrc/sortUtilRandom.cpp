@@ -26,11 +26,7 @@ void quickSortRandom_AscendOrder(int* ary, int begIdx, int endIdx, int arySz)
     int rIndex = endIdx - 1;
     int lenOfCenterRange = rIndex - lIndex + 1;
 
-    // int dt = 0;
-    // if ( lenOfCenterRange == 0 ) { dt = std::abs(std::rand()) % 2; } else { dt = std::abs(std::rand()) % lenOfCenterRange; }
-    // int pivotIdx = lIndex +  dt; // std::abs(std::rand()) % lenOfCenterRange; // random the pivot position at the center position of given range 
-
-    int pivotIdx = lIndex +  std::abs(std::rand()) % lenOfCenterRange; // random the pivot position at the center position of given range 
+    int pivotIdx = lIndex +  std::rand() % lenOfCenterRange; // random the pivot position at the center position of given range 
     int pivotNum = ary[pivotIdx]; 
 
     int i = begIdx;
@@ -89,11 +85,7 @@ void quickSortRandom_AscendOrder_Safe(int* ary, int begIdx, int endIdx, int aryS
     int rIndex = endIdx - 1;
     int lenOfCenterRange = rIndex - lIndex + 1;
 
-    // int dt = 0;
-    // if ( lenOfCenterRange == 0 ) { dt = std::abs(std::rand()) % 2; } else { dt = std::abs(std::rand()) % lenOfCenterRange; }
-    // int pivotIdx = lIndex +  dt; // std::abs(std::rand()) % lenOfCenterRange; // random the pivot position at the center position of given range 
-
-    int pivotIdx = lIndex +  std::abs(std::rand()) % lenOfCenterRange; // random the pivot position at the center position of given range 
+    int pivotIdx = lIndex +  std::rand() % lenOfCenterRange; // random the pivot position at the center position of given range 
     int pivotNum = getElementSafely(ary, pivotIdx, arySz); // ary[pivotIdx]; 
 
     int i = begIdx;
@@ -154,11 +146,7 @@ void quickSortRandom_DescendOrder(int* ary, int begIdx, int endIdx, int arySz)
     int rIndex = endIdx - 1;
     int lenOfCenterRange = rIndex - lIndex + 1;
 
-    // int dt = 0;
-    // if ( lenOfCenterRange == 0 ) { dt = std::abs(std::rand()) % 2; } else { dt = std::abs(std::rand()) % lenOfCenterRange; }
-    // int pivotIdx = lIndex +  dt; // std::abs(std::rand()) % lenOfCenterRange; // random the pivot position at the center position of given range 
-
-    int pivotIdx = lIndex +  std::abs(std::rand()) % lenOfCenterRange; // random the pivot position at the center position of given range 
+    int pivotIdx = lIndex +  std::rand() % lenOfCenterRange; // random the pivot position at the center position of given range 
     int pivotNum = ary[pivotIdx]; 
 
     int i = begIdx;
@@ -216,11 +204,7 @@ void quickSortRandom_DescendOrder_Safe(int* ary, int begIdx, int endIdx, int ary
     int rIndex = endIdx - 1;
     int lenOfCenterRange = rIndex - lIndex + 1;
 
-    // int dt = 0;
-    // if ( lenOfCenterRange == 0 ) { dt = std::abs(std::rand()) % 2; } else { dt = std::abs(std::rand()) % lenOfCenterRange; }
-    // int pivotIdx = lIndex +  dt; // std::abs(std::rand()) % lenOfCenterRange; // random the pivot position at the center position of given range 
-
-    int pivotIdx = lIndex +  std::abs(std::rand()) % lenOfCenterRange; // random the pivot position at the center position of given range 
+    int pivotIdx = lIndex +  std::rand() % lenOfCenterRange; // random the pivot position at the center position of given range 
     int pivotNum = getElementSafely(ary, pivotIdx, arySz); // ary[pivotIdx]; 
 
     int i = begIdx;
