@@ -407,7 +407,7 @@ void testSortWithNumber(bool isAscOrder, int headOrTailOrRandom, int version, bo
 		if ( bIsSorted ) {
             ++g_CaseSuccCnt;
 
-			cout << "=> Sort SUCC : contains " << arysz << " elements. Ary Original [ ";
+			cout << "=> Sort SUCC : contains " << arysz << " elements. num = " << num <<  ", Ary Original [ ";
 			for( int idx = 0; idx < arysz; ++idx ) {
 				cout << pBackupAry[idx] << (idx!=arysz-1 ? ", " : " ");
 			}
@@ -420,7 +420,7 @@ void testSortWithNumber(bool isAscOrder, int headOrTailOrRandom, int version, bo
 		} else {
             ++g_CaseFailed;
 
-			cout << "=> Sort Failed   :(   ==> contains " << arysz << " elements. Ary Original [";
+			cout << "=> Sort Failed   :(   ==> contains " << arysz << " elements. num = " << num <<  "Ary Original [";
 			for( int idx = 0; idx < arysz; ++idx ) {
 				cout << pBackupAry[idx] << (idx!=arysz-1 ? ", " : " ");
 			}
@@ -487,7 +487,7 @@ void printUsage()
 		 << "==================================================" << endl
 		 // total 6 arguments  ( at least 4 elements )
 		 //       0         1             2               3            4
-		 << " $ ./main  asc|desc   head|tail|random  --ver=1  [--checkIndex=true|false]  [maxNumber=intNumber]" << endl
+		 << " $ ./main  asc|desc   head|tail|random  --ver=1  [--checkIndex=true|false]  [--maxNumber=intValue]" << endl
 		 << "==================================================" << endl
 		 << endl;
 }
@@ -564,7 +564,7 @@ int main(int argc, char* argv[], char* env[])
 	try {
         int limitNumber = 1;
         if ( argc >= 6 ) {
-            const string prefix("maxNumber=");
+            const string prefix("--maxNumber=");
             string arg5( argv[5] );
             auto strPos = arg5.find(prefix);
             if ( strPos != 0 ) {
