@@ -3,7 +3,6 @@
 #include <string>
 using namespace std;
 
-// outFile.write( content, static_cast<streamsize>(1) );
 
 static const char G_R = '\r';
 static const char G_N = '\n';
@@ -297,4 +296,3 @@ int main(int argc, char* argv[], char* env[])
 	return 0;
 
 }
-
