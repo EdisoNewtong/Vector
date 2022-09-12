@@ -23,7 +23,6 @@ using namespace std;
 
 
 static const bool G_NeedBreakIfError = true;
-unsigned long long G_quickSortRangesOutOfBoundCnt = 0;
 
 
 namespace 
@@ -408,15 +407,24 @@ void testSortWithNumber(bool isAscOrder, int headOrTailOrRandom, int version, bo
 		if ( bIsSorted ) {
             ++g_CaseSuccCnt;
 
-			cout << "=> Sort SUCC : contains " << arysz << " elements. Ary => [ ";
+			cout << "=> Sort SUCC : contains " << arysz << " elements. Ary Original [ ";
+			for( int idx = 0; idx < arysz; ++idx ) {
+				cout << pBackupAry[idx] << (idx!=arysz-1 ? ", " : " ");
+			}
+			cout << " ] ";
+			cout << " => [ ";
 			for( int idx = 0; idx < arysz; ++idx ) {
 				cout << pAry[idx] << (idx!=arysz-1 ? ", " : " ");
 			}
-			cout << " ] " << endl;
+			_cout << " ] " << endl;
 		} else {
             ++g_CaseFailed;
 
-			cout << "=> Sort Failed   :(   ==> contains " << arysz << " elements. " << endl;
+			cout << "=> Sort Failed   :(   ==> contains " << arysz << " elements. Ary Original [";
+			for( int idx = 0; idx < arysz; ++idx ) {
+				cout << pBackupAry[idx] << (idx!=arysz-1 ? ", " : " ");
+			}
+			cout << " ] ";
 			cout << "    " << "After Sort : " << endl
 				 << " [ ";
             vector<int> failedAry;

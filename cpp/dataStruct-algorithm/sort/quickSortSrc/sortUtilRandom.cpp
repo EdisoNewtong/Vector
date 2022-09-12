@@ -61,7 +61,7 @@ void quickSortRandom_AscendOrder(int* ary, int begIdx, int endIdx, int arySz)
     if (  j > pivotIdx ) {
         swap2Elements(ary, pivotIdx, j);
         i = j;
-    } else if ( ary[i] > pivotNum ) { 
+    } else {
         swap2Elements(ary, pivotIdx, i);
     }
 
@@ -124,7 +124,7 @@ void quickSortRandom_AscendOrder_Safe(int* ary, int begIdx, int endIdx, int aryS
     if (  j > pivotIdx ) {
 		swap2Elements_Safe(ary, pivotIdx, j, arySz);
         i = j;
-    } else if ( getElementSafely(ary, i, arySz) > pivotNum ) { 
+    } else {
 		swap2Elements_Safe(ary, pivotIdx, i, arySz);
     }
 
@@ -189,7 +189,7 @@ void quickSortRandom_DescendOrder(int* ary, int begIdx, int endIdx, int arySz)
     if (  j > pivotIdx ) {
         swap2Elements(ary, pivotIdx, j);
         i = j;
-    } else if ( ary[i] < pivotNum ) { 
+    } else {
         swap2Elements(ary, pivotIdx, i);
     }
 
@@ -251,7 +251,7 @@ void quickSortRandom_DescendOrder_Safe(int* ary, int begIdx, int endIdx, int ary
     if (  j > pivotIdx ) {
 		swap2Elements_Safe(ary, pivotIdx, j, arySz);
         i = j;
-    } else if ( getElementSafely(ary, i, arySz) < pivotNum ) { 
+    } else {
 		swap2Elements_Safe(ary, pivotIdx, i, arySz);
     }
 
