@@ -14,7 +14,7 @@ build-*
 
 cpp/console/tools/binarycmp/binarycmp
 cpp/console/tools/binarywrite/binarywrite
-cpp/console/tools/deletelasteol/deletelasteol
+cpp/console/tools/delOrAddLastEol/delOrAddLastEol
 cpp/console/tools/eolconvert/eolconvert
 cpp/console/tools/spacetabconvert/spacetabconvert
 cpp/console/tools/hexstring/hexstring
@@ -29,6 +29,7 @@ cpp/console/tools/mathOperatation/mathCalc
 cpp/console/tools/mathOperatation/build/*.o
 !cpp/console/tools/mathOperatation/build/**
 cpp/console/tools/**/*.exe
+cpp/console/tools/**/main
 
 cpp/console/tools/arithMetic/build/*.o
 !cpp/console/tools/arithmetic/build/tmp.txt
@@ -44,4 +45,3 @@ lua/lua_C_Lab/basic/lualib/*.lib
 lua/sourceCodeStudy/xcodeLuaStudy
 
 *.pro.user
-
