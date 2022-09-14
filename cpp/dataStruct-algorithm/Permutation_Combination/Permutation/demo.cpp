@@ -9,6 +9,24 @@ struct Slot
 	vector<string> pool;
 };
 
+/**
+ * Recusively Call
+ *
+     利用递归调用 ，实现 乘法原理 :
+
+	     完成1件事需要分n个步骤， 而每一个步骤会可以选择多种方法来完成
+
+	Event :
+		     event-1 : n1
+		     event-2 : n2
+		     event-3 : n3
+		     event-4 : n4
+		         ...
+		     event-n : nn
+
+		 那么完成整个 Event 总共有 :  n1 * n2 * n3 * n4 * ... * nn 种方法
+
+*/
 void enumerateSlot(const vector<Slot*>& slotAry, int slotIdx, vector< vector<int> >& used, vector<string>& grp, vector<vector<string>>& pp)
 {
 	int slotSz = static_cast<int>( slotAry.size() );
@@ -50,19 +68,14 @@ void enumerateSlot(const vector<Slot*>& slotAry, int slotIdx, vector< vector<int
  *
  *     123456789 => 9
 */
-int getNumberBitInDecimal(unsigned long long cnt) 
+int getNumberBitInDecimal(unsigned long long num) 
 {
-	int ret = 0;
-	if ( cnt == 0 ) {
-		ret = 1;
-		return ret;
-	}
-	
-	while ( cnt > 0 ) {
-		++ret;
-		cnt /= 10;
-	}
-	return ret;
+	int nBits = 0;
+	do {
+		num /= 10;
+		++nBits;
+	} while ( num != 0 );
+	return nBits;
 }
 
 void enumerateSlotAry(const vector<Slot*>& slotAry)
