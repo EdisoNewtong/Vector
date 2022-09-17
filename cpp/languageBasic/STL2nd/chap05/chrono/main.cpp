@@ -423,8 +423,10 @@ int main(int argc, char* argv[], char* env[])
     cout << "====================================================================================================" << endl;
     studyChronoClock();
     cout << "====================================================================================================" << endl;
+    cout << "1. use ctime(...); take time-zone into account." << endl;
     study_TimePoint(1); // 1 => take  time-zone into account
     cout << "====================================================================================================" << endl;
+    cout << "2. use asctime(...);  Do <NOT> take time-zone into account (UTC time). " << endl;
     study_TimePoint(2); // 2 => <NOT> take time-zone into account (UTC time)
     cout << "====================================================================================================" << endl;
     study_TimePointCalc(1);
