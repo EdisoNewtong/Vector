@@ -273,9 +273,9 @@ Usage :
 or 
     $ deltatime  --timestamp  [--sinceNow]
 or 
-    $ deltatime  --deltatime-1  [--sinceNow] // unit in second
+    $ deltatime  --deltatime-1  [--sinceNow] // duration unit is second
 or 
-    $ deltatime  --deltatime-2  [--sinceNow] // unit in  hours:minutes:seconds
+    $ deltatime  --deltatime-2  [--sinceNow] // duration unit is hh:mm:ss
 )";
 	cout << text << endl;
 }
