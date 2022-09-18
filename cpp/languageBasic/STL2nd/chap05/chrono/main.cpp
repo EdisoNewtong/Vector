@@ -29,7 +29,10 @@ A duration of time is defined as a specific number of ticks over a time unit.
 One example is a duration such as "3 minutes" (3 ticks of a "minute")
 
 A duration is a combination of a value representing the number of ticks and a fraction representing the unit in seconds (default unit is in second )
-
+             
+//
+// if the unit is not given explicitly , the <Default> unit is second
+//
 std::chrono::duration<int>     dur(3);      // 3 ticks of 1 second
 
 
@@ -189,7 +192,7 @@ void studyChronoClock()
     // A clock :
     //    defines an epoch and a tick peroid.
     //    e.g. 
-    //        1. a clock might tick in milliseconds since the Unix epoch( January 1, 1970) 
+    //        1. a clock might tick in milliseconds since the Unix epoch( January 1, 1970    08:00:00,  take time-zone into account for GMT+8 ) 
     //        2. tick in nanoseconds since the start of the program
 
     cout << "system_clock: " << endl;
@@ -375,6 +378,7 @@ void study_TimePointCalc(int tag)
 
 }
 
+// YYYY-MM-DD HH:MM:SS
 inline
 chrono::system_clock::time_point 
 makeTimePoint(int year,int mon, int day, int hour,int min, int sec = 0)
@@ -440,4 +444,3 @@ int main(int argc, char* argv[], char* env[])
 
     return 0;
 }
-
