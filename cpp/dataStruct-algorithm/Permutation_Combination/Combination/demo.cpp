@@ -1,9 +1,8 @@
 #include <iostream>
-#include <vector>
 #include <iomanip>
 #include <string>
+#include <stack>
 using namespace std;
-
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -11,29 +10,39 @@ using namespace std;
 //
 //
 // Question:     
-//     There are 4 numbers 1,2,3,4 and  4 slots 
-//     fill any one number into the slot until all slots are filled
+//     There are m characters  A,B,C,D, ...,  and  n slots s1,s2,s3, ... , sn
+//     fill any character into the slot until all slots are filled
+//
+// Notes: 
+//         A,B,C / A,C,B / B,A,C / B,C,A / C,A,B / C,B,A   are treat as 1 kind
+//
 //     How many possibilities exists ?
 //
 
+
+namespace V1  // ( recusively Call )
+{
+
+
 static int g_nPossibilityCnt = 0;
 
-static int pickupPool[] = { 1,2,3,4 };
-static int flagsAry[]   = { 0,0,0,0 };
-static int retAry[]     = { 0,0,0,0 };
+static char*   pickupPool = nullptr;
+static int*    flagsAry   = nullptr;
 
-void comination(int deep, int cnt)
+static char*   retAry     = nullptr;
+
+void combination(int deep, int startIdx, int nPicked, int nPoolsz)
 {
 	//
 	// ==== Core Core Core ====
 	// Recursive termate condition
 	//
-	if ( deep == cnt ) {
+	if ( deep == nPicked ) {
 		// print result array
-		cout << (g_nPossibilityCnt+1) << ". ";
-		for ( int i = 0; i < cnt; ++i ) {
+		cout << setw(4) << (g_nPossibilityCnt+1) << ". ";
+		for ( int i = 0; i < nPicked; ++i ) {
 			cout << retAry[i];
-			if ( i != cnt-1 ) {
+			if ( i != nPicked-1 ) {
 				cout << " - ";
 			}
 		}
@@ -43,7 +52,7 @@ void comination(int deep, int cnt)
 		return;
 	}
 
-	for ( int i = 0; i < cnt; ++i ){
+	for ( int i = startIdx; i < nPoolsz; ++i ){
 		if ( flagsAry[i] == 0 ) {
 			// set flag
 			flagsAry[i] = 1;
@@ -51,7 +60,7 @@ void comination(int deep, int cnt)
 			// pick up one
 			retAry[deep] = pickupPool[i];
 
-			comination( deep+1, cnt);
+			combination( deep+1, i+1, nPicked, nPoolsz);
 			// clear flag
 			flagsAry[i] = 0;
 		}
@@ -60,47 +69,139 @@ void comination(int deep, int cnt)
 
 }
 
-/*
-    There are 4 slots  , A B C D 
-    and  4 numbers in the poll { 1,2,3,4 }
- 
-    Step-1 : A is filled with 2 ,then the rest 3 slots B C D  , can only filled with one of  { 1,   3, 4 } without 1
-    Step-2 : B is filled with 3 ,then the rest 2 slots C D    , can only filled with one of  { 1,      4 } without 2 and 3
-       ...
- 
- 
-    This example is different from 4 A,B,C,D slots, with 4 numbers {1,2,3,4} , some possibilities is shown below :
-
-	------------------
-	   A  B  C  D
-	   1  1  1  1
-	------------------
-	   A  B  C  D
-	   2  2  2  2
-
-	   ....
-
-	------------------
-	   A  B  C  D
-	   1  2  2  1
-	------------------
-
-
-
-*/
-void runCombinationDemo()
+void runCombination(int nPicked, int nPoolSize)
 {
-	comination(0, sizeof(retAry) /  sizeof(retAry[0]) );
 
-	cout << "==================================================" << endl
-		 << "\tThere are " << g_nPossibilityCnt << " possiblities in all. " << endl
-		 << "==================================================" << endl;
+    pickupPool = new char[nPoolSize];
+    for( int i = 0; i < nPoolSize; ++i ) { pickupPool[i] = ('A' + i); }
+
+    flagsAry   = new int[nPoolSize];
+    for( int i = 0; i < nPoolSize; ++i ) { flagsAry[i] = 0; }
+
+    retAry     = new char[nPicked];
+    for( int i = 0; i < nPicked; ++i ) { retAry[i] = 0; }
+
+	combination(0,0,  nPicked, nPoolSize );
+
+    delete [] pickupPool;
+    delete [] flagsAry;
+    delete [] retAry;
+
+	// cout << "==================================================" << endl
+	// 	 << "\tThere are " << g_nPossibilityCnt << " possiblities in all. " << endl
+	// 	 << "==================================================" << endl;
 }
+
+
+} // end namespace V1 ( recursively Call )
+
+
+namespace V2  // ( none-recursively Call )
+{
+
+int runCombination(int nPick, int nPoolSize)
+{
+	int nPossibilities = 0;
+	char* elementAry = new char[nPoolSize];
+	int idx = 0;
+	for( idx = 0; idx < nPoolSize; ++idx ) {
+		elementAry[idx] = ('A' + idx);
+	}
+
+	char* slotAry = new char[nPick];
+	int*  flagAry = new int[nPoolSize];
+	for( idx = 0; idx < nPoolSize; ++idx ) { 
+		flagAry[idx] = -1;
+	}
+
+	int slotIdx = 0;
+	int avaliableIdx = 0;
+	slotAry[slotIdx] = elementAry[avaliableIdx];
+	flagAry[slotIdx] = avaliableIdx;
+
+	stack<int> stk;
+	stk.push(0);
+
+	while ( !stk.empty() )
+	{
+		int stksz = static_cast<int>( stk.size() );
+
+		if ( stksz == nPick )
+		{
+			slotIdx = stk.top();
+			stk.pop();
+
+			cout << setw(4) << (++nPossibilities) << ". ";
+			for( idx = 0; idx < nPick; ++idx )
+			{
+				cout << slotAry[idx] << ((idx < nPick-1) ? " - " : "");
+			}
+			cout << endl;
+		}
+		else
+		{
+			avaliableIdx = -1;
+			do {
+				
+				for( idx = slotIdx+1 ; idx < nPoolSize; ++idx ) {
+					if ( flagAry[idx] == -1 ) {
+						break;
+					}
+				}
+
+				if ( idx < nPoolSize ) {
+					avaliableIdx = idx;
+				} else {
+					if ( !stk.empty() ) {
+						slotIdx = stk.top();
+						stk.pop();
+
+						for( idx = slotIdx+1; idx < nPoolSize ; ++idx )
+						{
+							flagAry[idx] = -1;
+						}
+					} else {
+						avaliableIdx = -2;
+					}
+				}
+			} while ( avaliableIdx == -1 );
+
+			if ( avaliableIdx >= 0 ) {
+				stksz = static_cast<int>( stk.size() );
+				stk.push( avaliableIdx );
+
+				flagAry[ avaliableIdx ] = stksz;
+				slotAry[ stksz ] = elementAry[ avaliableIdx ];
+			}
+		}
+	}
+
+
+	delete [] elementAry;
+	delete [] slotAry;
+	delete [] flagAry;
+
+	return nPossibilities;
+}
+
+} // end namespace V2 ( none-recursively Call )
+
 
 
 int main(int argc, char* argv[], char* env[])
 {
-	runCombinationDemo();
+    if ( argc < 3 ) {
+        cerr << "[ERROR] require 2 arguments. " << endl;
+        return -1;
+    }
+
+    int nPicked = stoi(argv[1]);
+    int nPoolSz = stoi(argv[2]);
+
+	V1::runCombination( nPicked, nPoolSz );
+
+	// or 
+	// V2::runCombination( nPicked, nPoolSz );
+    
 	return 0;
 }
-
