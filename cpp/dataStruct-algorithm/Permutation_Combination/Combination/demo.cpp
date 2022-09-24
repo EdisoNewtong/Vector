@@ -52,7 +52,20 @@ void combination(int deep, int startIdx, int nPicked, int nPoolsz)
 		return;
 	}
 
-	for ( int i = startIdx; i < nPoolsz; ++i ){
+	//
+	// Core Core Core
+	//
+	//     3
+	//   C 
+	//     9
+	//                          maxBound
+	//   slot-0  : [0,6] => [0,  7   )      7 = 9 - 3 + 1 + 0 = 7
+	//   slot-1  : [1,7] => [1,  8   )      8 = 9 - 3 + 1 + 1 = 8
+	//   slot-2  : [2,8] => [2,  9   )      9 = 9 - 3 + 1 + 2 = 9
+	//
+	int maxBound = (nPoolsz - nPicked + 1 + deep);
+
+	for ( int i = startIdx; i < maxBound; ++i ){
 		if ( flagsAry[i] == 0 ) {
 			// set flag
 			flagsAry[i] = 1;
@@ -198,10 +211,10 @@ int main(int argc, char* argv[], char* env[])
     int nPicked = stoi(argv[1]);
     int nPoolSz = stoi(argv[2]);
 
-	V1::runCombination( nPicked, nPoolSz );
+	// V1::runCombination( nPicked, nPoolSz );
 
 	// or 
-	// V2::runCombination( nPicked, nPoolSz );
+	V2::runCombination( nPicked, nPoolSz );
     
 	return 0;
 }
