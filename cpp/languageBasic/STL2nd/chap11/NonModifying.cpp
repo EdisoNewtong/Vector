@@ -75,7 +75,6 @@ void countOrCount_ifCase()
                    });
     cout << G_TAB << "number of elements greater than 4  : " << num << endl;
     cout << G_TAB << "------------------------------------------------------------" << endl << endl;
-    cout << endl;
 
 }
 
