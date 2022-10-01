@@ -1,6 +1,21 @@
 #include <iostream>
 #include <string>
+#include <iomanip>
+#include <map>
 using namespace std;
+
+
+struct ChDetail
+{
+	char ch;
+	bool bPrintAble;
+	string displayString;
+	string detail;
+};
+
+
+bool parseArgument(const string& arg1, char* pCh);
+
 
 #if !defined(_MSC_VER)
 // #pragma message("in unix/linux platform")
@@ -561,17 +576,175 @@ cout
 #endif
 
 
+void printUsage()
+{
+	cout << u8R"(
+Usage :
+      $ ./asc2table
+or 
+      $ ./asc2table 97      //  --> 'a'
+      $ ./asc2table 0x61    //  --> 'a'
+      $ ./asc2table 'a'     //  = 0x61 = 97 = 'a'  
+      $ ./asc2table "a"     //  = 0x61 = 97 = 'a'  
+)"   << endl;
+
+}
+
+
+
+bool parseArgument(const string& arg1,  int* pCode)
+{
+	int  strLen = static_cast<int>( arg1.size() );
+	if ( strLen == 0  ||  pCode == nullptr ) {
+		return false;
+	}
+
+
+	int base = 10; // default : assume the string as a decimal format
+	char firstCh = arg1.at(0);
+	if ( firstCh >= '0' && firstCh <= '9' ) {
+		if (    firstCh == '0'   
+			&&  strLen >=2   && ( ( arg1.at(1) | ' ') == 'x' )  ) {
+			base = 16;
+		} 
+
+
+		try {
+			int decCode = stoi(arg1, 0, base);
+			*pCode = decCode;
+			return true;
+		} catch ( const exception& e ) {
+			cout << "[ERROR] : convert from string to int failed : \"" << arg1 << "\"  -> " << e.what() << endl;
+			return false;
+		}
+	} else if ( firstCh == '\'' ) {
+		if ( strLen != 3 ) {
+			return false;
+		}
+
+		// len == 3
+		if ( arg1.at(2) == '\'' ) {
+			*pCode = static_cast<int>( arg1.at(1) & 0xFF );
+			return true;
+		} 
+	} else if ( strLen == 1 ) {
+		*pCode = static_cast<int>( firstCh & 0xFF );
+		return true;
+	}
+
+	return false;
+}
+
+void printDetail(int inputCode)
+{
+	map<int,ChDetail> asc2table{
+
+            /*                          ch   bPrintAble     displayString                  detail     */
+			{  0,  {   static_cast<char>(0), false,       "NUL (null)",                        "空字符" } },
+			{  1,  {   static_cast<char>(1), false,       "SOH (Start of Headling)",           "标题开始" } },
+			{  2,  {   static_cast<char>(2), false,       "STX (Start Of Text)",               "正文开始" } },
+			{  3,  {   static_cast<char>(3), false,       "ETX (End of Text)",                 "正文结束" } },
+			{  4,  {   static_cast<char>(4), false,       "EOT (End Of Transmission)",         "传输结束" } },
+			{  5,  {   static_cast<char>(5), false,       "ENQ (Enquiry)",                     "请求" } },
+			{  6,  {   static_cast<char>(6), false,       "ACK (ACKnowledge)",                 "收到通知" } },
+			{  7,  {   static_cast<char>(7), false,       "BEL (Bell)                \\a",     "响铃" } },
+			{  8,  {   static_cast<char>(8), false,       "BS (BackSpace)            \\b",     "退格" } },
+			{  9,  {   static_cast<char>(9), false,       "HT (Horizontal Tab)       \\t",     "水平制表符" } },
+			{ 10,  {   static_cast<char>(10), false,      "LF (Line Feed, New Line)  \\n",     "换行键" } },
+			{ 11,  {   static_cast<char>(11), false,      "VT (Vertical Tab)         \\v",     "垂直制表符" } },
+			{ 12,  {   static_cast<char>(12), false,      "FF (Form Feed, New Page)  \\f",     "换页符" } },
+			{ 13,  {   static_cast<char>(13), false,      "CR (Carriage Return)      \\r",     "回车键" } },
+			{ 14,  {   static_cast<char>(14), false,      "SO (Shift Out)",                    "不用切换" } },
+			{ 15,  {   static_cast<char>(15), false,      "SI (Shift In)",                     "启用切换" } },
+			{ 16,  {   static_cast<char>(16), false,      "DLE (Data Link Escape)",            "数据链路转义" } },
+			{ 17,  {   static_cast<char>(17), false,      "DC1 (Device Control 1)",            "设备控制" } },
+			{ 18,  {   static_cast<char>(18), false,      "DC2 (Device Control 2)",            "设备控制" } },
+			{ 19,  {   static_cast<char>(19), false,      "DC3 (Device Control 3)",            "设备控制" } },
+			{ 20,  {   static_cast<char>(20), false,      "DC4 (Device Control 4)",            "设备控制" } },
+			{ 21,  {   static_cast<char>(21), false,      "NAK (Negative AcKnowledge)",        "拒绝接收" } },
+			{ 22,  {   static_cast<char>(22), false,      "SYN (SYNchronous idle)",            "同步空闲" } },
+			{ 23,  {   static_cast<char>(23), false,      "ETB (End of Trans. Block)",         "传输块结束" } },
+			{ 24,  {   static_cast<char>(24), false,      "CAN (CANcel)",                      "取消" } },
+			{ 25,  {   static_cast<char>(25), false,      "EM (End of Medium)",                "介质中断" } },
+			{ 26,  {   static_cast<char>(26), false,      "SUB (SUBstitute)",                  "替补" } },
+			{ 27,  {   static_cast<char>(27), false,      "ESC (ESCape)",                      "溢出" } },
+			{ 28,  {   static_cast<char>(28), false,      "FS (File Separator)",               "文件分割符" } },
+			{ 29,  {   static_cast<char>(29), false,      "GS (Group Separator)",              "分组符" } },
+			{ 30,  {   static_cast<char>(30), false,      "RS (Record Separator)",             "记录分离符" } },
+			{ 31,  {   static_cast<char>(31), false,      "US (Unit Separator)",               "单元分隔符" } },
+			{ 32,  {   static_cast<char>(32), false,      "(Space)",                           "空格"       } }
+	};
+
+	for( int code = 33; code < 127; ++code ) {
+		char ch = static_cast<char>(code & 0xFF);
+		// ChDetail detail
+		asc2table.emplace( code, ChDetail{ ch, true, string(1,ch), string("") } ); 
+	}
+
+
+	asc2table.emplace( 127,  ChDetail{ static_cast<char>(127), false, "DEL ( DELete )", "删除" } );
+
+
+	auto it = asc2table.find(inputCode);
+	if ( it == asc2table.end() ) {
+		cerr << "[ERROR] Can't find code:" << std::dec << inputCode << " in the ascii table. " << endl;
+		return;
+	}
+
+	if ( it->second.bPrintAble ) {
+		cout << "'" << it->second.ch << "'"
+			 << " = 0x" << std::hex << std::uppercase << setw(2) << setfill('0') << inputCode
+			 << " = "   << std::dec << inputCode 
+			 << "    -> " << it->second.displayString
+			 << "  , " << it->second.detail
+			 << endl;
+	} else {
+		cout << "'?'"
+			 << " = 0x" << std::hex << std::uppercase << setw(2) << setfill('0') << inputCode
+			 << " = "   << std::dec << inputCode 
+			 << "    -> " << it->second.displayString;
+
+		if ( !(it->second.detail.empty()) ) {
+			 cout << "  , " << it->second.detail
+				  << endl;
+		}
+	}
+
+}
+
+
 int main(int argc, char* argv[], char* env[])
 {
-    (void)argc;
-    (void)argv;
     (void)env;
 
+	int  code = 0;
+
+	if ( argc == 1 ) {
 #if !defined(_MSC_VER)
-    printAsciiCodeTable();
+	printAsciiCodeTable();
 #else
-    printAsciiCodeTableForWindows();
+	printAsciiCodeTableForWindows();
 #endif
+	} else {
+		// argc > 1
+		string strArg1(argv[1]);
+		if ( argc == 2 ) {
+			if ( !parseArgument( strArg1,  &code) ) {
+				printUsage();
+				return -1;
+			}
+
+			if ( code >=0 && code <=127 ) {
+				printDetail(code);
+			} else {
+				cout << "Invalid Number Code , value is out of range : avaliable range is [0,127] ." << endl;
+				printUsage();
+			}
+		} else {
+			// argc >= 3
+			printUsage();
+		}
+	}
 
     return 0;
 }
