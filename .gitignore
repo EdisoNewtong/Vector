@@ -24,7 +24,7 @@ cpp/console/tools/ieee754/genTools
 cpp/console/tools/ieee754/ieee754
 cpp/console/tools/ieee754/unitTest
 cpp/console/tools/intvalRange/intvalRange
-cpp/console/tools/asciiCodeTable/asciiCodeTable
+cpp/console/tools/asc2table/asc2table
 cpp/console/tools/mathOperatation/mathCalc
 cpp/console/tools/mathOperatation/build/*.o
 !cpp/console/tools/mathOperatation/build/**
