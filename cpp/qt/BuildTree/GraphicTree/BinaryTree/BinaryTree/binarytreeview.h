@@ -9,6 +9,10 @@
 #include <QByteArray>
 #include <QSet>
 
+
+#include "mysettingbtndelegate.h"
+
+
 class QMenu;
 class QAction;
 class QContextMenuEvent;
@@ -56,7 +60,8 @@ protected:
     QAction*    m_pAddLeftAct;   // add only left node
     QAction*    m_pAddRightAct;  // add only right node
 
-    QStandardItemModel* m_pTreeModel; // model
+    QStandardItemModel*    m_pTreeModel;   // model
+	mysettingbtndelegate*  m_btnDelegate;  // styled delegate
 
     rapidxml::xml_document<char>* m_pXMLDoc;
     QVector<QByteArray> m_XmlStringList;

@@ -13,10 +13,14 @@ mytreeitem::mytreeitem(const QString& text,bool isRoot /* = false */,bool canEdi
     , m_bIsValid(isValid)
 {
     // qDebug() << "create a mytreeitem : " << text;// ++G_CNT;
+    auto oldflags = this->flags();
+    // this->setFlags( oldflags | Qt::ItemIsSelectable);
+
     if (  !canEdit ) {
-        auto oldflags = this->flags();
-        this->setFlags(oldflags & (~Qt::ItemIsEditable) );
-    }
+        // oldflags = this->flags();
+		// set editable as  false
+        this->setFlags( oldflags   & (~Qt::ItemIsEditable) );
+    } 
 
     if ( !isValid ) {
         this->setData( QBrush(Qt::red), Qt::ForegroundRole );

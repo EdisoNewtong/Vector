@@ -36,6 +36,12 @@
       <height>531</height>
      </rect>
     </property>
+    <property name="focusPolicy">
+     <enum>Qt::ClickFocus</enum>
+    </property>
+    <property name="viewportUpdateMode">
+     <enum>QGraphicsView::SmartViewportUpdate</enum>
+    </property>
    </widget>
    <widget class="QPushButton" name="newTreeBtn">
     <property name="geometry">

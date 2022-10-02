@@ -3,6 +3,7 @@
 
 #include "rapidxml.hpp" // for xml generte use
 #include "rapidxml_print.hpp" // for xml generate file content
+#include "globalSettings.h"
 
 #include <QToolTip>
 #include <QDebug>
@@ -26,6 +27,7 @@ binarytreeview::binarytreeview(QWidget* parent /*= nullptr*/)
     , m_pAddLeftAct(nullptr)
     , m_pAddRightAct(nullptr)
     , m_pTreeModel(nullptr)
+	, m_btnDelegate(nullptr)
     , m_pXMLDoc(nullptr)
 {
     m_pPopupMenu = new QMenu(this);
@@ -43,9 +45,19 @@ binarytreeview::binarytreeview(QWidget* parent /*= nullptr*/)
 
     m_pTreeModel = new QStandardItemModel();
     this->setModel(m_pTreeModel);
+
+
+
+
+	// m_btnDelegate = nullptr;
+    m_btnDelegate = new mysettingbtndelegate(  this );
+    this->setItemDelegateForColumn( 2, m_btnDelegate );
+	// this->setItemDelegate( m_btnDelegate );
+
     initTreeView(true);
     // QStandardItemModel::itemChanged(QStandardItem *item)
     connect(m_pTreeModel, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(onTreeLeafItemEdited(QStandardItem*) ) );
+
 
     m_pXMLDoc = new rapidxml::xml_document<char>();
 
@@ -70,6 +82,14 @@ binarytreeview::~binarytreeview()
         delete m_pTreeModel;
         m_pTreeModel = nullptr;
     }
+
+	if ( m_btnDelegate != nullptr ) {
+		// detach  delegate already existed    immediately
+		this->setItemDelegate( nullptr );
+		
+        delete m_btnDelegate;
+        m_btnDelegate = nullptr;
+	}
 
     if ( m_pXMLDoc!=nullptr ) {
         m_pXMLDoc->clear();
@@ -124,7 +144,7 @@ void binarytreeview::contextMenuEvent(QContextMenuEvent* event) // Q_DECL_OVERRI
             m_pDelteNodeAct->setEnabled(!rootFlag);
 
             auto nRows = selitem->rowCount();
-            if ( nRows == 2) {
+            if ( nRows == GlobalSetting::SPECIAL_COLUMN_INDEX ) {
                 m_pAddBothAct->setEnabled(false);
                 m_pAddLeftAct->setEnabled(false);
                 m_pAddRightAct->setEnabled(false);
@@ -177,20 +197,25 @@ void binarytreeview::initTreeView(bool needCreateRoot)
 
     QStringList headlst;
     headlst.push_back("name");
-    headlst.push_back("value");
-    headlst.push_back("status");
+    headlst.push_back("text");
+    headlst.push_back("style");
     m_pTreeModel->setHorizontalHeaderLabels(headlst);
 
     auto invisibleRoot = m_pTreeModel->invisibleRootItem();
     if ( invisibleRoot!=nullptr && needCreateRoot ) {
-        const auto rootFlag = true;
-        const auto canEdit = false;
-        auto treeRoot = new mytreeitem("Root", rootFlag,canEdit);
-        invisibleRoot->setChild(0,0, treeRoot );
-        invisibleRoot->setChild(0,1, new mytreeitem("0") );
-        // set invalid tag
-        invisibleRoot->setChild(0,2, new mytreeitem("",false,canEdit) );
+        auto bIsRoot = true;
+		const auto canEditColumn0 = false;
+		const auto canEditColumn1 = true;
+
+        invisibleRoot->setChild(0,0, new mytreeitem("Root", bIsRoot, canEditColumn0) );
+
+		bIsRoot = false;
+        invisibleRoot->setChild(0,1, new mytreeitem("0", bIsRoot, canEditColumn1) );
+        invisibleRoot->setChild(0,2, new mytreeitem("0", bIsRoot, GlobalSetting::SPECIAL_COLUMN_EDITABLE )  );
+        // invisibleRoot->setChild(0,2, new QStandardItem() );
     }
+
+
 }
 
 
@@ -218,10 +243,26 @@ void binarytreeview::onAdd2NodesActionTrigger()
         return;
     }
 
-    selitem->setChild(0,0, new mytreeitem("left") );
-    selitem->setChild(0,1, new mytreeitem("0") );
-    selitem->setChild(1,0, new mytreeitem("right") );
-    selitem->setChild(1,1, new mytreeitem("0") );
+
+	auto bIsRoot = false;
+	auto canEditColumn0 = false;
+	auto canEditColumn1 = true;
+
+	// Append Left Row
+    selitem->setChild(0,0, new mytreeitem("left", bIsRoot, canEditColumn0) );
+    selitem->setChild(0,1, new mytreeitem("0", bIsRoot, canEditColumn1) );
+	auto leftStyle = new mytreeitem("0", bIsRoot, GlobalSetting::SPECIAL_COLUMN_EDITABLE );
+	// auto leftStyle = new QStandardItem();
+    selitem->setChild(0,2, leftStyle);
+
+
+	// Append Right Row
+    selitem->setChild(1,0, new mytreeitem("right", bIsRoot, canEditColumn0) );
+    selitem->setChild(1,1, new mytreeitem("0", bIsRoot, canEditColumn1) );
+	auto rightStyle = new mytreeitem("0", bIsRoot, GlobalSetting::SPECIAL_COLUMN_EDITABLE );
+    selitem->setChild(1,2, rightStyle );
+
+    expand( selitem->index() );
 }
 
 void binarytreeview::onAddLeftNodeActionTrigger()
@@ -232,8 +273,15 @@ void binarytreeview::onAddLeftNodeActionTrigger()
         return;
     }
     
-    selitem->insertRow(0,new mytreeitem("left"));
-    selitem->setChild(0,1,new mytreeitem("0"));
+	auto bIsRoot = false;
+	auto canEditColumn0 = false;
+	auto canEditColumn1 = true;
+    selitem->insertRow(0,  new mytreeitem("left", bIsRoot, canEditColumn0 ));
+    selitem->setChild(0,1, new mytreeitem("0", bIsRoot, canEditColumn1));
+	auto leftStyle =       new mytreeitem("0", bIsRoot, GlobalSetting::SPECIAL_COLUMN_EDITABLE );
+    selitem->setChild(0,2, leftStyle);
+
+    expand( selitem->index() );
 }
 
 void binarytreeview::onAddRightNodeActionTrigger()
@@ -247,17 +295,28 @@ void binarytreeview::onAddRightNodeActionTrigger()
     auto nRows = selitem->rowCount();
     auto insertRowIdx = nRows == 0 ? 0 : 1; 
 
-    selitem->setChild(insertRowIdx,0,new mytreeitem("right"));
-    selitem->setChild(insertRowIdx,1,new mytreeitem("0"));
+	auto bIsRoot = false;
+	auto canEditColumn0 = false;
+	auto canEditColumn1 = true;
+
+    selitem->setChild(insertRowIdx,0, new mytreeitem("right", bIsRoot, canEditColumn0));
+    selitem->setChild(insertRowIdx,1, new mytreeitem("0", bIsRoot, canEditColumn1));
+	auto rightStyle =                 new mytreeitem("0", bIsRoot, GlobalSetting::SPECIAL_COLUMN_EDITABLE );
+    selitem->setChild(insertRowIdx,2, rightStyle);
+
+    expand( selitem->index() );
 }
 
+//
+// A grid is in Edited Done State
+//
 void binarytreeview::onTreeLeafItemEdited(QStandardItem* pItem)
 {
     if ( pItem == nullptr || pItem->column()!=1 ) {
         return;
     }
 
-    qDebug() << "row,col = " << pItem->row() << "," << pItem->column();
+    // qDebug() << "row,col = " << pItem->row() << "," << pItem->column();
     auto strAfterChanged = pItem->text();
     // qDebug() << "strAfterChanged = " << strAfterChanged;
     strAfterChanged = strAfterChanged.trimmed();
@@ -268,26 +327,27 @@ void binarytreeview::onTreeLeafItemEdited(QStandardItem* pItem)
         strAfterChanged.toInt(&canConvertToInt);
     }
 
-    qDebug() << "calc par ==> ";
+    // qDebug() << "calc par ==> ";
     auto par = pItem->parent();
     if ( par == nullptr ) {
-        qDebug() << "in if";
+        // qDebug() << "in if";
         par = m_pTreeModel->invisibleRootItem();
-    } 
+    } else {
+		// update vaild status
+        // qDebug() << "reset data";
 
-    qDebug() << "in else";
-    // update vaild status
-    if ( par!=nullptr ) {
-        qDebug() << "reset data";
+
+		/*
         QString statusText(canConvertToInt ? "" : "invalid <int>");
         // par->setChild(pItem->row(),2, nullptr); // first delete it
 
         // add new
-        const auto isRootFlag = false;
+        const auto bIsRootFlag = false;
         const auto canEditable = false;
         const auto isValid = canConvertToInt;
-        auto errorItem = new mytreeitem(statusText, isRootFlag,canEditable,isValid);
+        auto errorItem = new mytreeitem(statusText, bIsRootFlag,canEditable,isValid);
         par->setChild(pItem->row(),2, errorItem);
+		*/
     }
 }
 
@@ -395,6 +455,8 @@ bool binarytreeview::loadTreeFromFile(const QString& filename, QString* pErrorSt
         }
     }
 
+
+    expandAll();
     return parseRet;
 }
 
@@ -463,7 +525,7 @@ bool binarytreeview::travelsalTreeView(QStandardItem* itemNode, rapidxml::xml_no
                 bavalue.append(nodeValue);
                 m_XmlStringList.push_back(bavalue);
 
-                auto attrValue = m_pXMLDoc->allocate_attribute("value", m_XmlStringList.last().constData() );
+                auto attrValue = m_pXMLDoc->allocate_attribute("text", m_XmlStringList.last().constData() );
                 ele_node->append_attribute(attrValue);
                 xmlparent->append_node(ele_node);
                 
@@ -502,11 +564,11 @@ bool binarytreeview::tryToBuildTree(QStandardItem* itemNode, rapidxml::xml_node<
             QString attrname = attr->name();
             QString attrvalue = attr->value();
             if ( attrIdx == 0 ) {
-                if ( attrname == "value" ) {
+                if ( attrname == "text" ) {
                     gotAttrValue = attrvalue;
                 } else {
                     if ( pErrorStr!=nullptr ) {
-                        *pErrorStr = "first attribute name != \"value\"";
+                        *pErrorStr = "first attribute name != \"text\"";
                     }
                 }
                 break;
@@ -560,12 +622,13 @@ bool binarytreeview::tryToBuildTree(QStandardItem* itemNode, rapidxml::xml_node<
         auto canEdit = false;
         auto nodeRoot = new mytreeitem(tagName ,isRootFlag, canEdit);
         itemNode->setChild(idx,0, nodeRoot);
+
         auto isRootFlag2nd = false;
         canEdit = true;
         itemNode->setChild(idx,1, new mytreeitem(gotAttrValue, isRootFlag2nd,canEdit) );
+
         auto isRootFlag3rd = false;
-        canEdit = false;
-        itemNode->setChild(idx,2, new mytreeitem("", isRootFlag3rd, canEdit) );
+        itemNode->setChild(idx,2,  new mytreeitem("", isRootFlag3rd, GlobalSetting::SPECIAL_COLUMN_EDITABLE )  );
         
         auto recursiveRet = tryToBuildTree(nodeRoot, child, pErrorStr, level+1);
         if ( !recursiveRet ) {
