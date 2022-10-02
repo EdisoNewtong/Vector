@@ -737,7 +737,7 @@ int main(int argc, char* argv[], char* env[])
 			if ( code >=0 && code <=127 ) {
 				printDetail(code);
 			} else {
-				cout << "Invalid Number Code , value is out of range : avaliable range is [0,127] ." << endl;
+				cout << "[ERROR] : Invalid Number Code , value is out of range : avaliable range is [0,127] ." << endl;
 				printUsage();
 			}
 		} else {
