@@ -30,7 +30,8 @@ SOURCES += \
         binarytreeview.cpp \
         mytreeitem.cpp \
 		mysettingbtndelegate.cpp \
-		globalSettings.cpp
+		globalSettings.cpp \
+        nodestylesettingdlg.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -38,13 +39,15 @@ HEADERS += \
         mytreeitem.h \
 		mysettingbtndelegate.h \
 		globalSettings.h \
+        nodestylesettingdlg.h \
         XmlParser/rapidxml.hpp \
         XmlParser/rapidxml_iterators.hpp \
         XmlParser/rapidxml_print.hpp \
         XmlParser/rapidxml_utils.hpp
 
 FORMS += \
-        mainwindow.ui
+        mainwindow.ui \
+        nodestylesettingdlg.ui
 
 INCLUDEPATH += XmlParser
 

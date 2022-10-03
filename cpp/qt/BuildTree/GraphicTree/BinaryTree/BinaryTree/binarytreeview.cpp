@@ -58,6 +58,16 @@ binarytreeview::binarytreeview(QWidget* parent /*= nullptr*/)
     // QStandardItemModel::itemChanged(QStandardItem *item)
     connect(m_pTreeModel, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(onTreeLeafItemEdited(QStandardItem*) ) );
 
+	// 
+	// Core Core Core
+	// When you want to edit a grid, you need to follow 2 steps : 
+	//    1. Single-click a certain grid to select it 
+	//    2. Double-click it for edit the content inside the grid
+	//
+	// But when the 1st step, the delegate appearance doesn't work
+	// The following code can let it work immediately
+	setEditTriggers( QAbstractItemView::CurrentChanged );
+
 
     m_pXMLDoc = new rapidxml::xml_document<char>();
 
@@ -447,7 +457,8 @@ bool binarytreeview::loadTreeFromFile(const QString& filename, QString* pErrorSt
         parseRet = tryToBuildTree(noneDisplayRoot, m_pXMLDoc, pErrorStr, 0);
     } catch ( const rapidxml::parse_error& error ) {
         if ( pErrorStr!=nullptr ) {
-            *pErrorStr = "Parse XML Failed";
+			const auto& errLineInfo = error.getErrorLineInfo();
+            *pErrorStr = QString("Parse XML Failed %1 . @%1:%2").arg( error.what() ).arg( errLineInfo.line_no ).arg( errLineInfo.col_no );
         }
     } catch ( ... ) {
         if ( pErrorStr!=nullptr ) {
@@ -556,7 +567,7 @@ bool binarytreeview::tryToBuildTree(QStandardItem* itemNode, rapidxml::xml_node<
             continue;
         }
 
-        QStandardItem* currentItem = nullptr;
+        // QStandardItem* currentItem = nullptr;
         QString tagName = child->name();
         QString gotAttrValue;
         auto attrIdx = 0;
@@ -584,7 +595,7 @@ bool binarytreeview::tryToBuildTree(QStandardItem* itemNode, rapidxml::xml_node<
         }
 
         auto bConvertFlag = false;
-        auto num = gotAttrValue.toInt(&bConvertFlag);
+        /* auto num = */ gotAttrValue.toInt(&bConvertFlag);
         if ( !bConvertFlag ) {
             if ( pErrorStr!=nullptr ) {
                 *pErrorStr = QString("can't convert string %1 to number").arg(gotAttrValue);

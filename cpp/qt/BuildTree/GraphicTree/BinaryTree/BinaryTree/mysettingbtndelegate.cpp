@@ -2,7 +2,12 @@
 
 #include <QPushButton>
 #include <QDebug>
+#include <QColorDialog>
+#include <QFontDialog>
+
+
 #include "globalSettings.h"
+#include "nodestylesettingdlg.h"
 
 mysettingbtndelegate::mysettingbtndelegate(QObject* parent /* = nullptr */ )
 	: QStyledItemDelegate(parent)
@@ -79,6 +84,7 @@ void mysettingbtndelegate::onSettingBtnClick(bool checked /* = false */)
 {
 	(void)checked;
 
+	/*
 	// QModelIndex
 	qDebug() << "On Btn Clicked ";
 	if ( !m_clickedBtnIdx.isValid() ) {
@@ -96,5 +102,29 @@ void mysettingbtndelegate::onSettingBtnClick(bool checked /* = false */)
 	}
 
     qDebug() << "data = " << m_clickedBtnIdx.siblingAtColumn(1).data().toString();
+	*/
+
+
+
+
+    /*
+	static int G_CNT = 0;
+	++G_CNT;
+    auto option = QColorDialog::ShowAlphaChannel;
+    if ( G_CNT % 2 == 1 ) {
+        qDebug() << "use option = ShowAlphaChannel";
+        option = QColorDialog::ShowAlphaChannel;
+    } else {
+        qDebug() << "use option = DontUseNativeDialog";
+        option = QColorDialog::DontUseNativeDialog;
+    }
+    QColorDialog::getColor( Qt::red, nullptr, tr("Pick your favourite the circle's brush color"), option);
+    */
+
+    // bool bIsOK = false;
+    // QFontDialog::getFont(&bIsOK, nullptr);
+	
+    auto dlg = new NodeStyleSettingDlg();
+    dlg->exec();
 
 }

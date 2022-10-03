@@ -47,7 +47,7 @@ namespace rapidxml
     */
     // Added by Edison , you can use <Space> instead of Tab
     /*const*/ int   print_use_space_count = 4; // none default
-    /*bool*/  bool  print_use_space_instead = false;
+    /*const*/ bool  print_use_space_instead = false;
 
     // Added by Edison
     void set_use_space_instead(bool b_flag, int space_cnt)
@@ -289,6 +289,9 @@ namespace rapidxml
         template<class OutIt, class Ch>
         inline OutIt print_attributes(OutIt out, const xml_node<Ch> *node, int flags)
         {
+            // Added by Edison
+            (void)flags;
+
             for (xml_attribute<Ch> *attribute = node->first_attribute(); attribute; attribute = attribute->next_attribute())
             {
                 if (attribute->name() && attribute->value())

@@ -133,7 +133,7 @@ void MainWindow::on_drawTreeBtn_clicked()
         }
 
         // Core Code , for Render line Antialiasing
-        ui->graphicsView->setRenderHint( QPainter::Antialiasing , true);
+        ui->graphicsView->setRenderHints( QPainter::Antialiasing | QPainter::TextAntialiasing );
 
         // level0 : Invisible Layer => layer.z = 0;
         auto iLevel = 0; 
@@ -388,7 +388,6 @@ qreal MainWindow::generateRenderObject(TreeNode* parentNode,myRectWithTextItem* 
 
     return widthSum;
 }
-
 
 
 

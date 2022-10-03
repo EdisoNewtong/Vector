@@ -68,7 +68,7 @@ void MainWindow::on_saveBtn_clicked()
     if ( !ret ) {
         // auto selmodel = ui->treeView->selectionModel();
         ui->statusBar->showMessage("Some value is invalid, Please Check", 3500);
-        ui->treeView->scrollTo((QModelIndex) errorIdx);
+        ui->treeView->scrollTo( static_cast<QModelIndex>(errorIdx) );
         
         // if ( selmodel!=nullptr ) {
         //     // QItemSelection qsel(errorIdx,errorIdx);
