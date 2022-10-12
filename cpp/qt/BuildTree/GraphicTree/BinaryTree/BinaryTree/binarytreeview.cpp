@@ -1,4 +1,6 @@
 #include "binarytreeview.h"
+
+#include "binarytreemodel.h"
 #include "mytreeitem.h"
 
 #include "rapidxml.hpp" // for xml generte use
@@ -12,7 +14,6 @@
 #include <QContextMenuEvent>
 
 #include <QStandardItem>
-#include <QStandardItemModel>
 #include <QRect>
 #include <QDebug>
 
@@ -26,8 +27,6 @@ binarytreeview::binarytreeview(QWidget* parent /*= nullptr*/)
     , m_pAddBothAct(nullptr)
     , m_pAddLeftAct(nullptr)
     , m_pAddRightAct(nullptr)
-    , m_pTreeModel(nullptr)
-	, m_btnDelegate(nullptr)
     , m_pXMLDoc(nullptr)
 {
     m_pPopupMenu = new QMenu(this);
@@ -36,27 +35,14 @@ binarytreeview::binarytreeview(QWidget* parent /*= nullptr*/)
     m_pAddLeftAct = m_pPopupMenu->addAction("Add Left Node");
     m_pAddRightAct = m_pPopupMenu->addAction("Add Right Node");
     m_pPopupMenu->addSeparator();
-    m_pDelteNodeAct = m_pPopupMenu->addAction("Delete select Node");
+    m_pDelteNodeAct = m_pPopupMenu->addAction("Delete Select Node");
 
     connect( m_pAddBothAct,   SIGNAL(triggered(bool)), this, SLOT(onAdd2NodesActionTrigger()) );
     connect( m_pAddLeftAct,   SIGNAL(triggered(bool)), this, SLOT(onAddLeftNodeActionTrigger()) );
     connect( m_pAddRightAct,  SIGNAL(triggered(bool)), this, SLOT(onAddRightNodeActionTrigger()) );
     connect( m_pDelteNodeAct, SIGNAL(triggered(bool)), this, SLOT(onDeleteNode()) );
 
-    m_pTreeModel = new QStandardItemModel();
-    this->setModel(m_pTreeModel);
-
-
-
-
-	// m_btnDelegate = nullptr;
-    m_btnDelegate = new mysettingbtndelegate(  this );
-    this->setItemDelegateForColumn( 2, m_btnDelegate );
-	// this->setItemDelegate( m_btnDelegate );
-
     initTreeView(true);
-    // QStandardItemModel::itemChanged(QStandardItem *item)
-    connect(m_pTreeModel, SIGNAL(itemChanged(QStandardItem*)), this, SLOT(onTreeLeafItemEdited(QStandardItem*) ) );
 
 	// 
 	// Core Core Core
@@ -67,7 +53,6 @@ binarytreeview::binarytreeview(QWidget* parent /*= nullptr*/)
 	// But when the 1st step, the delegate appearance doesn't work
 	// The following code can let it work immediately
 	setEditTriggers( QAbstractItemView::CurrentChanged );
-
 
     m_pXMLDoc = new rapidxml::xml_document<char>();
 
@@ -86,21 +71,6 @@ binarytreeview::~binarytreeview()
         selectionModel = nullptr;
     }
     
-    if ( m_pTreeModel  != nullptr ) {
-        m_pTreeModel->clear();
-
-        delete m_pTreeModel;
-        m_pTreeModel = nullptr;
-    }
-
-	if ( m_btnDelegate != nullptr ) {
-		// detach  delegate already existed    immediately
-		this->setItemDelegate( nullptr );
-		
-        delete m_btnDelegate;
-        m_btnDelegate = nullptr;
-	}
-
     if ( m_pXMLDoc!=nullptr ) {
         m_pXMLDoc->clear();
 
@@ -110,28 +80,29 @@ binarytreeview::~binarytreeview()
 }
 
 
-mytreeitem* binarytreeview::getSelectedNodeItem(int* pColInfo)
+QPair<QModelIndex,treenode*> binarytreeview::getSelectedNodeItem(int* pColInfo)
 {
     auto selLst = this->selectedIndexes();
-    mytreeitem* selitem = nullptr;
+    treenode* treeData = nullptr;
     if ( selLst.size() == 1 ) {
         auto selidx = selLst.at(0);
+        QModelIndex retIdx = selidx;
+
         auto nCol = selidx.column();
+
         if ( pColInfo!=nullptr ) {
             *pColInfo = nCol;
         }
 
         if ( nCol!=0 ) {
-            return nullptr;
+            return qMakePair(QModelIndex(), nullptr);
         }
         
-        QStandardItemModel* smodel = dynamic_cast<QStandardItemModel*>(this->model());
-        if ( smodel!=nullptr ) {
-            selitem = dynamic_cast<mytreeitem*>(smodel->itemFromIndex(selidx));
-        }
+		treeData = static_cast<treenode*>( selidx.internalPointer() );
+        return qMakePair(retIdx, treeData);
     }
 
-    return selitem;
+    return qMakePair(QModelIndex(), treeData);
 }
 
 void binarytreeview::contextMenuEvent(QContextMenuEvent* event) // Q_DECL_OVERRIDE;
@@ -139,44 +110,42 @@ void binarytreeview::contextMenuEvent(QContextMenuEvent* event) // Q_DECL_OVERRI
     QTreeView::contextMenuEvent(event);
 
     auto colInfo = -1;
-    mytreeitem* selitem = this->getSelectedNodeItem(&colInfo);
-    if ( colInfo != 0 ) {
+    auto selitemPr = this->getSelectedNodeItem(&colInfo);
+	auto modelidx = selitemPr.first;
+	auto treePtr = selitemPr.second;
+    if ( colInfo != 0 || !modelidx.isValid() || treePtr == nullptr ) {
         return;
     } 
 
-    auto selRect = this->visualRect( this->selectedIndexes().at(0) );
+    auto selRect = this->visualRect( modelidx );
     auto isCursorInside = selRect.isValid() && selRect.contains( event->pos() );
 
-    if ( isCursorInside && selitem!=nullptr ) {
-        // TODO : update Menu Action First
-        if ( selitem!=nullptr ) {
-            auto rootFlag = selitem->isRootNode();
+    if ( isCursorInside && treePtr!=nullptr ) {
+        if ( treePtr!=nullptr ) {
+
+			// set Context Menu Item for Deleting Operatation
+            auto rootFlag = treePtr->isRoot();
             m_pDelteNodeAct->setEnabled(!rootFlag);
 
-            auto nRows = selitem->rowCount();
-            if ( nRows == GlobalSetting::SPECIAL_COLUMN_INDEX ) {
+            auto childStatePr = treePtr->getChildState();
+			auto childCnt = childStatePr.first;
+            if ( childCnt == 2 ) {
                 m_pAddBothAct->setEnabled(false);
                 m_pAddLeftAct->setEnabled(false);
                 m_pAddRightAct->setEnabled(false);
-            } else if ( nRows == 1 ) {
-                auto child1st = selitem->child(0);
-                if ( child1st!=nullptr ) {
-                    auto txt = child1st->text();
-                    if ( txt == "left" ) {
-                        m_pAddBothAct->setEnabled(false);
-                        m_pAddLeftAct->setEnabled(false);
-                        m_pAddRightAct->setEnabled(true);
-                    } else if ( txt == "right" ) {
-                        m_pAddBothAct->setEnabled(false);
-                        m_pAddLeftAct->setEnabled(true);
-                        m_pAddRightAct->setEnabled(false);
-                    } else {
-                        m_pAddBothAct->setEnabled(false);
-                        m_pAddLeftAct->setEnabled(false);
-                        m_pAddRightAct->setEnabled(false);
-                    }
-                }
-            } else if ( nRows == 0 ) {
+            } else if ( childCnt == 1 ) {
+				m_pAddBothAct->setEnabled(false);
+				auto childTag = childStatePr.second;
+				if ( childTag == treenode::E_LEFT ) {
+					// Only has Left Child
+					m_pAddLeftAct->setEnabled(false);
+					m_pAddRightAct->setEnabled(true);
+				} else {
+					// Only has Right Child
+					m_pAddLeftAct->setEnabled(true);
+					m_pAddRightAct->setEnabled(false);
+				}
+            } else if ( childCnt == 0 ) {
                 m_pAddBothAct->setEnabled(true);
                 m_pAddLeftAct->setEnabled(true);
                 m_pAddRightAct->setEnabled(true);
@@ -189,177 +158,104 @@ void binarytreeview::contextMenuEvent(QContextMenuEvent* event) // Q_DECL_OVERRI
 }
 
 
-
-void binarytreeview::clearTree()
-{
-    if ( m_pTreeModel!=nullptr ) {
-        m_pTreeModel->clear();
-    }
-}
-
-
 void binarytreeview::initTreeView(bool needCreateRoot)
 {
-    // clear the data of the tree
-    if ( m_pTreeModel!=nullptr ) {
-        m_pTreeModel->clear();
-    }
-
-    QStringList headlst;
-    headlst.push_back("name");
-    headlst.push_back("text");
-    headlst.push_back("style");
-    m_pTreeModel->setHorizontalHeaderLabels(headlst);
-
-    auto invisibleRoot = m_pTreeModel->invisibleRootItem();
-    if ( invisibleRoot!=nullptr && needCreateRoot ) {
-        auto bIsRoot = true;
-		const auto canEditColumn0 = false;
-		const auto canEditColumn1 = true;
-
-        invisibleRoot->setChild(0,0, new mytreeitem("Root", bIsRoot, canEditColumn0) );
-
-		bIsRoot = false;
-        invisibleRoot->setChild(0,1, new mytreeitem("0", bIsRoot, canEditColumn1) );
-        invisibleRoot->setChild(0,2, new mytreeitem("0", bIsRoot, GlobalSetting::SPECIAL_COLUMN_EDITABLE )  );
-        // invisibleRoot->setChild(0,2, new QStandardItem() );
-    }
+	Q_UNUSED(needCreateRoot)
 
 
 }
 
 
-void binarytreeview::onDeleteNode()
+bool binarytreeview::onDeleteNode()
 {
     auto colInfo = -1;
-    mytreeitem* selitem = this->getSelectedNodeItem(&colInfo);
+	auto selItemPr = this->getSelectedNodeItem(&colInfo);
+	auto modelIdx = selItemPr.first;
+	auto treePtr = selItemPr.second;
     
-    if ( colInfo != 0  || selitem == nullptr || selitem->isRootNode() ) {
-        return;
+    if ( colInfo != 0  || !modelIdx.isValid()  || treePtr == nullptr || treePtr->isRoot() ) {
+        return false;
     }
 
-    auto nRow = selitem->row();
-    auto par = selitem->parent();
-    if ( par!=nullptr ) {
-        par->removeRow(nRow);
-    }
+
+	binarytreemodel* model = qobject_cast<binarytreemodel*>( this->model() );
+	if ( model != nullptr ) {
+		if ( model->delete_SelectedNode(modelIdx) ) {
+			return true;
+		}
+	}
+
+	return false;
+
 }
 
-void binarytreeview::onAdd2NodesActionTrigger()
+bool binarytreeview::onAdd2NodesActionTrigger()
 {
     auto colInfo = -1;
-    mytreeitem* selitem = this->getSelectedNodeItem(&colInfo);
-    if ( colInfo != 0 || selitem == nullptr  ) {
-        return;
+    auto selitemPr  = this->getSelectedNodeItem(&colInfo);
+	auto modelidx = selitemPr.first;
+	auto treePtr = selitemPr.second;
+
+    if ( colInfo != 0 || !modelidx.isValid() || treePtr == nullptr  ) {
+        return false;
     }
 
+    auto b1 = onAddLeftNodeActionTrigger();
+    auto b2 = onAddRightNodeActionTrigger();
+	auto bRet = b1 && b2;
+	if( bRet ) {
+		// TODO :
+	}
 
-	auto bIsRoot = false;
-	auto canEditColumn0 = false;
-	auto canEditColumn1 = true;
-
-	// Append Left Row
-    selitem->setChild(0,0, new mytreeitem("left", bIsRoot, canEditColumn0) );
-    selitem->setChild(0,1, new mytreeitem("0", bIsRoot, canEditColumn1) );
-	auto leftStyle = new mytreeitem("0", bIsRoot, GlobalSetting::SPECIAL_COLUMN_EDITABLE );
-	// auto leftStyle = new QStandardItem();
-    selitem->setChild(0,2, leftStyle);
-
-
-	// Append Right Row
-    selitem->setChild(1,0, new mytreeitem("right", bIsRoot, canEditColumn0) );
-    selitem->setChild(1,1, new mytreeitem("0", bIsRoot, canEditColumn1) );
-	auto rightStyle = new mytreeitem("0", bIsRoot, GlobalSetting::SPECIAL_COLUMN_EDITABLE );
-    selitem->setChild(1,2, rightStyle );
-
-    expand( selitem->index() );
+	return bRet;
 }
 
-void binarytreeview::onAddLeftNodeActionTrigger()
+bool binarytreeview::onAddLeftNodeActionTrigger()
 {
     auto colInfo = -1;
-    mytreeitem* selitem = this->getSelectedNodeItem(&colInfo);
-    if ( colInfo != 0 ) {
-        return;
-    }
-    
-	auto bIsRoot = false;
-	auto canEditColumn0 = false;
-	auto canEditColumn1 = true;
-    selitem->insertRow(0,  new mytreeitem("left", bIsRoot, canEditColumn0 ));
-    selitem->setChild(0,1, new mytreeitem("0", bIsRoot, canEditColumn1));
-	auto leftStyle =       new mytreeitem("0", bIsRoot, GlobalSetting::SPECIAL_COLUMN_EDITABLE );
-    selitem->setChild(0,2, leftStyle);
+	auto selItemPr = this->getSelectedNodeItem(&colInfo);
+	auto modelIdx = selItemPr.first;
+	auto treePtr = selItemPr.second;
 
-    expand( selitem->index() );
+    if ( colInfo != 0 || !modelIdx.isValid() || treePtr == nullptr ) {
+        return false;
+    }
+
+	
+	binarytreemodel* model = qobject_cast<binarytreemodel*>( this->model() );
+	if ( model != nullptr ) {
+        if ( model->create_AddLeftNode(modelIdx) ) {
+            expand( modelIdx );
+			return true;
+		}
+	}
+
+	return false;
 }
 
-void binarytreeview::onAddRightNodeActionTrigger()
+bool binarytreeview::onAddRightNodeActionTrigger()
 {
     auto colInfo = -1;
-    mytreeitem* selitem = this->getSelectedNodeItem(&colInfo);
-    if ( colInfo != 0   ) {
-        return;
+	auto selItemPr = this->getSelectedNodeItem(&colInfo);
+	auto modelIdx = selItemPr.first;
+	auto treePtr = selItemPr.second;
+
+    if ( colInfo != 0 || !modelIdx.isValid() || treePtr == nullptr ) {
+        return false;
     }
 
-    auto nRows = selitem->rowCount();
-    auto insertRowIdx = nRows == 0 ? 0 : 1; 
+	binarytreemodel* model = qobject_cast<binarytreemodel*>( this->model() );
+	if ( model != nullptr ) {
+        if ( model->create_AddRightNode(modelIdx) ) {
+            expand( modelIdx );
+			return true;
+		}
+	}
 
-	auto bIsRoot = false;
-	auto canEditColumn0 = false;
-	auto canEditColumn1 = true;
-
-    selitem->setChild(insertRowIdx,0, new mytreeitem("right", bIsRoot, canEditColumn0));
-    selitem->setChild(insertRowIdx,1, new mytreeitem("0", bIsRoot, canEditColumn1));
-	auto rightStyle =                 new mytreeitem("0", bIsRoot, GlobalSetting::SPECIAL_COLUMN_EDITABLE );
-    selitem->setChild(insertRowIdx,2, rightStyle);
-
-    expand( selitem->index() );
+	return false;
 }
 
-//
-// A grid is in Edited Done State
-//
-void binarytreeview::onTreeLeafItemEdited(QStandardItem* pItem)
-{
-    if ( pItem == nullptr || pItem->column()!=1 ) {
-        return;
-    }
 
-    // qDebug() << "row,col = " << pItem->row() << "," << pItem->column();
-    auto strAfterChanged = pItem->text();
-    // qDebug() << "strAfterChanged = " << strAfterChanged;
-    strAfterChanged = strAfterChanged.trimmed();
-    auto canConvertToInt = false;
-    if ( strAfterChanged.isEmpty() ) {
-         canConvertToInt = false;
-    } else {
-        strAfterChanged.toInt(&canConvertToInt);
-    }
-
-    // qDebug() << "calc par ==> ";
-    auto par = pItem->parent();
-    if ( par == nullptr ) {
-        // qDebug() << "in if";
-        par = m_pTreeModel->invisibleRootItem();
-    } else {
-		// update vaild status
-        // qDebug() << "reset data";
-
-
-		/*
-        QString statusText(canConvertToInt ? "" : "invalid <int>");
-        // par->setChild(pItem->row(),2, nullptr); // first delete it
-
-        // add new
-        const auto bIsRootFlag = false;
-        const auto canEditable = false;
-        const auto isValid = canConvertToInt;
-        auto errorItem = new mytreeitem(statusText, bIsRootFlag,canEditable,isValid);
-        par->setChild(pItem->row(),2, errorItem);
-		*/
-    }
-}
 
 
 
@@ -367,11 +263,12 @@ bool binarytreeview::prepareSavedContent(QString* pContent, QPersistentModelInde
 {
     m_XmlStringList.clear();
     m_valueSet.clear();
-    if( m_pTreeModel==nullptr ) {
+    binarytreemodel* model = qobject_cast<binarytreemodel*>( this->model() );
+    if( model == nullptr ) {
         return false;
     }
 
-    auto noneDisplayRoot = m_pTreeModel->invisibleRootItem();
+    QStandardItem* noneDisplayRoot = nullptr;
     if ( noneDisplayRoot == nullptr ) {
         return false;
     }
@@ -432,7 +329,8 @@ bool binarytreeview::loadTreeFromFile(const QString& filename, QString* pErrorSt
     initTreeView(needCreateRoot);
 
     m_XmlTextByteArray.clear();
-    if ( m_pXMLDoc == nullptr || m_pTreeModel == nullptr ) {
+	binarytreemodel* model = qobject_cast<binarytreemodel*>( this->model() );
+    if ( m_pXMLDoc == nullptr || model == nullptr ) {
         if ( pErrorStr!=nullptr ) {
             *pErrorStr = "XML Parse or Tree Model hasn't been prepared";
         }
@@ -453,7 +351,7 @@ bool binarytreeview::loadTreeFromFile(const QString& filename, QString* pErrorSt
         m_pXMLDoc->clear();
         m_pXMLDoc->parse<rapidxml::parse_full>( m_XmlTextByteArray.data() );
         
-        auto noneDisplayRoot = m_pTreeModel->invisibleRootItem();
+        QStandardItem* noneDisplayRoot = nullptr;
         parseRet = tryToBuildTree(noneDisplayRoot, m_pXMLDoc, pErrorStr, 0);
     } catch ( const rapidxml::parse_error& error ) {
         if ( pErrorStr!=nullptr ) {
@@ -465,7 +363,6 @@ bool binarytreeview::loadTreeFromFile(const QString& filename, QString* pErrorSt
             *pErrorStr = "Parse XML Failed for unexcepted reason";
         }
     }
-
 
     expandAll();
     return parseRet;
@@ -554,7 +451,8 @@ bool binarytreeview::travelsalTreeView(QStandardItem* itemNode, rapidxml::xml_no
 }
 
 
-bool binarytreeview::tryToBuildTree(QStandardItem* itemNode, rapidxml::xml_node<char>* xmlparent,QString* pErrorStr,int level)
+// bool binarytreeview::tryToBuildTree(treenode* itemNode,  rapidxml::xml_node<char>* xmlparent,QString* pErrorStr,int level)
+bool binarytreeview::tryToBuildTree(QStandardItem* itemNode,  rapidxml::xml_node<char>* xmlparent,QString* pErrorStr,int level)
 {
     if ( itemNode == nullptr || xmlparent == nullptr ) {
         return false;

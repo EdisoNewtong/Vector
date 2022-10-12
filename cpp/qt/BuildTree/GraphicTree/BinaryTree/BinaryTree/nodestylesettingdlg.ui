@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>826</width>
-    <height>321</height>
+    <width>805</width>
+    <height>327</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,9 +17,9 @@
    <property name="geometry">
     <rect>
      <x>440</x>
-     <y>280</y>
+     <y>271</y>
      <width>341</width>
-     <height>32</height>
+     <height>41</height>
     </rect>
    </property>
    <property name="orientation">
@@ -57,10 +57,10 @@
      <string>Fill Color :</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton">
+   <widget class="QPushButton" name="circleBrushSettingBtn">
     <property name="geometry">
      <rect>
-      <x>90</x>
+      <x>80</x>
       <y>30</y>
       <width>71</width>
       <height>31</height>
@@ -80,14 +80,14 @@
      </rect>
     </property>
     <property name="title">
-     <string>Pen Outline :</string>
+     <string>Pen Outline</string>
     </property>
     <widget class="QLabel" name="label_2">
      <property name="geometry">
       <rect>
        <x>20</x>
        <y>50</y>
-       <width>51</width>
+       <width>31</width>
        <height>31</height>
       </rect>
      </property>
@@ -95,10 +95,10 @@
       <string>Color :</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="pushButton_2">
+    <widget class="QPushButton" name="circlePenSettingBtn">
      <property name="geometry">
       <rect>
-       <x>80</x>
+       <x>60</x>
        <y>50</y>
        <width>61</width>
        <height>31</height>
@@ -113,7 +113,7 @@
       <rect>
        <x>20</x>
        <y>100</y>
-       <width>51</width>
+       <width>31</width>
        <height>31</height>
       </rect>
      </property>
@@ -121,117 +121,48 @@
       <string>Width :</string>
      </property>
     </widget>
-    <widget class="QDoubleSpinBox" name="doubleSpinBox">
+    <widget class="QDoubleSpinBox" name="circlePenWidthSetting">
      <property name="geometry">
       <rect>
-       <x>80</x>
+       <x>60</x>
        <y>100</y>
-       <width>61</width>
+       <width>91</width>
        <height>31</height>
       </rect>
      </property>
     </widget>
+    <widget class="QFrame" name="circlePen">
+     <property name="geometry">
+      <rect>
+       <x>130</x>
+       <y>50</y>
+       <width>21</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+    </widget>
    </widget>
-  </widget>
-  <widget class="QGroupBox" name="groupBox_3">
-   <property name="geometry">
-    <rect>
-     <x>230</x>
-     <y>10</y>
-     <width>171</width>
-     <height>251</height>
-    </rect>
-   </property>
-   <property name="title">
-    <string>Text Setting</string>
-   </property>
-   <widget class="QLabel" name="label_4">
+   <widget class="QFrame" name="circleBrush">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>40</y>
-      <width>71</width>
+      <x>160</x>
+      <y>30</y>
+      <width>21</width>
       <height>31</height>
      </rect>
     </property>
-    <property name="text">
-     <string>Font :</string>
+    <property name="frameShape">
+     <enum>QFrame::StyledPanel</enum>
     </property>
-   </widget>
-   <widget class="QPushButton" name="pushButton_3">
-    <property name="geometry">
-     <rect>
-      <x>70</x>
-      <y>40</y>
-      <width>71</width>
-      <height>31</height>
-     </rect>
+    <property name="frameShadow">
+     <enum>QFrame::Raised</enum>
     </property>
-    <property name="text">
-     <string>Set ...</string>
-    </property>
-   </widget>
-   <widget class="QGroupBox" name="groupBox_4">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>80</y>
-      <width>151</width>
-      <height>161</height>
-     </rect>
-    </property>
-    <property name="title">
-     <string>Text Color :</string>
-    </property>
-    <widget class="QLabel" name="label_5">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>100</y>
-       <width>51</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Width :</string>
-     </property>
-    </widget>
-    <widget class="QDoubleSpinBox" name="doubleSpinBox_2">
-     <property name="geometry">
-      <rect>
-       <x>80</x>
-       <y>100</y>
-       <width>61</width>
-       <height>31</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_6">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>50</y>
-       <width>51</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Color :</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="pushButton_4">
-     <property name="geometry">
-      <rect>
-       <x>80</x>
-       <y>50</y>
-       <width>61</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Set ...</string>
-     </property>
-    </widget>
    </widget>
   </widget>
   <widget class="QGroupBox" name="groupBox_5">
@@ -244,14 +175,14 @@
     </rect>
    </property>
    <property name="title">
-    <string>Connected Line</string>
+    <string>Connection</string>
    </property>
    <widget class="QGroupBox" name="groupBox_6">
     <property name="geometry">
      <rect>
-      <x>30</x>
-      <y>50</y>
-      <width>151</width>
+      <x>20</x>
+      <y>40</y>
+      <width>171</width>
       <height>161</height>
      </rect>
     </property>
@@ -271,12 +202,12 @@
       <string>Width :</string>
      </property>
     </widget>
-    <widget class="QDoubleSpinBox" name="doubleSpinBox_3">
+    <widget class="QDoubleSpinBox" name="connectionLineWidthSetting">
      <property name="geometry">
       <rect>
-       <x>80</x>
+       <x>70</x>
        <y>100</y>
-       <width>61</width>
+       <width>91</width>
        <height>31</height>
       </rect>
      </property>
@@ -294,10 +225,10 @@
       <string>Color :</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="pushButton_5">
+    <widget class="QPushButton" name="connectionLineSettingBtn">
      <property name="geometry">
       <rect>
-       <x>80</x>
+       <x>70</x>
        <y>50</y>
        <width>61</width>
        <height>31</height>
@@ -307,6 +238,103 @@
       <string>Set ...</string>
      </property>
     </widget>
+    <widget class="QFrame" name="linePen">
+     <property name="geometry">
+      <rect>
+       <x>140</x>
+       <y>50</y>
+       <width>21</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+    </widget>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_3">
+   <property name="geometry">
+    <rect>
+     <x>220</x>
+     <y>10</y>
+     <width>191</width>
+     <height>251</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Text Style Setting</string>
+   </property>
+   <widget class="QLabel" name="label_4">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>60</y>
+      <width>111</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Font :</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="textFontSettingBtn">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>60</y>
+      <width>51</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Set ...</string>
+    </property>
+   </widget>
+   <widget class="QFrame" name="textBrush">
+    <property name="geometry">
+     <rect>
+      <x>160</x>
+      <y>150</y>
+      <width>21</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::StyledPanel</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Raised</enum>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_5">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>150</y>
+      <width>71</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Text Color :</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="textBrushSettingBtn">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>150</y>
+      <width>71</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Set ...</string>
+    </property>
    </widget>
   </widget>
  </widget>

@@ -3,6 +3,11 @@
 
 #include <QMainWindow>
 #include <QGraphicsScene>
+#include <QModelIndex>
+#include <QGraphicsEllipseItem>
+
+#include "binarytreemodel.h"
+#include "mysettingbtndelegate.h"
 
 namespace Ui {
 class MainWindow;
@@ -30,10 +35,21 @@ private slots:
 
     void on_saveGraphicBtn_clicked();
 
+    void on_treeOptionBtn_clicked();
+
+    void on_drawTreeBtn_clicked();
+
 private:
     Ui::MainWindow *ui;
 
 	QGraphicsScene* m_pScene;
+
+	// TreeView related object
+	binarytreemodel* m_pTreeModel;
+	mysettingbtndelegate*  m_btnDelegate;  // styled delegate
+
+	void drawTreeBySelectedItem( const QModelIndex& selected, int level); 
+    QGraphicsEllipseItem* allocCircle(const qreal& r, const QString& text);
 };
 
 #endif // MAINWINDOW_H

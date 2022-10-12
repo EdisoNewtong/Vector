@@ -29,17 +29,23 @@ SOURCES += \
         mainwindow.cpp \
         binarytreeview.cpp \
         mytreeitem.cpp \
-		mysettingbtndelegate.cpp \
-		globalSettings.cpp \
-        nodestylesettingdlg.cpp
+        mysettingbtndelegate.cpp \
+        globalSettings.cpp \
+        nodestylesettingdlg.cpp \
+        nodestylecfg.cpp \
+        binarytreemodel.cpp \
+		treenode.cpp
 
 HEADERS += \
         mainwindow.h \
         binarytreeview.h \
         mytreeitem.h \
-		mysettingbtndelegate.h \
-		globalSettings.h \
+        mysettingbtndelegate.h \
+        globalSettings.h \
         nodestylesettingdlg.h \
+        nodestylecfg.h \
+        binarytreemodel.h \
+		treenode.h \
         XmlParser/rapidxml.hpp \
         XmlParser/rapidxml_iterators.hpp \
         XmlParser/rapidxml_print.hpp \

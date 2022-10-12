@@ -98,9 +98,9 @@
    <widget class="QPushButton" name="clearBtn">
     <property name="geometry">
      <rect>
-      <x>590</x>
+      <x>620</x>
       <y>600</y>
-      <width>140</width>
+      <width>81</width>
       <height>50</height>
      </rect>
     </property>
@@ -111,14 +111,40 @@
    <widget class="QPushButton" name="saveGraphicBtn">
     <property name="geometry">
      <rect>
-      <x>780</x>
+      <x>850</x>
       <y>600</y>
-      <width>141</width>
+      <width>81</width>
       <height>51</height>
      </rect>
     </property>
     <property name="text">
      <string>Save Picture</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="treeOptionBtn">
+    <property name="geometry">
+     <rect>
+      <x>500</x>
+      <y>600</y>
+      <width>91</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Tree Options ...</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="drawTreeBtn">
+    <property name="geometry">
+     <rect>
+      <x>736</x>
+      <y>600</y>
+      <width>81</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Draw</string>
     </property>
    </widget>
   </widget>

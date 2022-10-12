@@ -9,6 +9,8 @@
 #include "globalSettings.h"
 #include "nodestylesettingdlg.h"
 
+// static int G_CNT = 0;
+
 mysettingbtndelegate::mysettingbtndelegate(QObject* parent /* = nullptr */ )
 	: QStyledItemDelegate(parent)
 {
@@ -125,6 +127,8 @@ void mysettingbtndelegate::onSettingBtnClick(bool checked /* = false */)
     // QFontDialog::getFont(&bIsOK, nullptr);
 	
     auto dlg = new NodeStyleSettingDlg();
+	// TODO : replace defaultCfg to it's object property cfg
+	dlg->init( nodeStyleCfg::DefaultCfg() );
     dlg->exec();
 
 }
