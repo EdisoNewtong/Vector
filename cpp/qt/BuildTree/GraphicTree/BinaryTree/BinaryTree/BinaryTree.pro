@@ -28,7 +28,6 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
         binarytreeview.cpp \
-        mytreeitem.cpp \
         mysettingbtndelegate.cpp \
         globalSettings.cpp \
         nodestylesettingdlg.cpp \
@@ -39,7 +38,6 @@ SOURCES += \
 HEADERS += \
         mainwindow.h \
         binarytreeview.h \
-        mytreeitem.h \
         mysettingbtndelegate.h \
         globalSettings.h \
         nodestylesettingdlg.h \

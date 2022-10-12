@@ -39,6 +39,7 @@ MainWindow::MainWindow(QWidget *parent)
     m_btnDelegate = new mysettingbtndelegate( ui->treeView  );
     ui->treeView->setItemDelegateForColumn( GlobalSetting::SPECIAL_COLUMN_INDEX, m_btnDelegate );
 
+	ui->treeView->initEventHandler();
 }
 
 MainWindow::~MainWindow()
@@ -68,8 +69,8 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_newTreeBtn_clicked()
 {
-    auto needCreateRoot = true;
-    ui->treeView->initTreeView(needCreateRoot);
+    // auto needCreateRoot = true;
+    // ui->treeView->initTreeView(needCreateRoot);
 }
 
 void MainWindow::on_loadBtn_clicked()
@@ -80,17 +81,48 @@ void MainWindow::on_loadBtn_clicked()
         return;
     }
 
-    QString errorString;
-    auto ret = ui->treeView->loadTreeFromFile(filename, &errorString);
-    if ( !ret ) {
-        ui->statusBar->showMessage(errorString, 3500);
-    } else {
-        ui->statusBar->showMessage("Load Tree OK :)", 3500);
-    }
+	if ( m_pTreeModel != nullptr ) {
+		QString errorMsg;
+		if ( m_pTreeModel->loadFromFile(filename, &errorMsg) ) {
+			ui->statusBar->showMessage("Load Tree OK :)", 3500);
+			ui->treeView->expandAll();
+		} else {
+            ui->statusBar->showMessage(errorMsg, 3500);
+		}
+	}
+
 }
 
 void MainWindow::on_saveBtn_clicked()
 {
+	
+    auto savedfile = QFileDialog::getSaveFileName(this,"Save Binary Tree" ,QString(), tr("XML files (*.xml)"));
+    if ( savedfile.trimmed().isEmpty() ) {
+        return;
+    }
+
+	if ( m_pTreeModel != nullptr ) {
+		QString errorMsg;
+		QPersistentModelIndex errIdx;
+        if ( m_pTreeModel->saveToFile(savedfile, &errorMsg, errIdx) ) {
+			ui->statusBar->showMessage("Save Tree OK :)", 3500);
+		} else {
+            ui->statusBar->showMessage(errorMsg, 3500);
+
+			auto selmodel = ui->treeView->selectionModel();
+			if ( selmodel != nullptr ) {
+				QItemSelection selRange( errIdx, errIdx );
+				selmodel->select( selRange,  QItemSelectionModel::Select);
+				ui->treeView->scrollTo( static_cast<QModelIndex>(errIdx) );
+			}
+
+		}
+	}
+	
+
+
+
+	/*
     QString xmlcontent;
     QPersistentModelIndex errorIdx;
     auto ret = ui->treeView->prepareSavedContent(&xmlcontent,errorIdx);
@@ -128,6 +160,7 @@ void MainWindow::on_saveBtn_clicked()
     } else {
         ui->statusBar->showMessage("Failed on saving file", 3500);
     }
+	*/
 
 
 }

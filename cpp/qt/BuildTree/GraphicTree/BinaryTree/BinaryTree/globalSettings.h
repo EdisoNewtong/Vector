@@ -9,6 +9,11 @@ namespace GlobalSetting
 	extern const int  SPECIAL_COLUMN_INDEX;
 	extern const bool SPECIAL_COLUMN_EDITABLE;
 
+	extern const QString ROOT_TAG;
+	extern const QString LEFT_TAG;
+	extern const QString RIGHT_TAG;
+	extern const QString TEXT_TAG;
+
 	extern const QBrush CIRCLE_BRUSH;
 	extern const QPen CIRCLE_OUTLINE;
 	extern const QFont TEXT_FONT;

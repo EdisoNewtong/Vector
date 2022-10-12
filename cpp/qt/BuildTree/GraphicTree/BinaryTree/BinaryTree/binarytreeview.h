@@ -3,21 +3,14 @@
 
 #include <QTreeView>
 #include <QModelIndex>
-#include <QStringList>
-#include <QPersistentModelIndex>
-#include <QVector>
-#include <QByteArray>
-#include <QSet>
-
 
 #include "treenode.h"
 
 class QMenu;
 class QAction;
 class QContextMenuEvent;
-// class QStandardItemModel;
 class QStandardItem;
-// class mytreeitem;
+
 
 
 namespace rapidxml {
@@ -33,16 +26,18 @@ public:
     explicit binarytreeview(QWidget* parent = nullptr);
     virtual ~binarytreeview();
 
-    void initTreeView(bool needCreateRoot);
-
-    bool prepareSavedContent(QString* pContent,QPersistentModelIndex& errorIdx);
-    bool loadTreeFromFile(const QString& filename, QString* pErrorStr);
-
+	void initEventHandler();
 public slots:
-    bool onDeleteNode();
-    bool onAdd2NodesActionTrigger();
-    bool onAddLeftNodeActionTrigger();
-    bool onAddRightNodeActionTrigger();
+    void onDeleteNode();
+    void onAdd2NodesActionTrigger();
+    void onAddLeftNodeActionTrigger();
+    void onAddRightNodeActionTrigger();
+
+signals:
+	void addLeftNode(const QModelIndex& rightClickParentNode);
+	void addRightNode(const QModelIndex& rightClickParentNode);
+	void addBothNodes(const QModelIndex& rightClickParentNode);
+	void deleteNode(const QModelIndex& rightClickCurrentNode);
 
 protected:
     void contextMenuEvent(QContextMenuEvent* event) Q_DECL_OVERRIDE;
@@ -55,15 +50,6 @@ protected:
     QAction*    m_pAddLeftAct;   // add only left node
     QAction*    m_pAddRightAct;  // add only right node
 
-    rapidxml::xml_document<char>* m_pXMLDoc;
-    QVector<QByteArray> m_XmlStringList;
-
-    QByteArray          m_XmlTextByteArray;
-    QSet<int>           m_valueSet;
-
-    bool travelsalTreeView(QStandardItem* itemNode, rapidxml::xml_node<char>* xmlparent,QPersistentModelIndex& errorIdx,int level);
-    bool tryToBuildTree(QStandardItem* itemNode, rapidxml::xml_node<char>* xmlparent,QString* pErrorStr,int level);
-    // bool tryToBuildTree(treenode* itemNode, rapidxml::xml_node<char>* xmlparent,QString* pErrorStr,int level);
 
 };
 

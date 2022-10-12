@@ -2,8 +2,12 @@
 
 #include <QAbstractItemModel>
 #include <QVariant>
+#include <QPersistentModelIndex>
+#include <QVector>
+#include <QByteArray>
 
 #include "treenode.h"
+#include "rapidxml.hpp" // for xml generte use
 
 class binarytreemodel : public QAbstractItemModel
 {
@@ -41,14 +45,27 @@ public:
                  int role = Qt::EditRole) Q_DECL_OVERRIDE;
 
 
+	//
+	// File Operatation
+	//
+	bool loadFromFile(const QString& filename, QString* pErrorStr);
+	bool saveToFile(const QString& filenameToSave, QString* pErrorStr, QPersistentModelIndex& errorIdx );
+
+
+
 	void clear();
 
-	bool create_AddLeftNode( const QModelIndex& parent);
+protected slots:
+	bool create_AddLeftNode(const QModelIndex& parent);
 	bool create_AddRightNode(const QModelIndex& parent);
+	bool create_BothNodes(const QModelIndex& parent);
+
 	bool delete_SelectedNode(const QModelIndex& selectedItem);
+protected:
 
-
-
+	// recursively call
+	void travelsalNodeForWriting(treenode* node, rapidxml::xml_node<char>* xmlparent, int level);
+	void buildNodeFromReading(treenode* node, rapidxml::xml_node<char>* xmlparent, int level);
 protected:
 	// invisible Root node
 	treenode* m_pInvisibleRootItem;
@@ -56,9 +73,11 @@ protected:
 	// the very beginning root which is shown in the treeView
 	treenode* m_pRoot;
 
-public:
-	static const QString sc_ROOT_TEXT;
-	static const QString sc_LEFT_TEXT;
-	static const QString sc_RIGHT_TEXT;
+	// save to xml file
+    rapidxml::xml_document<char>* m_pXMLDoc;
+
+    QVector<QByteArray> m_XmlStringList;
+	QByteArray          m_XmlFileContent;
+
 
 };

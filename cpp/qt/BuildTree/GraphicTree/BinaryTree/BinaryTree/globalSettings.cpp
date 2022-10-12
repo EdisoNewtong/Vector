@@ -7,6 +7,12 @@ namespace GlobalSetting
 	extern const bool SPECIAL_COLUMN_EDITABLE = true;
 
 
+	extern const QString ROOT_TAG("root");
+	extern const QString LEFT_TAG("left");
+	extern const QString RIGHT_TAG("right");
+	extern const QString TEXT_TAG("text");
+
+
 	extern const QBrush CIRCLE_BRUSH = QBrush(Qt::red);
     extern const QPen CIRCLE_OUTLINE = QPen( QBrush(Qt::black), 1 );
 	extern const QFont TEXT_FONT = QFont("SimSun", 9);
