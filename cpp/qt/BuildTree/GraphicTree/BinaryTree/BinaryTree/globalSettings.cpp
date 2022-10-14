@@ -19,8 +19,9 @@ namespace GlobalSetting
     extern const QBrush TEXT_COLOR = QBrush(Qt::blue);
 
 
-	extern const qreal CIRCLE_RADIUS = 30.0;
-	extern const qreal DISTANCE_BETWEEN_LEFTRIGHT = 35.0;
+	extern const qreal CIRCLE_RADIUS = 40.0;
+    extern const qreal DISTANCE_BETWEEN_LEFTRIGHT = 20.0;
+    extern const qreal DISTANCE_BETWEEN_RIGHT__LEFT = 35.0;
 	extern const qreal HEIGHT_BETWEEN_PARENT_AND_CHILDREN = 23.0;
 
 

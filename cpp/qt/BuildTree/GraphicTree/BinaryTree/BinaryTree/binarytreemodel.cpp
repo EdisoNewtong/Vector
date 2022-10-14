@@ -1,5 +1,7 @@
 #include <QVariant>
 #include <QFile>
+#include <QDebug>
+#include <QMapIterator>
 #include "binarytreemodel.h"
 #include "globalSettings.h"
 
@@ -46,14 +48,21 @@
 binarytreemodel::binarytreemodel(QObject* parent /* = nullptr*/ )
     : QAbstractItemModel(parent)
 {
+
+	m_renderCircleMap.clear();
+	m_allNodes.clear();
+
 	// invisible Root
 	m_pInvisibleRootItem = new treenode( QString(), nullptr, true);
 	// the very beginning  Root Node
     m_pRoot = m_pInvisibleRootItem->addLeftNode( QString("0") );
+	// Core Core Core : travelsal the whole tree once
+	updateDepthAndHeight( m_pRoot );
 
 	m_pXMLDoc = new rapidxml::xml_document<char>();
 	m_pXMLDoc->clear();
 	m_XmlStringList.clear();
+
 }
 
 
@@ -76,7 +85,7 @@ binarytreemodel::~binarytreemodel() // Q_DECL_OVERRIDE
 int binarytreemodel::rowCount(const QModelIndex &parent /* = QModelIndex() */) const // override;
 {
 	if ( !parent.isValid() ) {
-		return 1;
+		return m_pRoot!=nullptr ? 1 : 0;
 	}
 
 	treenode* parentNode = static_cast<treenode*>( parent.internalPointer() );
@@ -179,14 +188,10 @@ QModelIndex binarytreemodel::index(int row, int column, const QModelIndex &paren
 		if ( leftnode!=nullptr && rightnode!=nullptr ) {
 			if ( row == 0 ) {
 				currentNode = leftnode;
-				// return createIndex(0, column, leftnode);
 			} else {
 				currentNode = rightnode;
-				// row == 1
-				// return createIndex(1, column, rightnode);
 			}
 		} else if ( leftnode!=nullptr || rightnode!=nullptr ) {
-			// return createIndex(0, column, leftnode!=nullptr ? leftnode : rightnode);
 			currentNode = (leftnode != nullptr ? leftnode : rightnode);
 		} else {
 			// return QModelIndex();
@@ -276,6 +281,9 @@ bool binarytreemodel::create_AddLeftNode( const QModelIndex& parent)
 	beginInsertRows(parent, 0, 0);
     parentNode->addLeftNode("0");
 	endInsertRows();
+
+	updateDepthAndHeight( m_pRoot );
+
 	return true;
 
 }
@@ -300,6 +308,9 @@ bool binarytreemodel::create_AddRightNode(const QModelIndex& parent)
 	beginInsertRows(parent, position, position);
     parentNode->addRightNode( QString("0") );
 	endInsertRows();
+
+	updateDepthAndHeight( m_pRoot );
+
 	return true;
 }
 
@@ -357,6 +368,8 @@ bool binarytreemodel::delete_SelectedNode(const QModelIndex& selectedItem)
         parentNode->deleteRightNode();
 	}
 	endRemoveRows();
+
+	updateDepthAndHeight( m_pRoot );
 
 	return true;
 
@@ -437,6 +450,8 @@ bool binarytreemodel::loadFromFile(const QString& filename, QString* pErrorStr)
 	int level = 0;
 	buildNodeFromReading( m_pInvisibleRootItem, m_pXMLDoc, level );
 	endResetModel();
+
+	updateDepthAndHeight( m_pRoot );
 
 	return true;
 }
@@ -589,7 +604,169 @@ void binarytreemodel::buildNodeFromReading(treenode* parentNode, rapidxml::xml_n
 }
 
 
-void binarytreemodel::clear()
+
+bool binarytreemodel::isTreeOnlyHasRoot()
 {
-// TODO :
+	return      m_pRoot!=nullptr &&
+		       (m_pRoot->leftNode() == nullptr 
+			&& m_pRoot->rightNode() == nullptr);
+}
+
+
+void binarytreemodel::generateANewTree()
+{
+	if ( m_pInvisibleRootItem != nullptr ) {
+		beginResetModel();
+
+		m_pInvisibleRootItem->deleteLeftNode();
+		m_pRoot = m_pInvisibleRootItem->addLeftNode( QString("0") );
+
+		endResetModel();
+	}
+}
+
+
+//                                         以被UI层选中的结点为 根结点 ， 构建一颗树
+void binarytreemodel::updateDepthAndHeight(treenode* selectedRootNode)
+{
+    using namespace GlobalSetting;
+	if ( selectedRootNode == nullptr ) {
+		return;
+	}
+
+
+	m_renderCircleMap.clear();
+
+	auto isLeftNode = true;
+	int wholeTreeHeight = calcTreeNodeDepthAndHeight( selectedRootNode, isLeftNode, 0);
+	// qDebug() << "wholeTreeHeight = " << wholeTreeHeight;
+	// Q_UNUSED(wholeTreeHeight)
+
+
+	/****************************************************************************************************
+	  Core Core Core :
+
+	    从树的最底层开始, 依次从下自上的逐层进行 计算，假定这是一颗[**满**]二叉树(除了树叶结点外，其他结点都有左右2个儿子结点)  
+		因此计算 树中各个结点的位置 相对方便一些
+		因为计算完下层后，上层的根的水平位置为是2个儿子结点的中点处
+
+
+	*/
+	QVector< QVector< QPair<double,double> > > measurement;
+	measurement.resize( wholeTreeHeight + 1);
+
+	QMapIterator<int, QVector<treenode*> > reverseIt( m_renderCircleMap );
+	reverseIt.toBack();
+	while ( reverseIt.hasPrevious() ) {
+		reverseIt.previous();
+		int depth = reverseIt.key();
+		qDebug() << depth << ". ";
+
+		int nodeFullCnt = 1;
+		for( int i = 0; i < depth; ++i ) {
+			nodeFullCnt *= 2;
+		}
+
+		// calculate center point position
+		measurement[depth].clear();
+		double h = (CIRCLE_RADIUS * 2 + HEIGHT_BETWEEN_PARENT_AND_CHILDREN) * depth + CIRCLE_RADIUS;
+		if ( depth == wholeTreeHeight ) {
+			double x = 0.0;
+			for( int i = 0; i < nodeFullCnt; ++i ) {
+				x += CIRCLE_RADIUS;
+                measurement[depth].push_back( qMakePair(x, h) );
+
+				// next : move delta step which distance with (a radius + a gap)
+				x += CIRCLE_RADIUS;
+				double gap = (i%2 == 0) ? DISTANCE_BETWEEN_LEFTRIGHT : DISTANCE_BETWEEN_RIGHT__LEFT;
+				x += gap;
+			}
+		} else {
+			for( int i = 0; i < nodeFullCnt; ++i ) {
+				auto leftChildIdx  = i*2;
+                auto rightChildIdx = leftChildIdx + 1;
+				auto leftCx = measurement[depth+1][leftChildIdx].first;
+				auto rightCx = measurement[depth+1][rightChildIdx].first;
+				auto centerX = (leftCx + rightCx) / 2.0;
+                measurement[depth].push_back( qMakePair(centerX, h) );
+			}
+		}
+
+
+		for( auto ndIt = reverseIt.value().begin(); ndIt != reverseIt.value().end(); ++ndIt ) {
+			treenode* nd = *ndIt;
+			if ( nd !=nullptr ) {
+				auto layerIdx = nd->layerIdx();
+				nd->setCenterPt_x( measurement[depth][layerIdx].first );
+				nd->setCenterPt_y( measurement[depth][layerIdx].second );
+				qDebug() << "\t" << nd->text() << ", l-idx = "<< layerIdx <<", (" << nd->x() << "," << nd->y() << ")";
+			}
+		}
+
+	}
+
+	
+	
+
+}
+
+int binarytreemodel::calcTreeNodeDepthAndHeight(treenode* node, bool leftTag, int layer)
+{
+	auto printDebugInfo = true;
+	if ( node == nullptr ) {
+		return -1;
+	}
+
+	// 使用 [先根遍历]   根-左-右
+	node->setDepth( layer );
+
+	if ( layer == 0 ) {
+		node->setLayerIdx( 0 );
+	} else {
+		auto parent = node->parent();
+		if ( parent != nullptr ) {
+			node->setLayerIdx( parent->layerIdx() * 2 + (leftTag ? 0 : 1) );
+		}
+	}
+
+
+	auto it = m_renderCircleMap.find( layer );
+	if ( it == m_renderCircleMap.end() ) {
+		QVector<treenode*> vec;
+		vec.push_back( node );
+
+		m_renderCircleMap.insert( layer, vec);
+	} else {
+		it.value().push_back( node );
+	}
+
+
+	int leftTreeHeight  = calcTreeNodeDepthAndHeight( node->leftNode(), true,  layer+1 );
+	int rightTreeHeight = calcTreeNodeDepthAndHeight( node->rightNode(),false, layer+1 );
+	int maxH = leftTreeHeight > rightTreeHeight ? leftTreeHeight : rightTreeHeight;
+	maxH += 1;
+	node->setHeight( maxH );
+
+	if ( printDebugInfo ) {
+		qDebug() << "node.text = " << node->text() << ", dep = " << node->depth() << ", h = " << node->height() << ", l-idx = " << node->layerIdx();
+	}
+
+	return maxH;
+}
+
+
+/*
+    
+*/
+const QVector<treenode*>& binarytreemodel::getTreeNodes()
+{
+	m_allNodes.clear();
+	for ( auto mpPrIt = m_renderCircleMap.begin(); mpPrIt != m_renderCircleMap.end(); ++mpPrIt )
+	{
+		for( auto nodeIt = mpPrIt.value().begin(); nodeIt != mpPrIt.value().end(); ++nodeIt ) {
+			m_allNodes.push_back( *nodeIt );
+		}
+	}
+
+	return m_allNodes;
 }

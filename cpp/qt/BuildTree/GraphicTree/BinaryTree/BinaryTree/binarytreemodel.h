@@ -5,6 +5,7 @@
 #include <QPersistentModelIndex>
 #include <QVector>
 #include <QByteArray>
+#include <QMap>
 
 #include "treenode.h"
 #include "rapidxml.hpp" // for xml generte use
@@ -51,10 +52,13 @@ public:
 	bool loadFromFile(const QString& filename, QString* pErrorStr);
 	bool saveToFile(const QString& filenameToSave, QString* pErrorStr, QPersistentModelIndex& errorIdx );
 
+	bool isTreeOnlyHasRoot();
+	void generateANewTree();
 
 
-	void clear();
-
+	// void updateSelectedDepthAndHeight( const QModelIndex& selectedRootNode );
+	void updateDepthAndHeight( treenode* selectedRootNode);
+    const QVector<treenode*>& getTreeNodes();
 protected slots:
 	bool create_AddLeftNode(const QModelIndex& parent);
 	bool create_AddRightNode(const QModelIndex& parent);
@@ -66,6 +70,8 @@ protected:
 	// recursively call
 	void travelsalNodeForWriting(treenode* node, rapidxml::xml_node<char>* xmlparent, int level);
 	void buildNodeFromReading(treenode* node, rapidxml::xml_node<char>* xmlparent, int level);
+
+	int  calcTreeNodeDepthAndHeight(treenode* node, bool leftTag, int layer);
 protected:
 	// invisible Root node
 	treenode* m_pInvisibleRootItem;
@@ -75,6 +81,10 @@ protected:
 
 	// save to xml file
     rapidxml::xml_document<char>* m_pXMLDoc;
+
+	QMap<int, QVector<treenode*> > m_renderCircleMap;
+	QVector<treenode*>             m_allNodes;
+
 
     QVector<QByteArray> m_XmlStringList;
 	QByteArray          m_XmlFileContent;

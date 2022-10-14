@@ -26,7 +26,10 @@ public:
     explicit binarytreeview(QWidget* parent = nullptr);
     virtual ~binarytreeview();
 
+
 	void initEventHandler();
+
+    QPair<QModelIndex,treenode*> getSelectedNodeItem(int* pColInfo);
 public slots:
     void onDeleteNode();
     void onAdd2NodesActionTrigger();
@@ -41,7 +44,6 @@ signals:
 
 protected:
     void contextMenuEvent(QContextMenuEvent* event) Q_DECL_OVERRIDE;
-    QPair<QModelIndex,treenode*> getSelectedNodeItem(int* pColInfo);
 
     QMenu*      m_pPopupMenu;
 

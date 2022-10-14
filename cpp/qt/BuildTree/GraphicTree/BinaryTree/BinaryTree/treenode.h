@@ -25,6 +25,10 @@ protected:
 
 	int       m_depth;
 	int       m_height;
+	int       m_layerIdx;
+
+	double    m_centerPt_x;
+	double    m_centerPt_y;
 
 
 	bool      m_isInvisibleRoot;
@@ -52,8 +56,16 @@ public:
 
 	int depth();
 	int height();
+	int layerIdx();
+	double x();
+	double y();
+
 	void setDepth(int depth);
 	void setHeight(int height);
+	void setLayerIdx(int idx);
+	void setCenterPt_x(double x);
+	void setCenterPt_y(double y);
+
+
 
 };
-

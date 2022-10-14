@@ -12,6 +12,9 @@ treenode::treenode(const QString& text, treenode* parent, bool isInvisibleRoot /
 	, m_graphicsRenderObject( nullptr )
 	, m_depth( 0 )
 	, m_height( 0 )
+	, m_layerIdx( 0 )
+	, m_centerPt_x(0.0)
+	, m_centerPt_y(0.0)
 	, m_isInvisibleRoot( isInvisibleRoot )
 {
 	qDebug() << "Alloc " << ++G_NODE_CNT << " self-defined treenode";
@@ -153,22 +156,14 @@ QPair<int,treenode::E_ChildType> treenode::getChildState()
 	
 }
 
-int treenode::depth()
-{
-	return m_depth;
-}
+int treenode::depth()    { return m_depth; }
+int treenode::height()   { return m_height; }
+int treenode::layerIdx() { return m_layerIdx; }
+double treenode::x()     { return m_centerPt_x; }
+double treenode::y()     { return m_centerPt_y; }
 
-int treenode::height()
-{
-	return m_height;
-}
-
-void treenode::setDepth(int depth)
-{
-	m_depth = depth;
-}
-
-void treenode::setHeight(int height)
-{
-	m_height = height;
-}
+void treenode::setDepth(int depth)   { m_depth = depth; }
+void treenode::setHeight(int height) { m_height = height; }
+void treenode::setLayerIdx(int idx)  { m_layerIdx = idx; }
+void treenode::setCenterPt_x(double x)     { m_centerPt_x = x; }
+void treenode::setCenterPt_y(double y)     { m_centerPt_y = y; }

@@ -22,6 +22,7 @@ namespace GlobalSetting
 
 	extern const qreal CIRCLE_RADIUS;
 	extern const qreal DISTANCE_BETWEEN_LEFTRIGHT;
+	extern const qreal DISTANCE_BETWEEN_RIGHT__LEFT;
 	extern const qreal HEIGHT_BETWEEN_PARENT_AND_CHILDREN;
 
 

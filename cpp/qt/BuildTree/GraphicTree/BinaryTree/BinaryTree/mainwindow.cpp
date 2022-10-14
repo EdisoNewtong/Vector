@@ -10,6 +10,7 @@
 #include <QBrush>
 #include <QFontMetricsF>
 #include <QGraphicsLineItem>
+#include <QMessageBox>
 
 #include "globalSettings.h"
 
@@ -26,7 +27,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-	m_pScene = new QGraphicsScene(0.0 , 0.0, 800.0, 600.0, ui->graphicsView );
+	m_pScene = new QGraphicsScene(0.0 , 0.0, 1600.0, 900.0, ui->graphicsView );
 	// m_pScene->setBackgroundBrush( Qt::white ); /* Qt::blue */
 
 	ui->graphicsView->setScene( m_pScene );
@@ -69,19 +70,41 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_newTreeBtn_clicked()
 {
-    // auto needCreateRoot = true;
-    // ui->treeView->initTreeView(needCreateRoot);
+	auto makeSureCreateNewTree = true;
+	if ( m_pTreeModel != nullptr && !m_pTreeModel->isTreeOnlyHasRoot() ) {
+		auto ret = QMessageBox::question(this, tr("Discard Current Tree ?"), 
+				                    tr("The tree already has left/right nodes.\nAre you sure destroy it and rebuild a new tree ?") );
+
+		makeSureCreateNewTree = (ret == QMessageBox::Yes);
+	}
+
+	if ( makeSureCreateNewTree ) {
+		 m_pTreeModel->generateANewTree();
+	}
 }
 
 void MainWindow::on_loadBtn_clicked()
 {
     // QString	getOpenFileName(QWidget * parent = 0, const QString & caption = QString(), const QString & dir = QString(), const QString & filter = QString(), QString * selectedFilter = 0, Options options = 0)
-    const auto filename = QFileDialog::getOpenFileName(this,"Load Tree From File");
-    if ( filename.trimmed().isEmpty() ) {
-        return;
-    }
 
 	if ( m_pTreeModel != nullptr ) {
+		auto makeSureCreateNewTree = true;
+		if ( !m_pTreeModel->isTreeOnlyHasRoot() ) {
+			auto ret = QMessageBox::question(this, tr("Discard Current Tree ?"), 
+										tr("The tree already has left/right nodes.\nAre you sure destroy it and load a new tree from file ?") );
+
+			makeSureCreateNewTree = (ret == QMessageBox::Yes);
+		}
+
+		if ( !makeSureCreateNewTree ) {
+			return;
+		}
+
+		const auto filename = QFileDialog::getOpenFileName(this,"Load Tree From File");
+		if ( filename.trimmed().isEmpty() ) {
+			return;
+		}
+
 		QString errorMsg;
 		if ( m_pTreeModel->loadFromFile(filename, &errorMsg) ) {
 			ui->statusBar->showMessage("Load Tree OK :)", 3500);
@@ -119,49 +142,6 @@ void MainWindow::on_saveBtn_clicked()
 		}
 	}
 	
-
-
-
-	/*
-    QString xmlcontent;
-    QPersistentModelIndex errorIdx;
-    auto ret = ui->treeView->prepareSavedContent(&xmlcontent,errorIdx);
-    if ( !ret ) {
-        // auto selmodel = ui->treeView->selectionModel();
-        ui->statusBar->showMessage("Some value is invalid, Please Check", 3500);
-        ui->treeView->scrollTo( static_cast<QModelIndex>(errorIdx) );
-        
-        // if ( selmodel!=nullptr ) {
-        //     // QItemSelection qsel(errorIdx,errorIdx);
-        //     // qDebug() << "selmodel != nullptr";
-        //     // selmodel->select(qsel,QItemSelectionModel::Select);
-        // } else {
-        //     qDebug() << "selmodel == nullptr";
-        // }
-        return;
-    }
-
-//    qDebug() << "Parse Binary Tree Successful";
-//    qDebug() << R"(content =
-//==================================================)";
-//    qDebug() << xmlcontent;
-//    qDebug() << "==================================================)";
-
-    // static
-    auto savedfile = QFileDialog::getSaveFileName(this,"Save Tree Info" ,QString(), tr("XML files (*.xml)"));
-    if ( savedfile.trimmed().isEmpty() ) {
-        return;
-    }
-
-    QFile fileToSave(savedfile);
-    if ( fileToSave.open(QIODevice::WriteOnly) ) {
-        fileToSave.write( xmlcontent.toUtf8() );
-        ui->statusBar->showMessage("Saved :)", 2500);
-    } else {
-        ui->statusBar->showMessage("Failed on saving file", 3500);
-    }
-	*/
-
 
 }
 
@@ -214,126 +194,46 @@ void MainWindow::drawTreeBySelectedItem(const QModelIndex& selected, int level)
 
 void MainWindow::on_drawTreeBtn_clicked()
 {
-	/*
-    auto selmodel = ui->treeView->selectionModel();
-    if ( selmodel!=nullptr ) {
-        auto currentSelectedItem = selmodel->currentIndex();
-        if ( !currentSelectedItem.isValid() ) {
-            qDebug() << "Please Select at least 1 item! ";
-            return;
-        }
-
-        // pick the item at the 0 column item
-        if ( currentSelectedItem.column() != 0 ) {
-            currentSelectedItem = currentSelectedItem.siblingAtColumn( 0 );
-        }
-
-
-        drawTreeBySelectedItem(currentSelectedItem, 0 );
-
-    }
-	*/
-
 	using namespace GlobalSetting;
 
+	if ( m_pTreeModel != nullptr ) {
+		int selectedCol = 0;
+		auto pr = ui->treeView->getSelectedNodeItem(&selectedCol);
+		auto selectedTreeNode = pr.second;
+		if ( selectedTreeNode == nullptr ) {
+			qDebug() << "Selected Node is invalid";
+			return;
+		}
 
-	// 5th layer
-	// QGraphicsEllipseItem* ndList5th[16] = { nullptr }; 
+		m_pTreeModel->updateDepthAndHeight( selectedTreeNode );
+		const auto& nodevec = m_pTreeModel->getTreeNodes();
 
+		for( auto nd = nodevec.begin(); nd != nodevec.end(); ++nd ) 
+		{
+			treenode* node = *nd;
+			if ( node != nullptr ) {
+				auto graphicsCircleWithContent = allocCircle( CIRCLE_RADIUS , node->text() );
+				QPointF centerPt( LEFT_MARGIN + node->x(), TOP_MARGIN + node->y() );
+				QPointF leftTop = centerPt - QPointF(CIRCLE_RADIUS, CIRCLE_RADIUS);
+				
+				graphicsCircleWithContent->setPos( leftTop );
+				m_pScene->addItem( graphicsCircleWithContent );
+				
+				if ( selectedTreeNode != node ) { // !node->isRoot() 
+					auto parentNode = node->parent();
+					if ( parentNode != nullptr ) {
+						QPointF parentCenter( LEFT_MARGIN +  parentNode->x(), TOP_MARGIN + parentNode->y() );
+						auto connectionLine = new QGraphicsLineItem( centerPt.x(), centerPt.y(),  parentCenter.x(), parentCenter.y() );
+						connectionLine->setZValue( -1.0 );
+						m_pScene->addItem( connectionLine );
+					}
+				}
 
-	auto DofCircle = 2 * CIRCLE_RADIUS;
-
-	// 4th layer
-	QGraphicsEllipseItem* ndList4th[8] = { nullptr }; 
-	QGraphicsEllipseItem* ndList3rd[4] = { nullptr }; 
-	QGraphicsEllipseItem* ndList2nd[2] = { nullptr }; 
-	QGraphicsEllipseItem* ndRoot    =   nullptr;
-	for( int i = 0; i < 8; ++i ) {
-		ndList4th[i] = allocCircle( CIRCLE_RADIUS, tr("%1").arg( 0 + (i+1) ) );
-		ndList4th[i]->setPos( QPointF( LEFT_MARGIN + i * (DofCircle + DISTANCE_BETWEEN_LEFTRIGHT) ,  TOP_MARGIN + (4-1) * (DofCircle + HEIGHT_BETWEEN_PARENT_AND_CHILDREN) ) );
-		if ( m_pScene != nullptr ) {
-			m_pScene->addItem( ndList4th[i] );
+			}
+			
 		}
 	}
-
-	// 3rd layer
-	for( int i = 0; i < 4; ++i ) {
-		ndList3rd[i] = allocCircle( GlobalSetting::CIRCLE_RADIUS, tr("%1").arg( 8 + (i+1) ) );
-        QPointF t1( LEFT_MARGIN + (1+i*2) * (DofCircle) + (( 1+4*i )/2.0)*DISTANCE_BETWEEN_LEFTRIGHT - CIRCLE_RADIUS, TOP_MARGIN + (3-1) * (DofCircle + HEIGHT_BETWEEN_PARENT_AND_CHILDREN) );
-        ndList3rd[i]->setPos( t1 );
-
-		QPointF cen = t1 + QPointF( CIRCLE_RADIUS, CIRCLE_RADIUS );
-
-		int idxLeft  = 2*i + 0;
-		int idxRight = 2*i + 1;
-		QPointF cL = ndList4th[idxLeft]->pos()  + QPointF( CIRCLE_RADIUS, CIRCLE_RADIUS );
-		QPointF cR = ndList4th[idxRight]->pos() + QPointF( CIRCLE_RADIUS, CIRCLE_RADIUS );
-
-		//   QGraphicsLineItem(qreal x1, qreal y1, qreal x2, qreal y2, QGraphicsItem *parent = nullptr)
-		auto lineL = new QGraphicsLineItem(cL.x(), cL.y(),  cen.x(), cen.y() );
-		auto lineR = new QGraphicsLineItem(cR.x(), cR.y(),  cen.x(), cen.y() ); 
-		lineL->setZValue( -1.0 );
-		lineR->setZValue( -1.0 );
-
-		if ( m_pScene != nullptr ) {
-			m_pScene->addItem( lineL );
-			m_pScene->addItem( lineR );
-
-			m_pScene->addItem( ndList3rd[i] );
-		}
-	}
-
-
-	// 2nd layer
-	for( int i = 0; i < 2; ++i ) {
-		ndList2nd[i] = allocCircle( GlobalSetting::CIRCLE_RADIUS, tr("%1").arg( 13 + (i+1) ) );
-		QPointF t1( LEFT_MARGIN + (i==0 ? 2 : 6) * DofCircle + ( (i==0 ? 3 : 11) / 2.0) * DISTANCE_BETWEEN_LEFTRIGHT - CIRCLE_RADIUS, TOP_MARGIN + (2-1) * (DofCircle + HEIGHT_BETWEEN_PARENT_AND_CHILDREN) );
-		ndList2nd[i]->setPos( t1 );
-
-		QPointF cen = t1 + QPointF( CIRCLE_RADIUS, CIRCLE_RADIUS );
-
-		int idxLeft  = 2*i + 0;
-		int idxRight = 2*i + 1;
-		QPointF cL = ndList3rd[idxLeft]->pos()  + QPointF( CIRCLE_RADIUS, CIRCLE_RADIUS );
-		QPointF cR = ndList3rd[idxRight]->pos() + QPointF( CIRCLE_RADIUS, CIRCLE_RADIUS );
-
-		//   QGraphicsLineItem(qreal x1, qreal y1, qreal x2, qreal y2, QGraphicsItem *parent = nullptr)
-		auto lineL = new QGraphicsLineItem(cL.x(), cL.y(),  cen.x(), cen.y() );
-		auto lineR = new QGraphicsLineItem(cR.x(), cR.y(),  cen.x(), cen.y() ); 
-		lineL->setZValue( -1.0 );
-		lineR->setZValue( -1.0 );
-
-		if ( m_pScene != nullptr ) {
-			m_pScene->addItem( lineL );
-			m_pScene->addItem( lineR );
-
-			m_pScene->addItem( ndList2nd[i] );
-		}
-	}
-
-	ndRoot = allocCircle( CIRCLE_RADIUS, tr("%1").arg(19) );
-    QPointF rootLeftTop( LEFT_MARGIN + 7*CIRCLE_RADIUS + 7/2.0 * DISTANCE_BETWEEN_LEFTRIGHT, TOP_MARGIN + (1-1) * (DofCircle + HEIGHT_BETWEEN_PARENT_AND_CHILDREN));
-	ndRoot->setPos( rootLeftTop );
-
-	QPointF cen = rootLeftTop + QPointF( CIRCLE_RADIUS, CIRCLE_RADIUS );
-
-	int idxLeft  = 0;
-	int idxRight = 1;
-	QPointF cL = ndList2nd[idxLeft]->pos()  + QPointF( CIRCLE_RADIUS, CIRCLE_RADIUS );
-	QPointF cR = ndList2nd[idxRight]->pos() + QPointF( CIRCLE_RADIUS, CIRCLE_RADIUS );
-
-	//   QGraphicsLineItem(qreal x1, qreal y1, qreal x2, qreal y2, QGraphicsItem *parent = nullptr)
-	auto lineL = new QGraphicsLineItem(cL.x(), cL.y(),  cen.x(), cen.y() );
-	auto lineR = new QGraphicsLineItem(cR.x(), cR.y(),  cen.x(), cen.y() ); 
-	lineL->setZValue( -1.0 );
-	lineR->setZValue( -1.0 );
-
-	if ( m_pScene != nullptr ) {
-		m_pScene->addItem( lineL );
-		m_pScene->addItem( lineR );
-
-		m_pScene->addItem( ndRoot );
-	}
+	
 
 
 }

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>966</width>
-    <height>702</height>
+    <width>1327</width>
+    <height>686</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -32,7 +32,7 @@
      <rect>
       <x>510</x>
       <y>30</y>
-      <width>441</width>
+      <width>761</width>
       <height>531</height>
      </rect>
     </property>
@@ -98,8 +98,8 @@
    <widget class="QPushButton" name="clearBtn">
     <property name="geometry">
      <rect>
-      <x>620</x>
-      <y>600</y>
+      <x>770</x>
+      <y>590</y>
       <width>81</width>
       <height>50</height>
      </rect>
@@ -111,8 +111,8 @@
    <widget class="QPushButton" name="saveGraphicBtn">
     <property name="geometry">
      <rect>
-      <x>850</x>
-      <y>600</y>
+      <x>1120</x>
+      <y>590</y>
       <width>81</width>
       <height>51</height>
      </rect>
@@ -124,9 +124,9 @@
    <widget class="QPushButton" name="treeOptionBtn">
     <property name="geometry">
      <rect>
-      <x>500</x>
-      <y>600</y>
-      <width>91</width>
+      <x>590</x>
+      <y>590</y>
+      <width>111</width>
       <height>51</height>
      </rect>
     </property>
@@ -137,8 +137,8 @@
    <widget class="QPushButton" name="drawTreeBtn">
     <property name="geometry">
      <rect>
-      <x>736</x>
-      <y>600</y>
+      <x>940</x>
+      <y>590</y>
       <width>81</width>
       <height>51</height>
      </rect>
