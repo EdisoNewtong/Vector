@@ -9,13 +9,20 @@ treenode::treenode(const QString& text, treenode* parent, bool isInvisibleRoot /
 	, m_LeftNode( nullptr )
 	, m_RightNode( nullptr )
 	, m_parentNode( parent )
-	, m_graphicsRenderObject( nullptr )
+	, m_pGraphicCircle( nullptr )
+	, m_pGraphicLine( nullptr )
+	, m_pGraphicText( nullptr )
 	, m_depth( 0 )
 	, m_height( 0 )
 	, m_layerIdx( 0 )
 	, m_centerPt_x(0.0)
 	, m_centerPt_y(0.0)
+	, m_connectionLineSelf_x( 0.0 )
+	, m_connectionLineSelf_y( 0.0 )
+	, m_connectionLineParent_x( 0.0 )
+	, m_connectionLineParent_y( 0.0 )
 	, m_isInvisibleRoot( isInvisibleRoot )
+	, m_nodeStyle( nodeStyleCfg::DefaultCfg() )
 {
 	qDebug() << "Alloc " << ++G_NODE_CNT << " self-defined treenode";
 }
@@ -117,18 +124,47 @@ QString treenode::text()
 }
 
 
-
-
-void treenode::attachRenderObject(QGraphicsItem* item)
+void treenode::setCircle(QGraphicsEllipseItem* circle)
 {
-	m_graphicsRenderObject = item;
+	m_pGraphicCircle = circle; 
 }
 
 
-void treenode::detachRenderObject()
+QGraphicsEllipseItem* treenode::circleObject()
 {
-	m_graphicsRenderObject = nullptr;
+	return m_pGraphicCircle;
 }
+
+void treenode::setLine(QGraphicsLineItem* line)
+{
+	m_pGraphicLine = line;
+}
+
+QGraphicsLineItem* treenode::lineObject()
+{
+	return m_pGraphicLine;
+}
+
+
+void treenode::setTextObject(QGraphicsSimpleTextItem* textObj)
+{
+	m_pGraphicText = textObj;
+}
+
+QGraphicsSimpleTextItem* treenode::textObject()
+{
+	return m_pGraphicText;
+}
+
+
+void treenode::detachAllRenderObject()
+{
+	setCircle(nullptr);
+	setLine(nullptr);
+	setTextObject(nullptr);
+}
+
+
 
 
 bool treenode::isRoot()
@@ -161,9 +197,22 @@ int treenode::height()   { return m_height; }
 int treenode::layerIdx() { return m_layerIdx; }
 double treenode::x()     { return m_centerPt_x; }
 double treenode::y()     { return m_centerPt_y; }
+double treenode::connectionLineSelfDot_x()    { return m_connectionLineSelf_x; }
+double treenode::connectionLineSelfDot_y()    { return m_connectionLineSelf_y; }
+double treenode::connectionLineSelfParent_x() { return m_connectionLineParent_x; }
+double treenode::connectionLineSelfParent_y() { return m_connectionLineParent_y; }
+
+
+
+nodeStyleCfg treenode::getNodeStyle() { return m_nodeStyle; }
 
 void treenode::setDepth(int depth)   { m_depth = depth; }
 void treenode::setHeight(int height) { m_height = height; }
 void treenode::setLayerIdx(int idx)  { m_layerIdx = idx; }
 void treenode::setCenterPt_x(double x)     { m_centerPt_x = x; }
 void treenode::setCenterPt_y(double y)     { m_centerPt_y = y; }
+void treenode::setConnectionLine_SelfDot(double x, double y)   { m_connectionLineSelf_x   = x; m_connectionLineSelf_y   = y; }
+void treenode::setConnectionLine_ParentDot(double x, double y) { m_connectionLineParent_x = x; m_connectionLineParent_y = y; }
+
+
+void treenode::setNodeStyle(const nodeStyleCfg& newCfg) { m_nodeStyle = newCfg; }

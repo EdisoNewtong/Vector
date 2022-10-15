@@ -2,6 +2,11 @@
 
 #include <QString>
 #include <QGraphicsItem>
+#include <QGraphicsEllipseItem>    // Round Item
+#include <QGraphicsLineItem>       // Line Item
+#include <QGraphicsSimpleTextItem> // Text Item
+
+#include "nodestylecfg.h"
 
 class treenode 
 {
@@ -21,7 +26,9 @@ protected:
 	treenode* m_RightNode;
 	treenode* m_parentNode;
 
-	QGraphicsItem* m_graphicsRenderObject;
+	QGraphicsEllipseItem*       m_pGraphicCircle;
+	QGraphicsLineItem*          m_pGraphicLine;
+	QGraphicsSimpleTextItem*    m_pGraphicText;
 
 	int       m_depth;
 	int       m_height;
@@ -30,8 +37,14 @@ protected:
 	double    m_centerPt_x;
 	double    m_centerPt_y;
 
+	double    m_connectionLineSelf_x;
+	double    m_connectionLineSelf_y;
+	double    m_connectionLineParent_x;
+	double    m_connectionLineParent_y;
 
 	bool      m_isInvisibleRoot;
+
+	nodeStyleCfg m_nodeStyle;
 public:
 	void setText(const QString& text);
 	QString text();
@@ -60,6 +73,13 @@ public:
 	double x();
 	double y();
 
+	double connectionLineSelfDot_x();
+	double connectionLineSelfDot_y();
+	double connectionLineSelfParent_x();
+	double connectionLineSelfParent_y();
+
+
+
 	void setDepth(int depth);
 	void setHeight(int height);
 	void setLayerIdx(int idx);
@@ -67,5 +87,19 @@ public:
 	void setCenterPt_y(double y);
 
 
+	void setConnectionLine_SelfDot(double x, double y);
+	void setConnectionLine_ParentDot(double x, double y); 
+
+	QGraphicsEllipseItem*     circleObject();
+	QGraphicsLineItem*        lineObject();
+	QGraphicsSimpleTextItem*  textObject();
+
+	void setCircle(QGraphicsEllipseItem* circle);
+	void setLine(QGraphicsLineItem* line);
+	void setTextObject(QGraphicsSimpleTextItem* textObj);
+	void detachAllRenderObject();
+
+	nodeStyleCfg getNodeStyle();
+	void         setNodeStyle( const nodeStyleCfg& newCfg);
 
 };

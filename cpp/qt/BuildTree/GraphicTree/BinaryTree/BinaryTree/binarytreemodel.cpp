@@ -2,6 +2,12 @@
 #include <QFile>
 #include <QDebug>
 #include <QMapIterator>
+#include <QColor>
+
+#include <QGraphicsSimpleTextItem>
+#include <QFontMetricsF>
+#include <QLineF>
+
 #include "binarytreemodel.h"
 #include "globalSettings.h"
 
@@ -57,7 +63,7 @@ binarytreemodel::binarytreemodel(QObject* parent /* = nullptr*/ )
 	// the very beginning  Root Node
     m_pRoot = m_pInvisibleRootItem->addLeftNode( QString("0") );
 	// Core Core Core : travelsal the whole tree once
-	updateDepthAndHeight( m_pRoot );
+	updateDepthAndHeight( m_pRoot , nullptr);
 
 	m_pXMLDoc = new rapidxml::xml_document<char>();
 	m_pXMLDoc->clear();
@@ -133,13 +139,16 @@ int binarytreemodel::columnCount(const QModelIndex &parent /* = QModelIndex() */
 // virtual 
 QVariant binarytreemodel::data(const QModelIndex &index, int role /* = Qt::DisplayRole */ ) const // override;
 {
-	if ( !index.isValid()  || (role != Qt::DisplayRole  && role != Qt::EditRole) ) {
+	if ( !index.isValid()   ) {
 		return QVariant();
 	}
 
-	// if ( role != Qt::DisplayRole ) {
-	// 	return QVariant();
-	// }
+	int columnIdx = index.column();
+    if ( columnIdx < 2  ) {
+        if ( role != Qt::DisplayRole  && role != Qt::EditRole ) {
+            return QVariant();
+        }
+	}
 
 	treenode* rawNode = static_cast<treenode*>( index.internalPointer() );
 	if ( rawNode == nullptr ) {
@@ -148,15 +157,29 @@ QVariant binarytreemodel::data(const QModelIndex &index, int role /* = Qt::Displ
 
 	QVariant retVar;
 	auto isRoot = rawNode->isRoot();
-	int columnIdx = index.column();
 	switch( columnIdx )
 	{
 	case 0:
         retVar = isRoot ? GlobalSetting::ROOT_TAG : ( (rawNode->parent()->leftNode() == rawNode) ? GlobalSetting::LEFT_TAG  :  GlobalSetting::RIGHT_TAG );
 		break;
 	case 1:
-	case 2:
         retVar = rawNode->text();
+		break;
+	case 2:
+		{
+            if ( role == Qt::DisplayRole || role == Qt::EditRole ) {
+				retVar = rawNode->text();
+            } else if ( role == Qt::BackgroundRole ) {
+				retVar =  rawNode->getNodeStyle().m_circleBrushColor;
+            } else if ( role == Qt::ForegroundRole ) {
+				retVar = rawNode->getNodeStyle().m_textBrush;
+			} else if ( role == Qt::FontRole ) {
+                retVar = rawNode->getNodeStyle().m_textFont;
+			} else if ( role == Qt::TextAlignmentRole ) {
+                Qt::Alignment flags = (Qt::AlignHCenter | Qt::AlignVCenter);
+                retVar = static_cast<unsigned int>(flags);
+			} 
+		}
 		break;
     default:
 		break;
@@ -282,7 +305,7 @@ bool binarytreemodel::create_AddLeftNode( const QModelIndex& parent)
     parentNode->addLeftNode("0");
 	endInsertRows();
 
-	updateDepthAndHeight( m_pRoot );
+	updateDepthAndHeight( m_pRoot , nullptr);
 
 	return true;
 
@@ -309,7 +332,7 @@ bool binarytreemodel::create_AddRightNode(const QModelIndex& parent)
     parentNode->addRightNode( QString("0") );
 	endInsertRows();
 
-	updateDepthAndHeight( m_pRoot );
+	updateDepthAndHeight( m_pRoot , nullptr);
 
 	return true;
 }
@@ -369,7 +392,7 @@ bool binarytreemodel::delete_SelectedNode(const QModelIndex& selectedItem)
 	}
 	endRemoveRows();
 
-	updateDepthAndHeight( m_pRoot );
+	updateDepthAndHeight( m_pRoot , nullptr);
 
 	return true;
 
@@ -379,22 +402,48 @@ bool binarytreemodel::delete_SelectedNode(const QModelIndex& selectedItem)
 // virtual 
 bool binarytreemodel::setData(const QModelIndex &index, const QVariant &value, int role /* = Qt::EditRole */) // Q_DECL_OVERRIDE;
 {
-    if (role != Qt::EditRole) {
-        return false;
-	}
+	auto iColomn = index.column();
+
+	qDebug() << "setData(" << iColomn << ")";
+    if ( role != Qt::EditRole ) {
+        qDebug() << "setData(...) , role != Qt::EditRole    , return false";
+         return false;
+    }
 
 	treenode* selectedNode = static_cast<treenode*>( index.internalPointer() );
     bool result = true;
 	if ( selectedNode == nullptr ) {
 		result = false;
 	} else {
-		selectedNode->setText( value.toString() );
+        qDebug() << "setData(...) , setText(...) 1";
+        selectedNode->setText( value.toString() );
 		result = true;
 	}
 
     if ( result ) {
+		qDebug() << "setData(...) , setText(...) 2";
 		QVector<int> playedRoleVec{ Qt::DisplayRole, Qt::EditRole };
+		// QVector<int> playedRoleVec{ Qt::DisplayRole, Qt::EditRole, Qt::FontRole, Qt::TextAlignmentRole, Qt::BackgroundRole, Qt::ForegroundRole   };
+
+		if ( iColomn == 1 ) {
+			auto d = 2.0 * GlobalSetting::circle_radius;
+			auto textRenderObject = selectedNode->textObject();
+			if ( textRenderObject != nullptr ) {
+				auto fnt = textRenderObject->font();
+
+				QFontMetricsF fmObj( fnt );
+				auto dWidth = fmObj.horizontalAdvance( selectedNode->text() );
+				auto dHeight = fmObj.height();
+				auto x = (d - dWidth) / 2.0;
+				auto y = (d - dHeight) / 2.0;
+
+				textRenderObject->setPos( QPointF(x,y) );
+				textRenderObject->setText( selectedNode->text() );
+			}
+		}
+
         emit dataChanged(index, index, playedRoleVec );
+        // emit dataChanged(index, index.siblingAtColumn(GlobalSetting::SPECIAL_COLUMN_INDEX), playedRoleVec );
 	}
 
     return result;
@@ -442,6 +491,7 @@ bool binarytreemodel::loadFromFile(const QString& filename, QString* pErrorStr)
 		return false;
 	}
 
+
 	beginResetModel();
 	// Delete Entire Tree
 	m_pInvisibleRootItem->deleteLeftNode();
@@ -451,13 +501,14 @@ bool binarytreemodel::loadFromFile(const QString& filename, QString* pErrorStr)
 	buildNodeFromReading( m_pInvisibleRootItem, m_pXMLDoc, level );
 	endResetModel();
 
-	updateDepthAndHeight( m_pRoot );
+	updateDepthAndHeight( m_pRoot , nullptr);
 
 	return true;
 }
 
 bool binarytreemodel::saveToFile(const QString& filenameToSave, QString* pErrorStr, QPersistentModelIndex& errorIdx )
 {
+	using namespace GlobalSetting;
 	(void)errorIdx;
 	if ( m_pRoot == nullptr || m_pXMLDoc == nullptr ) {
 		if ( pErrorStr != nullptr ) {
@@ -497,6 +548,167 @@ bool binarytreemodel::saveToFile(const QString& filenameToSave, QString* pErrorS
 	dclNode->append_attribute(attr1);
 	dclNode->append_attribute(attr2);
 	m_pXMLDoc->append_node(dclNode);
+
+
+
+	rapidxml::xml_node<char>* settingNode = m_pXMLDoc->allocate_node(rapidxml::node_element);
+
+	// set node's Tag
+    m_XmlStringList.push_back( GLOBAL_SETTINGS_TAG.toUtf8() );
+	settingNode->name( m_XmlStringList.last().constData() );
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////
+	// set all attribute
+	//
+	
+	// Scene's BG Color
+	m_XmlStringList.push_back( SCENE_BG_TAG.toUtf8() );
+	m_XmlStringList.push_back( scene_bg.color().name(QColor::HexArgb).toUtf8() );
+	auto attrSceneBgColor = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
+	settingNode->append_attribute( attrSceneBgColor );
+	// circle's radius
+	m_XmlStringList.push_back( RADIUS.toUtf8() );
+	m_XmlStringList.push_back( QString("%1").arg(circle_radius).toUtf8() );
+	auto attrR = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
+	settingNode->append_attribute( attrR );
+	// gap-1
+	m_XmlStringList.push_back( LR_GAP1.toUtf8() );
+	m_XmlStringList.push_back( QString("%1").arg(distance_between_leftright).toUtf8() );
+	auto attrGap1 = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
+	settingNode->append_attribute( attrGap1 );
+	// gap-2
+	m_XmlStringList.push_back( RL_GAP2.toUtf8() );
+	m_XmlStringList.push_back( QString("%1").arg(distance_between_right__left).toUtf8() );
+	auto attrGap2 = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
+	settingNode->append_attribute( attrGap2 );
+	// vertical layer gap
+	m_XmlStringList.push_back( LAYER_GAP.toUtf8() );
+	m_XmlStringList.push_back( QString("%1").arg(height_between_parent_and_children).toUtf8() );
+	auto attrHGap = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
+	settingNode->append_attribute( attrHGap );
+	// left margin
+	m_XmlStringList.push_back( LEFT_MARGIN_TAG.toUtf8() );
+	m_XmlStringList.push_back( QString("%1").arg(left_margin).toUtf8() );
+	auto attrLeftMargin = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
+	settingNode->append_attribute( attrLeftMargin  );
+	// right margin
+	m_XmlStringList.push_back( RIGHT_MARGIN_TAG.toUtf8() );
+	m_XmlStringList.push_back( QString("%1").arg(right_margin).toUtf8() );
+	auto attrRightMargin = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
+	settingNode->append_attribute( attrRightMargin );
+	// top margin
+	m_XmlStringList.push_back( TOP_MARGIN_TAG.toUtf8() );
+	m_XmlStringList.push_back( QString("%1").arg(top_margin).toUtf8() );
+	auto attrTopMargin = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
+	settingNode->append_attribute( attrTopMargin );
+	// bottom margin
+	m_XmlStringList.push_back( BOTTOM_MARGIN_TAG.toUtf8() );
+	m_XmlStringList.push_back( QString("%1").arg(bottom_margin).toUtf8() );
+	auto attrBottomMargin = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
+	settingNode->append_attribute( attrBottomMargin );
+
+	  ////////////////////////////////////////////////////////////////////////////////////////////////////
+    auto circleColor = circle_brush.color();
+    auto circlePenColor = circle_outline.color();
+    auto circlePenWidth = circle_outline.widthF();
+
+	auto contentTextFont = text_font;
+	auto contentTextColor = text_color.color();
+
+	auto connectionLineColor = connection_line.color();
+	auto connectionLineWidth = connection_line.widthF();
+
+	// set circle's color's   tag
+	QByteArray baAttrCircleColorTag;
+	baAttrCircleColorTag.append( CIRCLE_COLOR_TAG );
+	m_XmlStringList.push_back( baAttrCircleColorTag );
+	// save circle color's value   : format "#AARRGGBB" in Qt
+	QByteArray baAttrCircleColorValue;
+	baAttrCircleColorValue.append( circleColor.name(QColor::HexArgb) );
+	m_XmlStringList.push_back( baAttrCircleColorValue );
+	auto attrCircleColor = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
+	settingNode->append_attribute( attrCircleColor  );
+
+	// set circle's pen color tag
+	QByteArray baAttrCirclePenColorTag;
+	baAttrCirclePenColorTag.append( CIRCLE_PEN_COLOR_TAG );
+	m_XmlStringList.push_back( baAttrCirclePenColorTag );
+	// set circle's pen color value
+	QByteArray baAttrCirclePenColorValue;
+	baAttrCirclePenColorValue.append( circlePenColor.name(QColor::HexArgb) );
+	m_XmlStringList.push_back( baAttrCirclePenColorValue );
+	auto attrCirclePenColor = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
+	settingNode->append_attribute( attrCirclePenColor );
+
+	// set circle's pen width tag
+	QByteArray baAttrCirclePenWidthTag;
+	baAttrCirclePenWidthTag.append( CIRCLE_PEN_WIDTH_TAG );
+	m_XmlStringList.push_back( baAttrCirclePenWidthTag );
+	// set circle's pen width value
+	QByteArray baAttrCirclePenWidthValue;
+    baAttrCirclePenWidthValue.append( QString("%1").arg( circlePenWidth )  );
+	m_XmlStringList.push_back( baAttrCirclePenWidthValue );
+	auto attrCirclePenWidth = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
+	settingNode->append_attribute( attrCirclePenWidth );
+
+
+	// set text font tag
+	QByteArray baAttrTextFontTag;
+	baAttrTextFontTag.append( TEXT_FONT_NAME_TAG );
+	m_XmlStringList.push_back( baAttrTextFontTag );
+	// set text font's name as value
+	QByteArray baAttrTextFontNameValue;
+	baAttrTextFontNameValue.append( contentTextFont.family() );
+	m_XmlStringList.push_back( baAttrTextFontNameValue );
+	auto attrFontName = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
+	settingNode->append_attribute( attrFontName );
+
+
+	// set text font pointsize 
+	QByteArray baAttrTextFontSizeTag;
+	baAttrTextFontSizeTag.append( TEXT_FONT_SIZE_TAG );
+	m_XmlStringList.push_back( baAttrTextFontSizeTag );
+	// set text font's name as value
+	QByteArray baAttrTextFontSizeValue;
+	baAttrTextFontSizeValue.append( QString("%1").arg(contentTextFont.pointSize()) );
+	m_XmlStringList.push_back( baAttrTextFontSizeValue );
+	auto attrFontSize = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
+	settingNode->append_attribute( attrFontSize );
+
+	// set text color
+	QByteArray baAttrTextColorTag;
+	baAttrTextColorTag.append( TEXT_COLOR_TAG );
+	m_XmlStringList.push_back( baAttrTextColorTag );
+	// set text color's value
+	QByteArray baAttrTextColorValue;
+	baAttrTextColorValue.append( contentTextColor.name(QColor::HexArgb) );
+	m_XmlStringList.push_back( baAttrTextColorValue );
+	auto attrTextColor = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
+	settingNode->append_attribute( attrTextColor );
+
+	// set connection line color
+	QByteArray baAttrConnectionLineColorTag;
+	baAttrConnectionLineColorTag.append( CONNECTION_LINE_COLOR_TAG );
+	m_XmlStringList.push_back( baAttrConnectionLineColorTag );
+	// set text color's value
+	QByteArray baAttrConnectionLineColorValue;
+	baAttrConnectionLineColorValue.append( connectionLineColor.name(QColor::HexArgb) );
+	m_XmlStringList.push_back( baAttrConnectionLineColorValue );
+	auto attrConnectionLineColor = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
+	settingNode->append_attribute( attrConnectionLineColor );
+
+	// set connection line color
+	QByteArray baAttrConnectionLineWidthTag;
+	baAttrConnectionLineWidthTag.append( CONNECTION_LINE_WIDTH_TAG );
+	m_XmlStringList.push_back( baAttrConnectionLineWidthTag );
+	// set text color's value
+	QByteArray baAttrConnectionLineWidthValue;
+	baAttrConnectionLineWidthValue.append( QString("%1").arg( connectionLineWidth ) );
+	m_XmlStringList.push_back( baAttrConnectionLineWidthValue );
+	auto attrConnectionLineWidth = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
+	settingNode->append_attribute( attrConnectionLineWidth );
+
+	m_pXMLDoc->append_node(settingNode);
 
 	int begLevel = 0;
 	// Core Core Core
@@ -539,19 +751,131 @@ void binarytreemodel::travelsalNodeForWriting(treenode* node, rapidxml::xml_node
 	}
 
 	auto ele_node = m_pXMLDoc->allocate_node(rapidxml::node_element);
-	QByteArray eleName;
+
 	// set node's Tag
+	QByteArray eleName;
 	eleName.append( tag );
 	m_XmlStringList.push_back( eleName );
 	ele_node->name( m_XmlStringList.last().constData() );
 
-	// set node's content
+	////////////////////////////////////////////////////////////////////////////////////////////////////
+	// set all attribute
+	//
+	// set Text' attribute name
+	QByteArray baAttrText;
+	baAttrText.append( GlobalSetting::TEXT_TAG );
+	m_XmlStringList.push_back( baAttrText );
+
+	// save node's text 
 	QByteArray baText;
 	baText.append( node->text() );
 	m_XmlStringList.push_back( baText );
-
-	auto attrText = m_pXMLDoc->allocate_attribute("text", m_XmlStringList.last().constData() );
+	auto attrText = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
 	ele_node->append_attribute( attrText );
+
+
+	auto renderStyle = node->getNodeStyle();
+    auto circleColor = renderStyle.m_circleBrushColor.color();
+    auto circlePenColor = renderStyle.m_circlePen.color();
+    auto circlePenWidth = renderStyle.m_circlePen.widthF();
+
+	auto contentTextFont = renderStyle.m_textFont;
+	auto contentTextColor = renderStyle.m_textBrush.color();
+
+	auto connectionLineColor = renderStyle.m_connectionLinePen.color();
+	auto connectionLineWidth = renderStyle.m_connectionLinePen.widthF();
+
+
+	// set circle's color's   tag
+	QByteArray baAttrCircleColorTag;
+	baAttrCircleColorTag.append( GlobalSetting::CIRCLE_COLOR_TAG );
+	m_XmlStringList.push_back( baAttrCircleColorTag );
+	// save circle color's value   : format "#AARRGGBB" in Qt
+	QByteArray baAttrCircleColorValue;
+	baAttrCircleColorValue.append( circleColor.name(QColor::HexArgb) );
+	m_XmlStringList.push_back( baAttrCircleColorValue );
+	auto attrCircleColor = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
+	ele_node->append_attribute( attrCircleColor  );
+
+	// set circle's pen color tag
+	QByteArray baAttrCirclePenColorTag;
+	baAttrCirclePenColorTag.append( GlobalSetting::CIRCLE_PEN_COLOR_TAG );
+	m_XmlStringList.push_back( baAttrCirclePenColorTag );
+	// set circle's pen color value
+	QByteArray baAttrCirclePenColorValue;
+	baAttrCirclePenColorValue.append( circlePenColor.name(QColor::HexArgb) );
+	m_XmlStringList.push_back( baAttrCirclePenColorValue );
+	auto attrCirclePenColor = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
+	ele_node->append_attribute( attrCirclePenColor );
+
+	// set circle's pen width tag
+	QByteArray baAttrCirclePenWidthTag;
+	baAttrCirclePenWidthTag.append( GlobalSetting::CIRCLE_PEN_WIDTH_TAG );
+	m_XmlStringList.push_back( baAttrCirclePenWidthTag );
+	// set circle's pen width value
+	QByteArray baAttrCirclePenWidthValue;
+    baAttrCirclePenWidthValue.append( QString("%1").arg( circlePenWidth )  );
+	m_XmlStringList.push_back( baAttrCirclePenWidthValue );
+	auto attrCirclePenWidth = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
+	ele_node->append_attribute( attrCirclePenWidth );
+
+
+	// set text font tag
+	QByteArray baAttrTextFontTag;
+	baAttrTextFontTag.append( GlobalSetting::TEXT_FONT_NAME_TAG );
+	m_XmlStringList.push_back( baAttrTextFontTag );
+	// set text font's name as value
+	QByteArray baAttrTextFontNameValue;
+	baAttrTextFontNameValue.append( contentTextFont.family() );
+	m_XmlStringList.push_back( baAttrTextFontNameValue );
+	auto attrFontName = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
+	ele_node->append_attribute( attrFontName );
+
+
+	// set text font pointsize 
+	QByteArray baAttrTextFontSizeTag;
+	baAttrTextFontSizeTag.append( GlobalSetting::TEXT_FONT_SIZE_TAG );
+	m_XmlStringList.push_back( baAttrTextFontSizeTag );
+	// set text font's name as value
+	QByteArray baAttrTextFontSizeValue;
+	baAttrTextFontSizeValue.append( QString("%1").arg(contentTextFont.pointSize()) );
+	m_XmlStringList.push_back( baAttrTextFontSizeValue );
+	auto attrFontSize = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
+	ele_node->append_attribute( attrFontSize );
+
+	// set text color
+	QByteArray baAttrTextColorTag;
+	baAttrTextColorTag.append( GlobalSetting::TEXT_COLOR_TAG );
+	m_XmlStringList.push_back( baAttrTextColorTag );
+	// set text color's value
+	QByteArray baAttrTextColorValue;
+	baAttrTextColorValue.append( contentTextColor.name(QColor::HexArgb) );
+	m_XmlStringList.push_back( baAttrTextColorValue );
+	auto attrTextColor = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
+	ele_node->append_attribute( attrTextColor );
+
+	// set connection line color
+	QByteArray baAttrConnectionLineColorTag;
+	baAttrConnectionLineColorTag.append( GlobalSetting::CONNECTION_LINE_COLOR_TAG );
+	m_XmlStringList.push_back( baAttrConnectionLineColorTag );
+	// set text color's value
+	QByteArray baAttrConnectionLineColorValue;
+	baAttrConnectionLineColorValue.append( connectionLineColor.name(QColor::HexArgb) );
+	m_XmlStringList.push_back( baAttrConnectionLineColorValue );
+	auto attrConnectionLineColor = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
+	ele_node->append_attribute( attrConnectionLineColor );
+
+	// set connection line color
+	QByteArray baAttrConnectionLineWidthTag;
+	baAttrConnectionLineWidthTag.append( GlobalSetting::CONNECTION_LINE_WIDTH_TAG );
+	m_XmlStringList.push_back( baAttrConnectionLineWidthTag );
+	// set text color's value
+	QByteArray baAttrConnectionLineWidthValue;
+	baAttrConnectionLineWidthValue.append( QString("%1").arg( connectionLineWidth ) );
+	m_XmlStringList.push_back( baAttrConnectionLineWidthValue );
+	auto attrConnectionLineWidth = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
+	ele_node->append_attribute( attrConnectionLineWidth );
+
 	xmlparent->append_node( ele_node );
 
 	travelsalNodeForWriting( node->leftNode(),   ele_node, level+1); // travelsal Left  Node
@@ -562,6 +886,7 @@ void binarytreemodel::travelsalNodeForWriting(treenode* node, rapidxml::xml_node
 
 void binarytreemodel::buildNodeFromReading(treenode* parentNode, rapidxml::xml_node<char>* xmlparent, int level)
 {
+	using namespace GlobalSetting;
 	if ( parentNode  == nullptr || xmlparent == nullptr ) {
 		return;
 	}
@@ -574,9 +899,13 @@ void binarytreemodel::buildNodeFromReading(treenode* parentNode, rapidxml::xml_n
 			continue;
 		}
 
+		auto loadGlobalSettingFromFile = false;
 		treenode* toBeAllocedNode = nullptr;
 		QString tagName = child->name();
-		if ( tagName == GlobalSetting::ROOT_TAG ) {
+        if ( tagName == GlobalSetting::GLOBAL_SETTINGS_TAG ) {
+			loadGlobalSettingFromFile = true;
+			toBeAllocedNode = nullptr;
+		} else if ( tagName == GlobalSetting::ROOT_TAG ) {
 			m_pRoot = parentNode->addLeftNode("0");
 			toBeAllocedNode = m_pRoot;
 		} else if ( tagName == GlobalSetting::LEFT_TAG ) {
@@ -585,8 +914,27 @@ void binarytreemodel::buildNodeFromReading(treenode* parentNode, rapidxml::xml_n
 			toBeAllocedNode = parentNode->addRightNode("0");
 		}
 
-		if ( toBeAllocedNode == nullptr ) {
-			continue;
+		if ( !loadGlobalSettingFromFile ) {
+			if ( toBeAllocedNode == nullptr ) {
+				continue;
+			}
+		}
+
+		//
+		// Core Core Core :
+		// You Must assign a new QBrush / QPen    rather than set the old brush's color
+		/*
+		    
+				QColor c;
+				c.setNamedColor( attrValue );
+
+				newCfg.m_circleBrushColor.setColor( c );     // doesn't work ( the UI doesn't update )
+				newCfg.m_circleBrushColor = QBrush( c );  // correct
+		*/
+
+		nodeStyleCfg newCfg; 
+		if ( !loadGlobalSettingFromFile && toBeAllocedNode != nullptr ) {
+			newCfg = toBeAllocedNode->getNodeStyle();
 		}
 
 		auto attrIdx = 0;
@@ -594,11 +942,152 @@ void binarytreemodel::buildNodeFromReading(treenode* parentNode, rapidxml::xml_n
 			QString attrName = attr->name();
 			QString attrValue = attr->value();
 			if ( attrName == GlobalSetting::TEXT_TAG ) {
-				toBeAllocedNode->setText( attrValue );
+				if ( toBeAllocedNode!=nullptr ) {
+					toBeAllocedNode->setText( attrValue );
+				}
+			} else if ( attrName == GlobalSetting::CIRCLE_COLOR_TAG ) {
+				QColor c;
+				c.setNamedColor( attrValue );
+				// cfg.m_circleBrushColor.setColor( c );
+                if ( !loadGlobalSettingFromFile ) {
+					newCfg.m_circleBrushColor = QBrush( c );
+				} else {
+					scene_bg = QBrush(c);
+				}
+			} else if ( attrName == GlobalSetting::CIRCLE_PEN_COLOR_TAG ) {
+				QColor c;
+				c.setNamedColor( attrValue );
+				// newCfg.m_circlePen.setColor( c );
+				if ( !loadGlobalSettingFromFile ) {
+					newCfg.m_circlePen = QPen( QBrush(c), newCfg.m_circlePen.widthF() );
+				} else {
+					circle_outline = QPen( QBrush(c), circle_outline.widthF() );
+				}
+			} else if ( attrName == GlobalSetting::CIRCLE_PEN_WIDTH_TAG ) {
+				auto convertRet = false;
+				auto dVal = attrValue.toDouble( &convertRet );
+				if ( convertRet ) {
+					// newCfg.m_circlePen.setWidthF(dVal);
+					if ( !loadGlobalSettingFromFile ) {
+						newCfg.m_circlePen = QPen( QBrush(newCfg.m_circlePen.color() ), dVal );
+					} else {
+						circle_outline = QPen( circle_outline.brush(), dVal );
+					}
+				}
+			} else if ( attrName == GlobalSetting::TEXT_FONT_NAME_TAG ) {
+				// newCfg.m_textFont.setFamily( attrValue );
+				if ( !loadGlobalSettingFromFile ) {
+					newCfg.m_textFont = QFont(attrValue, newCfg.m_textFont.pointSize() );
+				} else {
+					text_font = QFont(attrValue, text_font.pointSize() );
+				}
+			} else if ( attrName == GlobalSetting::TEXT_FONT_SIZE_TAG ) {
+				auto convertRet = false;
+				int pointsz = attrValue.toInt(&convertRet);
+				if ( convertRet ) {
+					// newCfg.m_textFont.setPointSize( pointsz );
+					if ( !loadGlobalSettingFromFile ) {
+						newCfg.m_textFont = QFont( newCfg.m_textFont.family(),  pointsz );
+					} else {
+						text_font = QFont( text_font.family(),  pointsz );
+					}
+				}
+			} else if ( attrName == GlobalSetting::TEXT_COLOR_TAG ) {
+				QColor c;
+				c.setNamedColor( attrValue );
+				// newCfg.m_textBrush.setColor( c );
+				if ( !loadGlobalSettingFromFile ) {
+					newCfg.m_textBrush = QBrush( c );
+				} else {
+					text_color = QBrush(c);
+				}
+			} else if ( attrName == GlobalSetting::CONNECTION_LINE_COLOR_TAG ) {
+				QColor c;
+				c.setNamedColor( attrValue );
+				// newCfg.m_connectionLinePen.setColor( c );
+				if ( !loadGlobalSettingFromFile ) {
+					newCfg.m_connectionLinePen = QPen( QBrush(c), newCfg.m_connectionLinePen.widthF() );
+				} else {
+                    connection_line = QPen( QBrush(c), connection_line.widthF() );
+				}
+			} else if ( attrName == GlobalSetting::CONNECTION_LINE_WIDTH_TAG ) {
+				auto convertRet = false;
+				auto dVal = attrValue.toDouble( &convertRet );
+				if ( convertRet ) {
+					// newCfg.m_connectionLinePen.setWidthF(dVal);
+					if ( !loadGlobalSettingFromFile ) {
+						newCfg.m_connectionLinePen = QPen( QBrush(newCfg.m_connectionLinePen.color()), dVal );
+					} else {
+                        connection_line = QPen( connection_line.brush(), dVal);
+					}
+				}
+			} else {
+				//
+				// For Global settings 
+				//
+				if ( loadGlobalSettingFromFile ) {
+					if ( attrName == SCENE_BG_TAG ) {
+						QColor c;
+						c.setNamedColor( attrValue );
+						scene_bg = QBrush( c );
+					} else if ( attrName == RADIUS ) {
+						auto convertRet = false;
+						auto dVal = attrValue.toDouble(&convertRet);
+						if ( convertRet ) {
+							circle_radius = dVal;
+						}
+					} else if ( attrName == LR_GAP1 ) {
+						auto convertRet = false;
+						auto dVal = attrValue.toDouble(&convertRet);
+						if ( convertRet ) {
+							distance_between_leftright = dVal;
+						}
+					} else if ( attrName == RL_GAP2 ) {
+						auto convertRet = false;
+						auto dVal = attrValue.toDouble(&convertRet);
+						if ( convertRet ) {
+							distance_between_right__left = dVal;
+						}
+					} else if ( attrName == LAYER_GAP ) {
+						auto convertRet = false;
+						auto dVal = attrValue.toDouble(&convertRet);
+						if ( convertRet ) {
+							height_between_parent_and_children = dVal;
+						}
+					} else if ( attrName == LEFT_MARGIN_TAG ) {
+						auto convertRet = false;
+						auto dVal = attrValue.toDouble(&convertRet);
+						if ( convertRet ) {
+							left_margin = dVal;
+						}
+					} else if ( attrName == RIGHT_MARGIN_TAG ) {
+						auto convertRet = false;
+						auto dVal = attrValue.toDouble(&convertRet);
+						if ( convertRet ) {
+							right_margin = dVal;
+						}
+					} else if ( attrName == TOP_MARGIN_TAG ) {
+						auto convertRet = false;
+						auto dVal = attrValue.toDouble(&convertRet);
+						if ( convertRet ) {
+							top_margin = dVal;
+						}
+					} else if ( attrName == BOTTOM_MARGIN_TAG ) {
+						auto convertRet = false;
+						auto dVal = attrValue.toDouble(&convertRet);
+						if ( convertRet ) {
+							bottom_margin = dVal;
+						}
+					}
+				}
 			}
 		}
 
-		buildNodeFromReading(toBeAllocedNode, child, level+1 );
+
+		if ( !loadGlobalSettingFromFile && toBeAllocedNode!=nullptr ) {
+			toBeAllocedNode->setNodeStyle(newCfg);
+			buildNodeFromReading(toBeAllocedNode, child, level+1 );
+		}
 	}
 
 }
@@ -622,25 +1111,33 @@ void binarytreemodel::generateANewTree()
 		m_pRoot = m_pInvisibleRootItem->addLeftNode( QString("0") );
 
 		endResetModel();
+
+		updateDepthAndHeight( m_pRoot , nullptr);
 	}
 }
 
 
+void  binarytreemodel::updateDepthAndHeightForRoot()
+{
+	if ( m_pRoot != nullptr ) {
+		updateDepthAndHeight(m_pRoot, nullptr);
+	}
+
+}
+
 //                                         以被UI层选中的结点为 根结点 ， 构建一颗树
-void binarytreemodel::updateDepthAndHeight(treenode* selectedRootNode)
+void binarytreemodel::updateDepthAndHeight(treenode* selectedRootNode, QPointF* pMostRightBottomCenterPt)
 {
     using namespace GlobalSetting;
 	if ( selectedRootNode == nullptr ) {
 		return;
 	}
 
-
 	m_renderCircleMap.clear();
 
 	auto isLeftNode = true;
 	int wholeTreeHeight = calcTreeNodeDepthAndHeight( selectedRootNode, isLeftNode, 0);
 	// qDebug() << "wholeTreeHeight = " << wholeTreeHeight;
-	// Q_UNUSED(wholeTreeHeight)
 
 
 	/****************************************************************************************************
@@ -660,7 +1157,7 @@ void binarytreemodel::updateDepthAndHeight(treenode* selectedRootNode)
 	while ( reverseIt.hasPrevious() ) {
 		reverseIt.previous();
 		int depth = reverseIt.key();
-		qDebug() << depth << ". ";
+		// qDebug() << depth << ". ";
 
 		int nodeFullCnt = 1;
 		for( int i = 0; i < depth; ++i ) {
@@ -669,16 +1166,20 @@ void binarytreemodel::updateDepthAndHeight(treenode* selectedRootNode)
 
 		// calculate center point position
 		measurement[depth].clear();
-		double h = (CIRCLE_RADIUS * 2 + HEIGHT_BETWEEN_PARENT_AND_CHILDREN) * depth + CIRCLE_RADIUS;
+		double h = (circle_radius * 2 + height_between_parent_and_children) * depth + circle_radius;
 		if ( depth == wholeTreeHeight ) {
 			double x = 0.0;
 			for( int i = 0; i < nodeFullCnt; ++i ) {
-				x += CIRCLE_RADIUS;
+				x += circle_radius;
                 measurement[depth].push_back( qMakePair(x, h) );
+				if ( i == (nodeFullCnt-1)    &&   pMostRightBottomCenterPt != nullptr ) {
+					pMostRightBottomCenterPt->setX( x );
+                    pMostRightBottomCenterPt->setY( h );
+				}
 
 				// next : move delta step which distance with (a radius + a gap)
-				x += CIRCLE_RADIUS;
-				double gap = (i%2 == 0) ? DISTANCE_BETWEEN_LEFTRIGHT : DISTANCE_BETWEEN_RIGHT__LEFT;
+				x += circle_radius;
+				double gap = (i%2 == 0) ? distance_between_leftright : distance_between_right__left;
 				x += gap;
 			}
 		} else {
@@ -697,22 +1198,47 @@ void binarytreemodel::updateDepthAndHeight(treenode* selectedRootNode)
 			treenode* nd = *ndIt;
 			if ( nd !=nullptr ) {
 				auto layerIdx = nd->layerIdx();
-				nd->setCenterPt_x( measurement[depth][layerIdx].first );
-				nd->setCenterPt_y( measurement[depth][layerIdx].second );
-				qDebug() << "\t" << nd->text() << ", l-idx = "<< layerIdx <<", (" << nd->x() << "," << nd->y() << ")";
+				auto belowCenterX = measurement[depth][layerIdx].first;
+				auto belowCenterY =  measurement[depth][layerIdx].second;
+				nd->setCenterPt_x( belowCenterX );
+				nd->setCenterPt_y( belowCenterY );
+
+				//
+				// set connection line position
+				//
+				if ( depth > 0 ) {
+					double upperLayerH = (circle_radius * 2 + height_between_parent_and_children) * (depth-1) + circle_radius;
+					double centerX = 0.0;
+					if ( layerIdx % 2 == 0 ) {
+						centerX = (measurement[depth][layerIdx].first + measurement[depth][layerIdx+1].first) / 2.0;
+					} else {
+						centerX = (measurement[depth][layerIdx].first + measurement[depth][layerIdx-1].first) / 2.0;
+					}
+
+					QLineF below2upperLine( belowCenterX, belowCenterY, centerX, upperLayerH);
+					QLineF upper2belowLine( centerX, upperLayerH, belowCenterX, belowCenterY );
+					below2upperLine.setLength( circle_radius );
+					upper2belowLine.setLength( circle_radius );
+
+					nd->setConnectionLine_SelfDot(   below2upperLine.x2(),  below2upperLine.y2() );
+					nd->setConnectionLine_ParentDot( upper2belowLine.x2(),  upper2belowLine.y2() );
+				}
+				// qDebug() << "\t" << nd->text() << ", l-idx = "<< layerIdx <<", (" << nd->x() << "," << nd->y() << ")";
 			}
 		}
 
 	}
-
-	
 	
 
 }
 
+
+
+
 int binarytreemodel::calcTreeNodeDepthAndHeight(treenode* node, bool leftTag, int layer)
 {
-	auto printDebugInfo = true;
+	static const bool printDebugInfo = false;
+
 	if ( node == nullptr ) {
 		return -1;
 	}
@@ -756,7 +1282,7 @@ int binarytreemodel::calcTreeNodeDepthAndHeight(treenode* node, bool leftTag, in
 
 
 /*
-    
+	get All travelsaled nodes into a vector   
 */
 const QVector<treenode*>& binarytreemodel::getTreeNodes()
 {

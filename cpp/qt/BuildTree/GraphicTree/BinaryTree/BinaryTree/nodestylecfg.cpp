@@ -1,9 +1,14 @@
 #include "nodestylecfg.h"
+#include "globalSettings.h"
 
 
 void nodeStyleCfg::reset2Default()
 {
-
+	m_circleBrushColor = GlobalSetting::circle_brush;
+	m_circlePen = GlobalSetting::circle_outline;
+	m_textFont =  GlobalSetting::text_font;
+	m_textBrush = GlobalSetting::text_color;
+	m_connectionLinePen = GlobalSetting::connection_line;
 }
 
 
@@ -11,11 +16,11 @@ void nodeStyleCfg::reset2Default()
 const nodeStyleCfg& nodeStyleCfg::DefaultCfg()
 {
 	static nodeStyleCfg dftCfg;
-	dftCfg.m_circleBrushColor = QBrush( Qt::red );
-	dftCfg.m_circlePen = QPen( QBrush(Qt::green), 2.5  );
-	dftCfg.m_textFont =  QFont( QString("SimSun"), 9 );
-	dftCfg.m_textBrush = QBrush( Qt::black ) ;
-	dftCfg.m_connectionLinePen = QPen( QBrush(Qt::blue), 3);
+	dftCfg.m_circleBrushColor = GlobalSetting::circle_brush;
+	dftCfg.m_circlePen = GlobalSetting::circle_outline;
+	dftCfg.m_textFont =  GlobalSetting::text_font;
+	dftCfg.m_textBrush = GlobalSetting::text_color;
+	dftCfg.m_connectionLinePen = GlobalSetting::connection_line;
 
 	return dftCfg;
 }

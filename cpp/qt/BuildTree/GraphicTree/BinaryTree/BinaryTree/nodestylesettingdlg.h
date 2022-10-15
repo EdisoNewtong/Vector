@@ -2,6 +2,8 @@
 #define NODESTYLESETTINGDLG_H
 
 #include <QDialog>
+#include <QAbstractButton>
+#include "treenode.h"
 #include "nodestylecfg.h"
 
 
@@ -17,7 +19,18 @@ public:
     explicit NodeStyleSettingDlg(QWidget *parent = nullptr);
     ~NodeStyleSettingDlg();
 
-	void init(const nodeStyleCfg& cfg);
+    void init(treenode* node);
+
+protected:
+    treenode* m_nodeToSet;
+
+    nodeStyleCfg m_originalCfg;
+    nodeStyleCfg m_toApplyCfg;
+
+	bool m_bNeedUpdateAtOnce;
+
+protected:
+	void updateAllRenderObject();
 private slots:
     void on_circleBrushSettingBtn_clicked();
 
@@ -28,6 +41,14 @@ private slots:
     void on_connectionLineSettingBtn_clicked();
 
     void on_textBrushSettingBtn_clicked();
+
+    void on_circlePenWidthSetting_valueChanged(double arg1);
+
+    void on_connectionLineWidthSetting_valueChanged(double arg1);
+
+    void on_buttonBox_clicked(QAbstractButton *button);
+
+    void on_NodeStyleSettingDlg_finished(int result);
 
 private:
     Ui::NodeStyleSettingDlg *ui;

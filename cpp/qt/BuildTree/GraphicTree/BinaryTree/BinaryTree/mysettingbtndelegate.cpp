@@ -5,7 +5,7 @@
 #include <QColorDialog>
 #include <QFontDialog>
 
-
+#include "treenode.h"
 #include "globalSettings.h"
 #include "nodestylesettingdlg.h"
 
@@ -21,10 +21,8 @@ QWidget* mysettingbtndelegate::createEditor(QWidget *parent, const QStyleOptionV
 {
 	if ( index.column() == GlobalSetting::SPECIAL_COLUMN_INDEX  ) {
         QPushButton* settingBtn = new QPushButton("Setting ... ", parent);
-		// settingBtn->setFrame( false );
 		m_clickedBtnIdx = index;
         connect( settingBtn, &QPushButton::clicked, this, &mysettingbtndelegate::onSettingBtnClick);
-        // qDebug() << "createEditor (" << G_CNT << "). ";
 
 		return settingBtn;
 	}
@@ -86,49 +84,21 @@ void mysettingbtndelegate::onSettingBtnClick(bool checked /* = false */)
 {
 	(void)checked;
 
-	/*
-	// QModelIndex
-	qDebug() << "On Btn Clicked ";
 	if ( !m_clickedBtnIdx.isValid() ) {
-		qDebug() << "m_clickedBtnIdx is not valid.";
 		return;
 	}
 
-	qDebug() << " row : " << m_clickedBtnIdx.row()
-		     << " col : " << m_clickedBtnIdx.column();
-	QModelIndex par = m_clickedBtnIdx.parent();
-	if ( par.isValid() ) {
-		qDebug() << "parent is OK. ";
-	} else {
-		qDebug() << "parent is not valid.";
+	treenode* currentNodeItem = static_cast<treenode*>( m_clickedBtnIdx.internalPointer() );
+	if ( currentNodeItem == nullptr ) {
+		return;
 	}
 
-    qDebug() << "data = " << m_clickedBtnIdx.siblingAtColumn(1).data().toString();
-	*/
-
-
-
-
-    /*
-	static int G_CNT = 0;
-	++G_CNT;
-    auto option = QColorDialog::ShowAlphaChannel;
-    if ( G_CNT % 2 == 1 ) {
-        qDebug() << "use option = ShowAlphaChannel";
-        option = QColorDialog::ShowAlphaChannel;
-    } else {
-        qDebug() << "use option = DontUseNativeDialog";
-        option = QColorDialog::DontUseNativeDialog;
-    }
-    QColorDialog::getColor( Qt::red, nullptr, tr("Pick your favourite the circle's brush color"), option);
-    */
 
     // bool bIsOK = false;
     // QFontDialog::getFont(&bIsOK, nullptr);
 	
     auto dlg = new NodeStyleSettingDlg();
-	// TODO : replace defaultCfg to it's object property cfg
-	dlg->init( nodeStyleCfg::DefaultCfg() );
+    dlg->init( currentNodeItem  );
     dlg->exec();
 
 }

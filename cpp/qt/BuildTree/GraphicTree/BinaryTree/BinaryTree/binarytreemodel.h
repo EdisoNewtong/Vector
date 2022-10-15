@@ -57,8 +57,10 @@ public:
 
 
 	// void updateSelectedDepthAndHeight( const QModelIndex& selectedRootNode );
-	void updateDepthAndHeight( treenode* selectedRootNode);
+	void  updateDepthAndHeight( treenode* selectedRootNode, QPointF* pMostRightBottomCenterPt);
+	void  updateDepthAndHeightForRoot();
     const QVector<treenode*>& getTreeNodes();
+
 protected slots:
 	bool create_AddLeftNode(const QModelIndex& parent);
 	bool create_AddRightNode(const QModelIndex& parent);

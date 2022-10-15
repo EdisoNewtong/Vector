@@ -4,8 +4,12 @@
 #include <QMainWindow>
 #include <QGraphicsScene>
 #include <QModelIndex>
-#include <QGraphicsEllipseItem>
 
+
+#include <QGraphicsEllipseItem>
+#include <QGraphicsSimpleTextItem>
+
+#include "treenode.h"
 #include "binarytreemodel.h"
 #include "mysettingbtndelegate.h"
 
@@ -48,8 +52,8 @@ private:
 	binarytreemodel* m_pTreeModel;
 	mysettingbtndelegate*  m_btnDelegate;  // styled delegate
 
-	void drawTreeBySelectedItem( const QModelIndex& selected, int level); 
-    QGraphicsEllipseItem* allocCircle(const qreal& r, const QString& text);
+	// void drawTreeBySelectedItem( const QModelIndex& selected, int level); 
+    QPair<QGraphicsEllipseItem*,QGraphicsSimpleTextItem*>  allocCircle(treenode* node);
 };
 
 #endif // MAINWINDOW_H

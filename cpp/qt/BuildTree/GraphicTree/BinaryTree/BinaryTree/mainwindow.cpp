@@ -6,13 +6,17 @@
 #include <QDebug>
 #include <QItemSelection>
 #include <QFileDialog>
+#include <QPainter>
 #include <QPen>
 #include <QBrush>
 #include <QFontMetricsF>
-#include <QGraphicsLineItem>
 #include <QMessageBox>
 
+#include <QGraphicsLineItem>
+
 #include "globalSettings.h"
+#include "nodestylecfg.h"
+#include "globalsettingdlg.h"
 
 
 // static QGraphicsEllipseItem* G_pItem = nullptr;
@@ -25,14 +29,16 @@ MainWindow::MainWindow(QWidget *parent)
 	, m_pTreeModel( nullptr )
 	, m_btnDelegate( nullptr )
 {
+
     ui->setupUi(this);
 
-	m_pScene = new QGraphicsScene(0.0 , 0.0, 1600.0, 900.0, ui->graphicsView );
-	// m_pScene->setBackgroundBrush( Qt::white ); /* Qt::blue */
+	GlobalSetting::resetToDefault();
+
+	m_pScene = new QGraphicsScene(0.0 , 0.0, 800.0, 600.0, ui->graphicsView );
+	m_pScene->setBackgroundBrush( GlobalSetting::scene_bg );
 
 	ui->graphicsView->setScene( m_pScene );
 	ui->graphicsView->setRenderHints( QPainter::Antialiasing | QPainter::TextAntialiasing );
-
 
 	m_pTreeModel = new binarytreemodel( this );
 	ui->treeView->setModel( m_pTreeModel );
@@ -106,8 +112,11 @@ void MainWindow::on_loadBtn_clicked()
 		}
 
 		QString errorMsg;
+
 		if ( m_pTreeModel->loadFromFile(filename, &errorMsg) ) {
 			ui->statusBar->showMessage("Load Tree OK :)", 3500);
+            // update Scene's Background
+            m_pScene->setBackgroundBrush( GlobalSetting::scene_bg );
 			ui->treeView->expandAll();
 		} else {
             ui->statusBar->showMessage(errorMsg, 3500);
@@ -150,43 +159,31 @@ void MainWindow::on_clearBtn_clicked()
 	if ( m_pScene != nullptr ) {
 		m_pScene->clear();
 		m_pScene->update( m_pScene->sceneRect() );
+
+		if ( m_pTreeModel != nullptr ) {
+			m_pTreeModel->updateDepthAndHeightForRoot();
+			const auto& nodevec = m_pTreeModel->getTreeNodes();
+            for( auto nd = nodevec.begin(); nd != nodevec.end(); ++nd ) {
+				treenode* node = *nd;
+				if ( node != nullptr ) {
+					node->detachAllRenderObject();
+				}
+			}
+		}
+
 	}
 
 }
 
 void MainWindow::on_treeOptionBtn_clicked()
 {
+	QBrush outBg = GlobalSetting::scene_bg;
+	auto dlg = new GlobalSettingDlg(this,&outBg); 
+	dlg->exec();
 
-}
-
-
-
-/******************************************************************************** 
-Core Core Core :
-
-     Draw the tree recursively function
-
-level : the depth of a given item ( 0 for the root item )
-*********************************************************************************/
-void MainWindow::drawTreeBySelectedItem(const QModelIndex& selected, int level)
-{
-	(void)selected;
-    (void)level;
-
-	// Get the text
-	auto textField = selected.siblingAtColumn(1);
-	if ( !textField.isValid() ) {
-		return;
+	if ( m_pScene != nullptr ) {
+		m_pScene->setBackgroundBrush( outBg );
 	}
-
-	auto content = textField.data().toString();
-
-	auto graphicsCircleWithContent = allocCircle( GlobalSetting::CIRCLE_RADIUS, content );
-	if ( m_pScene != nullptr  &&    graphicsCircleWithContent != nullptr ) { 
-        graphicsCircleWithContent->setPos( QPointF(10,10) );
-		m_pScene->addItem( graphicsCircleWithContent );
-	}
-
 }
 
 
@@ -201,36 +198,63 @@ void MainWindow::on_drawTreeBtn_clicked()
 		auto pr = ui->treeView->getSelectedNodeItem(&selectedCol);
 		auto selectedTreeNode = pr.second;
 		if ( selectedTreeNode == nullptr ) {
-			qDebug() << "Selected Node is invalid";
+			ui->statusBar->showMessage("Please Select the 1st column of the Node", 3500);
 			return;
 		}
 
-		m_pTreeModel->updateDepthAndHeight( selectedTreeNode );
-		const auto& nodevec = m_pTreeModel->getTreeNodes();
+        QPointF mostRightBottomCenterPoint;
+        m_pTreeModel->updateDepthAndHeight( selectedTreeNode, &mostRightBottomCenterPoint);
+		if ( m_pScene != nullptr ) {
+			// auto rect = m_pScene->sceneRect();
+			// auto width = rect.width();
+			// auto height = rect.height();
+			QPointF rightbottomPt = (mostRightBottomCenterPoint + QPointF( circle_radius, circle_radius )) + QPointF(left_margin, top_margin) + QPointF(right_margin, bottom_margin);
+			m_pScene->setSceneRect( QRectF( QPointF(0.0,0.0),  rightbottomPt ) );
+		}
 
+
+
+		const auto& nodevec = m_pTreeModel->getTreeNodes();
 		for( auto nd = nodevec.begin(); nd != nodevec.end(); ++nd ) 
 		{
 			treenode* node = *nd;
 			if ( node != nullptr ) {
-				auto graphicsCircleWithContent = allocCircle( CIRCLE_RADIUS , node->text() );
-				QPointF centerPt( LEFT_MARGIN + node->x(), TOP_MARGIN + node->y() );
-				QPointF leftTop = centerPt - QPointF(CIRCLE_RADIUS, CIRCLE_RADIUS);
+				// alloc circle with text by the passed node struct
+				auto circleTextPr = allocCircle( node );
+				auto circle = circleTextPr.first;
+				auto text = circleTextPr.second;
+				QPointF centerPt( left_margin + node->x(), top_margin + node->y() );
+				QPointF leftTop = centerPt - QPointF(circle_radius, circle_radius);
 				
-				graphicsCircleWithContent->setPos( leftTop );
-				m_pScene->addItem( graphicsCircleWithContent );
-				
-				if ( selectedTreeNode != node ) { // !node->isRoot() 
-					auto parentNode = node->parent();
-					if ( parentNode != nullptr ) {
-						QPointF parentCenter( LEFT_MARGIN +  parentNode->x(), TOP_MARGIN + parentNode->y() );
-						auto connectionLine = new QGraphicsLineItem( centerPt.x(), centerPt.y(),  parentCenter.x(), parentCenter.y() );
-						connectionLine->setZValue( -1.0 );
-						m_pScene->addItem( connectionLine );
-					}
-				}
+				if ( circle!=nullptr   &&   text!=nullptr ) {
+					circle->setPos( leftTop );
+					// Core Core Core : attach render circle with text
+					node->setCircle(circle);
+					node->setTextObject(text);
 
+					m_pScene->addItem( circle );
+				}
+				
+				// render the connection line
+				if ( selectedTreeNode != node ) {
+                    QPointF lineUpperLayerPos( left_margin + node->connectionLineSelfParent_x() , top_margin + node->connectionLineSelfParent_y() );
+                    auto connectionLine = new QGraphicsLineItem( left_margin + node->connectionLineSelfDot_x(), top_margin + node->connectionLineSelfDot_y(),  lineUpperLayerPos.x(), lineUpperLayerPos.y() );
+					auto styleCfg = node->getNodeStyle();
+					connectionLine->setPen( styleCfg.m_connectionLinePen );
+                    // connectionLine->setZValue( -1.0 );
+
+					// Core Core Core : attach render connection line
+					node->setLine( connectionLine );
+					m_pScene->addItem( connectionLine );
+				}
 			}
 			
+		}
+
+		// center focus on the selected node 
+		auto rootCircleObject = selectedTreeNode->circleObject();
+		if ( rootCircleObject != nullptr ) {
+			ui->graphicsView->centerOn( rootCircleObject );
 		}
 	}
 	
@@ -243,94 +267,43 @@ void MainWindow::on_drawTreeBtn_clicked()
 
 void MainWindow::on_saveGraphicBtn_clicked()
 {
-	qDebug() << "To Save Picture";
+	// qDebug() << "To Save Picture";
+    auto savedfile = QFileDialog::getSaveFileName(this,"Save Tree As png", QString(), tr("Png Files (*.png)") );
+    if ( savedfile.trimmed().isEmpty() ) {
+        ui->statusBar->showMessage("Cancel Saving File", 3500);
+        return;
+    }
 
+    //
+    // Core Core Core :
+    //
+    //      Must set the pixmap's size first , otherwise , the save-file operation will be failed by the following Error List
+    //
+    // QPainter::begin: Paint device returned engine == 0, type: 2
+    // QPainter::setBackground: Painter not active
+    // QPainter::setRenderHint: Painter must be active to set rendering hints
+    // QPainter::save: Painter not active
 
-	/*
-	auto tag = 122;
-	if (  tag == 123 ) {
-		return;
-	}
+    auto rectSz = m_pScene->sceneRect().size().toSize();
 
-	auto round1 = new QGraphicsEllipseItem( 10, 10, 200, 200);
-	round1->setPen( QPen(Qt::black) ); 
-	round1->setBrush( QBrush(Qt::red) );
+    QPixmap pixmap( rectSz );
+    QPainter painter;
+    painter.begin(&pixmap);
+    // painter.setBackground(  Qt::white );
+    painter.setBackground(  m_pScene->backgroundBrush() );
+    painter.setRenderHints( QPainter::Antialiasing |  QPainter::TextAntialiasing );
+    m_pScene->render(&painter);
+    painter.end();
 
-	auto round2 = new QGraphicsEllipseItem( 220, 10, 200, 200);
-	QPen p( QBrush(Qt::blue), 16);
-	round2->setPen( p ); 
-	round2->setBrush( QBrush(Qt::red) );
-	G_pItem = round2;
-
-	auto round3 = new QGraphicsEllipseItem( 220, 115, 200, 200);
-	QPen p33( QBrush(Qt::blue), 5);
-	round3->setPen( p33 ); 
-	round3->setBrush( QBrush(Qt::red) );
-
-	auto round4 = new QGraphicsEllipseItem( 10, 115, 200, 200);
-	round4->setPen( QPen(Qt::black) );
-	round4->setBrush( QBrush(Qt::red) );
-
-
-	m_pScene->addItem(round1);
-	m_pScene->addItem(round2);
-	m_pScene->addItem(round3);
-	m_pScene->addItem(round4);
-
-	auto text1 = new QGraphicsSimpleTextItem("ABC");
-	QPen p2( QBrush(Qt::yellow), 2);
-	text1->setPen( p2 ); 
-	text1->setBrush( QBrush(Qt::green) );
-	text1->setPos( 10, 110 );
-
-	auto text2 = new QGraphicsSimpleTextItem("DEF");
-	QPen p3( QBrush(Qt::yellow), 1);
-	text2->setPen( p3 ); 
-	text2->setBrush( QBrush(Qt::green) );
-	text2->setPos( 220, 110 );
-
-	auto text3 = new QGraphicsSimpleTextItem("DEF");
-	QFont fnt( text3->font() );
-	qDebug() << tr("old size = %1").arg( fnt.pointSize() );
-	fnt.setPointSize( 16 );
-	text3->setFont( fnt );
-	// QPen p4( QBrush(Qt::yellow), 1);
-	// text3->setPen( p4 ); 
-	text3->setBrush( QBrush(Qt::green) );
-	text3->setPos( 240, 215 );
-
-
-	m_pScene->addItem( text1 );
-	m_pScene->addItem( text2 );
-	m_pScene->addItem( text3 );
-	
-	*/
-
-
-	/*
-	   QAbstractGraphicsShapeItem                    
-	    |
-		 -- QGraphicsSimpleTextItem
-
-
-
-		QGraphicsObject
-		 |
-		  -- QGraphicsTextItem 
-
-	*/
-
-
-	/*
-	if ( G_pItem != nullptr ) {
-
-		// QPen p( QBrush(Qt::blue), 16);
-		// round2->setPen( p ); 
-		// round2->setBrush( QBrush(Qt::red) );
-		G_pItem->setPen( QPen( QBrush(Qt::blue), 3 ) );
-		G_pItem->setBrush( QBrush(Qt::green) );
-	}
-	*/
+    auto succ = pixmap.save(savedfile,"PNG");
+    if ( !succ ) {
+        QString errorMsg("Save Png Failed");
+        ui->statusBar->showMessage(errorMsg, 3500);
+        QMessageBox::critical(this, QStringLiteral("Saving Error"), errorMsg);
+    } else {
+        QMessageBox::information(this, QStringLiteral("Saving Status"), QStringLiteral("Png File Saved") );
+        ui->statusBar->showMessage("Saving File Done", 3500);
+    }
 
 
 
@@ -338,22 +311,29 @@ void MainWindow::on_saveGraphicBtn_clicked()
 
 
 
-QGraphicsEllipseItem* MainWindow::allocCircle(const qreal& r, const QString& text)
+QPair<QGraphicsEllipseItem*, QGraphicsSimpleTextItem*> MainWindow::allocCircle(treenode* node)
 {
-	auto d = 2.0 * r;
+	if ( node == nullptr ) {
+		return qMakePair(nullptr, nullptr);
+	}
+
+    auto styleCfg = node->getNodeStyle();
+
+	using namespace GlobalSetting;
+	auto d = 2.0 * circle_radius;
 	auto graphicCircle =  new QGraphicsEllipseItem(0, 0, d, d);
-	graphicCircle->setPen( GlobalSetting::CIRCLE_OUTLINE ); 
-	graphicCircle->setBrush( GlobalSetting::CIRCLE_BRUSH );
+	graphicCircle->setPen( styleCfg.m_circlePen  ); 
+	graphicCircle->setBrush( styleCfg.m_circleBrushColor );
 
 	// CIRCLE_BRUSH
-	auto graphicText = new QGraphicsSimpleTextItem( text, graphicCircle );
-	graphicText->setFont( GlobalSetting::TEXT_FONT );
-	graphicText->setBrush( GlobalSetting::TEXT_COLOR );
+	auto graphicText = new QGraphicsSimpleTextItem( node->text() , graphicCircle );
+	graphicText->setFont( styleCfg.m_textFont );
+	graphicText->setBrush( styleCfg.m_textBrush );
 
 	auto fnt = graphicText->font();
 
 	QFontMetricsF fmObj( fnt );
-	auto dWidth = fmObj.horizontalAdvance(text);
+    auto dWidth = fmObj.horizontalAdvance( node->text() );
 	auto dHeight = fmObj.height();
 	auto x = (d - dWidth) / 2.0;
 	auto y = (d - dHeight) / 2.0;
@@ -361,5 +341,5 @@ QGraphicsEllipseItem* MainWindow::allocCircle(const qreal& r, const QString& tex
 	graphicText->setPos( QPointF(x,y) );
 
 	// graphicCircle->addItem( graphicText );
-	return graphicCircle; 
+	return qMakePair( graphicCircle, graphicText); 
 }

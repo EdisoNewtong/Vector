@@ -25,6 +25,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++11
 
 SOURCES += \
+    globalsettingdlg.cpp \
         main.cpp \
         mainwindow.cpp \
         binarytreeview.cpp \
@@ -36,6 +37,7 @@ SOURCES += \
 		treenode.cpp
 
 HEADERS += \
+    globalsettingdlg.h \
         mainwindow.h \
         binarytreeview.h \
         mysettingbtndelegate.h \
@@ -50,6 +52,7 @@ HEADERS += \
         XmlParser/rapidxml_utils.hpp
 
 FORMS += \
+        globalsettingdlg.ui \
         mainwindow.ui \
         nodestylesettingdlg.ui
 
