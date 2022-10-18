@@ -551,164 +551,6 @@ bool binarytreemodel::saveToFile(const QString& filenameToSave, QString* pErrorS
 
 
 
-	rapidxml::xml_node<char>* settingNode = m_pXMLDoc->allocate_node(rapidxml::node_element);
-
-	// set node's Tag
-    m_XmlStringList.push_back( GLOBAL_SETTINGS_TAG.toUtf8() );
-	settingNode->name( m_XmlStringList.last().constData() );
-
-	////////////////////////////////////////////////////////////////////////////////////////////////////
-	// set all attribute
-	//
-	
-	// Scene's BG Color
-	m_XmlStringList.push_back( SCENE_BG_TAG.toUtf8() );
-	m_XmlStringList.push_back( scene_bg.color().name(QColor::HexArgb).toUtf8() );
-	auto attrSceneBgColor = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
-	settingNode->append_attribute( attrSceneBgColor );
-	// circle's radius
-	m_XmlStringList.push_back( RADIUS.toUtf8() );
-	m_XmlStringList.push_back( QString("%1").arg(circle_radius).toUtf8() );
-	auto attrR = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
-	settingNode->append_attribute( attrR );
-	// gap-1
-	m_XmlStringList.push_back( LR_GAP1.toUtf8() );
-	m_XmlStringList.push_back( QString("%1").arg(distance_between_leftright).toUtf8() );
-	auto attrGap1 = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
-	settingNode->append_attribute( attrGap1 );
-	// gap-2
-	m_XmlStringList.push_back( RL_GAP2.toUtf8() );
-	m_XmlStringList.push_back( QString("%1").arg(distance_between_right__left).toUtf8() );
-	auto attrGap2 = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
-	settingNode->append_attribute( attrGap2 );
-	// vertical layer gap
-	m_XmlStringList.push_back( LAYER_GAP.toUtf8() );
-	m_XmlStringList.push_back( QString("%1").arg(height_between_parent_and_children).toUtf8() );
-	auto attrHGap = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
-	settingNode->append_attribute( attrHGap );
-	// left margin
-	m_XmlStringList.push_back( LEFT_MARGIN_TAG.toUtf8() );
-	m_XmlStringList.push_back( QString("%1").arg(left_margin).toUtf8() );
-	auto attrLeftMargin = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
-	settingNode->append_attribute( attrLeftMargin  );
-	// right margin
-	m_XmlStringList.push_back( RIGHT_MARGIN_TAG.toUtf8() );
-	m_XmlStringList.push_back( QString("%1").arg(right_margin).toUtf8() );
-	auto attrRightMargin = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
-	settingNode->append_attribute( attrRightMargin );
-	// top margin
-	m_XmlStringList.push_back( TOP_MARGIN_TAG.toUtf8() );
-	m_XmlStringList.push_back( QString("%1").arg(top_margin).toUtf8() );
-	auto attrTopMargin = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
-	settingNode->append_attribute( attrTopMargin );
-	// bottom margin
-	m_XmlStringList.push_back( BOTTOM_MARGIN_TAG.toUtf8() );
-	m_XmlStringList.push_back( QString("%1").arg(bottom_margin).toUtf8() );
-	auto attrBottomMargin = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
-	settingNode->append_attribute( attrBottomMargin );
-
-	  ////////////////////////////////////////////////////////////////////////////////////////////////////
-    auto circleColor = circle_brush.color();
-    auto circlePenColor = circle_outline.color();
-    auto circlePenWidth = circle_outline.widthF();
-
-	auto contentTextFont = text_font;
-	auto contentTextColor = text_color.color();
-
-	auto connectionLineColor = connection_line.color();
-	auto connectionLineWidth = connection_line.widthF();
-
-	// set circle's color's   tag
-	QByteArray baAttrCircleColorTag;
-	baAttrCircleColorTag.append( CIRCLE_COLOR_TAG );
-	m_XmlStringList.push_back( baAttrCircleColorTag );
-	// save circle color's value   : format "#AARRGGBB" in Qt
-	QByteArray baAttrCircleColorValue;
-	baAttrCircleColorValue.append( circleColor.name(QColor::HexArgb) );
-	m_XmlStringList.push_back( baAttrCircleColorValue );
-	auto attrCircleColor = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
-	settingNode->append_attribute( attrCircleColor  );
-
-	// set circle's pen color tag
-	QByteArray baAttrCirclePenColorTag;
-	baAttrCirclePenColorTag.append( CIRCLE_PEN_COLOR_TAG );
-	m_XmlStringList.push_back( baAttrCirclePenColorTag );
-	// set circle's pen color value
-	QByteArray baAttrCirclePenColorValue;
-	baAttrCirclePenColorValue.append( circlePenColor.name(QColor::HexArgb) );
-	m_XmlStringList.push_back( baAttrCirclePenColorValue );
-	auto attrCirclePenColor = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
-	settingNode->append_attribute( attrCirclePenColor );
-
-	// set circle's pen width tag
-	QByteArray baAttrCirclePenWidthTag;
-	baAttrCirclePenWidthTag.append( CIRCLE_PEN_WIDTH_TAG );
-	m_XmlStringList.push_back( baAttrCirclePenWidthTag );
-	// set circle's pen width value
-	QByteArray baAttrCirclePenWidthValue;
-    baAttrCirclePenWidthValue.append( QString("%1").arg( circlePenWidth )  );
-	m_XmlStringList.push_back( baAttrCirclePenWidthValue );
-	auto attrCirclePenWidth = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
-	settingNode->append_attribute( attrCirclePenWidth );
-
-
-	// set text font tag
-	QByteArray baAttrTextFontTag;
-	baAttrTextFontTag.append( TEXT_FONT_NAME_TAG );
-	m_XmlStringList.push_back( baAttrTextFontTag );
-	// set text font's name as value
-	QByteArray baAttrTextFontNameValue;
-	baAttrTextFontNameValue.append( contentTextFont.family() );
-	m_XmlStringList.push_back( baAttrTextFontNameValue );
-	auto attrFontName = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
-	settingNode->append_attribute( attrFontName );
-
-
-	// set text font pointsize 
-	QByteArray baAttrTextFontSizeTag;
-	baAttrTextFontSizeTag.append( TEXT_FONT_SIZE_TAG );
-	m_XmlStringList.push_back( baAttrTextFontSizeTag );
-	// set text font's name as value
-	QByteArray baAttrTextFontSizeValue;
-	baAttrTextFontSizeValue.append( QString("%1").arg(contentTextFont.pointSize()) );
-	m_XmlStringList.push_back( baAttrTextFontSizeValue );
-	auto attrFontSize = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
-	settingNode->append_attribute( attrFontSize );
-
-	// set text color
-	QByteArray baAttrTextColorTag;
-	baAttrTextColorTag.append( TEXT_COLOR_TAG );
-	m_XmlStringList.push_back( baAttrTextColorTag );
-	// set text color's value
-	QByteArray baAttrTextColorValue;
-	baAttrTextColorValue.append( contentTextColor.name(QColor::HexArgb) );
-	m_XmlStringList.push_back( baAttrTextColorValue );
-	auto attrTextColor = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
-	settingNode->append_attribute( attrTextColor );
-
-	// set connection line color
-	QByteArray baAttrConnectionLineColorTag;
-	baAttrConnectionLineColorTag.append( CONNECTION_LINE_COLOR_TAG );
-	m_XmlStringList.push_back( baAttrConnectionLineColorTag );
-	// set text color's value
-	QByteArray baAttrConnectionLineColorValue;
-	baAttrConnectionLineColorValue.append( connectionLineColor.name(QColor::HexArgb) );
-	m_XmlStringList.push_back( baAttrConnectionLineColorValue );
-	auto attrConnectionLineColor = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
-	settingNode->append_attribute( attrConnectionLineColor );
-
-	// set connection line color
-	QByteArray baAttrConnectionLineWidthTag;
-	baAttrConnectionLineWidthTag.append( CONNECTION_LINE_WIDTH_TAG );
-	m_XmlStringList.push_back( baAttrConnectionLineWidthTag );
-	// set text color's value
-	QByteArray baAttrConnectionLineWidthValue;
-	baAttrConnectionLineWidthValue.append( QString("%1").arg( connectionLineWidth ) );
-	m_XmlStringList.push_back( baAttrConnectionLineWidthValue );
-	auto attrConnectionLineWidth = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
-	settingNode->append_attribute( attrConnectionLineWidth );
-
-	m_pXMLDoc->append_node(settingNode);
 
 	int begLevel = 0;
 	// Core Core Core
@@ -734,13 +576,16 @@ bool binarytreemodel::saveToFile(const QString& filenameToSave, QString* pErrorS
 
 void binarytreemodel::travelsalNodeForWriting(treenode* node, rapidxml::xml_node<char>* xmlparent, int level)
 {
+	using namespace GlobalSetting;
 	if ( node == nullptr || xmlparent == nullptr ) {
 		return;
 	}
 
 	// 使用 [先根遍历]   根-左-右
 	QString tag;
+	auto isRootFlag = false;
 	if ( node->isRoot() ) {
+		isRootFlag = true;
 		tag = GlobalSetting::ROOT_TAG;
 	} else {
 		if ( node->parent()->leftNode() == node ) {
@@ -751,6 +596,139 @@ void binarytreemodel::travelsalNodeForWriting(treenode* node, rapidxml::xml_node
 	}
 
 	auto ele_node = m_pXMLDoc->allocate_node(rapidxml::node_element);
+
+	if ( isRootFlag ) {
+        rapidxml::xml_node<char>* settingNode = m_pXMLDoc->allocate_node(rapidxml::node_element);
+		// set node's Tag
+		m_XmlStringList.push_back( GLOBAL_SETTINGS_TAG.toUtf8() );
+		settingNode->name( m_XmlStringList.last().constData() );
+
+		////////////////////////////////////////////////////////////////////////////////////////////////////
+		// set all attribute
+		//
+		
+		// Scene's BG Color
+		m_XmlStringList.push_back( SCENE_BG_TAG.toUtf8() );
+		m_XmlStringList.push_back( scene_bg.color().name(QColor::HexArgb).toUtf8() );
+		auto attrSceneBgColor = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
+		settingNode->append_attribute( attrSceneBgColor );
+		// circle's radius
+		m_XmlStringList.push_back( RADIUS.toUtf8() );
+		m_XmlStringList.push_back( QString("%1").arg(circle_radius).toUtf8() );
+		auto attrR = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
+		settingNode->append_attribute( attrR );
+		// gap-1
+		m_XmlStringList.push_back( LR_GAP1.toUtf8() );
+		m_XmlStringList.push_back( QString("%1").arg(distance_between_leftright).toUtf8() );
+		auto attrGap1 = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
+		settingNode->append_attribute( attrGap1 );
+		// gap-2
+		m_XmlStringList.push_back( RL_GAP2.toUtf8() );
+		m_XmlStringList.push_back( QString("%1").arg(distance_between_right__left).toUtf8() );
+		auto attrGap2 = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
+		settingNode->append_attribute( attrGap2 );
+		// vertical layer gap
+		m_XmlStringList.push_back( LAYER_GAP.toUtf8() );
+		m_XmlStringList.push_back( QString("%1").arg(height_between_parent_and_children).toUtf8() );
+		auto attrHGap = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
+		settingNode->append_attribute( attrHGap );
+		// left margin
+		m_XmlStringList.push_back( LEFT_MARGIN_TAG.toUtf8() );
+		m_XmlStringList.push_back( QString("%1").arg(left_margin).toUtf8() );
+		auto attrLeftMargin = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
+		settingNode->append_attribute( attrLeftMargin  );
+		// right margin
+		m_XmlStringList.push_back( RIGHT_MARGIN_TAG.toUtf8() );
+		m_XmlStringList.push_back( QString("%1").arg(right_margin).toUtf8() );
+		auto attrRightMargin = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
+		settingNode->append_attribute( attrRightMargin );
+		// top margin
+		m_XmlStringList.push_back( TOP_MARGIN_TAG.toUtf8() );
+		m_XmlStringList.push_back( QString("%1").arg(top_margin).toUtf8() );
+		auto attrTopMargin = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
+		settingNode->append_attribute( attrTopMargin );
+		// bottom margin
+		m_XmlStringList.push_back( BOTTOM_MARGIN_TAG.toUtf8() );
+		m_XmlStringList.push_back( QString("%1").arg(bottom_margin).toUtf8() );
+		auto attrBottomMargin = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
+		settingNode->append_attribute( attrBottomMargin );
+
+		  ////////////////////////////////////////////////////////////////////////////////////////////////////
+		auto circleColor = circle_brush.color();
+		auto circlePenColor = circle_outline.color();
+		auto circlePenWidth = circle_outline.widthF();
+
+		auto contentTextFont = text_font;
+		auto contentTextColor = text_color.color();
+
+		auto connectionLineColor = connection_line.color();
+		auto connectionLineWidth = connection_line.widthF();
+
+		// set circle's color's   tag
+		m_XmlStringList.push_back( CIRCLE_COLOR_TAG.toUtf8() );
+		// save circle color's value   : format "#AARRGGBB" in Qt
+		m_XmlStringList.push_back( circleColor.name(QColor::HexArgb).toUtf8() );
+		auto attrCircleColor = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
+		settingNode->append_attribute( attrCircleColor  );
+
+		// set circle's pen color tag
+		m_XmlStringList.push_back( CIRCLE_PEN_COLOR_TAG.toUtf8() ); 
+		// set circle's pen color value
+		m_XmlStringList.push_back( circlePenColor.name(QColor::HexArgb).toUtf8() );
+		auto attrCirclePenColor = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
+		settingNode->append_attribute( attrCirclePenColor );
+
+		// set circle's pen width tag
+		m_XmlStringList.push_back( CIRCLE_PEN_WIDTH_TAG.toUtf8() );
+		// set circle's pen width value
+		m_XmlStringList.push_back( QString("%1").arg( circlePenWidth ).toUtf8() );
+		auto attrCirclePenWidth = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
+		settingNode->append_attribute( attrCirclePenWidth );
+
+
+		// set text font tag
+		m_XmlStringList.push_back( TEXT_FONT_NAME_TAG.toUtf8() );
+		// set text font's name as value
+		m_XmlStringList.push_back( contentTextFont.family().toUtf8() );
+		auto attrFontName = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
+		settingNode->append_attribute( attrFontName );
+
+
+		// set text font pointsize 
+		m_XmlStringList.push_back( TEXT_FONT_SIZE_TAG.toUtf8() );
+		// set text font's name as value
+		m_XmlStringList.push_back( QString("%1").arg(contentTextFont.pointSize()).toUtf8() );
+		auto attrFontSize = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
+		settingNode->append_attribute( attrFontSize );
+
+		// set text color
+		m_XmlStringList.push_back( TEXT_COLOR_TAG.toUtf8() );
+		// set text color's value
+		m_XmlStringList.push_back( contentTextColor.name(QColor::HexArgb).toUtf8() );
+		auto attrTextColor = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
+		settingNode->append_attribute( attrTextColor );
+
+		// set connection line color
+		m_XmlStringList.push_back( CONNECTION_LINE_COLOR_TAG.toUtf8() );
+		// set text color's value
+		m_XmlStringList.push_back( connectionLineColor.name(QColor::HexArgb).toUtf8() );
+		auto attrConnectionLineColor = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
+		settingNode->append_attribute( attrConnectionLineColor );
+
+		// set connection line color
+		m_XmlStringList.push_back( CONNECTION_LINE_WIDTH_TAG.toUtf8() );
+		// set text color's value
+		m_XmlStringList.push_back( QString("%1").arg( connectionLineWidth ).toUtf8() );
+		auto attrConnectionLineWidth = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
+		settingNode->append_attribute( attrConnectionLineWidth );
+
+		ele_node->append_node(settingNode);
+	}
+
+
+
+
+
 
 	// set node's Tag
 	QByteArray eleName;
@@ -787,92 +765,60 @@ void binarytreemodel::travelsalNodeForWriting(treenode* node, rapidxml::xml_node
 
 
 	// set circle's color's   tag
-	QByteArray baAttrCircleColorTag;
-	baAttrCircleColorTag.append( GlobalSetting::CIRCLE_COLOR_TAG );
-	m_XmlStringList.push_back( baAttrCircleColorTag );
+	m_XmlStringList.push_back( GlobalSetting::CIRCLE_COLOR_TAG.toUtf8() );
 	// save circle color's value   : format "#AARRGGBB" in Qt
-	QByteArray baAttrCircleColorValue;
-	baAttrCircleColorValue.append( circleColor.name(QColor::HexArgb) );
-	m_XmlStringList.push_back( baAttrCircleColorValue );
+	m_XmlStringList.push_back( circleColor.name(QColor::HexArgb).toUtf8() );
 	auto attrCircleColor = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
 	ele_node->append_attribute( attrCircleColor  );
 
 	// set circle's pen color tag
-	QByteArray baAttrCirclePenColorTag;
-	baAttrCirclePenColorTag.append( GlobalSetting::CIRCLE_PEN_COLOR_TAG );
-	m_XmlStringList.push_back( baAttrCirclePenColorTag );
+	m_XmlStringList.push_back( GlobalSetting::CIRCLE_PEN_COLOR_TAG.toUtf8() );
 	// set circle's pen color value
-	QByteArray baAttrCirclePenColorValue;
-	baAttrCirclePenColorValue.append( circlePenColor.name(QColor::HexArgb) );
-	m_XmlStringList.push_back( baAttrCirclePenColorValue );
+	m_XmlStringList.push_back( circlePenColor.name(QColor::HexArgb).toUtf8() );
 	auto attrCirclePenColor = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
 	ele_node->append_attribute( attrCirclePenColor );
 
 	// set circle's pen width tag
-	QByteArray baAttrCirclePenWidthTag;
-	baAttrCirclePenWidthTag.append( GlobalSetting::CIRCLE_PEN_WIDTH_TAG );
-	m_XmlStringList.push_back( baAttrCirclePenWidthTag );
+	m_XmlStringList.push_back( GlobalSetting::CIRCLE_PEN_WIDTH_TAG.toUtf8() );
 	// set circle's pen width value
-	QByteArray baAttrCirclePenWidthValue;
-    baAttrCirclePenWidthValue.append( QString("%1").arg( circlePenWidth )  );
-	m_XmlStringList.push_back( baAttrCirclePenWidthValue );
+	m_XmlStringList.push_back( QString("%1").arg( circlePenWidth ).toUtf8() );
 	auto attrCirclePenWidth = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
 	ele_node->append_attribute( attrCirclePenWidth );
 
 
 	// set text font tag
-	QByteArray baAttrTextFontTag;
-	baAttrTextFontTag.append( GlobalSetting::TEXT_FONT_NAME_TAG );
-	m_XmlStringList.push_back( baAttrTextFontTag );
+	m_XmlStringList.push_back( GlobalSetting::TEXT_FONT_NAME_TAG.toUtf8() );
 	// set text font's name as value
-	QByteArray baAttrTextFontNameValue;
-	baAttrTextFontNameValue.append( contentTextFont.family() );
-	m_XmlStringList.push_back( baAttrTextFontNameValue );
+	m_XmlStringList.push_back( contentTextFont.family().toUtf8() );
 	auto attrFontName = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
 	ele_node->append_attribute( attrFontName );
 
 
 	// set text font pointsize 
-	QByteArray baAttrTextFontSizeTag;
-	baAttrTextFontSizeTag.append( GlobalSetting::TEXT_FONT_SIZE_TAG );
-	m_XmlStringList.push_back( baAttrTextFontSizeTag );
+	m_XmlStringList.push_back( GlobalSetting::TEXT_FONT_SIZE_TAG.toUtf8() );
 	// set text font's name as value
-	QByteArray baAttrTextFontSizeValue;
-	baAttrTextFontSizeValue.append( QString("%1").arg(contentTextFont.pointSize()) );
-	m_XmlStringList.push_back( baAttrTextFontSizeValue );
+	m_XmlStringList.push_back( QString("%1").arg(contentTextFont.pointSize()).toUtf8() );
 	auto attrFontSize = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
 	ele_node->append_attribute( attrFontSize );
 
 	// set text color
-	QByteArray baAttrTextColorTag;
-	baAttrTextColorTag.append( GlobalSetting::TEXT_COLOR_TAG );
-	m_XmlStringList.push_back( baAttrTextColorTag );
+	m_XmlStringList.push_back( GlobalSetting::TEXT_COLOR_TAG.toUtf8() );
 	// set text color's value
-	QByteArray baAttrTextColorValue;
-	baAttrTextColorValue.append( contentTextColor.name(QColor::HexArgb) );
-	m_XmlStringList.push_back( baAttrTextColorValue );
+	m_XmlStringList.push_back( contentTextColor.name(QColor::HexArgb).toUtf8() );
 	auto attrTextColor = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
 	ele_node->append_attribute( attrTextColor );
 
 	// set connection line color
-	QByteArray baAttrConnectionLineColorTag;
-	baAttrConnectionLineColorTag.append( GlobalSetting::CONNECTION_LINE_COLOR_TAG );
-	m_XmlStringList.push_back( baAttrConnectionLineColorTag );
+	m_XmlStringList.push_back( GlobalSetting::CONNECTION_LINE_COLOR_TAG.toUtf8() );
 	// set text color's value
-	QByteArray baAttrConnectionLineColorValue;
-	baAttrConnectionLineColorValue.append( connectionLineColor.name(QColor::HexArgb) );
-	m_XmlStringList.push_back( baAttrConnectionLineColorValue );
+	m_XmlStringList.push_back( connectionLineColor.name(QColor::HexArgb).toUtf8() );
 	auto attrConnectionLineColor = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
 	ele_node->append_attribute( attrConnectionLineColor );
 
 	// set connection line color
-	QByteArray baAttrConnectionLineWidthTag;
-	baAttrConnectionLineWidthTag.append( GlobalSetting::CONNECTION_LINE_WIDTH_TAG );
-	m_XmlStringList.push_back( baAttrConnectionLineWidthTag );
+	m_XmlStringList.push_back( GlobalSetting::CONNECTION_LINE_WIDTH_TAG.toUtf8() );
 	// set text color's value
-	QByteArray baAttrConnectionLineWidthValue;
-	baAttrConnectionLineWidthValue.append( QString("%1").arg( connectionLineWidth ) );
-	m_XmlStringList.push_back( baAttrConnectionLineWidthValue );
+	m_XmlStringList.push_back( QString("%1").arg( connectionLineWidth ).toUtf8() );
 	auto attrConnectionLineWidth = m_pXMLDoc->allocate_attribute( m_XmlStringList[m_XmlStringList.size()-2].constData(), m_XmlStringList.last().constData() );
 	ele_node->append_attribute( attrConnectionLineWidth );
 
@@ -952,7 +898,7 @@ void binarytreemodel::buildNodeFromReading(treenode* parentNode, rapidxml::xml_n
                 if ( !loadGlobalSettingFromFile ) {
 					newCfg.m_circleBrushColor = QBrush( c );
 				} else {
-					scene_bg = QBrush(c);
+                    circle_brush = QBrush(c);
 				}
 			} else if ( attrName == GlobalSetting::CIRCLE_PEN_COLOR_TAG ) {
 				QColor c;

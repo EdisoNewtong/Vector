@@ -177,12 +177,11 @@ void MainWindow::on_clearBtn_clicked()
 
 void MainWindow::on_treeOptionBtn_clicked()
 {
-	QBrush outBg = GlobalSetting::scene_bg;
-	auto dlg = new GlobalSettingDlg(this,&outBg); 
+	auto dlg = new GlobalSettingDlg(this); 
 	dlg->exec();
 
 	if ( m_pScene != nullptr ) {
-		m_pScene->setBackgroundBrush( outBg );
+		m_pScene->setBackgroundBrush( GlobalSetting::scene_bg );
 	}
 }
 
@@ -272,6 +271,14 @@ void MainWindow::on_saveGraphicBtn_clicked()
     if ( savedfile.trimmed().isEmpty() ) {
         ui->statusBar->showMessage("Cancel Saving File", 3500);
         return;
+    } else {
+        savedfile = savedfile.trimmed();
+
+        /*
+        QFile fl( savedfile );
+        fl.open( QIODevice::WriteOnly );
+        fl.close();
+        */
     }
 
     //
@@ -289,8 +296,8 @@ void MainWindow::on_saveGraphicBtn_clicked()
     QPixmap pixmap( rectSz );
     QPainter painter;
     painter.begin(&pixmap);
-    // painter.setBackground(  Qt::white );
-    painter.setBackground(  m_pScene->backgroundBrush() );
+    // painter.setBackground(  m_pScene->backgroundBrush() );
+    painter.setBackground( GlobalSetting::scene_bg );
     painter.setRenderHints( QPainter::Antialiasing |  QPainter::TextAntialiasing );
     m_pScene->render(&painter);
     painter.end();

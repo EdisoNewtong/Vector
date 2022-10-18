@@ -16,7 +16,7 @@ class GlobalSettingDlg : public QDialog
     Q_OBJECT
 
 public:
-    explicit GlobalSettingDlg(QWidget *parent, QBrush* pBg);
+    explicit GlobalSettingDlg(QWidget *parent);
     ~GlobalSettingDlg();
 
 private slots:
@@ -43,7 +43,6 @@ private slots:
 private:
     Ui::GlobalSettingDlg *ui;
 
-	QBrush* m_pOutBg;
 	QBrush m_sceneBg;
 
 	QBrush m_circleBrush;

@@ -8,11 +8,10 @@
 #include <QMessageBox>
 
 
-GlobalSettingDlg::GlobalSettingDlg(QWidget *parent, QBrush* pBg) :
+GlobalSettingDlg::GlobalSettingDlg(QWidget *parent /* = nullptr */) :
     QDialog(parent)
     , ui(new Ui::GlobalSettingDlg)
 	//////////////////////////////////////////////////
-	, m_pOutBg( pBg )
 	, m_sceneBg( GlobalSetting::scene_bg )
 	//
 	, m_circleBrush( GlobalSetting::circle_brush )
@@ -167,9 +166,8 @@ void GlobalSettingDlg::on_connectionLineWidthSetting_valueChanged(double arg1)
 
 void GlobalSettingDlg::updateUI()
 {
-	// TODO : set an image
-	// syntax :     background-image: url(images/welcome.png);
-	// ui->graphicImage->setStyleSheet( tr("background-image: url(images/welcome.png)") );
+    ui->graphicImage->setStyleSheet( R"( background-image: url(:/images/demo.png);
+background-repeat : no-repeat; )"  );
 
 	ui->circleBrush->setStyleSheet( tr(" background-color : rgba(%1,%2,%3,%4); ")
 			                         .arg( m_circleBrush.color().red() )
@@ -221,9 +219,6 @@ void GlobalSettingDlg::updateUI()
 void GlobalSettingDlg::on_GlobalSettingDlg_finished(int result)
 {
 	if ( result == QDialog::Accepted ) {
-		if ( m_pOutBg != nullptr ) {
-            *m_pOutBg = QBrush(m_sceneBg);
-		}
 		GlobalSetting::scene_bg = m_sceneBg;
 		
 		GlobalSetting::circle_brush = m_circleBrush;
@@ -256,7 +251,17 @@ void GlobalSettingDlg::on_GlobalSettingDlg_finished(int result)
 			}
 		}
 
-		if ( meetError ) {
+		if ( !meetError ) {
+			GlobalSetting::circle_radius = m_circleRadius;
+			GlobalSetting::distance_between_leftright = m_gap1;
+			GlobalSetting::distance_between_right__left = m_gap2;
+			GlobalSetting::height_between_parent_and_children = m_disHeight;
+			
+			GlobalSetting::left_margin = m_leftMargin;
+			GlobalSetting::right_margin = m_rightMargin;
+			GlobalSetting::top_margin = m_topMargin;
+			GlobalSetting::bottom_margin = m_bottomMargin;
+		} else {
 			QMessageBox::critical(this, "Error", errMsg); 
 		}
 

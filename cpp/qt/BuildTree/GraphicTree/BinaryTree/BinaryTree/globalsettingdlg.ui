@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>990</width>
-    <height>381</height>
+    <height>428</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <property name="geometry">
     <rect>
      <x>790</x>
-     <y>340</y>
+     <y>380</y>
      <width>171</width>
      <height>41</height>
     </rect>
@@ -33,9 +33,9 @@
    <property name="geometry">
     <rect>
      <x>420</x>
-     <y>20</y>
+     <y>10</y>
      <width>211</width>
-     <height>311</height>
+     <height>371</height>
     </rect>
    </property>
    <property name="title">
@@ -124,9 +124,9 @@
    <property name="geometry">
     <rect>
      <x>220</x>
-     <y>20</y>
+     <y>10</y>
      <width>191</width>
-     <height>311</height>
+     <height>371</height>
     </rect>
    </property>
    <property name="title">
@@ -205,9 +205,9 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>20</y>
+     <y>10</y>
      <width>191</width>
-     <height>311</height>
+     <height>371</height>
     </rect>
    </property>
    <property name="title">
@@ -338,9 +338,9 @@
    <property name="geometry">
     <rect>
      <x>650</x>
-     <y>30</y>
+     <y>20</y>
      <width>321</width>
-     <height>111</height>
+     <height>181</height>
     </rect>
    </property>
    <property name="frameShape">
@@ -357,7 +357,7 @@
    <property name="geometry">
     <rect>
      <x>650</x>
-     <y>190</y>
+     <y>240</y>
      <width>151</width>
      <height>141</height>
     </rect>
@@ -388,7 +388,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Gap1 :</string>
+     <string>H-Gap1 :</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_10">
@@ -401,7 +401,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Gap2 :</string>
+     <string>H-Gap2 :</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_11">
@@ -414,7 +414,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>TextLabel</string>
+     <string>V-Gap</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="lineEdit_1">
@@ -462,7 +462,7 @@
    <property name="geometry">
     <rect>
      <x>810</x>
-     <y>190</y>
+     <y>240</y>
      <width>161</width>
      <height>141</height>
     </rect>
@@ -470,7 +470,7 @@
    <property name="title">
     <string>Margin</string>
    </property>
-   <widget class="QLineEdit" name="lineEdit_5">
+   <widget class="QLineEdit" name="lineEdit_8">
     <property name="geometry">
      <rect>
       <x>70</x>
@@ -552,7 +552,7 @@
      <string>Right :</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEdit_8">
+   <widget class="QLineEdit" name="lineEdit_5">
     <property name="geometry">
      <rect>
       <x>70</x>
@@ -567,9 +567,9 @@
    <property name="geometry">
     <rect>
      <x>679</x>
-     <y>150</y>
+     <y>215</y>
      <width>101</width>
-     <height>31</height>
+     <height>20</height>
     </rect>
    </property>
    <property name="text">
@@ -580,9 +580,9 @@
    <property name="geometry">
     <rect>
      <x>820</x>
-     <y>150</y>
+     <y>215</y>
      <width>81</width>
-     <height>31</height>
+     <height>20</height>
     </rect>
    </property>
    <property name="frameShape">
@@ -599,7 +599,7 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>340</y>
+     <y>390</y>
      <width>141</width>
      <height>31</height>
     </rect>
