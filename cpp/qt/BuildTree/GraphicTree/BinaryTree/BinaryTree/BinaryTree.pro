@@ -34,7 +34,8 @@ SOURCES += \
         nodestylesettingdlg.cpp \
         nodestylecfg.cpp \
         binarytreemodel.cpp \
-		treenode.cpp
+		treenode.cpp \
+		mygraphicscircleitem.cpp
 
 HEADERS += \
     globalsettingdlg.h \
@@ -46,6 +47,7 @@ HEADERS += \
         nodestylecfg.h \
         binarytreemodel.h \
 		treenode.h \
+		mygraphicscircleitem.h \
         XmlParser/rapidxml.hpp \
         XmlParser/rapidxml_iterators.hpp \
         XmlParser/rapidxml_print.hpp \
@@ -65,5 +67,4 @@ RESOURCES += \
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
-
 

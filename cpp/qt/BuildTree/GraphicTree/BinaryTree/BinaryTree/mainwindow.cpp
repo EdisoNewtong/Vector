@@ -26,6 +26,10 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 	, m_pScene( nullptr )
+	, m_pHighLightCircleFrame( nullptr )
+	, m_pHighLightAnimation( nullptr )
+	, m_animationMsec( 1200 ) // in milliseconds
+	, m_scale( 4.0 / 5 )
 	, m_pTreeModel( nullptr )
 	, m_btnDelegate( nullptr )
 {
@@ -47,14 +51,32 @@ MainWindow::MainWindow(QWidget *parent)
     ui->treeView->setItemDelegateForColumn( GlobalSetting::SPECIAL_COLUMN_INDEX, m_btnDelegate );
 
 	ui->treeView->initEventHandler();
+
+
+	QItemSelectionModel* pSelModel = ui->treeView->selectionModel();
+	if ( pSelModel != nullptr ) {
+		// selectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
+		connect( pSelModel, &QItemSelectionModel::selectionChanged, this,  &MainWindow::onSelectionNodeChanged);
+	}
 }
 
 MainWindow::~MainWindow()
 {
 	if ( m_pScene != nullptr ) {
+		if ( m_pHighLightCircleFrame != nullptr ) {
+			m_pScene->removeItem( m_pHighLightCircleFrame );
+		}
+
 		delete m_pScene;
 		m_pScene = nullptr;
 	}
+
+	QItemSelectionModel* pSelModel = ui->treeView->selectionModel();
+	if ( pSelModel != nullptr ) {
+		delete pSelModel;
+		pSelModel = nullptr;
+	}
+	
 
 	if ( m_pTreeModel != nullptr ) {
 		ui->treeView->setModel( nullptr );
@@ -69,6 +91,17 @@ MainWindow::~MainWindow()
         delete m_btnDelegate;
         m_btnDelegate = nullptr;
 	}
+
+
+
+	if ( m_pHighLightAnimation != nullptr ) {
+		m_pHighLightAnimation->stop();
+
+		delete m_pHighLightAnimation;
+		m_pHighLightAnimation = nullptr;
+	}
+
+
 
 
     delete ui;
@@ -157,6 +190,16 @@ void MainWindow::on_saveBtn_clicked()
 void MainWindow::on_clearBtn_clicked()
 {
 	if ( m_pScene != nullptr ) {
+		if ( m_pHighLightAnimation != nullptr ) {
+			m_pHighLightAnimation->stop();
+		}
+
+		if( m_pHighLightCircleFrame != nullptr ) {
+			m_pHighLightCircleFrame->setVisible( false );
+			m_pScene->removeItem( m_pHighLightCircleFrame );
+		}
+		
+
 		m_pScene->clear();
 		m_pScene->update( m_pScene->sceneRect() );
 
@@ -191,6 +234,7 @@ void MainWindow::on_treeOptionBtn_clicked()
 void MainWindow::on_drawTreeBtn_clicked()
 {
 	using namespace GlobalSetting;
+	on_clearBtn_clicked();
 
 	if ( m_pTreeModel != nullptr ) {
 		int selectedCol = 0;
@@ -202,11 +246,9 @@ void MainWindow::on_drawTreeBtn_clicked()
 		}
 
         QPointF mostRightBottomCenterPoint;
+		m_pTreeModel->updateGlobalTree();
         m_pTreeModel->updateDepthAndHeight( selectedTreeNode, &mostRightBottomCenterPoint);
 		if ( m_pScene != nullptr ) {
-			// auto rect = m_pScene->sceneRect();
-			// auto width = rect.width();
-			// auto height = rect.height();
 			QPointF rightbottomPt = (mostRightBottomCenterPoint + QPointF( circle_radius, circle_radius )) + QPointF(left_margin, top_margin) + QPointF(right_margin, bottom_margin);
 			m_pScene->setSceneRect( QRectF( QPointF(0.0,0.0),  rightbottomPt ) );
 		}
@@ -236,11 +278,10 @@ void MainWindow::on_drawTreeBtn_clicked()
 				
 				// render the connection line
 				if ( selectedTreeNode != node ) {
-                    QPointF lineUpperLayerPos( left_margin + node->connectionLineSelfParent_x() , top_margin + node->connectionLineSelfParent_y() );
+                    QPointF lineUpperLayerPos( left_margin + node->connectionLineParent_x() , top_margin + node->connectionLineParent_y() );
                     auto connectionLine = new QGraphicsLineItem( left_margin + node->connectionLineSelfDot_x(), top_margin + node->connectionLineSelfDot_y(),  lineUpperLayerPos.x(), lineUpperLayerPos.y() );
 					auto styleCfg = node->getNodeStyle();
 					connectionLine->setPen( styleCfg.m_connectionLinePen );
-                    // connectionLine->setZValue( -1.0 );
 
 					// Core Core Core : attach render connection line
 					node->setLine( connectionLine );
@@ -349,4 +390,189 @@ QPair<QGraphicsEllipseItem*, QGraphicsSimpleTextItem*> MainWindow::allocCircle(t
 
 	// graphicCircle->addItem( graphicText );
 	return qMakePair( graphicCircle, graphicText); 
+}
+
+
+void MainWindow::onSelectionNodeChanged(const QItemSelection &selected, const QItemSelection &deselected)
+{
+	// Stop animation if it exists
+	if ( m_pHighLightAnimation != nullptr ) {
+		m_pHighLightAnimation->stop();
+	}
+	if( m_pHighLightCircleFrame != nullptr ) {
+		m_pHighLightCircleFrame->setVisible( false );
+        m_pScene->removeItem( m_pHighLightCircleFrame );
+	}
+
+
+	auto idxList = selected.indexes();
+	auto deidxList = deselected.indexes();
+	if ( idxList.size() != 1 || deidxList.size() != 1 ) {
+		return;
+	}
+
+
+	//
+	// set selected / unselected flag
+	QVector<treenode*> nodevec;
+	if ( m_pTreeModel != nullptr ) {
+		m_pTreeModel->updateDepthAndHeightForRoot();
+		nodevec = m_pTreeModel->getTreeNodes();
+		for( auto nd = nodevec.begin(); nd != nodevec.end(); ++nd ) {
+			treenode* node = *nd;
+			if ( node != nullptr ) {
+				node->unselect();
+			}
+		}
+
+		auto deidx = deidxList.at(0);
+		if ( deidx.column() != 0 ) {
+			auto de0 = deidx.siblingAtColumn(0);
+			m_pTreeModel->updateSelectionIndex( de0 );
+		} else {
+			m_pTreeModel->updateSelectionIndex( deidx );
+		}
+
+		treenode* selectedOne = nullptr;
+		auto idx = idxList.at(0);
+		if ( idx.column() != 0 ) {
+			auto idx0 = idx.siblingAtColumn(0);
+			selectedOne = static_cast<treenode*>( idx0.internalPointer() );
+		} else {
+			selectedOne = static_cast<treenode*>( idx.internalPointer() );
+		}
+
+		if ( selectedOne != nullptr ) {
+			auto hasPicked = false;
+			for( auto nd = nodevec.begin(); nd != nodevec.end(); ++nd ) {
+				treenode* node = *nd;
+				if ( node == selectedOne ) {
+					hasPicked = true;
+					node->select();
+					break;
+				}
+			}
+
+			if ( hasPicked && !selectedOne->isRoot() ) {
+				auto parent = selectedOne->parent();
+				do {
+					parent->select();
+					parent = (parent->isRoot() ? nullptr : parent->parent());
+				} while( parent!=nullptr );
+			}
+
+
+			if ( idx.column() != 0 ) {
+				auto idx0 = idx.siblingAtColumn(0);
+				m_pTreeModel->updateSelectionIndex( idx0 );
+			} else {
+				m_pTreeModel->updateSelectionIndex( idx );
+			}
+
+		}
+
+	}
+
+
+	auto idx = idxList.at(0);
+	QString msg;
+	QGraphicsEllipseItem* pRenderCircle = nullptr;
+	if ( idx.column() != 0 ) {
+		auto idx0 = idx.siblingAtColumn(0);
+		auto node = static_cast<treenode*>( idx0.internalPointer() );
+		if ( node == nullptr ) {
+			return;
+		}
+
+		pRenderCircle = node->circleObject();
+		auto txt    = node->text();
+		auto absDep = node->absDepth();
+		auto absH   = node->absHeight();
+		auto dep = node->depth();
+		auto h   = node->height();
+		msg = QString("node:'%1' absD=%2 absH=%3, rD=%4 rH=%5 ")
+			        .arg(txt)
+					.arg(absDep)
+					.arg(absH)
+					.arg(dep)
+					.arg(h);
+
+
+		if ( m_pTreeModel != nullptr ) {
+			m_pTreeModel->updateSelectionIndex(idx0);
+		}
+	} else {
+		auto node = static_cast<treenode*>( idx.internalPointer() );
+		if ( node == nullptr ) {
+			return;
+		}
+
+		pRenderCircle = node->circleObject();
+		auto txt    = node->text();
+		auto absDep = node->absDepth();
+		auto absH   = node->absHeight();
+		auto dep = node->depth();
+		auto h   = node->height();
+
+		msg = QString("node:'%1' absD=%2 absH=%3, rD=%4 rH=%5 ")
+			        .arg(txt)
+					.arg(absDep)
+					.arg(absH)
+					.arg(dep)
+					.arg(h);
+		
+
+		if ( m_pTreeModel != nullptr ) {
+			m_pTreeModel->updateSelectionIndex(idx);
+		}
+	}	
+    ui->statusBar->showMessage(msg, 0);
+
+
+
+	// high light the selected treeNode
+	if ( pRenderCircle != nullptr ) {
+        ui->graphicsView->centerOn( pRenderCircle );
+
+        auto d     = 2.0 * GlobalSetting::circle_radius;
+		auto h_gap = GlobalSetting::height_between_parent_and_children;
+
+		auto pos     = pRenderCircle->pos();
+		auto bigCirclePos = pos - QPointF(h_gap * m_scale,  h_gap * m_scale );
+		auto newR = GlobalSetting::circle_radius + h_gap * m_scale;
+
+
+		QRectF    begRect(0,0, 2.0*newR, 2.0*newR);
+        QRectF    endRect( h_gap * m_scale, h_gap * m_scale, d, d);
+
+		if ( m_pHighLightCircleFrame == nullptr ) {
+			m_pHighLightCircleFrame = new mygraphicscircleitem( );
+			m_pHighLightCircleFrame->setBrush( Qt::NoBrush );
+        } 
+		QColor c = pRenderCircle->brush().color();
+		// qDebug() << "color.value1 = " << c;
+		// QColor flipColor = QColor::fromRgb( (~(c.red()) & 0xFF), (~(c.green()) & 0xFF), (~(c.blue()) & 0xFF) );
+		QColor flipColor = QColor::fromRgb( 255 - c.red(), 255 - c.green(), 255 - c.blue() );
+		// qDebug() << "color.flip = " << flipColor;
+
+        m_pHighLightCircleFrame->setPen( QPen( QBrush( flipColor ), 1.5 ) );
+        m_pHighLightCircleFrame->setPos( bigCirclePos );
+        m_pHighLightCircleFrame->setRect( begRect  );
+		m_pHighLightCircleFrame->setVisible( true );
+        m_pScene->addItem( m_pHighLightCircleFrame );
+
+		if ( m_pHighLightAnimation == nullptr ) {
+			m_pHighLightAnimation = new QPropertyAnimation( m_pHighLightCircleFrame, "rect");
+		}
+
+		m_pHighLightAnimation->setDuration( m_animationMsec );
+		m_pHighLightAnimation->setStartValue( begRect );
+		m_pHighLightAnimation->setEndValue( endRect );
+
+		// qDebug() << "Do Animation ... ";
+		// loop forever
+		m_pHighLightAnimation->setLoopCount( -1 );
+		m_pHighLightAnimation->start();
+
+	}
 }

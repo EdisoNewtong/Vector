@@ -64,6 +64,7 @@ binarytreemodel::binarytreemodel(QObject* parent /* = nullptr*/ )
     m_pRoot = m_pInvisibleRootItem->addLeftNode( QString("0") );
 	// Core Core Core : travelsal the whole tree once
 	updateDepthAndHeight( m_pRoot , nullptr);
+	calcTreeGlobalDepthAndHeight(m_pRoot, 0 );
 
 	m_pXMLDoc = new rapidxml::xml_document<char>();
 	m_pXMLDoc->clear();
@@ -145,7 +146,7 @@ QVariant binarytreemodel::data(const QModelIndex &index, int role /* = Qt::Displ
 
 	int columnIdx = index.column();
     if ( columnIdx < 2  ) {
-        if ( role != Qt::DisplayRole  && role != Qt::EditRole ) {
+        if ( role != Qt::DisplayRole  && role != Qt::EditRole &&   role != Qt::BackgroundRole ) {
             return QVariant();
         }
 	}
@@ -160,7 +161,15 @@ QVariant binarytreemodel::data(const QModelIndex &index, int role /* = Qt::Displ
 	switch( columnIdx )
 	{
 	case 0:
-        retVar = isRoot ? GlobalSetting::ROOT_TAG : ( (rawNode->parent()->leftNode() == rawNode) ? GlobalSetting::LEFT_TAG  :  GlobalSetting::RIGHT_TAG );
+        if ( role == Qt::DisplayRole || role == Qt::EditRole ) {
+            retVar = isRoot ? GlobalSetting::ROOT_TAG : ( (rawNode->parent()->leftNode() == rawNode) ? GlobalSetting::LEFT_TAG  :  GlobalSetting::RIGHT_TAG );
+        } else if ( role == Qt::BackgroundRole ) {
+            if ( rawNode->isSelected() ) {
+				retVar = QBrush( QColor(204,232,255,255) );
+			} else {
+				retVar = QBrush( Qt::white );
+			}
+        }
 		break;
 	case 1:
         retVar = rawNode->text();
@@ -306,6 +315,7 @@ bool binarytreemodel::create_AddLeftNode( const QModelIndex& parent)
 	endInsertRows();
 
 	updateDepthAndHeight( m_pRoot , nullptr);
+	calcTreeGlobalDepthAndHeight(m_pRoot, 0 );
 
 	return true;
 
@@ -333,6 +343,7 @@ bool binarytreemodel::create_AddRightNode(const QModelIndex& parent)
 	endInsertRows();
 
 	updateDepthAndHeight( m_pRoot , nullptr);
+	calcTreeGlobalDepthAndHeight(m_pRoot, 0 );
 
 	return true;
 }
@@ -393,6 +404,7 @@ bool binarytreemodel::delete_SelectedNode(const QModelIndex& selectedItem)
 	endRemoveRows();
 
 	updateDepthAndHeight( m_pRoot , nullptr);
+	calcTreeGlobalDepthAndHeight(m_pRoot, 0 );
 
 	return true;
 
@@ -502,6 +514,7 @@ bool binarytreemodel::loadFromFile(const QString& filename, QString* pErrorStr)
 	endResetModel();
 
 	updateDepthAndHeight( m_pRoot , nullptr);
+	calcTreeGlobalDepthAndHeight(m_pRoot, 0 );
 
 	return true;
 }
@@ -1059,6 +1072,8 @@ void binarytreemodel::generateANewTree()
 		endResetModel();
 
 		updateDepthAndHeight( m_pRoot , nullptr);
+		calcTreeGlobalDepthAndHeight(m_pRoot, 0 );
+
 	}
 }
 
@@ -1067,6 +1082,7 @@ void  binarytreemodel::updateDepthAndHeightForRoot()
 {
 	if ( m_pRoot != nullptr ) {
 		updateDepthAndHeight(m_pRoot, nullptr);
+		calcTreeGlobalDepthAndHeight(m_pRoot, 0 );
 	}
 
 }
@@ -1081,8 +1097,7 @@ void binarytreemodel::updateDepthAndHeight(treenode* selectedRootNode, QPointF* 
 
 	m_renderCircleMap.clear();
 
-	auto isLeftNode = true;
-	int wholeTreeHeight = calcTreeNodeDepthAndHeight( selectedRootNode, isLeftNode, 0);
+	int wholeTreeHeight = calcTreeNodeDepthAndHeight( selectedRootNode,  0);
 	// qDebug() << "wholeTreeHeight = " << wholeTreeHeight;
 
 
@@ -1181,7 +1196,7 @@ void binarytreemodel::updateDepthAndHeight(treenode* selectedRootNode, QPointF* 
 
 
 
-int binarytreemodel::calcTreeNodeDepthAndHeight(treenode* node, bool leftTag, int layer)
+int binarytreemodel::calcTreeNodeDepthAndHeight(treenode* node, int layer)
 {
 	static const bool printDebugInfo = false;
 
@@ -1197,7 +1212,8 @@ int binarytreemodel::calcTreeNodeDepthAndHeight(treenode* node, bool leftTag, in
 	} else {
 		auto parent = node->parent();
 		if ( parent != nullptr ) {
-			node->setLayerIdx( parent->layerIdx() * 2 + (leftTag ? 0 : 1) );
+			auto bLeftTag = ( parent->leftNode() == node );
+			node->setLayerIdx( parent->layerIdx() * 2 + (bLeftTag ? 0 : 1) );
 		}
 	}
 
@@ -1213,8 +1229,8 @@ int binarytreemodel::calcTreeNodeDepthAndHeight(treenode* node, bool leftTag, in
 	}
 
 
-	int leftTreeHeight  = calcTreeNodeDepthAndHeight( node->leftNode(), true,  layer+1 );
-	int rightTreeHeight = calcTreeNodeDepthAndHeight( node->rightNode(),false, layer+1 );
+    int leftTreeHeight  = calcTreeNodeDepthAndHeight( node->leftNode(),  layer+1 );
+	int rightTreeHeight = calcTreeNodeDepthAndHeight( node->rightNode(), layer+1 );
 	int maxH = leftTreeHeight > rightTreeHeight ? leftTreeHeight : rightTreeHeight;
 	maxH += 1;
 	node->setHeight( maxH );
@@ -1227,10 +1243,51 @@ int binarytreemodel::calcTreeNodeDepthAndHeight(treenode* node, bool leftTag, in
 }
 
 
+int binarytreemodel::updateGlobalTree()
+{
+	if ( m_pRoot != nullptr ) {
+		return calcTreeGlobalDepthAndHeight(m_pRoot, 0);
+	}
+
+	return 0;
+}
+
+
+
+int  binarytreemodel::calcTreeGlobalDepthAndHeight(treenode* node, int layer)
+{
+	if ( node == nullptr ) {
+		return -1;
+	}
+
+	// 使用 [先根遍历]   根-左-右
+	node->setAbsDepth( layer );
+
+	if ( layer == 0 ) {
+		node->setAbsLayerIdx( 0 );
+	} else {
+		auto parent = node->parent();
+		if ( parent != nullptr ) {
+			auto bLeftTag = ( parent->leftNode() == node );
+            node->setAbsLayerIdx( parent->absLayerIdx() * 2 + (bLeftTag ? 0 : 1) );
+		}
+	}
+
+    int leftTreeHeight  = calcTreeGlobalDepthAndHeight( node->leftNode(),  layer+1 );
+	int rightTreeHeight = calcTreeGlobalDepthAndHeight( node->rightNode(), layer+1 );
+	int maxH = leftTreeHeight > rightTreeHeight ? leftTreeHeight : rightTreeHeight;
+	maxH += 1;
+	node->setAbsHeight( maxH );
+
+	return maxH;
+}
+
+
+
 /*
 	get All travelsaled nodes into a vector   
 */
-const QVector<treenode*>& binarytreemodel::getTreeNodes()
+QVector<treenode*>& binarytreemodel::getTreeNodes()
 {
 	m_allNodes.clear();
 	for ( auto mpPrIt = m_renderCircleMap.begin(); mpPrIt != m_renderCircleMap.end(); ++mpPrIt )
@@ -1242,3 +1299,31 @@ const QVector<treenode*>& binarytreemodel::getTreeNodes()
 
 	return m_allNodes;
 }
+
+
+void binarytreemodel::updateDeselectionIndex(const QModelIndex& unselected)
+{
+	QVector<int> playedRoleVec{ Qt::DisplayRole, Qt::EditRole, Qt::BackgroundRole };
+    emit dataChanged(unselected, unselected, playedRoleVec );
+
+	auto p = unselected.parent();
+	while ( p.isValid() ) {
+        emit dataChanged(p, p, playedRoleVec );
+		p = p.parent();
+	}
+
+}
+
+void binarytreemodel::updateSelectionIndex(const QModelIndex& selected)
+{
+	QVector<int> playedRoleVec{ Qt::DisplayRole, Qt::EditRole, Qt::BackgroundRole };
+    emit dataChanged(selected, selected, playedRoleVec );
+
+	auto p = selected.parent();
+	while ( p.isValid() ) {
+        emit dataChanged(p, p, playedRoleVec );
+		p = p.parent();
+	}
+
+}
+

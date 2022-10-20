@@ -25,6 +25,7 @@ protected:
 	treenode* m_LeftNode;
 	treenode* m_RightNode;
 	treenode* m_parentNode;
+	bool      m_selectedState;
 
 	QGraphicsEllipseItem*       m_pGraphicCircle;
 	QGraphicsLineItem*          m_pGraphicLine;
@@ -33,6 +34,10 @@ protected:
 	int       m_depth;
 	int       m_height;
 	int       m_layerIdx;
+
+	int       m_absDepth;
+	int       m_absHeight;
+	int       m_absLayerIdx;
 
 	double    m_centerPt_x;
 	double    m_centerPt_y;
@@ -70,19 +75,29 @@ public:
 	int depth();
 	int height();
 	int layerIdx();
+
+	int absDepth();
+	int absHeight();
+	int absLayerIdx();
+
 	double x();
 	double y();
 
 	double connectionLineSelfDot_x();
 	double connectionLineSelfDot_y();
-	double connectionLineSelfParent_x();
-	double connectionLineSelfParent_y();
+	double connectionLineParent_x();
+	double connectionLineParent_y();
 
 
 
 	void setDepth(int depth);
 	void setHeight(int height);
 	void setLayerIdx(int idx);
+
+	void setAbsDepth(int depth);
+	void setAbsHeight(int height);
+	void setAbsLayerIdx(int idx);
+
 	void setCenterPt_x(double x);
 	void setCenterPt_y(double y);
 
@@ -102,4 +117,8 @@ public:
 	nodeStyleCfg getNodeStyle();
 	void         setNodeStyle( const nodeStyleCfg& newCfg);
 
+
+	bool isSelected();
+	void select();
+	void unselect();
 };

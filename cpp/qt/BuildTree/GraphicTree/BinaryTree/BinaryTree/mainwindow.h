@@ -8,10 +8,13 @@
 
 #include <QGraphicsEllipseItem>
 #include <QGraphicsSimpleTextItem>
+#include <QItemSelection>
+#include <QPropertyAnimation>
 
 #include "treenode.h"
 #include "binarytreemodel.h"
 #include "mysettingbtndelegate.h"
+#include "mygraphicscircleitem.h"
 
 namespace Ui {
 class MainWindow;
@@ -43,10 +46,15 @@ private slots:
 
     void on_drawTreeBtn_clicked();
 
+	void onSelectionNodeChanged(const QItemSelection &selected, const QItemSelection &deselected);
 private:
     Ui::MainWindow *ui;
 
 	QGraphicsScene* m_pScene;
+	mygraphicscircleitem* m_pHighLightCircleFrame;
+	QPropertyAnimation*   m_pHighLightAnimation;
+	const int             m_animationMsec;
+	const double          m_scale;
 
 	// TreeView related object
 	binarytreemodel* m_pTreeModel;

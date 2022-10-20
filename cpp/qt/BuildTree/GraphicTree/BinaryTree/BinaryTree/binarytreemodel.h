@@ -59,8 +59,11 @@ public:
 	// void updateSelectedDepthAndHeight( const QModelIndex& selectedRootNode );
 	void  updateDepthAndHeight( treenode* selectedRootNode, QPointF* pMostRightBottomCenterPt);
 	void  updateDepthAndHeightForRoot();
-    const QVector<treenode*>& getTreeNodes();
+    QVector<treenode*>& getTreeNodes();
 
+	int updateGlobalTree();
+	void updateDeselectionIndex(const QModelIndex& unselected);
+	void updateSelectionIndex(const QModelIndex& selected);
 protected slots:
 	bool create_AddLeftNode(const QModelIndex& parent);
 	bool create_AddRightNode(const QModelIndex& parent);
@@ -73,7 +76,8 @@ protected:
 	void travelsalNodeForWriting(treenode* node, rapidxml::xml_node<char>* xmlparent, int level);
 	void buildNodeFromReading(treenode* node, rapidxml::xml_node<char>* xmlparent, int level);
 
-	int  calcTreeNodeDepthAndHeight(treenode* node, bool leftTag, int layer);
+	int  calcTreeNodeDepthAndHeight(treenode* node, int layer);
+	int  calcTreeGlobalDepthAndHeight(treenode* node, int layer);
 protected:
 	// invisible Root node
 	treenode* m_pInvisibleRootItem;
