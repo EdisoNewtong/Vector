@@ -111,7 +111,7 @@
    <widget class="QPushButton" name="saveGraphicBtn">
     <property name="geometry">
      <rect>
-      <x>1120</x>
+      <x>1090</x>
       <y>590</y>
       <width>81</width>
       <height>51</height>

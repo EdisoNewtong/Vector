@@ -414,6 +414,7 @@ void MainWindow::onSelectionNodeChanged(const QItemSelection &selected, const QI
 
 	//
 	// set selected / unselected flag
+	QString selectedNodePath;
 	QVector<treenode*> nodevec;
 	if ( m_pTreeModel != nullptr ) {
 		m_pTreeModel->updateDepthAndHeightForRoot();
@@ -454,11 +455,25 @@ void MainWindow::onSelectionNodeChanged(const QItemSelection &selected, const QI
 			}
 
 			if ( hasPicked && !selectedOne->isRoot() ) {
+				selectedNodePath = ( selectedOne->isLeftNode() ? "left" : "right" );
 				auto parent = selectedOne->parent();
-				do {
+				while ( parent != nullptr ) {
 					parent->select();
-					parent = (parent->isRoot() ? nullptr : parent->parent());
-				} while( parent!=nullptr );
+					if ( parent->isRoot() ) {
+						parent = nullptr;
+						selectedNodePath.prepend("root -> "); 
+					} else {
+						if ( parent->isLeftNode() ) {
+							selectedNodePath.prepend("left -> "); 
+						} else {
+							selectedNodePath.prepend("right -> "); 
+						}
+
+						parent = parent->parent();
+					}
+				} 
+			} else {
+				selectedNodePath = "root";
 			}
 
 
@@ -490,17 +505,15 @@ void MainWindow::onSelectionNodeChanged(const QItemSelection &selected, const QI
 		auto absH   = node->absHeight();
 		auto dep = node->depth();
 		auto h   = node->height();
-		msg = QString("node:'%1' absD=%2 absH=%3, rD=%4 rH=%5 ")
+		msg = QString("node:'%1' absD=%2 absH=%3, rD=%4 rH=%5 | %6")
 			        .arg(txt)
 					.arg(absDep)
 					.arg(absH)
 					.arg(dep)
-					.arg(h);
+					.arg(h)
+					.arg( selectedNodePath );
 
 
-		if ( m_pTreeModel != nullptr ) {
-			m_pTreeModel->updateSelectionIndex(idx0);
-		}
 	} else {
 		auto node = static_cast<treenode*>( idx.internalPointer() );
 		if ( node == nullptr ) {
@@ -514,17 +527,15 @@ void MainWindow::onSelectionNodeChanged(const QItemSelection &selected, const QI
 		auto dep = node->depth();
 		auto h   = node->height();
 
-		msg = QString("node:'%1' absD=%2 absH=%3, rD=%4 rH=%5 ")
+		msg = QString("node:'%1' absD=%2 absH=%3, rD=%4 rH=%5 | %6")
 			        .arg(txt)
 					.arg(absDep)
 					.arg(absH)
 					.arg(dep)
-					.arg(h);
+					.arg(h)
+					.arg( selectedNodePath );
 		
 
-		if ( m_pTreeModel != nullptr ) {
-			m_pTreeModel->updateSelectionIndex(idx);
-		}
 	}	
     ui->statusBar->showMessage(msg, 0);
 
@@ -549,11 +560,9 @@ void MainWindow::onSelectionNodeChanged(const QItemSelection &selected, const QI
 			m_pHighLightCircleFrame = new mygraphicscircleitem( );
 			m_pHighLightCircleFrame->setBrush( Qt::NoBrush );
         } 
-		QColor c = pRenderCircle->brush().color();
-		// qDebug() << "color.value1 = " << c;
+		QColor c = GlobalSetting::scene_bg.color();
 		// QColor flipColor = QColor::fromRgb( (~(c.red()) & 0xFF), (~(c.green()) & 0xFF), (~(c.blue()) & 0xFF) );
 		QColor flipColor = QColor::fromRgb( 255 - c.red(), 255 - c.green(), 255 - c.blue() );
-		// qDebug() << "color.flip = " << flipColor;
 
         m_pHighLightCircleFrame->setPen( QPen( QBrush( flipColor ), 1.5 ) );
         m_pHighLightCircleFrame->setPos( bigCirclePos );

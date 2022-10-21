@@ -68,7 +68,8 @@ public:
 	void detachRenderObject();
 
 	bool isRoot();
-	bool isInvisibleRoot() { return m_isInvisibleRoot; }
+	bool isInvisibleRoot(); 
+	bool isLeftNode();
 
 	QPair<int,treenode::E_ChildType> getChildState();
 

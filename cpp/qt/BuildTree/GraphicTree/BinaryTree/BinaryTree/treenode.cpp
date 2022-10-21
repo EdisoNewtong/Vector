@@ -176,6 +176,25 @@ bool treenode::isRoot()
 	return m_parentNode != nullptr && m_parentNode->isInvisibleRoot();
 }
 
+
+bool treenode::isInvisibleRoot() { return m_isInvisibleRoot; }
+
+bool treenode::isLeftNode()
+{
+	if ( isRoot() ) {
+		return true;
+	}
+
+	auto bIsLeft = false;
+	auto p = parent();
+	if ( p != nullptr ) {
+		bIsLeft = (p->leftNode() == this);
+	} 
+
+    return bIsLeft;
+}
+
+
 QPair<int,treenode::E_ChildType> treenode::getChildState()
 {
 	int childCnt = 0;
