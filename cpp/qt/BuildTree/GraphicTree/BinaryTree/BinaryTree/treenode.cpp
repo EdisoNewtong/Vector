@@ -3,6 +3,7 @@
 #include <QDebug>
 
 static int G_NODE_CNT = 0;
+static bool G_TRACE_ALLOC_RELEASE_FLAG = false;
 
 treenode::treenode(const QString& text, treenode* parent, bool isInvisibleRoot /* = false*/)
 	: m_text(text)
@@ -28,13 +29,17 @@ treenode::treenode(const QString& text, treenode* parent, bool isInvisibleRoot /
 	, m_isInvisibleRoot( isInvisibleRoot )
 	, m_nodeStyle( nodeStyleCfg::DefaultCfg() )
 {
-	qDebug() << "Alloc " << ++G_NODE_CNT << " self-defined treenode";
+    if ( G_TRACE_ALLOC_RELEASE_FLAG ) {
+        qDebug() << "Alloc " << ++G_NODE_CNT << " self-defined treenode";
+    }
 }
 
 
 treenode::~treenode()
 {
-	qDebug() << "Delete " << --G_NODE_CNT << " self-defined treenode";
+    if ( G_TRACE_ALLOC_RELEASE_FLAG ) {
+        qDebug() << "Delete " << --G_NODE_CNT << " self-defined treenode";
+    }
 
 	//
 	// delete Left && Right child
