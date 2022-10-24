@@ -7,6 +7,12 @@
 
 void static2DArraySample()
 {
+    /*
+    const int N1 = 3;
+    const int N2 = 5;
+    const int N3 = 7;
+    */
+
     printf("========== in in static-2D-ArraySample ( %d  *  %d )  ==========\n", N1, N2);
     int ary2D[N1][N2] = {
         {  1,  2,  3,  4,  5 },
@@ -44,6 +50,12 @@ void static2DArraySample()
 
 void static3DArraySample()
 {
+    /*
+    const int N1 = 3;
+    const int N2 = 5;
+    const int N3 = 7;
+    */
+
     printf("========== in in static-3D-ArraySample ( %d  *  %d  *  %d )  ==========\n", N1, N2, N3);
 
     int ary3D[N1][N2][N3] = {
