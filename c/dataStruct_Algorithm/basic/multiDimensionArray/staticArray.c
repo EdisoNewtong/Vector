@@ -1,0 +1,114 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define N1   3
+#define N2   5
+#define N3   7
+
+void static2DArraySample()
+{
+    printf("========== in in static-2D-ArraySample ( %d  *  %d )  ==========\n", N1, N2);
+    int ary2D[N1][N2] = {
+        {  1,  2,  3,  4,  5 },
+        {  6,  7,  8,  9, 10 },
+        { 11, 12, 13, 14, 15 }
+    };
+
+    printf("staticAry2D = ");
+    printf("{\n");
+    for( int i = 0; i < N1; ++i ) {
+        printf("  { ");
+        for( int j = 0; j < N2; ++j ) {
+            printf("%2d%s", ary2D[i][j], j<N2-1 ? ", " : " ");
+        }
+        printf("}%s\n", i<N1-1 ? ", " : " ");
+    }
+    printf("};\n");
+
+    printf("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
+    printf("Sample code for pointing to an 1-D <Static-Fixed> array : ...\n");
+    /* Core Core Core :
+         The following statement is equalvant to the uncomment statement.  */
+/*  int (*p1DAry)[N2] = (int (*)[N2])( ary2D + 1 );   */
+/*  int (*p1DAry)[N2] = (int (*)[N2])( &ary2D[1] );   */
+    int (*p1DAry)[N2] =              ( &ary2D[1] ); 
+    printf("ary2D[1]  ->  { ");
+    for( int j = 0; j < N2; ++j ) {
+        printf("%2d%s", (*p1DAry)[j],  (j < N2-1 ? ", " : "")  );
+    }
+    printf(" };\n ");
+
+}
+
+
+
+void static3DArraySample()
+{
+    printf("========== in in static-3D-ArraySample ( %d  *  %d  *  %d )  ==========\n", N1, N2, N3);
+
+    int ary3D[N1][N2][N3] = {
+        {
+           {   1,     2,    3,    4,    5,    6,    7   },      
+           {   8,     9,   10,   11,   12,   13,   14   },      
+           {   15,   16,   17,   18,   19,   20,   21   },      
+           {   22,   23,   24,   25,   26,   27,   28   },      
+           {   29,   30,   31,   32,   33,   34,   35   }
+        },
+
+        {
+           {   36,   37,   38,   39,   40,   41,   42   },
+           {   43,   44,   45,   46,   47,   48,   49   },
+           {   50,   51,   52,   53,   54,   55,   56   },
+           {   57,   58,   59,   60,   61,   62,   63   },
+           {   64,   65,   66,   67,   68,   69,   70   }
+        },
+
+        {
+           {   71,    72,    73,    74,    75,    76,    77   },
+           {   78,    79,    80,    81,    82,    83,    84   },
+           {   85,    86,    87,    88,    89,    90,    91   },
+           {   92,    93,    94,    95,    96,    97,    98   },
+           {   99,   100,   101,   102,   103,   104,   105   }
+        }
+    };
+
+    printf("staticAry3D = {\n");
+    for( int i = 0; i < N1; ++i ) {
+        printf("  {\n");
+        for( int j = 0; j < N2; ++j ) {
+            printf("    {");
+            for( int k = 0; k < N3; ++k ) {
+                printf("%3d%s", ary3D[i][j][k], ( k < N3-1 ? ", " : " ") );
+            }
+            printf(" }%s\n", j < N2-1 ? ", " : "");
+        }
+        printf("  }%s\n", i < N1-1 ? ", " : "");
+    }
+    printf("};\n");
+
+    printf("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
+    printf("Sample code for pointing to a 2-D <Static-Fixed> array : ...\n");
+    int (*p2DAry)[N2][N3] = &ary3D[1];
+    printf("ary3D[1]  ->  \n{\n");
+    for( int j = 0; j < N2; ++j ) {
+        printf("  {");
+        /* type is    ( int (*)[N3] )   */
+        
+        /* avaliable exp 1 :            */
+    /*  int (*p1DAry)[N3] = ( int (*)[N3] )( &( (*p2DAry)[j] ) ) ;  */
+
+        /* avaliable exp 2 :            */        
+     /* int (*p1DAry)[N3] = ( int (*)[N3] )( &( *(*p2DAry + j) ) ) ;  */
+
+        /* avaliable exp 3 :            */        
+        int (*p1DAry)[N3] = ( int (*)[N3] )( *p2DAry + j );
+        for( int k = 0; k < N3; ++k ) {
+            printf("%3d%s", (*p1DAry)[k],  (k < N3-1 ? ", " : " ")  );
+        }
+        printf("}%s\n", (j < N2-1 ? ", " : "") );
+    }
+    printf("};\n ");
+
+
+}
+
