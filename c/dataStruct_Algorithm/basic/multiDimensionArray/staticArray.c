@@ -56,6 +56,8 @@ void static3DArraySample()
     const int N3 = 7;
     */
 
+    int studyCase = 0;
+
     printf("========== in in static-3D-ArraySample ( %d  *  %d  *  %d )  ==========\n", N1, N2, N3);
 
     int ary3D[N1][N2][N3] = {
@@ -97,6 +99,51 @@ void static3DArraySample()
         printf("  }%s\n", i < N1-1 ? ", " : "");
     }
     printf("};\n");
+
+
+
+    if ( studyCase ) {
+        printf("---------- | Study Case of 3D Array address |----------\n");
+        printf(" ary3D    = %p\n", ary3D);
+        printf("&ary3D    = %p\n",&ary3D);
+        printf("&ary3D[0] = %p\n",&ary3D[0]);
+
+        if ( ((void*)ary3D) == &ary3D  && ary3D == &ary3D[0] ) {
+            printf("in if, ary == ary3D == &ary3D[0] . \n");
+        } else {
+            printf("in else, ary3D != &ary3D != &ary3D[0] . \n");
+        }
+
+        int i = 0;
+        int j = 0;
+        printf("\n");
+        for( i = 0; i < N1; ++i ) {
+            printf("   ary3D[%d]    = %p\n", i,   ary3D[i]);
+            printf("  &ary3D[%d][0] = %p\n", i,  &ary3D[i][0]);
+            printf("  &ary3D[%d]    = %p\n", i,  &ary3D[i]);
+            printf("\n");
+        }
+
+        printf("\n");
+        for( i = 0; i < N1; ++i ) {
+            for( j = 0; j < N2; ++j ) {
+                printf("     ary3D[%d][%d]    = %p\n", i,j,   ary3D[i][j]);
+                printf("    &ary3D[%d][%d][0] = %p\n", i,j,   &ary3D[i][j][0]);
+                printf("    &ary3D[%d][%d]    = %p\n", i,j,   &ary3D[i][j]);
+                printf("\n");
+            }
+            printf("\n");
+        }
+
+
+    }
+    // return;
+
+
+
+
+
+
 
     printf("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
     printf("Sample code for pointing to a 2-D <Static-Fixed> array : ...\n");
