@@ -144,7 +144,11 @@ void static3DArraySample()
 
 
 
+    /**************************************************
 
+       Compare with line:160 in file dynamicArray.c
+
+    ***************************************************/
     printf("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
     printf("Sample code for pointing to a 2-D <Static-Fixed> array : ...\n");
     int (*p2DAry)[N2][N3] = &ary3D[1];

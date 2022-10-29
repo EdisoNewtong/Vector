@@ -150,6 +150,11 @@ void dynamic3DArraySample()
     printf("};\n");
 
 
+    /***************************************************
+
+       Compare with line:154 in file staticArray.c
+
+    ****************************************************/
     printf("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
     printf("Sample code for pointing to a 2-D <Dynamic-Alloced> array : ...\n");
     printf("ary3D[1]  ->  \n{\n");
