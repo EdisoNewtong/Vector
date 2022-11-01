@@ -23,6 +23,11 @@
       <height>221</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
    </widget>
    <widget class="QPlainTextEdit" name="outputEdit">
     <property name="geometry">
@@ -32,6 +37,11 @@
       <width>631</width>
       <height>161</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
     </property>
    </widget>
    <widget class="QPushButton" name="pushButton">
