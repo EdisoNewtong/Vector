@@ -416,10 +416,10 @@ bool binarytreemodel::setData(const QModelIndex &index, const QVariant &value, i
 {
 	auto iColomn = index.column();
 
-	qDebug() << "setData(" << iColomn << ")";
+    // qDebug() << "setData(" << iColomn << ")";
     if ( role != Qt::EditRole ) {
-        qDebug() << "setData(...) , role != Qt::EditRole    , return false";
-         return false;
+        // qDebug() << "setData(...) , role != Qt::EditRole    , return false";
+        return false;
     }
 
 	treenode* selectedNode = static_cast<treenode*>( index.internalPointer() );
@@ -427,13 +427,13 @@ bool binarytreemodel::setData(const QModelIndex &index, const QVariant &value, i
 	if ( selectedNode == nullptr ) {
 		result = false;
 	} else {
-        qDebug() << "setData(...) , setText(...) 1";
+        // qDebug() << "setData(...) , setText(...) 1";
         selectedNode->setText( value.toString() );
 		result = true;
 	}
 
     if ( result ) {
-		qDebug() << "setData(...) , setText(...) 2";
+        // qDebug() << "setData(...) , setText(...) 2";
 		QVector<int> playedRoleVec{ Qt::DisplayRole, Qt::EditRole };
 		// QVector<int> playedRoleVec{ Qt::DisplayRole, Qt::EditRole, Qt::FontRole, Qt::TextAlignmentRole, Qt::BackgroundRole, Qt::ForegroundRole   };
 
@@ -1326,4 +1326,82 @@ void binarytreemodel::updateSelectionIndex(const QModelIndex& selected)
 	}
 
 }
+
+
+bool binarytreemodel::preOrderTravelsal(treenode* node, QVector<treenode*>& retList)
+{
+	if ( node == nullptr ) {
+		return false;
+	}
+
+	retList.clear();
+	innerPreOrderTravelsal(node, retList);
+	return true;
+}
+
+bool binarytreemodel::inOrderTravelsal(treenode* node, QVector<treenode*>& retList)
+{
+	if ( node == nullptr ) {
+		return false;
+	}
+
+	retList.clear();
+	innerInOrderTravelsal(node, retList);
+	return true;
+}
+
+bool binarytreemodel::postOrderTravelsal(treenode* node, QVector<treenode*>& retList)
+{
+	if ( node == nullptr ) {
+		return false;
+	}
+
+	retList.clear();
+	innerPostOrderTravelsal(node, retList);
+	return true;
+}
+
+void binarytreemodel::innerPreOrderTravelsal(treenode* node, QVector<treenode*>& nodeList)
+{
+	// 1. Root 
+	// 2. Left
+	// 3. Right
+	if ( node == nullptr ) {
+		return;
+	}
+
+	nodeList.push_back(node); // 1. root
+	innerPreOrderTravelsal( node->leftNode(), nodeList ); // 2. left
+	innerPreOrderTravelsal( node->rightNode(), nodeList ); // 3. right
+	
+}
+
+void binarytreemodel::innerInOrderTravelsal(treenode* node, QVector<treenode*>& nodeList)
+{
+	// 1. Left
+	// 2. Root
+	// 3. Right
+	if ( node == nullptr ) {
+		return;
+	}
+	
+	innerInOrderTravelsal( node->leftNode(), nodeList ); // 1. left
+	nodeList.push_back(node); // 2. root
+	innerInOrderTravelsal( node->rightNode(), nodeList ); // 3. right
+}
+
+void binarytreemodel::innerPostOrderTravelsal(treenode* node, QVector<treenode*>& nodeList)
+{
+	// 1. Left
+	// 2. Right
+	// 3. Root
+	if ( node == nullptr ) {
+		return;
+	}
+	
+	innerPostOrderTravelsal( node->leftNode(), nodeList );  // 1. left
+	innerPostOrderTravelsal( node->rightNode(), nodeList ); // 2. right
+	nodeList.push_back(node); // 3. root
+}
+
 

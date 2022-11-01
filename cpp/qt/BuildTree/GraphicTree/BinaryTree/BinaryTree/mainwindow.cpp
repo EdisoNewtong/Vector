@@ -11,6 +11,7 @@
 #include <QBrush>
 #include <QFontMetricsF>
 #include <QMessageBox>
+#include <QScrollBar> 
 
 #include <QGraphicsLineItem>
 
@@ -28,8 +29,15 @@ MainWindow::MainWindow(QWidget *parent)
 	, m_pScene( nullptr )
 	, m_pHighLightCircleFrame( nullptr )
 	, m_pHighLightAnimation( nullptr )
+	, m_pEnumerateHVBarAni( nullptr )
+	, m_pEnumerateMoveRect( nullptr )
+	, m_pEnumerateMoveRectAni( nullptr )
+	, m_pEnumerateStatusTextAni( nullptr )
+	, m_pEnumerateTextItem( nullptr )
+	, m_pEnumerateAnimationGrp( nullptr )
 	, m_animationMsec( 1200 ) // in milliseconds
-	, m_scale( 4.0 / 5 )
+	, m_scale( 4.0 / 5 ) // scale factor circle when be selected in treeview
+	, m_bEnumerateNodeWithAnimation( false )
 	, m_pTreeModel( nullptr )
 	, m_btnDelegate( nullptr )
 {
@@ -65,6 +73,7 @@ MainWindow::~MainWindow()
 	if ( m_pScene != nullptr ) {
 		if ( m_pHighLightCircleFrame != nullptr ) {
 			m_pScene->removeItem( m_pHighLightCircleFrame );
+			m_pHighLightCircleFrame = nullptr;
 		}
 
 		delete m_pScene;
@@ -93,7 +102,10 @@ MainWindow::~MainWindow()
 	}
 
 
+	stopEnuerateAnimationIfNecessary(true);
 
+
+	/*
 	if ( m_pHighLightAnimation != nullptr ) {
 		m_pHighLightAnimation->stop();
 
@@ -103,6 +115,44 @@ MainWindow::~MainWindow()
 
 
 
+
+
+
+
+
+	if ( m_pEnumerateHVBarAni != nullptr ) {
+		m_pEnumerateHVBarAni->stop();
+
+		delete m_pEnumerateHVBarAni;
+		m_pEnumerateHVBarAni = nullptr;
+	}
+
+	if ( m_pEnumerateMoveRectAni != nullptr ) {
+		m_pEnumerateMoveRectAni->stop();
+
+		delete m_pEnumerateMoveRectAni;
+		m_pEnumerateMoveRectAni = nullptr;
+	}
+
+	if( m_pEnumerateTextItem != nullptr ) {
+		delete m_pEnumerateTextItem;
+		m_pEnumerateTextItem = nullptr;
+	}
+
+	if ( m_pEnumerateStatusTextAni != nullptr ) {
+		m_pEnumerateStatusTextAni->stop();
+
+		delete m_pEnumerateStatusTextAni;
+		m_pEnumerateStatusTextAni = nullptr;
+	}
+
+	if ( m_pEnumerateAnimationGrp != nullptr ) {
+		m_pEnumerateAnimationGrp->stop();
+
+		delete m_pEnumerateAnimationGrp;
+		m_pEnumerateAnimationGrp = nullptr;
+	}
+	*/
 
     delete ui;
 }
@@ -190,14 +240,39 @@ void MainWindow::on_saveBtn_clicked()
 void MainWindow::on_clearBtn_clicked()
 {
 	if ( m_pScene != nullptr ) {
+		stopEnuerateAnimationIfNecessary(true);
+
+
+		/*
 		if ( m_pHighLightAnimation != nullptr ) {
 			m_pHighLightAnimation->stop();
+
+			delete m_pHighLightAnimation;
+			m_pHighLightAnimation = nullptr;
 		}
 
 		if( m_pHighLightCircleFrame != nullptr ) {
 			m_pHighLightCircleFrame->setVisible( false );
 			m_pScene->removeItem( m_pHighLightCircleFrame );
+
+			m_pHighLightCircleFrame = nullptr;
 		}
+
+
+		if ( m_pEnumerateMoveRect != nullptr ) {
+			m_pEnumerateMoveRect->setVisible( false );
+			m_pScene->removeItem( m_pEnumerateMoveRect );
+
+			m_pEnumerateMoveRect = nullptr;
+		}
+
+
+		if( m_pEnumerateTextItem != nullptr ) {
+			delete m_pEnumerateTextItem;
+			m_pEnumerateTextItem = nullptr;
+		}
+		*/
+
 		
 
 		m_pScene->clear();
@@ -249,8 +324,21 @@ void MainWindow::on_drawTreeBtn_clicked()
 		m_pTreeModel->updateGlobalTree();
         m_pTreeModel->updateDepthAndHeight( selectedTreeNode, &mostRightBottomCenterPoint);
 		if ( m_pScene != nullptr ) {
+			auto d = 2.0 * circle_radius;
 			QPointF rightbottomPt = (mostRightBottomCenterPoint + QPointF( circle_radius, circle_radius )) + QPointF(left_margin, top_margin) + QPointF(right_margin, bottom_margin);
-			m_pScene->setSceneRect( QRectF( QPointF(0.0,0.0),  rightbottomPt ) );
+			m_pScene->setSceneRect( QRectF( QPointF(0.0, 0.0),  rightbottomPt ) );
+
+			auto hBar = ui->graphicsView->horizontalScrollBar();
+			if ( hBar != nullptr ) {
+				hBar->setPageStep( static_cast<int>(d) );
+			}
+
+			auto vBar = ui->graphicsView->verticalScrollBar();
+			if ( vBar != nullptr ) {
+				vBar->setPageStep( static_cast<int>(d) );
+			}
+			
+			// qDebug() << "rightbottomPt = " << rightbottomPt;
 		}
 
 
@@ -315,11 +403,6 @@ void MainWindow::on_saveGraphicBtn_clicked()
     } else {
         savedfile = savedfile.trimmed();
 
-        /*
-        QFile fl( savedfile );
-        fl.open( QIODevice::WriteOnly );
-        fl.close();
-        */
     }
 
     //
@@ -398,10 +481,16 @@ void MainWindow::onSelectionNodeChanged(const QItemSelection &selected, const QI
 	// Stop animation if it exists
 	if ( m_pHighLightAnimation != nullptr ) {
 		m_pHighLightAnimation->stop();
+
+        delete m_pHighLightAnimation;
+        m_pHighLightAnimation = nullptr;
 	}
+
 	if( m_pHighLightCircleFrame != nullptr ) {
 		m_pHighLightCircleFrame->setVisible( false );
         m_pScene->removeItem( m_pHighLightCircleFrame );
+
+		m_pHighLightCircleFrame = nullptr;
 	}
 
 
@@ -491,6 +580,7 @@ void MainWindow::onSelectionNodeChanged(const QItemSelection &selected, const QI
 
 	auto idx = idxList.at(0);
 	QString msg;
+	QString selectNodeText;
 	QGraphicsEllipseItem* pRenderCircle = nullptr;
 	if ( idx.column() != 0 ) {
 		auto idx0 = idx.siblingAtColumn(0);
@@ -500,13 +590,13 @@ void MainWindow::onSelectionNodeChanged(const QItemSelection &selected, const QI
 		}
 
 		pRenderCircle = node->circleObject();
-		auto txt    = node->text();
+		selectNodeText = node->text();
 		auto absDep = node->absDepth();
 		auto absH   = node->absHeight();
 		auto dep = node->depth();
 		auto h   = node->height();
 		msg = QString("node:'%1' absD=%2 absH=%3, rD=%4 rH=%5 | %6")
-			        .arg(txt)
+			        .arg(selectNodeText)
 					.arg(absDep)
 					.arg(absH)
 					.arg(dep)
@@ -521,14 +611,14 @@ void MainWindow::onSelectionNodeChanged(const QItemSelection &selected, const QI
 		}
 
 		pRenderCircle = node->circleObject();
-		auto txt    = node->text();
+		selectNodeText = node->text();
 		auto absDep = node->absDepth();
 		auto absH   = node->absHeight();
 		auto dep = node->depth();
 		auto h   = node->height();
 
 		msg = QString("node:'%1' absD=%2 absH=%3, rD=%4 rH=%5 | %6")
-			        .arg(txt)
+			        .arg(selectNodeText)
 					.arg(absDep)
 					.arg(absH)
 					.arg(dep)
@@ -543,7 +633,9 @@ void MainWindow::onSelectionNodeChanged(const QItemSelection &selected, const QI
 
 	// high light the selected treeNode
 	if ( pRenderCircle != nullptr ) {
+		// Edison TestOnly
         ui->graphicsView->centerOn( pRenderCircle );
+		qDebug() << QString("centerOn Node : '%1'.pos = ").arg(selectNodeText) << pRenderCircle->pos();
 
         auto d     = 2.0 * GlobalSetting::circle_radius;
 		auto h_gap = GlobalSetting::height_between_parent_and_children;
@@ -560,6 +652,7 @@ void MainWindow::onSelectionNodeChanged(const QItemSelection &selected, const QI
 			m_pHighLightCircleFrame = new mygraphicscircleitem( );
 			m_pHighLightCircleFrame->setBrush( Qt::NoBrush );
         } 
+
 		QColor c = GlobalSetting::scene_bg.color();
 		// QColor flipColor = QColor::fromRgb( (~(c.red()) & 0xFF), (~(c.green()) & 0xFF), (~(c.blue()) & 0xFF) );
 		QColor flipColor = QColor::fromRgb( 255 - c.red(), 255 - c.green(), 255 - c.blue() );
@@ -584,4 +677,491 @@ void MainWindow::onSelectionNodeChanged(const QItemSelection &selected, const QI
 		m_pHighLightAnimation->start();
 
 	}
+}
+
+
+void MainWindow::on_preOrderBtn_clicked()
+{
+	static const auto flag1 = 1;
+	auto selNode = getSelectedNode();
+	if ( selNode == nullptr  ) {
+		return;
+	}
+
+    auto bRunAnimation = ui->animationChkBtn->isChecked();
+	stopEnuerateAnimationIfNecessary();
+
+	if ( m_pTreeModel != nullptr ) {
+
+		QVector<treenode*> outputList;
+		if ( !m_pTreeModel->preOrderTravelsal( selNode, outputList ) ) {
+			return;
+		}
+
+		enumerateNodes(flag1, outputList, bRunAnimation);
+	}
+}
+
+void MainWindow::on_inOrderBtn_clicked()
+{
+	static const auto flag2 = 2;
+	auto selNode = getSelectedNode();
+	if ( selNode == nullptr  ) {
+		return;
+	}
+
+    auto bRunAnimation = ui->animationChkBtn->isChecked();
+	stopEnuerateAnimationIfNecessary();
+
+	if ( m_pTreeModel != nullptr ) {
+		QVector<treenode*> outputList;
+		if ( !m_pTreeModel->inOrderTravelsal( selNode, outputList ) ) {
+			return;
+		}
+
+		enumerateNodes(flag2, outputList, bRunAnimation);
+	}
+	
+}
+
+void MainWindow::on_postOrderBtn_clicked()
+{
+	static const auto flag3 = 3;
+	auto selNode = getSelectedNode();
+	if ( selNode == nullptr  ) {
+		return;
+	}
+
+    auto bRunAnimation = ui->animationChkBtn->isChecked();
+	stopEnuerateAnimationIfNecessary();
+
+	if ( m_pTreeModel != nullptr ) {
+
+		QVector<treenode*> outputList;
+		if ( !m_pTreeModel->postOrderTravelsal( selNode, outputList ) ) {
+			return;
+		}
+
+		enumerateNodes(flag3, outputList, bRunAnimation);
+	}
+}
+
+treenode* MainWindow::getSelectedNode()
+{
+	treenode* retNode = nullptr;
+	QItemSelectionModel* pSelModel = ui->treeView->selectionModel();
+	if ( pSelModel != nullptr ) {
+		auto idxList = pSelModel->selection().indexes();
+		if ( !idxList.empty() ) {
+			auto idx = idxList.at(0);
+			if ( idx.column() == 0 ) {
+				retNode = static_cast<treenode*>( idx.internalPointer() );
+			} else {
+				// not 
+				retNode = static_cast<treenode*>( idx.siblingAtColumn(0).internalPointer() );
+			}
+		}
+	}
+
+    return retNode;
+}
+
+void MainWindow::enumerateNodes(int type, const QVector<treenode*>& nodeList, bool bAnimationFlag)
+{
+	m_bEnumerateNodeWithAnimation = bAnimationFlag;
+
+	QString retStr;
+	if ( type == 1 ) {
+		retStr = "Pre-Order Travelsal  : ";
+	} else if ( type == 2 ) {
+		retStr = "In-Order Travelsal   : ";
+	} else if ( type == 3 ) {
+		retStr = "Post-Order Travelsal : ";
+	}
+
+
+	if ( !bAnimationFlag ) {
+		for( auto i = 0; i < nodeList.size(); ++i ) {
+			auto nd = nodeList.at(i);
+			if ( nd != nullptr ) {
+				retStr += nd->text();
+				if ( i < (nodeList.size()-1) ) {
+					retStr += " -> ";
+				}
+			}
+		}
+
+		ui->travelsalOutput->setText( retStr );
+	} else {
+		qDebug() << "Run Animation ...";
+
+		int sz = nodeList.size();
+		if ( sz <= 1 ) {
+			ui->travelsalOutput->setText( retStr );
+			return;
+		} 
+
+		// sz > 1
+		int duration = ui->animationSpeed->value();
+		if ( duration <= 0 ) {
+			duration = 3500;
+		}
+
+		if ( m_pEnumerateAnimationGrp == nullptr ) {
+			m_pEnumerateAnimationGrp = new QParallelAnimationGroup();
+		}
+
+
+		//
+		// set HV Bar animation
+		//
+        if ( m_pEnumerateHVBarAni == nullptr ) {
+			m_pEnumerateHVBarAni = new QPropertyAnimation( ui->graphicsView, "hvValue" );
+		}
+
+
+		auto node1st = nodeList.at(0);
+		auto circle1st = node1st->circleObject();
+		if ( node1st != nullptr ) {
+            ui->graphicsView->centerOn( circle1st );
+		}
+
+		m_pEnumerateHVBarAni->setDuration( duration * sz );
+		auto previousPercent = 0.0;
+        for( auto i = 0; i < sz; ++i ) {
+			auto nd = nodeList.at(i);
+			if ( nd != nullptr ) {
+				bool bIsOK = false;
+				QPoint leftTopPt = getHVScrollBarValueForMakeCircleCenter(nd->circleObject() , &bIsOK);
+				if ( bIsOK ) {
+					// m_pEnumerateHVBarAni->setKeyValueAt( 1.0/(sz-1) * i, leftTopPt );
+
+
+					if ( i == 0  ) {
+						previousPercent = 1.0/(sz-1) * i;
+						m_pEnumerateHVBarAni->setKeyValueAt( previousPercent, leftTopPt );
+					} else {
+						auto currentEnd = 1.0/(sz-1) * i;
+						auto step1 = (previousPercent + currentEnd) / 2.0;
+						auto step2 = currentEnd;
+						m_pEnumerateHVBarAni->setKeyValueAt(step1 , leftTopPt );
+						m_pEnumerateHVBarAni->setKeyValueAt(step2, leftTopPt );
+
+						previousPercent = step2;
+					}
+				}
+			}
+		}
+
+
+
+
+		auto d = GlobalSetting::circle_radius * 2.0;
+        auto edgeLength = d * 1.5;
+		auto delta = edgeLength - d;
+		if ( m_pEnumerateMoveRect == nullptr ) {
+			m_pEnumerateMoveRect = new mygraphicsrectitem();
+		}
+
+		if ( circle1st != nullptr ) {
+			QColor c = GlobalSetting::scene_bg.color();
+			QColor flipColor = QColor::fromRgb( 255 - c.red(), 255 - c.green(), 255 - c.blue() );
+
+			QPointF wrapRectBegPos = circle1st->pos() - QPointF( delta/2.0, delta/2.0);
+            QRectF begRect(0,0, edgeLength, edgeLength);
+			m_pEnumerateMoveRect->setBrush( Qt::NoBrush );
+			m_pEnumerateMoveRect->setPen( QPen( QBrush( flipColor ), 1.5 ) );
+			m_pEnumerateMoveRect->setPos( wrapRectBegPos );
+			m_pEnumerateMoveRect->setRect( begRect  );
+			m_pEnumerateMoveRect->setVisible( true );
+
+			m_pScene->addItem( m_pEnumerateMoveRect );
+		}
+
+
+		//
+		// set BoundingBox Rect Movement
+		//
+		if ( m_pEnumerateMoveRectAni == nullptr ) {
+			m_pEnumerateMoveRectAni = new QPropertyAnimation(m_pEnumerateMoveRect ,"pos");
+		}
+
+		m_pEnumerateMoveRectAni->setDuration( duration * sz );
+		previousPercent = 0.0;
+        for( auto i = 0; i < sz; ++i ) {
+			auto nd = nodeList.at(i);
+			if ( nd != nullptr ) {
+				auto pRenderCircle =  nd->circleObject();
+				if ( pRenderCircle != nullptr ) {
+					QPointF wrapPos = pRenderCircle->pos() - QPointF( delta/2.0, delta/2.0);
+					// m_pEnumerateMoveRectAni->setKeyValueAt( 1.0/(sz-1) * i, wrapPos );
+
+					if ( i == 0   ) {
+						previousPercent = 1.0/(sz-1) * i;
+						m_pEnumerateMoveRectAni->setKeyValueAt( previousPercent, wrapPos );
+					} else {
+						auto currentEnd = 1.0/(sz-1) * i;
+						auto step1 = (previousPercent + currentEnd) / 2.0;
+						auto step2 = currentEnd;
+						m_pEnumerateMoveRectAni->setKeyValueAt( step1, wrapPos );
+						m_pEnumerateMoveRectAni->setKeyValueAt( step2, wrapPos );
+
+						previousPercent = step2;
+					}
+				}
+			}
+		}
+
+
+
+		// set html prefix string
+		if ( type == 1 ) {
+			retStr = "<span>Pre-Order Travelsal  : </span>";
+		} else if ( type == 2 ) {
+			retStr = "<span>In-Order Travelsal   : </span>";
+		} else if ( type == 3 ) {
+			retStr = "<span>Post-Order Travelsal : </span>";
+		}
+		// txtlist << retStr;
+
+
+		//
+		// set Animation output html text
+		//
+		if ( m_pEnumerateTextItem == nullptr ) {
+			m_pEnumerateTextItem = new MyTextAnimationItem( ui->travelsalOutput, nodeList, retStr);
+		}
+
+		if ( m_pEnumerateStatusTextAni == nullptr ) {
+			m_pEnumerateStatusTextAni  = new QPropertyAnimation(m_pEnumerateTextItem, "step");
+		}
+
+
+		// QString previousText;
+		previousPercent = 0.0;
+		m_pEnumerateStatusTextAni->setDuration( duration * sz );
+        for( auto i = 0; i < sz; ++i ) {
+			auto nd = nodeList.at(i);
+			if ( nd != nullptr ) {
+				if ( i == 0  ) {
+					previousPercent = 1.0/(sz-1) * i;
+					m_pEnumerateStatusTextAni->setKeyValueAt( previousPercent, QPoint(i,i) );
+				} else {
+					auto currentEnd = 1.0/(sz-1) * i;
+					auto step1 = (previousPercent + currentEnd) / 2.0;
+					auto step2 = currentEnd;
+					m_pEnumerateStatusTextAni->setKeyValueAt( step1, QPoint(i,1) );
+					m_pEnumerateStatusTextAni->setKeyValueAt( step2, QPoint(i,0) );
+
+					previousPercent = step2;
+				}
+
+			}
+		}
+
+
+		//
+		// Run Group Animation
+		//
+		m_pEnumerateAnimationGrp->addAnimation( m_pEnumerateHVBarAni );
+		m_pEnumerateAnimationGrp->addAnimation( m_pEnumerateMoveRectAni );
+		m_pEnumerateAnimationGrp->addAnimation( m_pEnumerateStatusTextAni );
+		m_pEnumerateAnimationGrp->start();
+	}
+
+}
+
+void MainWindow::stopEnuerateAnimationIfNecessary(bool needForce /* = false */)
+{
+	if ( needForce || m_bEnumerateNodeWithAnimation ) {
+		// qDebug() << "----- Stop previous Begin ----- ";
+		if ( m_pEnumerateHVBarAni != nullptr ) {
+			m_pEnumerateHVBarAni->stop();
+
+			delete m_pEnumerateHVBarAni;
+			m_pEnumerateHVBarAni = nullptr;
+		}
+
+		if ( m_pEnumerateMoveRect != nullptr ) {
+			m_pEnumerateMoveRect->setVisible( false) ;
+			m_pScene->removeItem( m_pEnumerateMoveRect );
+			m_pEnumerateMoveRect = nullptr;
+		}
+
+
+		if ( m_pEnumerateMoveRectAni != nullptr ) {
+			m_pEnumerateMoveRectAni->stop();
+
+			delete m_pEnumerateMoveRectAni;
+			m_pEnumerateMoveRectAni = nullptr;
+		}
+
+		if( m_pEnumerateTextItem != nullptr ) {
+			delete m_pEnumerateTextItem;
+			m_pEnumerateTextItem = nullptr;
+		}
+
+
+		if ( m_pEnumerateStatusTextAni != nullptr ) {
+			m_pEnumerateStatusTextAni->stop();
+
+			delete m_pEnumerateStatusTextAni;
+			m_pEnumerateStatusTextAni = nullptr;
+		}
+
+
+		if ( m_pEnumerateAnimationGrp != nullptr ) {
+			m_pEnumerateAnimationGrp->stop();
+
+			delete m_pEnumerateAnimationGrp;
+			m_pEnumerateAnimationGrp = nullptr;
+		}
+		// qDebug() << "----- Stop previous End ----- ";
+
+	}
+}
+
+
+
+
+
+
+
+
+QPoint MainWindow::getHVScrollBarValueForMakeCircleCenter(QGraphicsEllipseItem* pCircle, bool* pIsOK)
+{
+	QPoint pt(0.0,  0.0);
+	if ( pCircle == nullptr ) {
+		if ( pIsOK != nullptr ) {
+			*pIsOK = false;
+		}
+		return pt;
+	}
+
+	if ( pIsOK != nullptr ) {
+		*pIsOK = true;
+	}
+
+	auto tweakDeltaFlag = false;
+
+	// render circle measurement
+	auto pos = pCircle->pos();
+	auto d = GlobalSetting::circle_radius * 2.0;
+
+	// scroll view's content size 
+    auto viewSz = ui->graphicsView->size();
+	auto viewW = viewSz.width();
+    auto viewH = viewSz.height();
+	auto centerHalf_HGap = (viewW - d) / 2.0;
+	auto centerHalf_VGap = (viewH - d) / 2.0;
+
+	// render scene's size
+	auto sceneRect = ui->graphicsView->sceneRect();
+	auto sceneW = sceneRect.width();
+	auto sceneH = sceneRect.height();
+
+	auto leftSpace = pos.x();
+	auto rightSpace = sceneW - (leftSpace + d);
+	auto topSpace = pos.y();
+	auto bottomSpace = sceneH - (topSpace + d);
+
+	auto scrollPlacedX = 0.0;
+	auto scrollPlacedY = 0.0;
+
+	// Key Core :
+	//
+	// Calc  Position
+	//
+	int hTag = 0;
+	if ( leftSpace >= centerHalf_HGap    &&   rightSpace >= centerHalf_HGap ) {
+		// the Horizontal position can be center
+		scrollPlacedX = leftSpace - centerHalf_HGap;
+		hTag = 1;
+	} else {
+		if ( leftSpace >= centerHalf_HGap ) {
+			// leftSpace is enough  , rightSpace is not enough
+			// scrollPlacedX = leftSpace - ( viewW - (rightSpace + d) );
+			auto hBar = ui->graphicsView->horizontalScrollBar();
+			if ( hBar != nullptr ) {
+				scrollPlacedX = hBar->maximum();
+			} else {
+				scrollPlacedX = leftSpace - ( viewW - (rightSpace + d) );
+			}
+
+			hTag = 2;
+		} else {
+			// rightSpace  is enough , leftSpace is not enough
+			scrollPlacedX = 0.0;
+			hTag = 3;
+		}
+	}
+
+	if ( tweakDeltaFlag ) {
+		if ( hTag == 1 ) {
+			auto deltaH = 0.0;
+			auto hPageStep = 0;
+			auto hBar = ui->graphicsView->horizontalScrollBar();
+			if ( hBar != nullptr ) {
+				hPageStep = hBar->pageStep();
+				// qDebug() <<" hPageStep = " << hPageStep;
+				deltaH = (viewW - hPageStep) / 2.0;
+			}
+
+			if ( scrollPlacedX > 0.0 ) {
+				scrollPlacedX += deltaH;
+			}
+		}
+	}
+
+
+	int vTag = 0;
+	if ( topSpace >= centerHalf_VGap  &&    bottomSpace >= centerHalf_VGap ) {
+		scrollPlacedY = topSpace - centerHalf_VGap;
+		vTag = 1;
+	} else {
+		if ( topSpace >= centerHalf_HGap ) {
+			// topSpace  is enough  , bottomSpace is not enough
+			auto vBar = ui->graphicsView->verticalScrollBar();
+			if ( vBar != nullptr ) {
+				scrollPlacedY = vBar->maximum();
+			} else {
+				scrollPlacedY = topSpace - ( viewH - (bottomSpace + d) );
+			}
+			vTag = 2;
+		} else {
+			// topSpace  is not enough  , bottomSpace is enough
+			scrollPlacedY = 0.0;
+			vTag = 3;
+		}
+	}
+
+	if ( tweakDeltaFlag ) {
+		if ( vTag == 1 ) {
+			auto deltaV = 0.0;
+			auto vPageStep = 0;
+			auto vBar = ui->graphicsView->verticalScrollBar();
+			if ( vBar != nullptr ) {
+				vPageStep = vBar->pageStep();
+				// qDebug() <<" vPageStep = " << vPageStep;
+				deltaV = (viewH - vPageStep) / 2.0;
+			}
+
+			if ( scrollPlacedY > 0.0 ) {
+				scrollPlacedY += deltaV;
+			}
+		}
+	}
+
+
+	pt.setX( static_cast<int>(scrollPlacedX) );
+	pt.setY( static_cast<int>(scrollPlacedY) );
+
+	return pt;
+}
+
+
+
+void MainWindow::on_stopAnimationBtn_clicked()
+{
+	stopEnuerateAnimationIfNecessary( true );
 }

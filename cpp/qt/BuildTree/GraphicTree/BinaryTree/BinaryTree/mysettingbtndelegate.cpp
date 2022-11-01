@@ -38,9 +38,9 @@ void mysettingbtndelegate::setEditorData(QWidget *editor, const QModelIndex &ind
 
 	if ( editor != nullptr ) {
 		if ( index.column() == GlobalSetting::SPECIAL_COLUMN_INDEX ) {
-            qDebug() << "setEditorData ( 2 ) ";
+            // qDebug() << "setEditorData ( 2 ) ";
 		} else {
-            qDebug() << "setEditorData ( not <2> ) ";
+            // qDebug() << "setEditorData ( not <2> ) ";
             // QStyledItemDelegate::setEditorData(editor, index);
 		}
 	}
@@ -55,9 +55,10 @@ void mysettingbtndelegate::setEditorData(QWidget *editor, const QModelIndex &ind
 void mysettingbtndelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const // override;
 {
 	if ( index.column() == GlobalSetting::SPECIAL_COLUMN_INDEX ) {
-		qDebug() << "setEditorData ( 2 ) ";
+        // qDebug() << "setEditorData ( 2 ) ";
 	} else {
-		qDebug() << "setEditorData ( not <2> ) ";
+        // qDebug() << "setEditorData ( not <2> ) ";
+
 		QStyledItemDelegate::setModelData(editor, model, index);
 	}
 
@@ -70,10 +71,10 @@ void mysettingbtndelegate::updateEditorGeometry(QWidget *editor, const QStyleOpt
 
 	if ( editor != nullptr ) {
 		if ( index.column() == GlobalSetting::SPECIAL_COLUMN_INDEX ) {
-			qDebug() << "set Geometry ( 2 ) ";
+            // qDebug() << "set Geometry ( 2 ) ";
 			editor->setGeometry( option.rect );
 		}  else {
-			qDebug() << "set Geometry ( Not 2 ) ";
+            // qDebug() << "set Geometry ( Not 2 ) ";
 		}
 	}
 

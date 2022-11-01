@@ -89,12 +89,15 @@ QPair<QModelIndex,treenode*> binarytreeview::getSelectedNodeItem(int* pColInfo)
             *pColInfo = nCol;
         }
 
+
         if ( nCol!=0 ) {
-            return qMakePair(QModelIndex(), nullptr);
-        }
-        
-		treeData = static_cast<treenode*>( selidx.internalPointer() );
-        return qMakePair(retIdx, treeData);
+			treeData = static_cast<treenode*>( selidx.internalPointer() );
+			return qMakePair(retIdx, treeData);
+        } else {
+			QModelIndex idxColumn0 = selidx.siblingAtColumn(0);
+			treeData = static_cast<treenode*>( idxColumn0.internalPointer() );
+            return qMakePair(idxColumn0 , treeData);
+		}
     }
 
     return qMakePair(QModelIndex(), treeData);

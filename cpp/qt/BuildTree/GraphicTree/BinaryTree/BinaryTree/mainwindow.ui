@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1327</width>
-    <height>686</height>
+    <width>1300</width>
+    <height>706</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -27,13 +27,13 @@
      <enum>QAbstractItemView::SelectItems</enum>
     </property>
    </widget>
-   <widget class="QGraphicsView" name="graphicsView">
+   <widget class="MyGraphicsView" name="graphicsView">
     <property name="geometry">
      <rect>
       <x>510</x>
-      <y>30</y>
-      <width>761</width>
-      <height>531</height>
+      <y>32</y>
+      <width>771</width>
+      <height>520</height>
      </rect>
     </property>
     <property name="focusPolicy">
@@ -98,10 +98,10 @@
    <widget class="QPushButton" name="clearBtn">
     <property name="geometry">
      <rect>
-      <x>770</x>
-      <y>590</y>
-      <width>81</width>
-      <height>50</height>
+      <x>710</x>
+      <y>620</y>
+      <width>61</width>
+      <height>41</height>
      </rect>
     </property>
     <property name="text">
@@ -111,23 +111,23 @@
    <widget class="QPushButton" name="saveGraphicBtn">
     <property name="geometry">
      <rect>
-      <x>1090</x>
-      <y>590</y>
+      <x>870</x>
+      <y>620</y>
       <width>81</width>
-      <height>51</height>
+      <height>41</height>
      </rect>
     </property>
     <property name="text">
-     <string>Save Picture</string>
+     <string>Save As PNG ...</string>
     </property>
    </widget>
    <widget class="QPushButton" name="treeOptionBtn">
     <property name="geometry">
      <rect>
-      <x>590</x>
-      <y>590</y>
+      <x>540</x>
+      <y>620</y>
       <width>111</width>
-      <height>51</height>
+      <height>41</height>
      </rect>
     </property>
     <property name="text">
@@ -137,14 +137,143 @@
    <widget class="QPushButton" name="drawTreeBtn">
     <property name="geometry">
      <rect>
-      <x>940</x>
-      <y>590</y>
+      <x>780</x>
+      <y>620</y>
       <width>81</width>
-      <height>51</height>
+      <height>41</height>
      </rect>
     </property>
     <property name="text">
      <string>Draw</string>
+    </property>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_2">
+    <property name="geometry">
+     <rect>
+      <x>960</x>
+      <y>605</y>
+      <width>321</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Travelsal</string>
+    </property>
+    <widget class="QPushButton" name="postOrderBtn">
+     <property name="geometry">
+      <rect>
+       <x>140</x>
+       <y>25</y>
+       <width>51</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>PostOrder</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="inOrderBtn">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>25</y>
+       <width>51</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>InOrder</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="animationChkBtn">
+     <property name="geometry">
+      <rect>
+       <x>200</x>
+       <y>45</y>
+       <width>61</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="layoutDirection">
+      <enum>Qt::LeftToRight</enum>
+     </property>
+     <property name="text">
+      <string>Animation</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="preOrderBtn">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>25</y>
+       <width>51</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>PreOrder</string>
+     </property>
+    </widget>
+    <widget class="QSpinBox" name="animationSpeed">
+     <property name="geometry">
+      <rect>
+       <x>230</x>
+       <y>20</y>
+       <width>41</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="minimum">
+      <number>1000</number>
+     </property>
+     <property name="maximum">
+      <number>10000</number>
+     </property>
+     <property name="singleStep">
+      <number>100</number>
+     </property>
+     <property name="value">
+      <number>1000</number>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label">
+     <property name="geometry">
+      <rect>
+       <x>196</x>
+       <y>20</y>
+       <width>31</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Speed:</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="stopAnimationBtn">
+     <property name="geometry">
+      <rect>
+       <x>280</x>
+       <y>30</y>
+       <width>31</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Stop</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QTextEdit" name="travelsalOutput">
+    <property name="geometry">
+     <rect>
+      <x>520</x>
+      <y>570</y>
+      <width>731</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
     </property>
    </widget>
   </widget>
@@ -156,6 +285,11 @@
    <class>binarytreeview</class>
    <extends>QTreeView</extends>
    <header>binarytreeview.h</header>
+  </customwidget>
+  <customwidget>
+   <class>MyGraphicsView</class>
+   <extends>QGraphicsView</extends>
+   <header>mygraphicsview.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

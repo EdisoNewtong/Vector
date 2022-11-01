@@ -5,4 +5,3 @@ mygraphicscircleitem::mygraphicscircleitem(QObject *parent /* = nullptr */ )
 {
 
 }
-

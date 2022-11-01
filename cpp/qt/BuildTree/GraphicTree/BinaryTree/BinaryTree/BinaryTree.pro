@@ -35,7 +35,10 @@ SOURCES += \
         nodestylecfg.cpp \
         binarytreemodel.cpp \
 		treenode.cpp \
-		mygraphicscircleitem.cpp
+		mygraphicscircleitem.cpp \
+		mygraphicsrectitem.cpp \
+		mygraphicsview.cpp \
+		mytextanimationitem.cpp
 
 HEADERS += \
     globalsettingdlg.h \
@@ -48,6 +51,9 @@ HEADERS += \
         binarytreemodel.h \
 		treenode.h \
 		mygraphicscircleitem.h \
+		mygraphicsrectitem.h \
+		mygraphicsview.h \
+		mytextanimationitem.h \
         XmlParser/rapidxml.hpp \
         XmlParser/rapidxml_iterators.hpp \
         XmlParser/rapidxml_print.hpp \
@@ -67,4 +73,3 @@ RESOURCES += \
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
-

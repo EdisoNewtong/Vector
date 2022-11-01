@@ -64,6 +64,12 @@ public:
 	int updateGlobalTree();
 	void updateDeselectionIndex(const QModelIndex& unselected);
 	void updateSelectionIndex(const QModelIndex& selected);
+
+
+
+	bool preOrderTravelsal(treenode* node,  QVector<treenode*>& retList);
+	bool inOrderTravelsal(treenode* node,   QVector<treenode*>& retList);
+	bool postOrderTravelsal(treenode* node, QVector<treenode*>& retList);
 protected slots:
 	bool create_AddLeftNode(const QModelIndex& parent);
 	bool create_AddRightNode(const QModelIndex& parent);
@@ -78,6 +84,11 @@ protected:
 
 	int  calcTreeNodeDepthAndHeight(treenode* node, int layer);
 	int  calcTreeGlobalDepthAndHeight(treenode* node, int layer);
+
+
+	void innerPreOrderTravelsal(treenode* node, QVector<treenode*>& nodeList);
+	void innerInOrderTravelsal(treenode* node, QVector<treenode*>& nodeList);
+	void innerPostOrderTravelsal(treenode* node, QVector<treenode*>& nodeList);
 protected:
 	// invisible Root node
 	treenode* m_pInvisibleRootItem;
