@@ -103,6 +103,32 @@ void static3DArraySample()
 
 
     if ( studyCase ) {
+        /**************************************************
+         
+              The correct  data type for the given expression
+             
+         **************************************************/
+        int (*p3DAry)[N1][N2][N3] = &ary3D;
+        int (*p2DAry_1)[N2][N3]   =  ary3D;
+        int (*p2DAry_2)[N2][N3]   = &ary3D[0];
+
+        int (*p1DAry_1)[N3]   =  ary3D[0];
+        int (*p1DAry_2)[N3]   = &ary3D[0][0];
+        int* pElement         = ary3D[2][0];   // pointer to the number : 71
+
+        // printf("0. *pElement = %d\n", *pElement);
+        // *pElement = 123;
+        // printf("1. ary3D[2][0][0] = %d\n",  ary3D[2][0][0]); // output 123
+        (void)p3DAry;
+        (void)p2DAry_1;
+        (void)p2DAry_2;
+        (void)p1DAry_1;
+        (void)p1DAry_2;
+        (void)pElement;
+
+
+
+
         printf("---------- | Study Case of 3D Array address |----------\n");
         printf(" ary3D    = %p\n", ary3D);
         printf("&ary3D    = %p\n",&ary3D);
