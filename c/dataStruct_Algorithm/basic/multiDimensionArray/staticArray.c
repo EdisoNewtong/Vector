@@ -116,6 +116,8 @@ void static3DArraySample()
         int (*p1DAry_2)[N3]   = &ary3D[0][0];
         int* pElement         = ary3D[2][0];   // pointer to the number : 71
 
+        int (**pp1DAry)[N3]   = &p1DAry_1;  // a pointer that point to a 1D array's pointer
+
         // printf("0. *pElement = %d\n", *pElement);
         // *pElement = 123;
         // printf("1. ary3D[2][0][0] = %d\n",  ary3D[2][0][0]); // output 123
@@ -125,6 +127,8 @@ void static3DArraySample()
         (void)p1DAry_1;
         (void)p1DAry_2;
         (void)pElement;
+
+        (void)pp1DAry;
 
 
 
