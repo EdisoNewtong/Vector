@@ -1137,7 +1137,7 @@ extern int lua_cpcall (lua_State *L, lua_CFunction func, void *ud) {
   lua_lock(L); /* ((void) 0); */
   c.func = func;
   c.ud = ud;
-  // luaD_pcall(...)
+  /* luaD_pcall(...) */
   /* status = luaD_pcall(L, f_Ccall, &c, ((char *)(L->top) - (char *)L->stack), 0); */
   status = luaD_pcall(L, f_Ccall, &c, savestack(L, L->top), 0);
   lua_unlock(L); /* ((void) 0); */
