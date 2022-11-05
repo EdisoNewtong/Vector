@@ -22,5 +22,5 @@ lu_byte  => unsigned char
 // ?? lu_mem  => size_t
 //////////////////////////////////////////////////
 typedef LUAI_UMEM lu_mem;  // llimits.h:20
-#define LUAI_UMEM	size_t // luaconf.h:417
+#define LUAI_UMEM size_t   // luaconf.h:417
 
