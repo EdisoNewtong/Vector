@@ -9,6 +9,11 @@ using namespace std;
 #include "floatNumberConverter.h"
 
 
+//
+// Core Flag :  Need Print Convert Detail ? 
+//
+static const bool G_NEED_PRINT_CONVERT_DETAIL = true;
+
 union FloatIntUnion 
 {
 	float f_num;
@@ -103,6 +108,14 @@ R"([ERROR] : invalid command-line format"
                     } else {
                         cout << "[SUCCESSFUL] , Convert Equal. "   <<  "Number = " <<  strfloat <<  " = 0x" << std::hex << std::uppercase << dui.dull_num << " => 64 bits , 1 unsigned long long " << endl;
                     }
+
+                    if ( G_NEED_PRINT_CONVERT_DETAIL ) {
+                        cout << "[Detail] : " << endl;
+                        cout << "--------------------------------------------------" << endl;
+                        cvt.printConvertDetail();
+                        cout << "--------------------------------------------------" << endl;
+                    }
+
                 } else {
                     cout << "[FAILED] , Convert <Not> Equal ! "       <<  endl
                          << "number = \""   << strfloat  << "\"" << endl
