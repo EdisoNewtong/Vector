@@ -95,12 +95,16 @@ set noendofline
 	nnoremap <C-L> 5zl
     nnoremap <Leader>bo    :browse oldfiles<CR>
 
-	" highlight
-	highlight  StatusLineNC ctermbg=LightGray ctermfg=DarkGrey guibg=LightGray guifg=DarkGrey 
-	highlight  StatusLine ctermfg=Green ctermbg=Red guibg=White guifg=#FF8040
-	"highlight  StatusLine ctermfg=Green ctermbg=Red guibg=White guifg=Red
-	highlight  TabLineSel ctermbg=Red ctermfg=White guibg=#FF8040 guifg=White
+
+
+
+	highlight  StatusLineNC ctermbg=LightGray ctermfg=DarkGrey     guibg=LightGray    guifg=DarkGrey 
+	highlight  StatusLine   ctermfg=Green     ctermbg=DarkGrey     guibg=White        guifg=#FF8040
+
+
+	highlight  TabLineSel ctermbg=Green ctermfg=White guibg=Green guifg=White
 	highlight  TabLine ctermbg=LightGray ctermfg=DarkGrey guibg=LightGray guifg=DarkGrey
+
 
 	set guifont=Menlo\ Regular:h22
 " endif
