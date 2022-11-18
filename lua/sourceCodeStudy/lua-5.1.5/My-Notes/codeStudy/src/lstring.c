@@ -35,14 +35,108 @@ void luaS_resize (lua_State *L, int newsize) {
   newhash = (GCObject * *)(  (size_t)(newsize+1) <= MAX_SIZET / sizeof(GCObject *)  
 			               ? luaM_realloc_(L, NULL, 0 * sizeof(GCObject *), newsize * sizeof(GCObject *) ) 
 						   : luaM_toobig(L) );
+
+  // set a reference pointer from   `&G(L)->strt`   <==   Core Core Core
   /*tb=&G(L)->strt; */
   tb = &(L->l_G)->strt;
+
   for (i=0; i<newsize; i++) {
     newhash[i] = NULL; // init each elements inside hash table as   NULL
   }
 
-  ////////////////////////////////////////////////////////////////////////////////////////////////////
-  // TODO : comment the following part later
+  /**********************************************************************
+        
+       Re-Order Hash Table :
+
+Assume Situation-1 :
+    old bucket count : 2  
+    new bucket count : 4
+
+
+--------------------------------------------------
+    Old Summary :
+--------------------------------------------------
+       a.hash = 4    a.slotIdx = 4   % 2 = 0
+       b.hash = 8    b.slotIdx = 8   % 2 = 0
+       c.hash = 12   c.slotIdx = 12  % 2 = 0
+
+       d.hash = 5    d.slotIdx = 5   % 2 = 1
+       e.hash = 9    e.slotIdx = 9   % 2 = 1
+       f.hash = 13   f.slotIdx = 13  % 2 = 1
+
+--------------------------------------------------
+    New Summary :
+--------------------------------------------------
+       a.hash = 4    a.slotIdx = 4   % 4 = 0
+       b.hash = 8    b.slotIdx = 8   % 4 = 0
+       c.hash = 12   c.slotIdx = 12  % 4 = 0
+
+       d.hash = 5    d.slotIdx = 5   % 4 = 1
+       e.hash = 9    e.slotIdx = 9   % 4 = 1
+       f.hash = 13   f.slotIdx = 13  % 4 = 1
+
+ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+           Old[0] : a -> b -> c
+           New[0] : c -> b -> a
+
+           Old[1] : d -> e -> f
+           New[1] : f -> e -> d
+
+
+####################################################################################################
+####################################################################################################
+####################################################################################################
+####################################################################################################
+
+
+
+
+Assume Situation-2 :
+    old bucket count : 4  
+    new bucket count : 8
+
+
+--------------------------------------------------
+    Old Summary :
+--------------------------------------------------
+       a.hash = 4    a.slotIdx = 4   % 4 = 0
+       b.hash = 8    b.slotIdx = 8   % 4 = 0
+       c.hash = 12   c.slotIdx = 12  % 4 = 0
+
+       d.hash = 5    d.slotIdx = 5   % 4 = 1
+       e.hash = 9    e.slotIdx = 9   % 4 = 1
+       f.hash = 13   f.slotIdx = 13  % 4 = 1
+
+--------------------------------------------------
+    New Summary :  Core Core Core 
+--------------------------------------------------
+       a.hash = 4    a.slotIdx = 4   % 8 = 4
+       b.hash = 8    b.slotIdx = 8   % 8 = 0
+       c.hash = 12   c.slotIdx = 12  % 8 = 4
+
+       d.hash = 5    d.slotIdx = 5   % 8 = 5
+       e.hash = 9    e.slotIdx = 9   % 8 = 1
+       f.hash = 13   f.slotIdx = 13  % 8 = 5
+
+
+           Old[0] : a -> b -> c
+           Old[1] : d -> e -> f
+
+           New[0] : b
+           New[1] : e
+           New[2] : <NULL>
+           New[3] : <NULL>
+           New[4] : c -> a
+           New[5] : f -> d
+           New[6] : <NULL>
+           New[7] : <NULL>
+
+
+
+
+
+  **********************************************************************/
   /* rehash */
   for (i=0; i<tb->size; i++) {
     GCObject *p = tb->hash[i];
@@ -79,9 +173,9 @@ void luaS_resize (lua_State *L, int newsize) {
 /*
     alloc a TString with 
 
-        2nd arg : str's content
-        3rd arg : str's length
-        4th arg : str's hash code
+        str |  2nd arg : str's content     
+        l   |  3rd arg : str's length      
+        h   |  4th arg : str's hash code   
 
 */
 static TString *newlstr (lua_State *L, const char *str, size_t l,
@@ -97,12 +191,13 @@ static TString *newlstr (lua_State *L, const char *str, size_t l,
 
   /////////////////////////////////////////////////////////////////
   //
-  // -----------------------------------------------------
-  // ||     Part1               ||    Part 2           ||
-  // -----------------------------------------------------
-  // ||  sizeof(struct TString) ||    s|t|r|.|.|.|\0   ||
-  // ------------------------------------------------------
+  // ----------------------------------------------------------------
+  // ||     Part1               ||    Part 2                       ||
+  // ----------------------------------------------------------------
+  // ||  sizeof(struct TString) ||   |h|e|l|l|o| |w|o|r|l|d|\0|    ||  here "hello world" is a dummy example only
+  // ----------------------------------------------------------------
   /*               luaM_malloc(L, (l+1)*sizeof(char)+sizeof(TString)) */
+  /*                                +1 : is take '\0' into account    */
   ts = (TString *)luaM_realloc_(L, NULL, 0,  (l+1) * sizeof(char) + sizeof(TString)  );
   ts->tsv.len = l;
   ts->tsv.hash = h;
@@ -112,7 +207,7 @@ static TString *newlstr (lua_State *L, const char *str, size_t l,
   ts->tsv.marked = (lu_byte)( (L->l_G)->currentwhite & ((1<<0) | (1<<1)) );
   /*                 4      LUA_TSTRING */
   ts->tsv.tt = LUA_TSTRING;
-  ts->tsv.reserved = 0;
+  ts->tsv.reserved = 0; // init as Un-Reserved word
 
   
   // copy the real str content into the 2nd part with '\0'
@@ -128,7 +223,9 @@ static TString *newlstr (lua_State *L, const char *str, size_t l,
   // use modulo value as the slot index to be placed ( for performance aspect use  & op rather than  % )
   //  but    tb->size must be a number whose value is power(2,n) , otherwise can't use op & instead of op %
   //
-  // TODO : make the algorithm more detailed than before
+  // if      the result of log2(n) is an interger number
+  // then     (a % n) == ( a & (n-1) )
+  // the exp ( a & (n-1) )  is  more efficient than  (a % n)
   //
   // Notes : 
   //        tb->size is container's capacity rather than the element's count
@@ -163,10 +260,7 @@ static TString *newlstr (lua_State *L, const char *str, size_t l,
             strlen("a2a4a6a8a0a2a4a6a8a0a2a4a6a8a0a2"), 
             hash2 );
 
-    // tb->hash[hash2] -> str2 -> str1 -> NULL
-
-
-
+       // tb->hash[hash2] -> str2 -> str1 -> NULL
 
   */
   ts->tsv.next = tb->hash[h]; /* chain new entry */
@@ -188,6 +282,12 @@ TString *luaS_newlstr (lua_State *L, const char *str, size_t l) {
   GCObject *o;
   unsigned int h = ((unsigned int)(l)); /* seed */
 
+  /*************************************************** 
+
+     Core Core Core : calculate string's Hash Code
+
+  ****************************************************/
+
   // if str.length >=32 , partially hash the character step by step ( depand on the value of varible step )
   // if len == 32  , every 2 (1+1) step
   // if len == 64  , every 3 (2+1) step
@@ -198,6 +298,8 @@ TString *luaS_newlstr (lua_State *L, const char *str, size_t l) {
     /*                           cast(unsigned char, str[l1-1]) */
     h = h ^ ( (h<<5) + (h>>2) + (unsigned char)(str[l1-1]) );
   }
+
+
   /*        G(L)                 lmod(h,  G(L)->strt.size)*/
   for (o = (L->l_G)->strt.hash[ (int)(h & (L->l_G->strt.size-1)) ];
        o != NULL;

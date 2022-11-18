@@ -37,12 +37,13 @@
 const char *const luaX_tokens [] = {
     "and", "break", "do", "else", "elseif",
     "end", "false", "for", "function", "if",
-    "in", "local", "nil", "not", "or", "repeat",
-    "return", "then", "true", "until", "while",
+    "in", "local", "nil", "not", "or", "repeat", 
+    "return", "then", "true", "until", "while", // 21 elements
+
     "..", "...", "==", ">=", "<=", "~=",
-    "<number>", "<name>", "<string>", "<eof>",
-    NULL
-};
+    "<number>", "<name>", "<string>", "<eof>", // 10  elements
+    NULL                                       //  1  element
+}; // Totally 32 elements
 
 
 #define save_and_next(ls) (save(ls, ls->current), next(ls))
@@ -76,8 +77,9 @@ static void save (LexState *ls, int c) {
 
 void luaX_init (lua_State *L) {
   int i;
-  //                                    277       257
-  /*          NUM_RESERVED => ( (int)( TK_WHILE - FIRST_RESERVED +1) )  */
+  //                                         277       257
+  /*          21              NUM_RESERVED => ( (int)( TK_WHILE - FIRST_RESERVED +1) )  */
+  // 21 elements not include ".." / "..." / "==" / ">=" / "~=" / ...
   for (i=0; i<NUM_RESERVED; i++) {
     /*             luaS_new(L, luaX_tokens[i]); */
     TString *ts = luaS_newlstr(L, luaX_tokens[i], strlen(luaX_tokens[i]));
@@ -90,6 +92,7 @@ void luaX_init (lua_State *L) {
     /*                 (lu_byte)(i+1);  cast_byte(i+1); */
     // set reserved flag as none zero  from    [ 1 , 20 ]
     ts->tsv.reserved = cast_byte(i+1); /* reserved word */
+
   }
 }
 

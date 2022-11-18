@@ -1,0 +1,80 @@
+--------------------------------------------------
+Date : 2021-03-16
+--------------------------------------------------
+Source Code Directory Structure :  codeStudy/directoryStructure.txt
+
+
+
+
+
+
+
+--------------------------------------------------
+Date : 2022-11-04
+--------------------------------------------------
+目录差异 : 
+
+srcOriginal/            :  lua-5.1.5 的源代码
+
+src/                    :  目前学习时的，可读性较好的改版的源代码, 但完全不改变代码编译后的二进制 *.o 的内容 ( 通过将宏的展开形式进行注释，而保持原始的宏，进行上下对比阅读 ) 
+srcMacroExpandRaw/      :  将 lua-5.1.5 的源代码通过编译选项 -E -P , 将所有预编译的宏进行展开的代码
+srcWithBrackets/        :  未展开宏的源代码，但是加入了一些 { ... } ,  为了能使可读性更好，对单行的语句也使用 { ... } 进行了包围操作
+
+
+
+--------------------------------------------------
+Date : 2022-11-16
+--------------------------------------------------
+lua 中的函数通常都有自己的命名规范,也就是说，
+当你看到一个函数名时，通常你就可以猜出它的出处
+e.g.
+     // lauxlib.c  : "luaL_"  前缀就是一个标识，'L' 标识它是一个Library ,  因此，它的实现体来自于 lauxlib.c
+     luaL_newstate(... );
+
+     // ldo.c      : "luaD_"  前缀就是一个标识，'D' 标识它用于Do Something ,  因此，它的实现体来自于 ldo.c
+     luaD_protectedparser(...)
+
+     // lstring.c  : "luaS_"  前缀就是一个标识，'S' 标识它用于string manipulate ,  因此，它的实现体来自于 lstring.c
+     luaS_newlstr(...)
+
+     // lbaselib.c : "luaB_"  前缀就是一个标识，'B' 标识它是一个 Base Library ,  因此，它的实现体来自于 lbaselib.c
+     luaB_print(...)
+
+     // lcode.c    : "luaK_"  前缀就是一个标识，'K' 标识它是一段 Code ( Code 中 C 的发音 K )  ,  因此，它的实现体来自于 lcode.c
+     luaK_setlist(...)
+
+     // ldblib.c   : "db_"  前缀就是一个标识，'db_' 标识它是一段 Debug ,  因此，它的实现体来自于 ldblib.c
+     db_getregistry(...)
+
+     // lfunc.c    : "luaF_"  前缀就是一个标识，'luaF_' 标识它是一个lua的函数执行代码  ,  因此，它的实现体来自于 lfunc.c
+     luaF_getlocalname(...)
+
+     // ltable.c   : "luaH_"  前缀就是一个标识，'luaH_' 标识它是一个lua table ( table内部通过Hash来实现Key-Value 对的存储 )  ,  因此，它的实现体来自于 ltable.c
+     luaH_set(...)
+
+     // lobject.c  : "luaO_" 前缀就是一个标识，'luaO_' 标识它是一个lua Object   ,  因此，它的实现体来自于 lobject.c
+     luaO_pushfstring(...)
+
+     // lmem.c     : "luaM_" 前缀就是一个标识，'luaM_' 标识它用于 Memory 分配/释放   ,  因此，它的实现体来自于 lmem.c
+     luaM_realloc_(...)
+
+     // lgc.c      : "luaC_" 前缀就是一个标识，'luaC_' 标识它用于 GC 操作 ,  因此，它的实现体来自于 lgc.c
+     luaC_link(...)
+
+     // lvm.c      : "luaV_" 前缀就是一个标识，'luaV_' 标识它用于 Value 操作 ,  因此，它的实现体来自于 lvm.c
+     luaV_equalval(...)
+
+     // ltm.c      : "luaT_" 前缀就是一个标识，'luaT_' 标识它用于 Tag Method 操作 ,  因此，它的实现体来自于 ltm.c
+     luaT_init(...)
+
+
+
+--------------------------------------------------
+Date : 2022-11-17
+--------------------------------------------------
+Finished at   lua_State *L = luaL_newstate(); // lua.c:514
+
+
+
+
+

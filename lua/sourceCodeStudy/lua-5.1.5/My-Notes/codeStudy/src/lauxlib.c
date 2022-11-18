@@ -750,6 +750,16 @@ extern int (luaL_loadstring) (lua_State *L, const char *s) {
    为什么 用 realloc 函数，而不用 alloc 函数
    因为代码逻辑中，可能会在已经分配的内存地址处，[再次]在原地址处，重新分配，覆盖原有块的内存
    也可能用于扩容/缩减  数组占据的内存空间
+
+arguments list
+--------------------------------------------------
+    void *ud     : unused
+    void *ptr    : <the pointer address> to be alloced / release
+    size_t osize : unused
+    size_t nsize : the memory to be alloc (value > 0 ) /  release flag (value as 0)
+--------------------------------------------------
+
+
 */
 static void *l_alloc (void *ud, void *ptr, size_t osize, size_t nsize) {
   (void)ud;

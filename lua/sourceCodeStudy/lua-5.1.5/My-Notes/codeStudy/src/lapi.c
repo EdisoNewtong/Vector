@@ -157,6 +157,10 @@ extern void lua_setlevel (lua_State *from, lua_State *to) {
 }
 
 
+/* 
+   用新的 panicf 函数 替换 原始的 G(L)->panic  , 并返回原始的 G(L)->panic 函数 
+   ( 从源码中可以查询到， panic 函数在 lstate.c 中被设置成了 NULL ) 
+*/
 extern lua_CFunction lua_atpanic (lua_State *L, lua_CFunction panicf) {
   lua_CFunction old;
   lua_lock(L); /* ((void) 0); */

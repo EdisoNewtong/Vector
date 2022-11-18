@@ -119,7 +119,9 @@ void luaD_throw (lua_State *L, int errcode) {
   }
 }
 
-
+/*
+   use  setjmp(...) / longjmp(...) flow-control to make the logic easier than 'error return ???;' mechanism
+*/
 int luaD_rawrunprotected (lua_State *L, Pfunc f, void *ud) {
   struct lua_longjmp lj;
   lj.status = 0;
@@ -132,6 +134,13 @@ int luaD_rawrunprotected (lua_State *L, Pfunc f, void *ud) {
   */
 
   if ( _setjmp( (&lj)->b ) == 0 ) { 
+      /*
+
+            void luaD_throw (lua_State *L, int errcode) {
+                ...
+                L->errorJmp->status = errcode;
+            }
+      */
 	  (*f)(L, ud); 
   };
 

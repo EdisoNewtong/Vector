@@ -57,6 +57,7 @@ void luaT_init (lua_State *L) {
     "__call"      // [16]
   };
   int i;
+  //           17   TM_N
   for (i=0; i<TM_N; i++) {
     /*  G(L)->tmname[i] =      luaS_new(L, luaT_eventname[i]); */
     // alloc  tag method's keywords , and push them into global string table

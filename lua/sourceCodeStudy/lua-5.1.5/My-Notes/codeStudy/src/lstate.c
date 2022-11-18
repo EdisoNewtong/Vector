@@ -97,6 +97,7 @@ static void f_luaopen (lua_State *L, void *ud) {
   /* UNUSED(ud); */
   ((void)(ud));
   stack_init(L, L); /* init stack */
+
   /* sethvalue(L, gt(L), luaH_new(L, 0, 2)); */
   { 
       /*             gt(L)  */
@@ -121,8 +122,18 @@ static void f_luaopen (lua_State *L, void *ud) {
   /*             32            MINSTRTABSIZE */
   luaS_resize(L, MINSTRTABSIZE); /* initial size of string table */
   luaT_init(L); // ltm.c:38   alloc tag-method's reservered keywords TString and set flags :  e.g.  __index, __newindex , __eq , ...
-  luaX_init(L); // llex.c:77  alloc lua keyword TStrings and set flags
+  luaX_init(L); // llex.c:77  alloc lua keyword TStrings and set flags : e.g.  "local" / "and" / "or" / "nil" / "then" / "repeat" / "util" / ...
 
+  /*
+      Notes:
+
+      ----------
+      |a|b|c|\0|   =>  sizeof("abc") yield  4 rather than 3
+      ----------
+
+         sizeof("abc") turns out 4 ( not 3 , because it take '\0' into account ) , so you should minus 1 if you want to get the real length of "abc"
+         
+  */
   // push a new TString "not enough memory" into global stringtable 
   /* luaS_fix(luaS_newliteral(L, MEMERRMSG)); */
   /*  MEMERRMSG    "not enough memory"         */
@@ -238,6 +249,11 @@ void luaE_freethread (lua_State *L, lua_State *L1) {
 }
 
 /* 
+                            //  lauxlib.c:764
+   lua_Alloc f =  static void *l_alloc (void *ud, void *ptr, size_t osize, size_t nsize); 
+   void    *ud =  NULL
+*/
+/* 
 extern LUA_API   */
 LUA_API  lua_State *lua_newstate (lua_Alloc f, void *ud) {
   int i;
@@ -247,6 +263,101 @@ LUA_API  lua_State *lua_newstate (lua_Alloc f, void *ud) {
   // struct LG { lua_State l; global_State g; };  // lstate.c:35
   // memory alloc a sturct LG's size
   /*                           state_size(LG) */
+  /************************************************************
+     Core Core Core:
+
+     Why ?
+         注意: 这里分配新的内存块时，为什么不用封装好的 luaM_realloc_(...) 函数 , 而用原始的 l_alloc(...) 进行分配呢 ?
+         因为:  
+                luaM_realloc_(...) 是被封装在 luaD_rawrunprotected(...) 中执行的
+
+        luaD_rawrunprotected() 封装了C语言的中断函数:
+           类似C++ 的 try { ... } catch { ... } 语句
+
+        在 任何<子>函数中发生问题的时候, 立即 中断( 而不使用常规做法， 在每个函数发生错误时，使用 return xxx 语句来中止当前函数的执行
+
+        因为这种代码的书写方式，在编码时会有一些[不]美观
+e.g.
+        
+         auto succ = func_1();
+
+         if ( succ ) {
+            succ = func_2();
+         }
+
+         if ( succ ) {
+            succ = func_3();
+         }
+
+         if ( succ ) {
+            succ = func_4();
+         }
+        
+or   
+
+         if (     func_1() 
+               && func_2() 
+               && func_3() 
+               && func_4() 
+        ) {
+            ...
+        } else {
+           // 逻辑控制，并不知道上面的 if 语句中，到底在哪个函数中发生了错误
+           //        func_1()   
+           //   or   func_2()    
+           //   or   func_3()    
+           //   or   func_4() 
+           //  都有可能
+        }
+
+
+
+
+e.g.
+        static jmp_buf buf;
+
+        int main()
+
+            if ( setjmp(buf) == 0 ) {
+                func_1();
+                func_2();
+                func_3();
+                func_4();
+            }
+
+            nextLogic(...);
+        }
+
+
+        void func_2()
+        {
+
+            ... 
+
+            if ( meet_error ) {
+                // longjmp(buf,1);
+                // --> 1 != 0 , if 块的后续函数就没有机会执行了，
+                //
+                // 直接跳出func_2的  if 块 , 
+                //    restCode() 也[没有]执行了
+                // 
+                // 与此同时， 跳出 if(  setjmp(b) == 0 ) { ... } , 因为立即无条件跳转，瞬间被侦测到了，条件不满足
+                //     func_3();  func_4(); 都[没有]机会执行了。
+                // 
+                // 于是执行main() 函数的 nextLogic(...)
+
+
+
+
+                longjmp(buf, 1);   
+            }
+
+            restCode();
+        }
+
+
+
+  *************************************************************/
   void *l = (*f)(ud, NULL, 0, (sizeof(LG) + 0));
   if (l == NULL) {
     return NULL;
@@ -254,7 +365,7 @@ LUA_API  lua_State *lua_newstate (lua_Alloc f, void *ud) {
 
   /* 
      --------------------------------------------------------------------
-        LG :    | LUAI_EXTRASPACE | lua_State | global_State |
+        LG :    | LUAI_EXTRASPACE ||       lua_State | global_State ||
      --------------------------------------------------------------------
 
         if LUAI_EXTRASPACE is not 0
@@ -263,11 +374,17 @@ LUA_API  lua_State *lua_newstate (lua_Alloc f, void *ud) {
   */
 
   /*    tostate(l); */
-  L = (lua_State *)((lu_byte *)(l) + 0);
+  L = (lua_State *)( (lu_byte *)(l)     + 0);
   // global_State gtmp = ((LG *)L)->g;
   // g = &gtmp;
   // g = &(    ((LG *)L)->g   );
   g = &((LG *)L)->g;
+
+  /***************************************************
+
+    初始化 L 结构体中的一些成员值
+
+  **************************************************/
   L->next = NULL;
   /*            8 LUA_TTHREAD */
   L->tt = LUA_TTHREAD;
@@ -284,15 +401,17 @@ LUA_API  lua_State *lua_newstate (lua_Alloc f, void *ud) {
   //        SFIXEDBIT FIXEDBIT
   // L->marked = | 0110 0001 |(B)
   /* set2bits(L->marked, FIXEDBIT, SFIXEDBIT); */
-  L->marked |= ( (1<<5) | (1<<6) );
+  L->marked |= ( (1<<5) | (1<<6) ); // L->marked = 0x61 = | 0110 0001 |(B)
 
   // lstate.h:128 , 初始化结构体中的成员
   preinit_state(L, g);
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //
   // 初始化 global_State 结构体中的一些成员值
+  //
   g->frealloc = f; // set alloc/free callback function
-  g->ud = ud;
+  g->ud = ud;     // user-data field is set as  NULL passed by  'ud'
   g->mainthread = L;
   g->uvhead.u.l.prev = &g->uvhead;
   g->uvhead.u.l.next = &g->uvhead;
@@ -326,21 +445,27 @@ LUA_API  lua_State *lua_newstate (lua_Alloc f, void *ud) {
   /*             200   LUAI_GCMUL */
   g->gcstepmul = LUAI_GCMUL;
   g->gcdept = 0;
-  /*              (8 +1)  NUM_TAGS */
+  /*           (8+1)  NUM_TAGS */
   for (i=0; i < NUM_TAGS; i++) {
+    // struct Table *mt[NUM_TAGS];  /* metatables for basic types */
     g->mt[i] = NULL;
   }
   //
   ////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  // luaD_rawrunprotected(...)       ldo.c:123  
-  // f_luaopen                       lstate.c:92
+  // luaD_rawrunprotected(...)      ldo.c:123  
+  // f_luaopen                      lstate.c:92
   if (luaD_rawrunprotected(L, f_luaopen, NULL) != 0) {
+    // result != 0  =>
+    // !!! Failed !!!
     /* memory allocation error: free partial state */
     close_state(L);
     L = NULL;
   }
   else {
+    // !!! Success !!! 
+    //  execute function  :
+    //       luaD_rawrunprotected(L, f_luaopen, NULL)   -> return 0
     /* luai_userstateopen(L); */
     ((void)L);
   }

@@ -76,8 +76,23 @@
 ** number of ints inside a lua_Number
 */
 static const Node dummynode_ = {
-  {{NULL}, LUA_TNIL}, /* value */
-  {{{NULL}, LUA_TNIL, NULL}} /* key */
+  {
+      {NULL},   // 'value'  is set as an union object with NULL pointer in `gc` field
+      LUA_TNIL  //  value's type is  nil
+  }, /* value */
+
+  {
+      { 
+          // #define TValuefields	Value value; int tt
+          // Key's Value is NULL with it's nil type
+          /*
+          value = { NULL }
+                          tt    = LUA_TNIL   */
+          {NULL},     LUA_TNIL, 
+          // struct Node *next;   // <- NULL
+          NULL   // /* for chaining */ 
+      }
+  } /* key */
 };
 
 
@@ -352,6 +367,19 @@ static int numusehash (const Table *t, int *nums, int *pnasize) {
 */
 static void setarrayvector (lua_State *L, Table *t, int size) {
   int i;
+  // Core Core Core :
+  //                 当 size 为0时: 
+  //     t->array 在此函数执行之前，已经提前被置成 NULL  
+  //  ( 具体见: 
+  //      luaH_new(...) { 
+  //          ...
+  //        t->array = NULL;
+  //        t->sizearray = 0;
+  //     }
+  //   )
+  //  不然 free(p) , p是一个垃圾地址的话，会出现一些意想不到的错误 or    !!! Segmentation Fault !!!
+  //     free(t->array) => Do Nothing , t->array = NULL
+  //
   /* luaM_reallocvector(L, t->array, t->sizearray, size, TValue); */
   t->array = (TValue *)(  ((size_t)(size+1)) <= MAX_SIZET/sizeof(TValue)
                         ? luaM_realloc_(L, t->array, t->sizearray * sizeof(TValue), size*sizeof(TValue) ) 
@@ -360,6 +388,7 @@ static void setarrayvector (lua_State *L, Table *t, int size) {
      /* setnilvalue(&t->array[i]); */
      (&t->array[i])->tt = LUA_TNIL;
   }
+
   t->sizearray = size;
 }
 
@@ -383,33 +412,42 @@ static void setnodevector (lua_State *L, Table *t, int size) {
          ceillog2(size) 的功能
               计算出这样一个数 :
               如果 : log2(size) 的值是整数    , 则取这个整数作为结果
-              否则 : log2(size) 的值是非整数  , 一个比 log2(size) 大，而且大刚刚好1级("向上整数" : 英语用 ceil 来表示 )  的 整数次幂的数值
+              否则 : log2(size) 的值是非整数  , 一个比 log2(size) 大，而且大刚刚好1级("向上取整" : 英语用 ceil 来表示 )  的 整数次幂的数值
 
          ceillog2(1) =  0    => 2^0 = 1 ( 幂数为整数 )
          ceillog2(2) =  1    => 2^1 = 2 ( 幂数为整数 )
          ceillog2(3) =  2    => 2^2 = 4 ( 幂数为[非]整数, 2 < 3 < 4 )
          ceillog2(4) =  2    => 2^2 = 4 ( 幂数为整数 )
-         ceillog2(5) =  3    => 2^3 = 8 ( 幂数为[非]整数, 4 < 5 < 8 )
-         ceillog2(6) =  3    => 2^3 = 8 ( 幂数为[非]整数, 4 < 6 < 8 )
-         ceillog2(7) =  3    => 2^3 = 8 ( 幂数为[非]整数, 4 < 7 < 8 )
+         ceillog2(5) =  3    => 2^3 = 8 ( 幂数为[非]整数, 4(2^2) < 5 < 8(2^3) )
+         ceillog2(6) =  3    => 2^3 = 8 ( 幂数为[非]整数, 4(2^2) < 6 < 8(2^3) )
+         ceillog2(7) =  3    => 2^3 = 8 ( 幂数为[非]整数, 4(2^2) < 7 < 8(2^3) )
 
                  ...
 
-         ceillog2(255) =  8    => 2^8 = 256 ( 幂数为[非]整数, 128 < 255 < 256 )
+         ceillog2(255) =  8    => 2^8 = 256 ( 幂数为[非]整数, 128(2^7) < 255 < 256(2^8) )
          ceillog2(256) =  8    => 2^8 = 256 ( 幂数为整数 )
-         ceillog2(257) =  9    => 2^9 = 512 ( 幂数为[非]整数, 256 < 257 < 512 )
+         ceillog2(257) =  9    => 2^9 = 512 ( 幂数为[非]整数, 256(2^8) < 257 < 512(2^9) )
 
     */
 
     /*      
-       luaO_log2(...) lobject.c:62
+
+    #define ceillog2(x)	(luaO_log2((x)-1) + 1)    // lobject.h:367
+
+       int luaO_log2 (unsigned int x) { ... }  // lobject.c:437
+
+           luaO_log2(...) lobject.c:62
             ceillog2(size);   lobject.h:367 
+
+
+
     */
     lsize = luaO_log2(size-1) + 1;
     /*             26      MAXBITS */
     if (lsize > MAXBITS) {
       luaG_runerror(L, "table overflow");
     }
+
     /*     twoto(lsize);     lobject.h:359  */
     size = 1<< lsize;
     /*         luaM_newvector(L, size, Node); */
@@ -427,15 +465,20 @@ static void setnodevector (lua_State *L, Table *t, int size) {
       (&(n)->i_val)->tt = LUA_TNIL;
     }
   }
-  /*              cast_byte(lsize); */
+
   /* 
+      lu_byte lsizenode;
+
       lsizenode :     log2 of size of `node' array 
       log size of node
   */
+  /*              cast_byte(lsize); */
   t->lsizenode = (lu_byte)(lsize);
 
+
   /*             gnode(t, size); */
-  // lastfree : any free position is before this position 
+
+  // lastfree : `any free position is before this position`
   // node[size] may be out of range
   t->lastfree = &(t)->node[size]; /* all positions are free */
 }
@@ -534,11 +577,13 @@ static void rehash (lua_State *L, Table *t, const TValue *ek) {
 ** }=============================================================
 */
 // create a lua table with 
-// 1. n elements of array specified by arg    'narray'
-// 2. n pairs(key-value) of hash table specified by arg    'nhash'
+// 1. <narray>  elements of array specified by arg    
+// 2. <nhash>   pairs(key-value) of hash table specified by arg    
 Table *luaH_new (lua_State *L, int narray, int nhash) {
   /*          luaM_new(L, Table); */
   Table *t = (Table *)( luaM_realloc_(L, NULL, 0, sizeof(Table) ) );
+
+  /* prepend a table named `t' into  global link-table  named  `g->rootgc`  */
   /*              obj2gco(t)           5  LUA_TTABLE */
   luaC_link(L, (GCObject *)(t), LUA_TTABLE);
   t->metatable = NULL;
@@ -549,13 +594,22 @@ Table *luaH_new (lua_State *L, int narray, int nhash) {
   t->flags = (lu_byte)(~0);
   /* temporary values (kept only if some malloc fails) */
 
+  //--------------------------------------------------
+  //   Array Part : Init and Alloc   N=narray element(s)  
+  //--------------------------------------------------
   // Core Core Core :
-  //    must set t->array as NULL, otherwise setarrayvector(L,t,0) will reach an unexpected behavior when executing free( t->array )
+  //                  must set t->array as NULL, otherwise setarrayvector(L,t,0) will reach an unexpected behavior when executing free( t->array )
   t->array = NULL;
   t->sizearray = 0;
+
+
+  //----------------------------------------------------------------------------------------------------
+  //  Key-Value Part : Init and Alloc  N=nhash  key-value pairs
+  //----------------------------------------------------------------------------------------------------
   t->lsizenode = 0;
   /*          cast(Node *, dummynode); */
   t->node = (Node *)(&dummynode_); // no elements in hash part of a lua table , set it as  `nil`
+
   setarrayvector(L, t, narray);
   setnodevector(L, t, nhash);
   return t;

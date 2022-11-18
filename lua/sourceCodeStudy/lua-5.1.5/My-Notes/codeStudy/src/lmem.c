@@ -82,7 +82,7 @@ void *luaM_realloc_ (lua_State *L, void *block, size_t osize, size_t nsize) {
   ((void)0);
   block = (*g->frealloc)(g->ud, block, osize, nsize);
   if ( block == NULL && nsize > 0 ) {
-	/*            4          LUA_ERRMEM */
+	/*            4  LUA_ERRMEM */
     luaD_throw(L, LUA_ERRMEM);
   }
   /* lua_assert((nsize == 0) == (block == NULL)); */
