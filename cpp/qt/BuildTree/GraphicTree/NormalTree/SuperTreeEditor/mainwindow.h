@@ -38,7 +38,9 @@ private slots:
     // Manually  Added by Edison
     void on_forceSetCheckBoxState(int checkedState);
 
-    void on_testOnlyButton_clicked();
+    // void on_testOnlyButton_clicked();
+
+    void on_checkBoxRestriction_stateChanged(int arg1);
 
 private:
     Ui::MainWindow *ui;
@@ -48,6 +50,8 @@ private:
 
     myRectWithTextItem* m_pRectText1;
     qreal              m_maxYPos;
+
+    bool               m_bSpecialFlag;
 
     qreal generateRenderObject(TreeNode* parentNode,myRectWithTextItem* parentRenderObject, int level, qreal previousX);
 

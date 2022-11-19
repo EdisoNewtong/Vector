@@ -134,9 +134,9 @@
    <widget class="QCheckBox" name="checkBoxOption0">
     <property name="geometry">
      <rect>
-      <x>310</x>
-      <y>510</y>
-      <width>121</width>
+      <x>300</x>
+      <y>560</y>
+      <width>231</width>
       <height>41</height>
      </rect>
     </property>
@@ -144,27 +144,20 @@
      <string>Key Only Number</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="testOnlyButton">
+   <widget class="QCheckBox" name="checkBoxRestriction">
     <property name="geometry">
      <rect>
-      <x>940</x>
+      <x>310</x>
       <y>510</y>
-      <width>131</width>
-      <height>41</height>
+      <width>127</width>
+      <height>35</height>
      </rect>
     </property>
     <property name="text">
-     <string>testOnly</string>
+     <string>Arbitrary</string>
     </property>
-   </widget>
-   <widget class="QLineEdit" name="argsEdit">
-    <property name="geometry">
-     <rect>
-      <x>1080</x>
-      <y>510</y>
-      <width>141</width>
-      <height>41</height>
-     </rect>
+    <property name="checked">
+     <bool>true</bool>
     </property>
    </widget>
   </widget>

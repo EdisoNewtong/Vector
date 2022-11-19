@@ -23,8 +23,15 @@ MainWindow::MainWindow(QWidget *parent)
     , m_pScene( nullptr )
     , m_pRectText1( nullptr )
     , m_maxYPos(0.0)
+    , m_bSpecialFlag( false )
 {
+
+
     ui->setupUi(this);
+    m_bSpecialFlag = true;
+    ui->checkBoxOption0->setEnabled( false );
+    m_bSpecialFlag = false;
+
 
     m_myTreeModel = new TreeModel(this);
     ui->treeView->setModel( m_myTreeModel );
@@ -215,7 +222,7 @@ void MainWindow::on_saveAsPngBtn_clicked()
 void MainWindow::on_checkBoxOption0_stateChanged(int arg1)
 {
     auto isSupportNumberOnly = (arg1 == Qt::Checked);
-    if ( m_myTreeModel != nullptr ) {
+    if ( !m_bSpecialFlag   &&   m_myTreeModel != nullptr ) {
         m_myTreeModel->setSupportNumberOnlyFlag( isSupportNumberOnly );
     }
 }
@@ -227,62 +234,62 @@ void MainWindow::on_forceSetCheckBoxState(int checkedState)
     ui->checkBoxOption0->setCheckState( static_cast<Qt::CheckState>( checkedState ) );
 }
 
-void MainWindow::on_testOnlyButton_clicked()
-{
-    auto args = ui->argsEdit->text();
-    auto splitedRetList = args.split(":");
-    int tag = splitedRetList.at(0).toInt();
-
-    // qDebug() << "After split : " << splitedRetList;
-    
-    if ( tag == 0 ) {
-        qDebug() << "Invalid tag == 0";
-        return;
-    }
-
-    switch ( tag ) 
-    {
-    case 1:
-        {
-            qDebug() << "Tag = 1";
-            /*
-            if ( m_pRectText1 != nullptr ) {
-                auto textObj = m_pRectText1->getTextItem();
-                auto rectF1 = textObj->boundingRect();
-                qDebug() << "textObj->boundingRect()  = " << rectF1;
-                if ( textObj != nullptr ) {
-                    QFontMetricsF fm( textObj->font() );
-                    auto txt = textObj->toPlainText();
-                    qDebug() << "txt = " << txt;
-                    auto rectF2 = fm.boundingRect( txt );
-                    qDebug() << "fm.boundingRect = " << rectF2;
-                }
-            }
-            */
-        }
-        break;
-    case 2:
-        {
-            qDebug() << "Tag = 2";
-        }
-        break;
-    case 3:
-        {
-            qDebug() << "Tag = 3";
-        }
-        break;
-    case 4:
-        {
-            qDebug() << "Tag = 3";
-        }
-        break;
-    default:
-        {
-            qDebug() << "Sorry , Tag is inside switch-case.default , value is " << tag;
-        }
-        break;
-    }
-}
+// void MainWindow::on_testOnlyButton_clicked()
+// {
+//     auto args = ui->argsEdit->text();
+//     auto splitedRetList = args.split(":");
+//     int tag = splitedRetList.at(0).toInt();
+// 
+//     // qDebug() << "After split : " << splitedRetList;
+//     
+//     if ( tag == 0 ) {
+//         qDebug() << "Invalid tag == 0";
+//         return;
+//     }
+// 
+//     switch ( tag ) 
+//     {
+//     case 1:
+//         {
+//             qDebug() << "Tag = 1";
+//             /*
+//             if ( m_pRectText1 != nullptr ) {
+//                 auto textObj = m_pRectText1->getTextItem();
+//                 auto rectF1 = textObj->boundingRect();
+//                 qDebug() << "textObj->boundingRect()  = " << rectF1;
+//                 if ( textObj != nullptr ) {
+//                     QFontMetricsF fm( textObj->font() );
+//                     auto txt = textObj->toPlainText();
+//                     qDebug() << "txt = " << txt;
+//                     auto rectF2 = fm.boundingRect( txt );
+//                     qDebug() << "fm.boundingRect = " << rectF2;
+//                 }
+//             }
+//             */
+//         }
+//         break;
+//     case 2:
+//         {
+//             qDebug() << "Tag = 2";
+//         }
+//         break;
+//     case 3:
+//         {
+//             qDebug() << "Tag = 3";
+//         }
+//         break;
+//     case 4:
+//         {
+//             qDebug() << "Tag = 3";
+//         }
+//         break;
+//     default:
+//         {
+//             qDebug() << "Sorry , Tag is inside switch-case.default , value is " << tag;
+//         }
+//         break;
+//     }
+// }
 
 
 
@@ -391,3 +398,27 @@ qreal MainWindow::generateRenderObject(TreeNode* parentNode,myRectWithTextItem* 
 
 
 
+
+void MainWindow::on_checkBoxRestriction_stateChanged(int arg1)
+{
+    auto isChecked = (arg1 == Qt::Checked);
+    if ( m_myTreeModel != nullptr ) {
+        m_myTreeModel->setArbitraryFlag( isChecked );
+
+        if ( ui->checkBoxOption0 != nullptr ) {
+            if ( isChecked ) {
+                m_bSpecialFlag = true;
+
+                ui->checkBoxOption0->setChecked( false );
+                ui->checkBoxOption0->setEnabled( false );
+                m_myTreeModel->setSupportNumberOnlyFlag( isChecked );
+
+                m_bSpecialFlag = false;
+            } else {
+                ui->checkBoxOption0->setEnabled( true );
+            }
+        }
+
+    }
+
+}

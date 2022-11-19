@@ -7,6 +7,7 @@
 #include <QDebug>
 #include <QMenu>
 #include <QAction>
+#include <QFile>
 
 #include "TreeModel.h"
 
@@ -43,6 +44,7 @@ TreeModel::TreeModel(QObject* parent /*= nullptr*/)
     , m_existedWillInsertNode( nullptr )
     , m_nameReg( QStringLiteral("[a-zA-Z_][a-zA-Z0-9_]*") )
     , m_isSupportNumberOnly( false )
+    , m_arbitraryFlag( true )
     , m_modeFromXMLFile(0)
 {
     reCreateRootNode(1);
@@ -680,7 +682,14 @@ bool TreeModel::checkNameIsValid(const QModelIndex& index, int* bFlagisEmptyStri
     } 
 
     // m_isSupportNumberOnly == false
-    auto bret = m_nameReg.exactMatch(strData);
+    auto bret = false;
+    if ( m_arbitraryFlag ) {
+        bret = true;
+    } else {
+        // name must match with    QStringLiteral("[a-zA-Z_][a-zA-Z0-9_]*")
+        bret = m_nameReg.exactMatch(strData);
+    }
+
     if ( bFlagisEmptyString != nullptr ) {
 
         if ( strData.isEmpty() ) {
@@ -988,3 +997,10 @@ TreeNode* TreeModel::getInvisibleRootNode()
 {
     return m_invisibleRoot;
 }
+
+
+void TreeModel::setArbitraryFlag(bool b)
+{
+    m_arbitraryFlag  = b;
+}
+

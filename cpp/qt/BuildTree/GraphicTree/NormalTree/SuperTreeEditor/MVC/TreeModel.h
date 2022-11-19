@@ -76,6 +76,7 @@ protected:
 public:
     // set support number only
     void setSupportNumberOnlyFlag(bool b);
+    void setArbitraryFlag(bool b);
 
     // for save info XML  file
     bool prepareSavedString(QString& outFileContent, QModelIndex& errorNodeMidx);
@@ -133,7 +134,9 @@ protected:
     QRegExp             m_nameReg;
 
     bool                m_isSupportNumberOnly;
+    bool                m_arbitraryFlag;
     int                 m_modeFromXMLFile;
+
 
 };
 
