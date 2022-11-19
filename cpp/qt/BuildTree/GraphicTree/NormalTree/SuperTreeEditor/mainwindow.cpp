@@ -111,6 +111,10 @@ void MainWindow::on_saveTreeToFileBtn_clicked()
         return;
     }
 
+	if ( !savedfile.endsWith( QStringLiteral(".xml") ) ) {
+		savedfile += QStringLiteral(".xml");
+	}
+
     QFile fileToSave(savedfile);
     if ( fileToSave.open(QIODevice::WriteOnly) ) {
         fileToSave.write( xmlcontent.toUtf8() );
