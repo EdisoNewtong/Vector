@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1486</width>
-    <height>649</height>
+    <width>1200</width>
+    <height>628</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,8 +19,8 @@
      <rect>
       <x>30</x>
       <y>80</y>
-      <width>291</width>
-      <height>411</height>
+      <width>511</width>
+      <height>421</height>
      </rect>
     </property>
     <property name="sizeAdjustPolicy">
@@ -36,18 +36,18 @@
    <widget class="QGraphicsView" name="graphicsView">
     <property name="geometry">
      <rect>
-      <x>340</x>
+      <x>560</x>
       <y>30</y>
       <width>621</width>
-      <height>461</height>
+      <height>471</height>
      </rect>
     </property>
    </widget>
    <widget class="QPushButton" name="clearTreeBtn">
     <property name="geometry">
      <rect>
-      <x>440</x>
-      <y>510</y>
+      <x>660</x>
+      <y>520</y>
       <width>101</width>
       <height>41</height>
      </rect>
@@ -59,8 +59,8 @@
    <widget class="QPushButton" name="drawTreeBtn">
     <property name="geometry">
      <rect>
-      <x>570</x>
-      <y>510</y>
+      <x>790</x>
+      <y>520</y>
       <width>171</width>
       <height>41</height>
      </rect>
@@ -72,8 +72,8 @@
    <widget class="QPushButton" name="saveAsPngBtn">
     <property name="geometry">
      <rect>
-      <x>770</x>
-      <y>510</y>
+      <x>990</x>
+      <y>520</y>
       <width>141</width>
       <height>41</height>
      </rect>
@@ -87,7 +87,7 @@
      <rect>
       <x>30</x>
       <y>30</y>
-      <width>291</width>
+      <width>511</width>
       <height>41</height>
      </rect>
     </property>
@@ -99,7 +99,7 @@
     <property name="geometry">
      <rect>
       <x>50</x>
-      <y>500</y>
+      <y>520</y>
       <width>101</width>
       <height>51</height>
      </rect>
@@ -112,7 +112,7 @@
     <property name="geometry">
      <rect>
       <x>190</x>
-      <y>500</y>
+      <y>520</y>
       <width>111</width>
       <height>51</height>
      </rect>
@@ -121,22 +121,12 @@
      <string>Save ...</string>
     </property>
    </widget>
-   <widget class="SuperTextEdit" name="textEdit">
-    <property name="geometry">
-     <rect>
-      <x>980</x>
-      <y>30</y>
-      <width>491</width>
-      <height>461</height>
-     </rect>
-    </property>
-   </widget>
    <widget class="QCheckBox" name="checkBoxOption0">
     <property name="geometry">
      <rect>
-      <x>300</x>
-      <y>560</y>
-      <width>231</width>
+      <x>360</x>
+      <y>550</y>
+      <width>171</width>
       <height>41</height>
      </rect>
     </property>
@@ -147,8 +137,8 @@
    <widget class="QCheckBox" name="checkBoxRestriction">
     <property name="geometry">
      <rect>
-      <x>310</x>
-      <y>510</y>
+      <x>360</x>
+      <y>520</y>
       <width>127</width>
       <height>35</height>
      </rect>
@@ -168,11 +158,6 @@
    <class>TreeView</class>
    <extends>QTableView</extends>
    <header>TreeView.h</header>
-  </customwidget>
-  <customwidget>
-   <class>SuperTextEdit</class>
-   <extends>QPlainTextEdit</extends>
-   <header>SuperTextEdit.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
