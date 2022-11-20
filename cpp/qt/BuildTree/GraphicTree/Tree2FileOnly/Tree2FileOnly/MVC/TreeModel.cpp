@@ -918,11 +918,18 @@ TreeNode* TreeModel::loadXMLContentIntoView(rapidxml::xml_node<char>* parentXmlN
                             }
                         } else {
                             // Normal mode    m_modeFromXMLFile == 1
-                            parsed_CreatedChildNode->setName( childName );
-                            parsed_CreatedChildNode->setValue( attrValue );
+                            if ( parsed_CreatedChildNode != nullptr ) {
+                                parsed_CreatedChildNode->setValue( attrValue );
+                            }
                         }
                     }
                 }
+
+
+                if ( parsed_CreatedChildNode != nullptr ) {
+                    parsed_CreatedChildNode->setName( childName );
+                }
+
             } else {
                 for ( rapidxml::xml_attribute<char> *attr = child->first_attribute(); attr != nullptr; attr = attr->next_attribute() , ++attrCount ) {
                     QString attrName = attr->name();
