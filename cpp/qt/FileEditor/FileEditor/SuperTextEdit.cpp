@@ -148,6 +148,7 @@ void SuperTextEdit::highlightCurrentLine()
 
 void SuperTextEdit::lineNumberAreaPaintEvent(QPaintEvent *event)
 {
+    auto theCursor = textCursor();
     QPainter painter(lineNumberArea);
     painter.fillRect(event->rect(), Qt::lightGray);
 
@@ -165,7 +166,7 @@ void SuperTextEdit::lineNumberAreaPaintEvent(QPaintEvent *event)
     while (block.isValid() && top <= event->rect().bottom()) {
         if (block.isVisible() && bottom >= event->rect().top()) {
             QString number = QString::number(blockNumber + 1);
-            painter.setPen(Qt::black);
+            painter.setPen(theCursor.blockNumber() == blockNumber ? Qt::red : Qt::black);
             painter.drawText(0, top, lineNumberArea->width(), fontMetrics().height(),
                              Qt::AlignRight, number);
         } 
