@@ -86,6 +86,7 @@ public:
 
 	bool forceReadAgain();
     bool processRawText(const QByteArray& buffer);
+	void buffer2Text();
 
 	const QVector<LineInfo*> getLineList() const;
 	bool isProcessSuccess();

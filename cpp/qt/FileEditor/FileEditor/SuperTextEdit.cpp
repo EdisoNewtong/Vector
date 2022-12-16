@@ -757,3 +757,12 @@ bool SuperTextEdit::saveToFile(const QString& filename, E_EOL_TYPE eolFlag, QStr
 	return ret;
 
 }
+
+
+
+void SuperTextEdit::buffer2Text()
+{
+	QString strContent(m_openedFileBuffer);
+	this->setPlainText(strContent);
+}
+

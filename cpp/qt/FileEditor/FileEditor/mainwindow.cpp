@@ -63,6 +63,7 @@ void MainWindow::on_loadBtn_clicked()
 				showHintsMessage( ui->plainTextEdit->getErrorMsg(), 2, 5000);
 			} else {
 				showHintsMessage( QString("Load File Successful !"), 1, 3000);
+				ui->plainTextEdit->buffer2Text();
 			}
 		} else {
 			showHintsMessage( QString("Can't open File \"%1\" ").arg(filename), 2, 5000);
