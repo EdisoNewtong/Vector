@@ -7,6 +7,9 @@
 #include <QVector>
 #include <QFileDialog>
 #include <QFile>
+#include <QMap>
+#include <QScrollBar> 
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -31,7 +34,6 @@ MainWindow::MainWindow(QWidget *parent)
 	pfileEOLGrp->addButton( ui->f_eol_mac, 2 );
 	pfileEOLGrp->addButton( ui->f_eol_hybrid, 3 );
 	pfileEOLGrp->setExclusive( true );
-
 
 	connect( ui->plainTextEdit, SIGNAL( cursorPositionChanged() ), this, SLOT( textBoxCursor_changed() ) );
 	connect( ui->plainTextEdit, SIGNAL( eolFlagDecide(int)  ),     this, SLOT( file_eol_decide(int) ) );
@@ -142,133 +144,18 @@ void MainWindow::textBoxCursor_changed()
     QTextCursor currentCursor = ui->plainTextEdit->textCursor();
     int curLineNo = currentCursor.blockNumber(); // start from 0    rather than 1
     int qtPosition  = currentCursor.position();
-	bool isAtBlockEnd = currentCursor.atBlockEnd();
+    // bool isAtBlockEnd = currentCursor.atBlockEnd();
 
 	if ( !m_isForceMoveTextCursor ) {
 		showHintsMessage( QString("[Cursor]   L:%1 , idx:%2").arg( (curLineNo+1 )).arg(qtPosition), 0, 3000 );
 	}
 
 	if ( !(ui->plainTextEdit->isProcessSuccess()) ) {
-		// ui->hoveredLine->setHtml( QString("<font color=\"red\"> File has not been loaded yet.</font>") );
 		ui->hoveredLine->setHtml( "" ); 
 		return;
 	}
 
-	auto lineVec = ui->plainTextEdit->getLineList();
-	
-    int lineIdx = curLineNo;
-	if ( lineIdx>=0   &&   lineIdx < lineVec.size() ) {
-		LineInfo* curLineInfo = lineVec.at(lineIdx);
-		if ( curLineInfo != nullptr ) {
-			QVector< QPair<QString,bool> > hexLine;
-			
-            int foundIdx = -1;
-			CharacterInfo foundCh;
-			for ( int i = 0; i < curLineInfo->charList.size(); ++i ) {
-				CharacterInfo chInfo = curLineInfo->charList.at(i);
-				bool isResetMatched = false;
-				bool isMatched = (chInfo.globalQtCharIdx == qtPosition);
-
-				if (         !isMatched  
-						&&   isAtBlockEnd
-						&&   (curLineInfo->eolFlag == E_EOL_TYPE::E_CRLF)
-						&&   chInfo.singleChar == QString("\n")
-						&&   chInfo.isEOL ) {
-					isMatched = true;
-					isResetMatched = true;
-				} 
-
-				for( int j = 0; j < chInfo.utf8seq.size(); ++j ) {
-					QString strHexCode;
-					int chCode = static_cast<int>( chInfo.utf8seq.at(j) & 0xFF);
-					strHexCode.setNum(chCode, 16);
-					strHexCode = strHexCode.toUpper();
-					strHexCode = strHexCode.rightJustified(2, '0');
-					hexLine.push_back( qMakePair(strHexCode,isMatched) );
-				}
-
-
-                if ( isMatched && !isResetMatched ) {
-                    foundIdx = i;
-					foundCh = chInfo;
-				} 
-			}
-
-
-			QString fmtStr;
-			if ( !hexLine.empty() ) {
-				for( int i = 0; i < hexLine.size(); ++i ) {
-                    auto strHexValue = hexLine.at(i).first;
-					auto bNeedSetColor = hexLine.at(i).second;
-					fmtStr += "| ";
-
-					if ( bNeedSetColor ) { fmtStr += "<font color=\"red\">"; }
-                    fmtStr.push_back( strHexValue );
-					if ( bNeedSetColor ) { fmtStr += "</font>"; }
-
-					fmtStr += " ";
-				}
-
-				fmtStr += "|";
-			} 
-			ui->hoveredLine->setHtml( fmtStr );
-
-			if ( foundIdx != -1 ) {
-				ui->lineNo->setText( QString("%1").arg( lineIdx + 1) );
-				ui->columnNo->setText( QString("%1").arg( foundIdx + 1) );
-				ui->byteIdx->setText( QString("%1").arg( foundCh.globalByteIdx  ) );
-				ui->charIdx->setText( QString("%1").arg( foundCh.globalCharIdx  ) );
-                // ui->qtcharIdx->setText( QString("%1").arg( foundCh.globalQtCharIdx  ) );
-                ui->qtcharIdx->setText( QString("%1").arg( qtPosition  ) );
-				
-				QString pickedCh( foundCh.utf8seq );
-				auto ucs4CodeVec = pickedCh.toUcs4();
-				if ( ucs4CodeVec.empty() ) {
-					ui->unicodeValue->setText( " N/A " );
-				} else {
-					QString strnum;
-					strnum.setNum( ucs4CodeVec.at(0), 16);
-					strnum = strnum.toUpper();
-					int len = strnum.size();
-					if ( len % 2 == 1 ) {
-						strnum = strnum.rightJustified(len+1, '0');
-					}
-
-					QString displayStr = foundCh.singleChar;
-					if ( displayStr == QString("\r") ) {
-						displayStr = "\\r";
-					} else if ( displayStr == QString("\n") ) {
-						displayStr = "\\n";
-					} else if ( displayStr == QString("\t") ) {
-						displayStr = "\\t";
-					} else if ( displayStr == QString( QChar(32) ) ) {
-						displayStr = "<SPACE>";
-					}
-					
-					ui->unicodeValue->setText( QString("U+%1 : %2").arg(strnum).arg( displayStr )  );
-				}
-
-				if( !isAtBlockEnd ) {
-					highLightCharacter( foundCh );
-				}
-
-            } else {
-				ui->lineNo->setText(" N/A ");
-				ui->columnNo->setText(" N/A ");
-				ui->byteIdx->setText(" N/A ");
-				ui->charIdx->setText(" N/A ");
-				ui->qtcharIdx->setText(" N/A ");
-				ui->unicodeValue->setText(" N/A ");
-			} 
-
-			pickEOLInfo( curLineInfo );
-
-		} else {
-			ui->hoveredLine->setHtml( QString("<font color=\"red\"> LineInfo is nullptr.</font>") );
-		}
-	} else {
-		ui->hoveredLine->setHtml( QString("<font color=\"red\"> lineIdx : %1 is out of array's index range. </font>").arg(lineIdx) );
-	}
+	updateLineByteInfo(currentCursor,  false, -1);
 }
 
 
@@ -359,7 +246,7 @@ void MainWindow::highLightCharacter(const CharacterInfo& chInfo)
 
 	QTextEdit::ExtraSelection selection;
 	selection.cursor = selCursor;
-	selection.format.setBackground( QBrush(Qt::yellow) );
+	selection.format.setBackground( QBrush(Qt::magenta) );
 
 	QList<QTextEdit::ExtraSelection> lst;
 	lst.push_back(selection);
@@ -402,8 +289,10 @@ void MainWindow::on_jmpBtn_clicked()
 	auto lineVec = ui->plainTextEdit->getLineList();
 
 	if ( ui->byteChkBox->isChecked() ) {
-		int qtCursor = -1;
+		//
 		// Byte Index is Checked
+		//
+		int qtCursor = -1;
 		for ( int i = 0; i < lineVec.size();  ++i ) {
 			LineInfo* curLineInfo = lineVec.at(i);
 			if ( curLineInfo != nullptr ) {
@@ -456,6 +345,7 @@ void MainWindow::on_jmpBtn_clicked()
 
 				showHintsMessage( QString("ByteIdx fulled matched, Jump Done") , 1, 3000);
 				forceMoveTextCursor( qtCursor );
+				updateLineByteInfo( ui->plainTextEdit->textCursor(), true, toJmpPos);
 
 				m_isForceMoveTextCursor = false;
 			} else {
@@ -463,6 +353,7 @@ void MainWindow::on_jmpBtn_clicked()
 
 				showHintsMessage( QString("ByteIdx to previous byte , Jump Done") , 3, 3000);
 				forceMoveTextCursor( qtCursor );
+				updateLineByteInfo(ui->plainTextEdit->textCursor(), true, toJmpPos);
 
 				m_isForceMoveTextCursor = false;
 			}
@@ -646,6 +537,7 @@ void MainWindow::forceMoveTextCursor(int pos)
     QTextCursor cur2Move = ui->plainTextEdit->textCursor();
 	cur2Move.setPosition(pos, QTextCursor::MoveAnchor);
 	ui->plainTextEdit->setTextCursor( cur2Move );
+
 }
 
 
@@ -663,4 +555,218 @@ E_EOL_TYPE MainWindow::getSavedOption()
 	} 
 
 	return selectedEOLFlag;
+}
+
+
+void MainWindow::updateLineByteInfo(const QTextCursor& cursor, bool moveByteFlag, int moveByteIdx)
+{
+    int curLineNo = cursor.blockNumber(); // start from 0    rather than 1
+    int qtPosition  = cursor.position();
+	bool isAtBlockEnd = cursor.atBlockEnd();
+
+	auto lineVec = ui->plainTextEdit->getLineList();
+	
+    int lineIdx = curLineNo;
+	if ( lineIdx>=0   &&   lineIdx < lineVec.size() ) {
+		LineInfo* curLineInfo = lineVec.at(lineIdx);
+		if ( curLineInfo != nullptr ) {
+			QVector< QPair<QString,int> > hexLine;
+			
+            int foundIdx = -1;
+			CharacterInfo foundCh;
+
+			QMap<int, QPair<int,int> > flagsIdxMp;
+			for ( int i = 0; i < curLineInfo->charList.size(); ++i ) {
+				CharacterInfo chInfo = curLineInfo->charList.at(i);
+				bool isResetMatched = false;
+				bool isMatched = (chInfo.globalQtCharIdx == qtPosition);
+
+				if (         !isMatched  
+						&&   isAtBlockEnd
+						&&   (curLineInfo->eolFlag == E_EOL_TYPE::E_CRLF)
+						&&   chInfo.singleChar == QString("\n")
+						&&   chInfo.isEOL ) {
+					// process    "\r\n" seq
+					isMatched = true;
+					isResetMatched = true;
+				}
+
+
+				for( int j = 0; j < chInfo.utf8seq.size(); ++j ) {
+					int byteMatchFlag = 0;
+					int byteidx = chInfo.globalByteIdx + j;
+
+					if ( moveByteFlag  && moveByteIdx  == byteidx ) {
+						byteMatchFlag = 2;
+					} else {
+						byteMatchFlag = isMatched ? 1 : 0;
+					}
+
+					if ( byteMatchFlag != 0 ) {
+						flagsIdxMp.insert( hexLine.size(), qMakePair(byteidx, byteMatchFlag) );
+					}
+
+					QString strHexCode;
+					int chCode = static_cast<int>( chInfo.utf8seq.at(j) & 0xFF);
+					strHexCode.setNum(chCode, 16);
+					strHexCode = strHexCode.toUpper();
+					strHexCode = strHexCode.rightJustified(2, '0');
+					hexLine.push_back( qMakePair(strHexCode, byteMatchFlag) );
+				}
+
+
+                if ( isMatched && !isResetMatched ) {
+                    foundIdx = i;
+					foundCh = chInfo;
+				}
+			}
+
+
+			QString fmtStr;
+			if ( !hexLine.empty() ) {
+				fmtStr += "<p>";
+				for( int i = 0; i < hexLine.size(); ++i ) {
+                    auto strHexValue = hexLine.at(i).first;
+					int iNeedSetColor = hexLine.at(i).second;
+					fmtStr += "| ";
+
+					if      ( iNeedSetColor == 1 ) { fmtStr += "<font color=\"#ff00ff\">"; }
+					else if ( iNeedSetColor == 2 ) { fmtStr += "<font color=\"#43f971\">"; }
+
+                    fmtStr.push_back( strHexValue );
+
+					if ( iNeedSetColor == 1 ||  iNeedSetColor == 2 ) { fmtStr += "</font>"; }
+
+					fmtStr += " ";
+				}
+
+				// fill last Ch
+				fmtStr += "|";
+				fmtStr += "</p>";
+			} 
+
+			int fmtLineCursor = 0;
+			if ( !flagsIdxMp.empty() ) {
+				fmtStr += "\n";
+				fmtStr += "<p>";
+
+				auto it = flagsIdxMp.begin();
+				
+				QString frontSpace;
+				int spaceCnt = 5 * it.key();
+				fmtLineCursor = spaceCnt;
+				if ( spaceCnt > 0 ) {
+					// Can't use "&nbsp;" 
+					//         to insert  <Space> , because the rendered <Space> width is not equal to width  of exp   =>   font().width("<Space>")
+					frontSpace.fill( QChar(' ') , spaceCnt);
+				}
+				fmtStr += frontSpace;
+
+				for( it = flagsIdxMp.begin(); it != flagsIdxMp.end(); ++it ) {
+					int byteidx = it.value().first;
+					int colorFlag = it.value().second;
+
+					QString strnum;
+					if      ( colorFlag == 1 ) { strnum += "<font color=\"#ff00ff\">"; }
+					else if ( colorFlag == 2 ) { strnum += "<font color=\"#43f971\">"; }
+
+					QString snum;
+					snum.setNum(byteidx ,10);
+					if ( snum.size() < 4 ) {
+						snum = snum.leftJustified( 4, ' ');
+					}
+					strnum += (snum + QString(" "));
+					strnum += "</font>";
+
+					fmtStr += strnum ;
+				}
+
+				fmtStr += "</p>";
+			}
+			fmtStr = processHtmlText(fmtStr);
+
+			ui->hoveredLine->setHtml( fmtStr );
+			// set Line Cursor
+			auto lineCursor = ui->hoveredLine->textCursor();
+			lineCursor.setPosition(fmtLineCursor, QTextCursor::MoveAnchor);
+			ui->hoveredLine->setTextCursor( lineCursor );
+			auto hBar =  ui->hoveredLine->horizontalScrollBar();
+			const int xDelta = 18;
+			if ( hBar != nullptr &&  fmtLineCursor > 0 ) {
+				hBar->setValue( hBar->value() + xDelta ) ;
+			}
+
+
+
+			if ( foundIdx != -1 ) {
+				ui->lineNo->setText( QString("%1").arg( lineIdx + 1) );
+				ui->columnNo->setText( QString("%1").arg( foundIdx + 1) );
+				ui->byteIdx->setText( QString("%1").arg( foundCh.globalByteIdx  ) );
+				ui->charIdx->setText( QString("%1").arg( foundCh.globalCharIdx  ) );
+                // ui->qtcharIdx->setText( QString("%1").arg( foundCh.globalQtCharIdx  ) );
+                ui->qtcharIdx->setText( QString("%1").arg( qtPosition  ) );
+				
+				QString pickedCh( foundCh.utf8seq );
+				auto ucs4CodeVec = pickedCh.toUcs4();
+				if ( ucs4CodeVec.empty() ) {
+					ui->unicodeValue->setText( " N/A " );
+				} else {
+					QString strnum;
+					strnum.setNum( ucs4CodeVec.at(0), 16);
+					strnum = strnum.toUpper();
+					int len = strnum.size();
+					if ( len % 2 == 1 ) {
+						strnum = strnum.rightJustified(len+1, '0');
+					}
+
+					QString displayStr = foundCh.singleChar;
+					if ( displayStr == QString("\r") ) {
+						displayStr = "\\r";
+					} else if ( displayStr == QString("\n") ) {
+						displayStr = "\\n";
+					} else if ( displayStr == QString("\t") ) {
+						displayStr = "\\t";
+					} else if ( displayStr == QString( QChar(32) ) ) {
+						displayStr = "<SPACE>";
+					}
+					
+					ui->unicodeValue->setText( QString("U+%1 : %2").arg(strnum).arg( displayStr )  );
+				}
+
+				if( !isAtBlockEnd ) {
+					highLightCharacter( foundCh );
+				}
+            } else {
+				ui->lineNo->setText(" N/A ");
+				ui->columnNo->setText(" N/A ");
+				ui->byteIdx->setText(" N/A ");
+				ui->charIdx->setText(" N/A ");
+				ui->qtcharIdx->setText(" N/A ");
+				ui->unicodeValue->setText(" N/A ");
+			} 
+
+			pickEOLInfo( curLineInfo );
+
+		} else {
+			ui->hoveredLine->setHtml( QString("<font color=\"red\"> LineInfo is nullptr.</font>") );
+		}
+	} else {
+		ui->hoveredLine->setHtml( QString("<font color=\"red\"> lineIdx : %1 is out of array's index range. </font>").arg(lineIdx) );
+	}
+
+}
+
+
+void MainWindow::on_positionEdit_returnPressed()
+{
+	on_jmpBtn_clicked();
+}
+
+
+QString MainWindow::processHtmlText(const QString& content)
+{
+	QString templateHtml = R"(<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html><head><meta name="qrichtext" content="1" /><style type="text/css"> p { white-space: pre-wrap; }</style></head><body>%1</body></html>)";
+
+	return templateHtml.arg(content);
 }

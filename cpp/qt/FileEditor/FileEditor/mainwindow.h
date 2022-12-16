@@ -39,15 +39,21 @@ private slots:
 	void file_eol_decide(int val);
 
 
+    void on_positionEdit_returnPressed();
+
 protected:
 	void showHintsMessage( const QString& msg, int isError, int msec);
 	void clearHighLight();
+
+	void updateLineByteInfo(const QTextCursor& cursor, bool moveByteFlag, int moveByteIdx);
 	void highLightCharacter(const CharacterInfo& chInfo);
 
 	void forceMoveTextCursor(int pos);
 
 	void pickEOLInfo( LineInfo* pLineInfo);
 	E_EOL_TYPE getSavedOption();
+
+	QString processHtmlText(const QString& content);
 private:
     Ui::MainWindow *ui;
 
@@ -57,5 +63,7 @@ private:
 	bool           m_isCursorMoveCauseChanged;
 	bool           m_isReadFileCauseChanged;
 	bool           m_isForceMoveTextCursor;
+	bool           m_singleByteCursorMoveFlag;
+	int            m_singleByteHighLightIdx;
 };
 #endif // MAINWINDOW_H

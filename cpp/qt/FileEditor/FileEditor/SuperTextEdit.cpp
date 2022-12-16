@@ -401,8 +401,8 @@ bool SuperTextEdit::processRawText(const QByteArray& buffer)
 						chInfo2.singleChar = SC_LF;
 						chInfo2.utf8seq    = QByteArray(1, '\n');
 						chInfo2.globalByteIdx = (i+1);
-						chInfo2.globalCharIdx = gCharIdx;
-						chInfo2.globalQtCharIdx = gQtCharIdx;
+						chInfo2.globalCharIdx = (gCharIdx-1);      // make '\n' closely after '\r'  as ( bind into one group (\r\n) )the same value of both gCharIdx and gQtCharIdx
+						chInfo2.globalQtCharIdx = (gQtCharIdx-1);
 						chInfo2.isEOL = true;
 
 						line.charList.push_back( chInfo2 );
@@ -757,4 +757,3 @@ bool SuperTextEdit::saveToFile(const QString& filename, E_EOL_TYPE eolFlag, QStr
 	return ret;
 
 }
-

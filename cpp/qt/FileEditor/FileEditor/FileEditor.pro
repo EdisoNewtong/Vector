@@ -24,6 +24,7 @@ HEADERS += \
     mainwindow.h \
     SuperTextEdit.h
 
+
 FORMS += \
     mainwindow.ui
 
