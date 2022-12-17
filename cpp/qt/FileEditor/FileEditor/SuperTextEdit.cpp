@@ -201,8 +201,8 @@ void SuperTextEdit::eolAreaPaintEvent(QPaintEvent *event)
 					LineInfo* pLineInfo = m_allLines.at(blockNumber);
 					if ( pLineInfo != nullptr ) {
 						if ( pLineInfo->eolFlag !=  E_EOL_TYPE::E_NONE ) {
-							if ( currentCursor.atBlockEnd() &&   (currentCursor.blockNumber() ==  blockNumber)  ) {
-								painter.setPen(Qt::red);
+							if ( currentCursor.blockNumber() ==  blockNumber ) {
+								painter.setPen(currentCursor.atBlockEnd() ? Qt::green : Qt::red );
 							} else {
 								painter.setPen(Qt::black);
 							}
