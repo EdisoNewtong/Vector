@@ -749,9 +749,23 @@ void MainWindow::updateLineByteInfo(const QTextCursor& cursor, bool moveByteFlag
 			pickEOLInfo( curLineInfo );
 
 		} else {
+			ui->lineNo->setText(" N/A ");
+			ui->columnNo->setText(" N/A ");
+			ui->byteIdx->setText(" N/A ");
+			ui->charIdx->setText(" N/A ");
+			ui->qtcharIdx->setText(" N/A ");
+			ui->unicodeValue->setText(" N/A ");
+
 			ui->hoveredLine->setHtml( QString("<font color=\"red\"> LineInfo is nullptr.</font>") );
 		}
 	} else {
+		ui->lineNo->setText(" N/A ");
+		ui->columnNo->setText(" N/A ");
+		ui->byteIdx->setText(" N/A ");
+		ui->charIdx->setText(" N/A ");
+		ui->qtcharIdx->setText(" N/A ");
+		ui->unicodeValue->setText(" N/A ");
+
 		ui->hoveredLine->setHtml( QString("<font color=\"red\"> lineIdx : %1 is out of array's index range. </font>").arg(lineIdx) );
 	}
 
@@ -771,3 +785,4 @@ QString MainWindow::processHtmlText(const QString& content)
 
 	return templateHtml.arg(content);
 }
+
