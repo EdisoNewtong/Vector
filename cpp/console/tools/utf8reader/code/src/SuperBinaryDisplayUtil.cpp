@@ -1589,6 +1589,10 @@ void printFileInfo(const FileInfo& fileInfo, string& retStr, bool needPrintToCon
 
 			// flag of print lineNo     front / tail ?
 			size_t iCharacterCount = 0;
+
+			//  New Added by Edison
+			size_t iBytesCount = 0; 
+			size_t iPreviousByteCount = 0;
 			for ( auto it = fileInfo.lineVec.begin(); it != fileInfo.lineVec.end(); ++it ) 
 			{
 				// vector< vector<SingleCharacter*>* > lineVec;
@@ -1626,6 +1630,7 @@ void printFileInfo(const FileInfo& fileInfo, string& retStr, bool needPrintToCon
 					{
 						auto pSingleCharacter = *pWord;
 						if(  pSingleCharacter!=nullptr ) {
+							iBytesCount += pSingleCharacter->nBytes;
 							switch ( pSingleCharacter->nBytes ) 
 							{
 							case 1:
@@ -1694,8 +1699,20 @@ void printFileInfo(const FileInfo& fileInfo, string& retStr, bool needPrintToCon
 								}
 							}
 						}
-						outstr << " => " << std::dec << beforeSz << " ~ " << std::dec << iCharacterCount << ",Tot:" << std::dec << (iCharacterCount - beforeSz +1);
+
+						outstr << " => " 
+							   << " Global ByteIdx : "
+							   << std::dec << iPreviousByteCount
+							   << " ~ " << std::dec << (iBytesCount-1)
+							   << " Tot-Byte(s) : " << std::dec << (iBytesCount - iPreviousByteCount)
+							   << " , CharacterIndex : "
+							   << std::dec << beforeSz 
+							   << " ~ " << std::dec << iCharacterCount 
+							   << " Tot-Char(s) : " << std::dec << (iCharacterCount - beforeSz +1);
+
+						// outstr << " => " << std::dec << beforeSz << " ~ " << std::dec << iCharacterCount << ",Tot:" << std::dec << (iCharacterCount - beforeSz +1);
 					}
+					iPreviousByteCount = iBytesCount;
 
 					outstr << endl; // line displayed string is over  , press <Enter> to new-line
 
