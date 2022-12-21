@@ -9,6 +9,7 @@
 #include <QFile>
 #include <QMap>
 #include <QScrollBar> 
+#include <QFontMetrics>
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -623,6 +624,7 @@ void MainWindow::updateLineByteInfo(const QTextCursor& cursor, bool moveByteFlag
 			}
 
 
+			QString unFmtStr;
 			QString fmtStr;
 			if ( !hexLine.empty() ) {
 				fmtStr += "<p>";
@@ -630,15 +632,18 @@ void MainWindow::updateLineByteInfo(const QTextCursor& cursor, bool moveByteFlag
                     auto strHexValue = hexLine.at(i).first;
 					int iNeedSetColor = hexLine.at(i).second;
 					fmtStr += "| ";
+					unFmtStr += "| ";
 
 					if      ( iNeedSetColor == 1 ) { fmtStr += "<font color=\"#ff00ff\">"; }
 					else if ( iNeedSetColor == 2 ) { fmtStr += "<font color=\"#43f971\">"; }
 
                     fmtStr.push_back( strHexValue );
+					unFmtStr += strHexValue;
 
 					if ( iNeedSetColor == 1 ||  iNeedSetColor == 2 ) { fmtStr += "</font>"; }
 
 					fmtStr += " ";
+					unFmtStr += " ";
 				}
 
 				// fill last Ch
@@ -659,7 +664,25 @@ void MainWindow::updateLineByteInfo(const QTextCursor& cursor, bool moveByteFlag
 				if ( spaceCnt > 0 ) {
 					// Can't use "&nbsp;" 
 					//         to insert  <Space> , because the rendered <Space> width is not equal to width  of exp   =>   font().width("<Space>")
+
+#ifdef Q_OS_WIN
 					frontSpace.fill( QChar(' ') , spaceCnt);
+#else
+
+					QString prefixStr = unFmtStr.left( spaceCnt );
+					int width = fontMetrics().horizontalAdvance( prefixStr );
+					// qDebug() << "calc  width : " << width << ", " << prefixStr;
+					int nSpCnt = 0;
+					int calcSpaceWidth = 0;
+					do {
+						frontSpace += QString(" ");
+						// frontSpace += QString("&nbsp;");
+						++nSpCnt;
+						calcSpaceWidth = fontMetrics().horizontalAdvance( frontSpace );
+					} while( calcSpaceWidth < width );
+					// qDebug() << " @Linux : nSpCnt = " << nSpCnt;
+
+#endif
 				}
 				fmtStr += frontSpace;
 
