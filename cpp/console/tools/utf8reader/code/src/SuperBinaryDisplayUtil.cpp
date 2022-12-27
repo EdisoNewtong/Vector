@@ -1680,7 +1680,7 @@ void printFileInfo(const FileInfo& fileInfo, string& retStr, bool needPrintToCon
 					
 					// Add Cursor Info for This Line and total Index
 					if ( !singleLine->empty() ) {
-						auto beforeSz = iCharacterCount + 1;
+						// auto beforeSz = iCharacterCount + 1;
 						auto sz = singleLine->size();
 						iCharacterCount += sz;
 						if ( treatrnAsOneEOL && sz >= 2 ) {
@@ -1704,11 +1704,11 @@ void printFileInfo(const FileInfo& fileInfo, string& retStr, bool needPrintToCon
 							   << " Global ByteIdx : "
 							   << std::dec << iPreviousByteCount
 							   << " ~ " << std::dec << (iBytesCount-1)
-							   << " Tot-Byte(s) : " << std::dec << (iBytesCount - iPreviousByteCount)
-							   << " , CharacterIndex : "
-							   << std::dec << beforeSz 
-							   << " ~ " << std::dec << iCharacterCount 
-							   << " Tot-Char(s) : " << std::dec << (iCharacterCount - beforeSz +1);
+							   << " Tot-Byte(s) : " << std::dec << (iBytesCount - iPreviousByteCount);
+							   // << " , CharacterIndex : "
+							   // << std::dec << beforeSz 
+							   // << " ~ " << std::dec << iCharacterCount 
+							   // << " Tot-Char(s) : " << std::dec << (iCharacterCount - beforeSz +1);
 
 						// outstr << " => " << std::dec << beforeSz << " ~ " << std::dec << iCharacterCount << ",Tot:" << std::dec << (iCharacterCount - beforeSz +1);
 					}
