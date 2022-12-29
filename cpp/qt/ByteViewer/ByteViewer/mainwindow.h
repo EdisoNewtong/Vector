@@ -41,6 +41,8 @@ private slots:
 
     void on_positionEdit_returnPressed();
 
+    void on_btnDelEOL_clicked();
+
 protected:
 	void showHintsMessage( const QString& msg, int isError, int msec);
 	void clearHighLight();

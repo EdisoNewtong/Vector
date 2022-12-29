@@ -7,6 +7,13 @@
 #include <QDropEvent>
 #include "SuperTextEdit.h"
 
+
+
+// static member init
+const QString SuperTextEdit::SC_CR( QChar('\r') );
+const QString SuperTextEdit::SC_LF( QChar('\n') );
+
+
 //![constructor]
 
 SuperTextEdit::SuperTextEdit(QWidget *parent /* = nullptr */) 
@@ -293,8 +300,6 @@ void SuperTextEdit::dropEvent(QDropEvent* event)  // Q_DECL_OVERRIDE;
 
 bool SuperTextEdit::processRawText(const QByteArray& buffer)
 {
-	static const QString SC_CR( QChar('\r') );
-	static const QString SC_LF( QChar('\n') );
 
 	QByteArray backupBuf( buffer );
 	m_openedFileBuffer.clear();
@@ -767,3 +772,86 @@ void SuperTextEdit::buffer2Text()
 	this->setPlainText(strContent);
 }
 
+
+
+bool SuperTextEdit::deleteEOL_forceUpdate(int lineIdx, E_EOL_TYPE& deletedType)
+{
+	int sz = m_allLines.size();
+	LineInfo* pLineEOLToBeDelete = nullptr;
+	E_EOL_TYPE eolFlag = E_EOL_TYPE::E_NONE;
+	if (    lineIdx>=0 && lineIdx < sz  
+		&& ( (pLineEOLToBeDelete = m_allLines.at(lineIdx)) != nullptr )  
+		&& ( (eolFlag = pLineEOLToBeDelete->eolFlag) != E_EOL_TYPE::E_NONE ) ) 
+	{
+		int globalIdx = -1;
+        int sz = pLineEOLToBeDelete->charList.size();
+		int sz1 = m_openedFileBuffer.size();
+
+		bool deleteDoneFlag = false;
+		if ( eolFlag == E_EOL_TYPE::E_LF ) {
+			if ( sz > 0 ) {
+				CharacterInfo chInfo = pLineEOLToBeDelete->charList.at( sz-1 );
+				if ( chInfo.singleChar == SuperTextEdit::SC_LF ) {
+					globalIdx = chInfo.globalByteIdx;
+
+					if ( globalIdx>=0  &&  globalIdx < sz1 ) {
+						if ( m_openedFileBuffer[globalIdx] == '\n' ) {
+							m_openedFileBuffer = m_openedFileBuffer.remove(globalIdx, 1);
+							deleteDoneFlag = true;
+						}
+					}
+				}
+			}
+
+		} else if ( eolFlag == E_EOL_TYPE::E_CRLF ) {
+			if ( sz > 1 ) {
+				CharacterInfo chLastInfo       = pLineEOLToBeDelete->charList.at( sz-1 );
+				CharacterInfo chLastButOneInfo = pLineEOLToBeDelete->charList.at( sz-2 );
+				if (      chLastButOneInfo.singleChar == SuperTextEdit::SC_CR 
+				      &&        chLastInfo.singleChar == SuperTextEdit::SC_LF ) 
+				{
+					globalIdx = chLastButOneInfo.globalByteIdx;
+
+					if ( (globalIdx>=0)  &&  (globalIdx < sz1)  &&  (globalIdx+1) < sz1 ) {
+						if ( m_openedFileBuffer[globalIdx] == '\r' && m_openedFileBuffer[globalIdx+1] == '\n' ) {
+							m_openedFileBuffer = m_openedFileBuffer.remove(globalIdx, 2);
+							deleteDoneFlag = true;
+						}
+					}
+				}
+			}
+
+		} else { // eolFlag == E_EOL_TYPE::E_CR
+			if ( sz > 0 ) {
+				CharacterInfo chInfo = pLineEOLToBeDelete->charList.at( sz-1 );
+				if ( chInfo.singleChar == SuperTextEdit::SC_CR ) {
+					globalIdx = chInfo.globalByteIdx;
+
+					if ( globalIdx>=0  &&  globalIdx < sz1 ) {
+						if ( m_openedFileBuffer[globalIdx] == '\r' ) {
+							m_openedFileBuffer = m_openedFileBuffer.remove(globalIdx, 1);
+							deleteDoneFlag = true;
+						}
+
+					}
+				}
+			}
+
+		}
+
+		if ( deleteDoneFlag ) {
+			deletedType = eolFlag;
+
+			// reScan the updated buffer again
+			processRawText( m_openedFileBuffer );
+
+			// read the info and set the content
+			QString strContent( m_openedFileBuffer );
+			this->setPlainText(strContent);
+			return true;
+		}
+
+	}
+
+	return false;
+}

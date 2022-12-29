@@ -310,7 +310,7 @@
       <rect>
        <x>10</x>
        <y>30</y>
-       <width>211</width>
+       <width>161</width>
        <height>119</height>
       </rect>
      </property>
@@ -337,6 +337,19 @@
        </widget>
       </item>
      </layout>
+    </widget>
+    <widget class="QPushButton" name="btnDelEOL">
+     <property name="geometry">
+      <rect>
+       <x>180</x>
+       <y>90</y>
+       <width>51</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Del</string>
+     </property>
     </widget>
    </widget>
    <widget class="QGroupBox" name="JumpBox">

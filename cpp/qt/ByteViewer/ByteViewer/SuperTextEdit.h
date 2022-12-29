@@ -92,6 +92,7 @@ public:
 	bool isProcessSuccess();
 
 	bool updateEOL(int lineIdx,  E_EOL_TYPE oldState, E_EOL_TYPE newState);
+	bool deleteEOL_forceUpdate(int lineIdx, E_EOL_TYPE& deletedType);
 
 
 	QString getOpenedFile();
@@ -130,6 +131,11 @@ private:
 	QByteArray           m_EOL_RN;
 	QByteArray           m_EOL_R;
 	QByteArray           m_EOL_N;
+
+private:
+	static const QString SC_CR;
+	static const QString SC_LF;
+
 };
 	
 //![codeeditordefinition]

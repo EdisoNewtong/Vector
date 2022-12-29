@@ -212,7 +212,10 @@ void MainWindow::file_line_EOL_changed(int btnId, bool  checked)
 
 }
 
-
+// 0 : normal      ( Black Color )
+// 1 : Successful  ( Green Color )
+// 2 : Failed      ( Red Color )
+// 3 : Warning     ( Brown-Orange Color )
 void MainWindow::showHintsMessage( const QString& msg, int tag, int msec)
 {
 	if ( tag == 0 ) {
@@ -437,6 +440,7 @@ void MainWindow::on_jmpBtn_clicked()
 	}
 
 }
+
 
 
 void MainWindow::pickEOLInfo( LineInfo* pLineInfo )
@@ -807,5 +811,34 @@ QString MainWindow::processHtmlText(const QString& content)
 <html><head><meta name="qrichtext" content="1" /><style type="text/css"> p { white-space: pre-wrap; }</style></head><body>%1</body></html>)";
 
 	return templateHtml.arg(content);
+}
+
+
+
+
+void MainWindow::on_btnDelEOL_clicked()
+{
+    QTextCursor currentCursor = ui->plainTextEdit->textCursor();
+
+    int curLineNo = currentCursor.blockNumber(); // start from 0    rather than 1
+	
+	E_EOL_TYPE deleteTypeRef;
+	auto bret = ui->plainTextEdit->deleteEOL_forceUpdate( curLineNo, deleteTypeRef );
+
+	if ( bret ) {
+		QString eolContent;
+		if ( deleteTypeRef == E_EOL_TYPE::E_LF ) {
+			eolContent = "\\n";
+		} else if (deleteTypeRef == E_EOL_TYPE::E_CRLF ) {
+			eolContent = "\\r \\n";
+		} else {
+			eolContent = "\\r";
+		}
+
+        showHintsMessage( QString("[DONE] EOL flag : '%1'  Delete ").arg(eolContent),  1, 3000);
+	} else {
+		showHintsMessage( QString("[Failed] EOL info is invalid ! ") ,2, 3000);
+	}
+
 }
 
