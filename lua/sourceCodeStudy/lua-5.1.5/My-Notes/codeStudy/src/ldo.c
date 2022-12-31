@@ -259,7 +259,10 @@ void luaD_callhook (lua_State *L, int event, int line) {
     ((void)0); /* lua_assert(L->ci->top <= L->stack_last); */
     L->allowhook = 0; /* cannot call hooks inside a hook */
     ((void) 0); /* lua_unlock(L); */
+
+    /* Core Core Core : actually Call hook function */ 
     (*hook)(L, &ar);
+
     ((void) 0); /* lua_lock(L); */
     ((void)0);  /* lua_assert(!L->allowhook); */
     L->allowhook = 1;
@@ -335,7 +338,7 @@ static StkId tryfuncTM (lua_State *L, StkId func) {
   StkId p;
   /*                 savestack(L, func);              */
   ptrdiff_t funcr = ((char *)(func) - (char *)L->stack);
-  /* ttisfunction(tm) */
+  /*    (((func)->tt) == LUA_TFUNCTION)  */
   if ( !ttisfunction(tm) ) {
     luaG_typeerror(L, func, "call");
   }
@@ -378,15 +381,31 @@ int luaD_precall (lua_State *L, StkId func, int nresults) {
     func = tryfuncTM(L, func); /* check the `function' tag method */
   }
   /*        savestack(L, func);             */
-  funcr = ((char *)(func) - (char *)L->stack);
-  /*   &clvalue(func)->l; */
+  funcr = ( (char *)(func)  -  (char *)L->stack  );
+  /*   &clvalue(func)->l;  // `l` field means that it is assumed as a lua function first   */
   cl = &(&(func)->value.gc->cl)->l;
 
   L->ci->savedpc = L->savedpc;
+  // check is C function or not
   if (!cl->isC) { /* Lua function? prepare its call */
     CallInfo *ci;
     StkId st, base;
-    Proto *p = cl->p;
+
+    /*
+
+        //
+        // lua Closure defination
+        //
+        typedef struct LClosure {
+          ClosureHeader;
+          struct Proto *p;   //   <===========
+          UpVal *upvals[1];
+        } LClosure;
+
+    */
+    // `p` is a field that saved the pointer of    a  lua function Proto
+    Proto *p = cl->p; // `p` is a field that saved the pointer of    a  lua function Proto
+
     /* luaD_checkstack(L, p->maxstacksize); */
     if ( (char *)L->stack_last - (char *)L->top <= p->maxstacksize * (int)sizeof(TValue) ) { 
 		luaD_growstack(L, p->maxstacksize); 
@@ -441,37 +460,73 @@ int luaD_precall (lua_State *L, StkId func, int nresults) {
     CallInfo *ci;
     int n;
     /* luaD_checkstack(L, LUA_MINSTACK); */
-    /* ensure minimum stack size */
+    /* ensure minimum stack size */            /* 20  LUA_MINSTACK */
     if ((char *)L->stack_last - (char *)L->top <= LUA_MINSTACK*(int)sizeof(TValue)) { 
 		luaD_growstack(L, LUA_MINSTACK); 
 	} else { 
 		((void)0); 
 	}
+
+    // Make ci pointer to the next CallInfo
     /* ci = inc_ci(L); */
     /* now `enter' new function */
     ci = (L->ci == L->end_ci) 
 		? growCI(L) 
 		: ( ((void)0), ++L->ci );
 
+    // set the invoke callback function from the offset `funcr`   // ci->func  <--   ...  
     /*          restorestack(L, funcr); */
     ci->func = ((TValue *)((char *)L->stack + (funcr)));
 
+    /*
+        L->base 通常指向将要执行的回调函数的地址的，向后移动 <1> 格的地址 ( +1 )
+        即 指向 ，函数的形参列表的 第1个 参数的地址
+    */
     L->base = ci->base = ci->func + 1;
     ci->top = L->top + LUA_MINSTACK; /* LUA_MINSTACK 20 */
     ((void)0); /* lua_assert(ci->top <= L->stack_last); */
+
+    // set the result count of the current CallInfo
     ci->nresults = nresults;
+
     /*                LUA_MASKCALL  (1 << 0) */
     if (L->hookmask & LUA_MASKCALL) {
       /*            LUA_HOOKCALL 0           */
       luaD_callhook(L, 0, -1);
     }
     ((void) 0); /* lua_unlock(L); */
+
+    /*
+        Core Core Core : execute the passed callback `C` function
+    */
+
+    // Core Core Core : n is the result count of the callback function
+    // ci->func = restorestack(L, funcr); // is assigned at this line
     /*                      (*curr_func(L)->c.f)(L); */
     n = (*((&(L->ci->func)->value.gc->cl))->c.f)(L); /* do the actual call */
+
     ((void) 0); /* lua_lock(L); */
     if (n < 0) { /* yielding? */
       return PCRYIELD; /* PCRYIELD 2 */
     } else {
+      /*
+
+      --> current <--   : L->top 
+          i+nArgs+nRes  : result   n
+             ...
+          i+nArgs+3     : result   3
+          i+nArgs+2     : result   2
+          i+nArgs+1     : result   1
+          i+nArgs       : argument n
+             ...
+          i+3           : argument 3
+          i+2           : argument 2
+          i+1           : argument 1
+          i             : C function address
+
+
+                      L->top - n ==>   the 1st result address
+      */
       luaD_poscall(L, L->top - n);
       return 1;
     }
@@ -507,7 +562,7 @@ int luaD_poscall (lua_State *L, StkId firstResult) {
   StkId res;
   int wanted, i;
   CallInfo *ci;
-  /*                 LUA_MASKRET (1 << 1)*/
+  /*                 LUA_MASKRET (1 << 1) */
   if ( L->hookmask & LUA_MASKRET ) {
     firstResult = callrethooks(L, firstResult);
   }
@@ -516,15 +571,20 @@ int luaD_poscall (lua_State *L, StkId firstResult) {
   wanted = ci->nresults;
   L->base = (ci - 1)->base; /* restore base */
   L->savedpc = (ci - 1)->savedpc; /* restore savedpc */
+
   /* move results to correct place */
   for (i = wanted; i != 0 && firstResult < L->top; i--) {
     /* { const TValue *o2=(firstResult++); TValue *o1=(res++); o1->value = o2->value; o1->tt=o2->tt; ((void)0); }; */
     setobjs2s(L, res++, firstResult++);
   }
+
+  // Core Core Core :
+  //      if required 5 , return 2,   filled up (the rest 3) results with  `nil` type
   while (i-- > 0) {
     /* ((res++)->tt = LUA_TNIL); */
     setnilvalue(res++);
   }
+
   L->top = res;
 
   /*             LUA_MULTRET (-1) */
@@ -539,6 +599,9 @@ int luaD_poscall (lua_State *L, StkId firstResult) {
 ** function position.
 */
 void luaD_call (lua_State *L, StkId func, int nResults) {
+  //
+  // Make  L->nCcalls  increase  (+1)
+  //
   /*                 LUAI_MAXCCALLS 200 */
   if (++L->nCcalls >= LUAI_MAXCCALLS ) {
     if (L->nCcalls == LUAI_MAXCCALLS ) {
@@ -553,6 +616,9 @@ void luaD_call (lua_State *L, StkId func, int nResults) {
   if (luaD_precall(L, func, nResults) == PCRLUA) { /* is a Lua function? */
     luaV_execute(L, 1); /* call it */
   }
+
+
+  // After invoke  Make  L->nCcalls  decrease  (-1)
   L->nCcalls--;
 
   /* luaC_checkGC(L); */
@@ -674,15 +740,18 @@ int luaD_pcall (lua_State *L, Pfunc func, void *u,
   int status;
   // cache the previous          nCcalls value
   unsigned short oldnCcalls = L->nCcalls;
-  //                  save the delta between   L->ci &&  L->base_ci in char unit rather struct unit
+  // Also see   the macro : savestack(L, L->top)      inside lua_cpcall(...)
+  //                  save the delta between   L->ci &&  L->base_ci in char unit rather than the sizeof(struct CallInfo)
   /*                  saveci(L, L->ci); */
   ptrdiff_t old_ci = ((char *)(L->ci) - (char *)L->base_ci);
   lu_byte old_allowhooks = L->allowhook;
   ptrdiff_t old_errfunc = L->errfunc;
   L->errfunc = ef;
+
   //         func : may be implement in   lapi.c:1116    static void f_Ccall (lua_State *L, void *ud) {
   // execute it in protected mode ( if there is some runtime error occurs , force interrupt the execution of following code , and  throw an exception
   status = luaD_rawrunprotected(L, func, u);
+
   if (status != 0) { /* an error occurred? */
     /*              restorestack(L, old_top);                */
     StkId oldtop = ((TValue *)((char *)L->stack + (old_top)));

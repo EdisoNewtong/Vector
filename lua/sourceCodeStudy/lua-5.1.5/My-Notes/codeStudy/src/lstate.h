@@ -111,7 +111,10 @@ struct lua_State {
   StkId base;  /* base of current function */
   global_State *l_G;
   CallInfo *ci;  /* call info for current function */
+
+  // typedef lu_int32 Instruction;  // llimits.h:84
   const Instruction *savedpc;  /* `savedpc' of current function */
+
   StkId stack_last;  /* last free slot in the stack */
   StkId stack;  /* stack base */
   CallInfo *end_ci;  /* points after end of ci array*/
@@ -125,6 +128,7 @@ struct lua_State {
   int basehookcount;
   int hookcount;
   lua_Hook hook;
+  // lua global table _G : such as : pairs(...)   ipairs(...)   require(...)  tonumber(...)
   TValue l_gt;  /* table of globals */
   TValue env;  /* temporary place for environments */
   GCObject *openupval;  /* list of open upvalues in this stack */

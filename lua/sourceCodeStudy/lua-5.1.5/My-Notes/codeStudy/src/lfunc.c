@@ -20,15 +20,39 @@
 
 
 
+/*
+
+typedef union Closure {
+  CClosure c;    // C    Lauguage Closure
+  LClosure l;    // lua  Language Closure
+} Closure;
+
+*/
+//
+//  nelems :  upvalue count
+//  e      :  function environment
+//
 Closure *luaF_newCclosure (lua_State *L, int nelems, Table *e) {
   /*
   luaM_malloc(L, sizeCclosure(nelems)
-  ((Closure *)(luaM_realloc_(L, ((void *)0), 0, ((((int)(sizeof(CClosure))) + ((int)(sizeof(TValue)*((nelems)-1))))))))
-  (Closure *)(
-	luaM_realloc_(L, NULL, 0, ( (int)(sizeof(CClosure))) +  (int)(sizeof(TValue) * (nelems-1) ))
-  )
+
+     Why    (nelems-1) * TValue ?
+     Because    
+
+        typedef struct CClosure {
+          ClosureHeader;
+          lua_CFunction f;
+          TValue upvalue[1];  // occupy 1 Tvalue , so use exp : (nelems-1) * sizeof(TValue)    to turn out the exact size of CClosure
+        } CClosure;
+
+
+      ((Closure *)(luaM_realloc_(L, ((void *)0), 0, ((((int)(sizeof(CClosure))) + ((int)(sizeof(TValue)*((nelems)-1))))))))
+      (Closure *)(
+        luaM_realloc_(L, NULL, 0, ( (int)(sizeof(CClosure))) +  (int)(sizeof(TValue) * (nelems-1) ))
+      )
   */
 
+  // 分配一块 (    CClosure + (nelems-1) * TValue  )  大小的内存块
   Closure *c = (Closure *)(
 	luaM_realloc_(L, NULL, 0, ( (int)(sizeof(CClosure))) +  (int)(sizeof(TValue) * (nelems-1) ))
   );
@@ -36,7 +60,7 @@ Closure *luaF_newCclosure (lua_State *L, int nelems, Table *e) {
   /* luaC_link(L, obj2gco(c), LUA_TFUNCTION); */
   luaC_link(L, ((GCObject *)c), LUA_TFUNCTION);
 
-  c->c.isC = 1;
+  c->c.isC = 1; // set C flag : Closure is a kind of C Language 
   c->c.env = e;
 
   /*               ((lu_byte)((nelems)));  */
@@ -56,7 +80,7 @@ Closure *luaF_newLclosure (lua_State *L, int nelems, Table *e) {
 
   /* luaC_link(L, obj2gco(c), LUA_TFUNCTION); */
   luaC_link(L, ( (GCObject *)c), LUA_TFUNCTION);
-  c->l.isC = 0;
+  c->l.isC = 0; // set not C function flag   : 0 => lua function
   c->l.env = e;
   /*               ((lu_byte)((nelems))) */
   c->l.nupvalues = cast_byte(nelems);

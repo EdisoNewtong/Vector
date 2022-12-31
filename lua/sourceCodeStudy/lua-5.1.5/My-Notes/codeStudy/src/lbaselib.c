@@ -728,6 +728,7 @@ static void auxopen (lua_State *L, const char *name,
                      lua_CFunction f, lua_CFunction u) {
   /* lua_pushcfunction(L, u); */
   lua_pushcclosure(L, u, 0);
+  /* 1: 1 upvalue count is   `u` which has been pushed previously */
   lua_pushcclosure(L, f, 1);
   lua_setfield(L, -2, name);
 }
@@ -735,28 +736,46 @@ static void auxopen (lua_State *L, const char *name,
 
 static void base_open (lua_State *L) {
   /* set global _G */
+  /*                  (-10002)  LUA_GLOBALSINDEX  in lua.h:38 */
   lua_pushvalue(L, LUA_GLOBALSINDEX);
-  /* lua_setglobal(L, "_G"); */
-  lua_setfield(L, LUA_GLOBALSINDEX, "_G");
+  // set      L->l_gt["_G"] = L->l_gt;
+  /* lua_setglobal(L, "_G"); */  
+  lua_setfield(L, LUA_GLOBALSINDEX, "_G"); 
 
   /* open lib into global table */
+  /*
+      _G["assert"] = luaB_assert;
+      _G["collectgarbage"] = luaB_collectgarbage;
+      _G["dofile"] = luaB_dofile;
+         ...
+
+  */
   luaL_register(L, "_G", base_funcs);
+
+  // set    L->l_gt["_VERSION"] = "Lua 5.1";
   lua_pushlstring(L, LUA_VERSION, (sizeof("Lua 5.1")/sizeof(char))-1);
   /* lua_setglobal(L, "_VERSION"); */
   lua_setfield(L, LUA_GLOBALSINDEX, "_VERSION"); /* set global _VERSION */
+
   /* `ipairs' and `pairs' need auxiliary functions as upvalues */
+  //  L->l_gt["ipairs"] = luaB_ipairs; // global function with its upvalue function `ipairsaux'
   auxopen(L, "ipairs", luaB_ipairs, ipairsaux);
+  //  L->l_gt["pairs"] = luaB_pairs;   // global function with its upvalue function `luaB_next`
   auxopen(L, "pairs", luaB_pairs, luaB_next);
+
+
   /* `newproxy' needs a weaktable as upvalue */
-  lua_createtable(L, 0, 1); /* new table `w' */
+  lua_createtable(L, 0, 1); /* new table `w' */ /* 0: 0 element , 1: 1 key-pair */
   lua_pushvalue(L, -1); /* `w' will be its own metatable */
   lua_setmetatable(L, -2);
 
   /* lua_pushliteral(L, "kv"); */
   lua_pushlstring(L, "" "kv", (sizeof("kv")/sizeof(char))-1);
-
   lua_setfield(L, -2, "__mode"); /* metatable(w).__mode = "kv" */
-  lua_pushcclosure(L, luaB_newproxy, 1);
+
+  /* it will override the previous slot whose value is `w` , because the upvalue is 1 */
+  // L->l_gt["newproxy"] = luaB_newproxy;
+  lua_pushcclosure(L, luaB_newproxy, 1); // 1: means 1 upvalues
   lua_setfield(L, LUA_GLOBALSINDEX, "newproxy"); /* set global `newproxy' */
 }
 
@@ -765,6 +784,11 @@ extern int luaopen_base (lua_State *L) {
   base_open(L);
   /* LUA_COLIBNAME  "coroutine" */
   luaL_register(L, LUA_COLIBNAME, co_funcs);
+
+  // 2 means the result count of the   luaopen_base(...)
+  // #1st : base_open(L)       : push 1 result
+  // #2nd : luaL_register(...) : push 1 result
+  //                     Total : 1+1 = 2
   return 2;
 }
 

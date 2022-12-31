@@ -456,6 +456,7 @@ static int pmain (lua_State *L) {
   struct Smain *s = (struct Smain *)lua_touserdata(L, 1);
   char **argv = s->argv;
   int script;
+  /* -i  or  -v   or  -e */
   int has_i = 0, has_v = 0, has_e = 0;
   globalL = L;
   if (argv[0] && argv[0][0]) {
@@ -463,11 +464,13 @@ static int pmain (lua_State *L) {
   }
   /*             0    LUA_GCSTOP */
   lua_gc(L, LUA_GCSTOP, 0); /* stop collector during initialization */
+
+  // LUALIB_API void luaL_openlibs (lua_State *L) { ... } // linit.c:37
   luaL_openlibs(L); /* open libraries */
   /*                1    LUA_GCRESTART */
   lua_gc(L, LUA_GCRESTART, 0);
   s->status = handle_luainit(L);
-  if (s->status != 0) {
+  if (s->status != 0) { 
     return 0;
   }
   script = collectargs(argv, &has_i, &has_v, &has_e);
@@ -495,7 +498,9 @@ static int pmain (lua_State *L) {
     /*   lua_stdin_is_tty() */
     if ( isatty(0) ) {
       print_version();
-      dotty(L);
+      // Start Lua Interpret  ( Waiting for the user input )
+      // > 
+      dotty(L); 
     }
     else {
       dofile(L, NULL); /* executes stdin as a file */

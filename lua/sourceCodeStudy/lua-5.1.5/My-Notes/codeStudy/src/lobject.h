@@ -33,7 +33,7 @@
 /*
 ** Union of all collectable objects
 */
-typedef union GCObject GCObject;
+typedef union GCObject GCObject; // lstate.h:146
 
 
 /*
@@ -57,10 +57,22 @@ typedef struct GCheader {
 ** Union of all Lua values
 */
 typedef union {
-  GCObject *gc;
-  void *p;
-  lua_Number n;
-  int b;
+  /*
+  ----------------------------------------------------------------------------------------------------
+   GCObject Type must be one of the following kinds :
+  ----------------------------------------------------------------------------------------------------
+            `string`
+      or    `user-data`
+      or    `Closure`   // C function / Lua function
+      or    `Table`
+      or    `Proto`     // lua function prototype
+      or    `UpVal`
+      or    `lua_State` // a lua thread
+  */
+  GCObject *gc; // garbage collection field 
+  void *p;      // none gc pointer
+  lua_Number n; // double number field
+  int b;        //        boolean field
 } Value;
 
 

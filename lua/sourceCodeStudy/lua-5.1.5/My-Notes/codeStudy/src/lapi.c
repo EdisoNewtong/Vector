@@ -91,12 +91,13 @@ static TValue *index2adr (lua_State *L, int idx) {
 
 static Table *getcurrenv (lua_State *L) {
   if (L->ci == L->base_ci) { /* no enclosing function? */
+    // #define hvalue(o)	check_exp(ttistable(o), &(o)->value.gc->h)   // lobject.h:99
     /* return (&((&L->l_gt))->value.gc->h); */
     return hvalue(gt(L)); /* use global table as environment */ 
   } else {
     /* Closure *func = ((&(L->ci->func)->value.gc->cl)); */
     Closure *func = curr_func(L);
-    return func->c.env;
+    return func->c.env; // use the Closure's environment instead
   }
 }
 
@@ -659,15 +660,52 @@ extern void lua_pushcclosure (lua_State *L, lua_CFunction fn, int n) {
   };
 
   api_checknelems(L, n); /* { (void)L; }; */
+
+  // alloc a block of lua Tag-Value to store passed   function
   cl = luaF_newCclosure(L, n, getcurrenv(L));
   cl->c.f = fn;
+
+
+  /*
+      Move L->top backward to   the upvalue <Beginning> index
+
+      assign each upvalue to 
+        L->top + (n-1)          cl->c.upvalue[n-1]
+        L->top + (n-2)          cl->c.upvalue[n-2]
+        L->top + (n-3)          cl->c.upvalue[n-3]
+
+                 ...
+
+        L->top + (n- (n-1) )    cl->c.upvalue[1]
+        L->top + (n-n)          cl->c.upvalue[0]
+  */
   L->top -= n;
   while (n--) {
     /* { const TValue *o2=(L->top+n); TValue *o1=(&cl->c.upvalue[n]); o1->value = o2->value; o1->tt=o2->tt; ((void)0); }; */
     setobj2n(L, &cl->c.upvalue[n], L->top+n);
   }
+
+  /*
+     Core Core Core : `override` a slot data
+
+         the value of n  ==  -1  ( if the initial value is none-zero )
+
+     Now << override >> the   upvalue[0]  <== the passed new   C closure
+
+     We assume that n == 3          
+
+----------------------------------------------------------------------------------------------------
+     Before invoke this function    |  After invoke this function
+                                    |
+                    upvalue-0       |   L->top  ==>   cl->c.f = fn;     // override this slot
+                    upvalue-1       |                 upvalue-1       
+                    upvalue-2       |                 upvalue-2       
+      L->top  ==>   ???             |   (L->top)      | ???          |  // previously pointer 
+
+  */
   /* { TValue *i_o=(L->top); i_o->value.gc=((GCObject *)((cl))); i_o->tt=LUA_TFUNCTION; ((void)0); }; */
   setclvalue(L, L->top, cl);
+
   lua_assert(iswhite(obj2gco(cl))); /* ((void)0); */
   /* {{ (void)L; }; L->top++;}; */
   api_incr_top(L);
@@ -866,16 +904,32 @@ extern void lua_settable (lua_State *L, int idx) {
   lua_unlock(L); /* ((void) 0); */
 }
 
+/*
+    Table t       @    idx
+    string key   is    the argument `key`
+           value  @    (L->top - 1)
 
+    after set key-value pair , pop the Value from (L->top-1)
+
+    L->top  ==>   (L->top-1)
+
+*/
 extern void lua_setfield (lua_State *L, int idx, const char *k) {
   StkId t;
+  // define a local varible named `key'
   TValue key;
   lua_lock(L); /* ((void) 0); */
   api_checknelems(L, 1); /* { (void)L; }; */
+  // get the table object
   t = index2adr(L, idx);
   api_checkvalidindex(L, t); /* { (void)L; }; */
+  
+  // set Table's key-value pair
   /* { TValue *i_o=(&key); i_o->value.gc=((GCObject *)(((luaS_newlstr(L, k, strlen(k)))))); i_o->tt=LUA_TSTRING; ((void)0); }; */
-  setsvalue(L, &key, luaS_new(L, k));
+  setsvalue(L, &key, luaS_new(L, k)); // e.g.   : `key` = "Hello World";
+
+  // lvm.c:266
+  // void luaV_settable (lua_State *L, const TValue *t, TValue *key, StkId val) { ... }
   luaV_settable(L, t, &key, L->top - 1);
   L->top--; /* pop value */
   lua_unlock(L); /* ((void) 0); */
@@ -1046,7 +1100,7 @@ extern void lua_call (lua_State *L, int nargs, int nresults) {
   lua_lock(L); /* ((void) 0); */
   api_checknelems(L, nargs+1); /* { (void)L; }; */
   checkresults(L, nargs, nresults); /* { (void)L; }; */
-  func = L->top - (nargs+1);
+  func = L->top - (nargs+1); /* pointer at the closure function's index */
   luaD_call(L, func, nresults);
 
   /* adjustresults(L, nresults); */
@@ -1112,6 +1166,7 @@ extern int lua_pcall (lua_State *L, int nargs, int nresults, int errfunc) {
 ** Execute a protected C call.
 */
 struct CCallS { /* data to `f_Ccall' */
+  // typedef int (*lua_CFunction) (lua_State *L);
   lua_CFunction func;
   void *ud;
 };
@@ -1124,41 +1179,98 @@ static void f_Ccall (lua_State *L, void *ud) {
         c.func = func;
         c.ud = ud;
   */
-  /* struct CCallS *c = ((struct CCallS *)(ud)); */
+  // 1. callback function
+  // 2. function's only argument  inside the data field :  void* ud
   struct CCallS *c = cast(struct CCallS *, ud);
 
   Closure *cl;
+  // nelems              = 0    :   upvalue count is   0
+  // Closure *luaF_newCclosure (lua_State *L, int nelems, Table *e) { ... } // lfunc.c:23
+  //            static Table *getcurrenv (lua_State *L) { ... } // lapi.c:92
   cl = luaF_newCclosure(L, 0, getcurrenv(L));
+
+
+  /*
+     push closure && ud into lua stack
+ ------------------------------------------------------------------------------------------------
+   idx  
+ ------------------------------------------------------------------------------------------------
+    n        | cl      | cl->c.f = c->func
+             ------------------------------------------------
+   n+1       | c->ud   | the argument of c->func
+             ------------------------------------------------
+
+   n+2  <---   L->top    
+
+
+  */
+
   // set function address by member cl->c.f    from the passed argument     `c` struct
   cl->c.f = c->func;
   /* { TValue *i_o=(L->top); i_o->value.gc=((GCObject *)((cl))); i_o->tt=LUA_TFUNCTION; ((void)0); }; */ /* push function */
   setclvalue(L, L->top, cl);  /* push function */
   /* {{ (void)L; }; L->top++;}; */
   api_incr_top(L);
+
+
   /* { TValue *i_o=(L->top); i_o->value.p=(c->ud); i_o->tt=LUA_TLIGHTUSERDATA; }; */ /* push only argument */
   setpvalue(L->top, c->ud);  /* push only argument */
   /* {{ (void)L; }; L->top++;}; */
   api_incr_top(L);
+
+  // void luaD_call (lua_State *L, StkId func, int nResults) { ... } // ldo.c:561
+  // L->top -2   ==>    cl ( it contains a  C Closure address )
+  // 0 : 0 result value(s) of the function
   luaD_call(L, L->top - 2, 0);
 }
 
 
 /*
-               cpcall  :  <c> language function call under   <p>rotected mode
+               cpcall  :  <c> language function under   <p>rotected mode   <call>
 */
 extern int lua_cpcall (lua_State *L, lua_CFunction func, void *ud) {
   struct CCallS c;
   int status;
   lua_lock(L); /* ((void) 0); */
+
+  //
+  //  Encapsulate the function with its calling arguments  into the struct <CCallS>   `c`
+  //
   c.func = func; // set the callback's function
   c.ud = ud;     // set the callback's executing arg struct
 
-  // luaD_pcall(...)    ldo.c:663
   //                                  savestack(...)
   //                                      the delta between   L->top  and   L->stack   in  char  unit
   //                        f_Ccall lapi.c:1116
-  /* status = luaD_pcall(L, f_Ccall, &c, ((char *)(L->top) - (char *)L->stack), 0); */
+  /* 
+     status = luaD_pcall(L, f_Ccall, &c, ((char *)(L->top) - (char *)L->stack), 0); 
+ 
+     struct lua_State {
+           ...
+
+        StkId top;    // first free slot in the stack 
+        StkId stack;  // stack base 
+
+           ...
+     };
+
+    //  typedef void (*Pfunc)(lua_State* L, void* ud); // ldo.h:38
+    //  luaD_pcall(...)              ldo.c:663
+    int luaD_pcall (lua_State *L, 
+                    Pfunc func, 
+                    void *u,
+                    ptrdiff_t old_top, 
+                    ptrdiff_t ef)      { ... }
+
+    //
+    // all the arguments of to be invoke is encapsulated into the ( void* ud )
+    // void* ud include   the function address and the arguments of the function
+    //
+    static void f_Ccall (lua_State *L, void *ud) { ... }
+
+  */
   status = luaD_pcall(L, f_Ccall, &c, savestack(L, L->top), 0);
+
   lua_unlock(L); /* ((void) 0); */
   return status;
 }

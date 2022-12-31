@@ -72,9 +72,6 @@
 
 #define dummynode		(&dummynode_)
 
-/*
-** number of ints inside a lua_Number
-*/
 static const Node dummynode_ = {
   {{NULL}, LUA_TNIL}, /* value */
   {{{NULL}, LUA_TNIL, NULL}} /* key */

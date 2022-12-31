@@ -49,6 +49,7 @@ static void stack_init (lua_State *L1, lua_State *L) {
   /*                 8        BASIC_CI_SIZE */
   L1->size_ci = BASIC_CI_SIZE;
   L1->end_ci = L1->base_ci + L1->size_ci - 1; // the address of the last element in the CallInfo's array
+
   /* initialize stack array */
   /*          luaM_newvector(L, BASIC_STACK_SIZE + EXTRA_STACK, TValue); */
   /*                                     BASIC_STACK_SIZE  (2*20)            #define LUA_MINSTACK	20  */
@@ -70,6 +71,8 @@ static void stack_init (lua_State *L1, lua_State *L) {
   /* setnilvalue(L1->top++); */
   (L1->top++)->tt = LUA_TNIL; /* `function' entry for this `ci' */
   L1->base = L1->ci->base = L1->top;
+
+  //  L1->ci->top   ===>  [21] / [45]     Tvalue
   /*                      20           LUA_MINSTACK */
   L1->ci->top = L1->top + LUA_MINSTACK;
 }
@@ -267,7 +270,7 @@ LUA_API  lua_State *lua_newstate (lua_Alloc f, void *ud) {
      Core Core Core:
 
      Why ?
-         注意: 这里分配新的内存块时，为什么不用封装好的 luaM_realloc_(...) 函数 , 而用原始的 l_alloc(...) 进行分配呢 ?
+         注意: 这里分配新的内存块时，为什么不用封装好的 luaM_realloc_(...) 函数 , 而用原始的 l_alloc(...) 进行分配呢 ? 同时，可以看到在此 l_alloc 执行完以后 ，立即通过代码判定指针 [是否] 为空的逻辑判定语句 , 而没有使用 luaD_throw(...)
          因为:  
                 luaM_realloc_(...) 是被封装在 luaD_rawrunprotected(...) 中执行的
 
@@ -279,27 +282,14 @@ LUA_API  lua_State *lua_newstate (lua_Alloc f, void *ud) {
         因为这种代码的书写方式，在编码时会有一些[不]美观
 e.g.
         
-         auto succ = func_1();
-
-         if ( succ ) {
-            succ = func_2();
-         }
-
-         if ( succ ) {
-            succ = func_3();
-         }
-
-         if ( succ ) {
-            succ = func_4();
-         }
+         auto          succ = func_1();
+         if ( succ ) { succ = func_2(); }
+         if ( succ ) { succ = func_3(); }
+         if ( succ ) { succ = func_4(); }
         
 or   
 
-         if (     func_1() 
-               && func_2() 
-               && func_3() 
-               && func_4() 
-        ) {
+        if (     func_1() && func_2() && func_3() && func_4() ) {
             ...
         } else {
            // 逻辑控制，并不知道上面的 if 语句中，到底在哪个函数中发生了错误
@@ -403,7 +393,7 @@ e.g.
   /* set2bits(L->marked, FIXEDBIT, SFIXEDBIT); */
   L->marked |= ( (1<<5) | (1<<6) ); // L->marked = 0x61 = | 0110 0001 |(B)
 
-  // lstate.h:128 , 初始化结构体中的成员
+  // lstate.h:128 , 初始化结构体中的成员 , 置为 0 或 1
   preinit_state(L, g);
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -424,6 +414,8 @@ e.g.
   /*           registry(L)     */
   ((&(L->l_G)->l_registry))->tt = LUA_TNIL;
 
+
+  // typedef struct Mbuffer { ... }    // lzio.h:24
   /* luaZ_initbuffer(L, &g->buff); */
   ( (&g->buff)->buffer = NULL, 
     (&g->buff)->buffsize = 0

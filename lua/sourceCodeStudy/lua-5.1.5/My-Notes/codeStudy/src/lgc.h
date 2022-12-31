@@ -86,6 +86,15 @@
 #define luaC_barrier(L,p,v) { if (valiswhite(v) && isblack(obj2gco(p)))  \
 	luaC_barrierf(L,obj2gco(p),gcvalue(v)); }
 
+/*
+    检测 
+          1.1 v 变量 是否是一个需要 gc 的变量类型 ,  v->tt >= LUA_TSTRING
+          1.2 v 下的 marked 字段 : 第1位，第2位 是否至少有1位是 1
+          2.  t 变量 marked 字段 : 第3位，是否是 1
+
+    如果3个条件同时满足 =>  执行 luaC_barrierback(L,t)
+     
+*/
 #define luaC_barriert(L,t,v) { if (valiswhite(v) && isblack(obj2gco(t)))  \
 	luaC_barrierback(L,t); }
 

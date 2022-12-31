@@ -77,4 +77,38 @@ Finished at   lua_State *L = luaL_newstate(); // lua.c:514
 
 
 
+--------------------------------------------------
+Date : 2022-11-21
+--------------------------------------------------
+static int pmain (lua_State *L) { ... };   // lua.c:455
+int status = lua_cpcall(L, &pmain, &s);    // lua.c:522
+// cpcall  :  <c> language function under <p>rotected mode   <call>
+extern int lua_cpcall (lua_State *L, lua_CFunction func, void *ud) { ... }
+//                                  f_Ccall
+int luaD_pcall (lua_State *L, Pfunc func, void *u, ptrdiff_t old_top, ptrdiff_t ef) { ... }
+// 将 入参 ud 加工处理, 包装成一个 Closure 对象
+static void f_Ccall (lua_State *L, void *ud) { ... } // lapi.c
+// get current environment
+static Table *getcurrenv (lua_State *L) { ... } // lapi.c:92
+
+
+
+
+
+--------------------------------------------------
+Date : 2022-11-25
+--------------------------------------------------
+L->stack
+         [0] : nil
+         [1] : &pmain         L->stack[1].value.gc->cl.c.f                           in  lua.c: status = lua_cpcall(L, &pmain, &s);
+         [2] : Smain*         ((struct Smain*)(L->stack[2].value.p))->argv[0]        in  lua.c: status = lua_cpcall(L, &pmain, &s);
+         [3] : &luaopen_base  L->stack[3].value.gc->cl.c.f                           in  lua_pushcfunction(L, lib->func);
+         [4] : ""             (char*)(&L->stack[4].value.gc->ts + 1)                 in  lua_pushstring(L, lib->name);
+         [5] : L->l_gt        L->stack[5].value.gc == L->l_gt.value.gc               in  lua_pushvalue(L, LUA_GLOBALSINDEX);
+
+                         _G["_G"] = _G;
+                         _G["_VERSION"] = "Lua 5.1";
+                            ...
+
+
 

@@ -72,9 +72,6 @@
 
 #define dummynode		(&dummynode_)
 
-/*
-** number of ints inside a lua_Number
-*/
 static const Node dummynode_ = {
   {
       {NULL},   // 'value'  is set as an union object with NULL pointer in `gc` field
@@ -450,6 +447,10 @@ static void setnodevector (lua_State *L, Table *t, int size) {
 
     /*     twoto(lsize);     lobject.h:359  */
     size = 1<< lsize;
+
+    // Core Core Core :
+    // Alloc n=size Slots for storing key-value pairs
+    //
     /*         luaM_newvector(L, size, Node); */
     t->node = (Node *)(   ((size_t)(size+1)) <= MAX_SIZET/sizeof(Node)
                         ? luaM_realloc_(L, NULL,  0 * sizeof(Node), size * sizeof(Node) ) 
@@ -460,9 +461,10 @@ static void setnodevector (lua_State *L, Table *t, int size) {
       /* gnext(n) */
       (n->i_key.nk.next) = NULL;
       /* setnilvalue(gkey(n)); */
-      (&(n)->i_key.nk)->tt = LUA_TNIL;
+      // (&(n)->i_key.nk)->tt = LUA_TNIL;
+      (&(n->i_key.nk))->tt = LUA_TNIL;
       /* setnilvalue(gval(n)); */
-      (&(n)->i_val)->tt = LUA_TNIL;
+      (&(n->i_val))->tt = LUA_TNIL;
     }
   }
 
@@ -655,6 +657,11 @@ static Node *getfreepos (Table *t) {
 ** position), new key goes to an empty position. 
 */
 static TValue *newkey (lua_State *L, Table *t, const TValue *key) {
+  /*
+      get the hash positioned slot inside the node array
+
+      return  node[idx]  inside  node[1 << t->lsizenode]
+  */
   Node *mp = mainposition(t, key);
   /*   ttisnil(gval(mp))                             dummynode   */
   if (!( ((&(mp)->i_val)->tt) == LUA_TNIL) || mp == (&dummynode_)) {

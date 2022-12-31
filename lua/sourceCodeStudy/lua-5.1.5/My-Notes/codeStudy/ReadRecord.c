@@ -2,7 +2,7 @@
 lua.c
 --------------------------------------------------
 int main (int argc, char **argv) {
-    lua_State *L = luaL_newstate();  // Done
+    lua_State *L = luaL_newstate();  // Done : implement in lauxlib.c:786
     ##################################################
 
 
@@ -21,9 +21,21 @@ static void *l_alloc (void *ud, void *ptr, size_t osize, size_t nsize) { ... }
 --------------------------------------------------
 lapi.c
 --------------------------------------------------
+// panic 在英文里的意思是 惊恐的 、 惊慌，人心惶惶
 // 用传入的参数 回调函数 panicf  替换 原始的 G(L)->panic  , 并返回原始的 G(L)->panic 函数 ( 从源码中可以查询到，原始的 panic 函数在 lstate.c 中被设置成了 NULL )
 extern lua_CFunction lua_atpanic (lua_State *L, lua_CFunction panicf) { ... } // lapi.c:160  Done
-
+static int panic (lua_State *L) { ... } //  输出 栈顶下方的那个槽的 错误内容的字符串到  stderr
+// wrap `func` && `ud` into a struct named CCallS , and invoke this function in lua way
+extern int lua_cpcall (lua_State *L, lua_CFunction func, void *ud) { ... }
+// push an new alloced Closure function object && the only wrapped argument  into lua state and invoke it
+static void f_Ccall (lua_State *L, void *ud) { ... }
+// return the corrected filed data with its type ( ttype(o) )
+extern void *lua_touserdata (lua_State *L, int idx) { ... }
+// get the TValue based upon L->base if (idx > 0)
+//          TValue* result = L->base + (idx-1);
+static TValue *index2adr (lua_State *L, int idx) { ... } // partially
+// Do garbage collection , only for the switch-case LUA_GCSTOP:
+extern int lua_gc (lua_State *L, int what, int data) { ... } // partially
 
 
 --------------------------------------------------
@@ -53,6 +65,8 @@ static void stack_init (lua_State *L1, lua_State *L) { ... } // Done
 
 // 初始化 lua_State 结构体 中的成员
 static void preinit_state (lua_State *L, global_State *g) { ... } // Done
+// 初始化 stack , gt(L) , registry(L) , string table , tag-method , lua keyword , ...
+static void f_luaopen (lua_State *L, void *ud) { ... }
 
 
 --------------------------------------------------
@@ -173,12 +187,24 @@ ldo.c
 int luaD_rawrunprotected (lua_State *L, Pfunc f, void *ud) { ... }
 
 
+
 --------------------------------------------------
 ldebug.c
 --------------------------------------------------
 // TODO : paritially read  ==>    wrap a C variadic function to generate a formated string 
 void luaG_runerror (lua_State *L, const char *fmt, ...) { ... }
 
+/*
+** Call a function (C or Lua). The function to be called is at *func.
+** The arguments are on the stack, right after the function.
+** When returns, all the results are on the stack, starting at the original
+** function position.
+*/
+void luaD_call (lua_State *L, StkId func, int nResults) { ... } // paritially
+
+// Call the given function by the passed argument `func` ( either C or Lua ) 
+// I read the only C function in else { ... }
+int luaD_precall (lua_State *L, StkId func, int nresults) { ... } // partially
 
 
 --------------------------------------------------
@@ -195,5 +221,30 @@ llex.c
 --------------------------------------------------
 // push all lua reserved key-words ( such as "local" "and" , "or" , "then" , "repeat" , "until" ... ) into  lua's global string table :  G(L)->strt
 void luaX_init (lua_State *L) { ... }
+
+
+--------------------------------------------------
+lfunc.c
+--------------------------------------------------
+// Alloc a new <C> Closure struct  without assign the callback function , and return the block memory
+Closure *luaF_newCclosure (lua_State *L, int nelems, Table *e) { ... }
+
+
+--------------------------------------------------
+lfunc.h
+--------------------------------------------------
+// because the struct has already defined a field named  : TValue upvalue[1];
+// so  use   (n)-1 as the correct alloced memory size
+#define sizeCclosure(n)	(cast(int, sizeof(CClosure)) + \
+                         cast(int, sizeof(TValue)*((n)-1)))
+
+
+
+
+--------------------------------------------------
+linit.c   // All Done
+--------------------------------------------------
+// Open All Lua Library : such as lua build-in function    coroutine / debuga / io / math / os / package / string / table
+LUALIB_API void luaL_openlibs (lua_State *L) { ... }
 
 

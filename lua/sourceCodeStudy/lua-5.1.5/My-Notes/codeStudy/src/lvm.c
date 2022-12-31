@@ -256,7 +256,13 @@ void luaV_gettable (lua_State *L, const TValue *t, TValue *key, StkId val) {
   luaG_runerror(L, "loop in gettable");
 }
 
+/*
+     t   : table
+     key : table.key
+     val : table.val
 
+     t[key] = val
+*/
 void luaV_settable (lua_State *L, const TValue *t, TValue *key, StkId val) {
   int loop;
   TValue temp;
@@ -267,6 +273,7 @@ void luaV_settable (lua_State *L, const TValue *t, TValue *key, StkId val) {
     if ( t->tt == LUA_TTABLE ) { /* `t' is a table? */
       /*         hvalue(t) */
       Table *h = &(t)->value.gc->h;
+      // get the value of the given key :  h[key] , if not found : alloc a new <key-value> pair , and return the new value's address
       TValue *oldval = luaH_set(L, h, key); /* do a primitive set */
       /*   ttisnil(oldval) */
       if (!(oldval->tt == LUA_TNIL) || /* result is no nil? */
@@ -297,6 +304,10 @@ void luaV_settable (lua_State *L, const TValue *t, TValue *key, StkId val) {
               luaC_barrierback(L,h); 
           } 
         };
+
+        //
+        // finish set table[key] <--  value
+        // return from this function
         return;
       }
       /* else will try the tag method */
