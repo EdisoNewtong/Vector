@@ -3995,8 +3995,9 @@ PUGI__NS_BEGIN
 
 
 						//
-						// push last 2 chars of "-->"
-						//                        ^^
+						// push last 3 chars of "-->"
+						//                       ^^^
+						m_QtCursor.forwardOnce(s + 0); // push '-'
 						m_QtCursor.forwardOnce(s + 1); // push '-'
 						m_QtCursor.forwardOnce(s + 2); // push '>'
 
@@ -4844,11 +4845,18 @@ PUGI__NS_BEGIN
 
 							// dataBeginCursor
 							pcDataNode = cursor;
+							LineInfo cmpConvertCursor( dataBeginCursorNotStepOver );
 							dataBeginCursorNotStepOver.forwardOnce(s); // push the first char after   '>' ( e.g.  'H' )
 
 							// as a type of PCDATA
-							cursor->beginCursor_range_start = dataBeginCursorNotStepOver;
-							cursor->endCursor_range_start   = dataBeginCursorNotStepOver;
+							if ( dataBeginCursorNotStepOver.iCharacterIdx_Qt == cmpConvertCursor.iCharacterIdx_Qt ) {
+								cmpConvertCursor = dataBeginCursorNotStepOver;
+								cmpConvertCursor.iCharacterIdx_Qt += 1;
+
+							} 
+
+							cursor->beginCursor_range_start = cmpConvertCursor;
+							cursor->endCursor_range_start   = cmpConvertCursor;
 
 							PUGI__POPNODE(); // Pop since this is a standalone.
 						}
