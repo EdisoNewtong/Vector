@@ -495,6 +495,7 @@ bool SuperTextEdit::processRawText(const QByteArray& buffer)
 				}
 			}
 
+			// Core Core Core , skip  '\n'   after   '\r'
 			i += delta;
 		} else {
 

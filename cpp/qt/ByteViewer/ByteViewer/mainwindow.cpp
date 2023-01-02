@@ -620,9 +620,8 @@ void MainWindow::updateLineByteInfo(const QTextCursor& cursor, bool moveByteFlag
 					hexLine.push_back( qMakePair(strHexCode, byteMatchFlag) );
 				}
 
-
-                if ( isMatched && !isResetMatched ) {
-                    foundIdx = i;
+				if ( isMatched && !isResetMatched  && foundIdx == -1 ) {
+					foundIdx = i;
 					foundCh = chInfo;
 				}
 			}
@@ -731,8 +730,8 @@ void MainWindow::updateLineByteInfo(const QTextCursor& cursor, bool moveByteFlag
 				ui->columnNo->setText( QString("%1").arg( foundIdx + 1) );
 				ui->byteIdx->setText( QString("%1").arg( foundCh.globalByteIdx  ) );
 				ui->charIdx->setText( QString("%1").arg( foundCh.globalCharIdx  ) );
-                // ui->qtcharIdx->setText( QString("%1").arg( foundCh.globalQtCharIdx  ) );
-                ui->qtcharIdx->setText( QString("%1").arg( qtPosition  ) );
+				// ui->qtcharIdx->setText( QString("%1").arg( foundCh.globalQtCharIdx  ) );
+				ui->qtcharIdx->setText( QString("%1").arg( qtPosition  ) );
 				
 				QString pickedCh( foundCh.utf8seq );
 				auto ucs4CodeVec = pickedCh.toUcs4();
@@ -841,4 +840,3 @@ void MainWindow::on_btnDelEOL_clicked()
 	}
 
 }
-
