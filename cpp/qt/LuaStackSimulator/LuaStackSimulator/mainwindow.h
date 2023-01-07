@@ -31,6 +31,9 @@ private slots:
 
     void on_tstBtn2_clicked();
 
+
+    // void onStackCommandSelectionChanged(const QItemSelection& newSelection, const QItemSelection& oldSelection);
+
     void on_addBtn_clicked();
 
     void on_minusBtn_clicked();
@@ -38,8 +41,10 @@ private slots:
 private:
     Ui::MainWindow *ui;
 
-
-
 	TableItemModel*     m_pStackModel;
+
+
+    void showHintsMessage( const QString& msg, int tag, int msec);
+
 };
 #endif // MAINWINDOW_H

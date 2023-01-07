@@ -2,6 +2,7 @@
 
 #include <QAbstractTableModel>
 #include <QVector>
+#include <QByteArray>
 // #include <QList>
 
 struct RawData
@@ -26,7 +27,43 @@ public:
 
 
 	void addLine();
+	void addLineWithArgs(const QString& command, const QString& detail);
+    bool removeLines(const QVector<int>& indexes, QString& error);
+
+    bool saveToFile(const QString& filename);
+    bool loadFromFile(const QString& filename, QString& error);
+
+    void clearData();
+
 protected:
 
 	QVector<RawData> m_innernalData;
+
+    static const QByteArray sc_VERSION;
+    static const QByteArray sc_VERSION_VALUE;
+    static const QByteArray sc_ENCODING;
+    static const QByteArray sc_ENCODING_VALUE;
+
+    static const QByteArray sc_rootName;
+    static const QByteArray sc_nodeName;
+    static const QByteArray sc_attrDetail;
+
+
+private:
+    class innernalUtil {
+    public:
+        innernalUtil(TableItemModel* base) : m_pBase(base) {
+            if ( m_pBase != nullptr ) {
+                m_pBase->beginResetModel();
+            }
+        }
+        virtual  ~innernalUtil() {
+            if ( m_pBase != nullptr ) {
+                m_pBase->endResetModel();
+            }
+        }
+    protected:
+        TableItemModel* m_pBase;
+    };
+
 };

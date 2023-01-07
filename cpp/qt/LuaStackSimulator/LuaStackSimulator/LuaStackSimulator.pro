@@ -18,11 +18,14 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
-    tableitemmodel.cpp
+    tableitemmodel.cpp \
+    pugixml.cpp
 
 HEADERS += \
     mainwindow.h \
-    tableitemmodel.h
+    tableitemmodel.h \
+    pugiconfig.hpp \
+    pugixml.hpp
 
 FORMS += \
     mainwindow.ui
