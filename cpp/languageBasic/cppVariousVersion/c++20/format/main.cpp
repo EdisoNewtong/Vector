@@ -68,6 +68,22 @@ void test3()
     cout << fmt::format("lNum = {:#x}", iNum) << endl;  // '#' means add prefix of  ???,   'x' means format the number in hex form     ( 0x... )   use lower case hex code : abcdef
     cout << fmt::format("lNum = {:#X}", iNum) << endl;  // '#' means add prefix of  ???,   'X' means format the number in hex form     ( 0X... )   use upper case hex code : ABCDEF
 
+    //
+    // float number "Format"
+    //
+    float fNum = 123.45f;
+    int nWidthAfterDot = 4;
+    string nameOftheType = "float";
+
+    cout << fmt::format("\"1234567890123456\"") << endl;
+
+    //
+    //                                      "123"   "."   "450000"
+    // total 13 width   :   3 space(s)  +      (3 +  1   +  6)    =  13
+    cout << fmt::format("\"{:13.6f}\" is a {} number", fNum, nameOftheType) << endl;
+
+    cout << fmt::format("\"{:.{}f}\" is a {} number", fNum, nWidthAfterDot, nameOftheType) << endl;
+
 }
 
 
