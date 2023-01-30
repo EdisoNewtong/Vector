@@ -8,6 +8,9 @@
 #include <QFileDialog>
 #include <QFile>
 
+#include <QMenu>
+#include <QAction>
+
 #include <limits>
 
 #include "mainwindow.h"
@@ -17,9 +20,12 @@
 #include "FileencdecUtil.h"
 
 
-namespace testcase {
+namespace testcase 
+{
     static const bool DEBUG_FLAG = false;
 }
+
+
 
 // static 
 // const int  QMainWindow::SC_TOTAL_CNT = 4;
@@ -54,12 +60,15 @@ MainWindow::MainWindow(QWidget *parent /* = nullptr */) :
       }
     , m_openedFileName()
     , m_encryptedFileBuf()
+	, m_decCodeSuccessPwd()
+	, m_decCodeFileContent()
     , m_hoverDuring( 2500 )
     , m_slotDoneDuring( 800 )
     , m_passwordshowDuring( 2250 )
     , m_infoMsgShowDuring( 3000 )
+	, m_statuBarRestoreOriginalStateDuring( 6000 )
     , m_attemptCntMax(3)
-    , m_bdOrderAry{ 0u, 2u , 3u, 1u }
+    , m_bdOrderAry{ (0x2BB3 & 0x5408), (0x7A0F8 ^ 0x7A0FA), (0xFF % 0x7E),  (0xD6 >> 7) } // key sequence of backdoor block visit order
     , m_currentTargetIdx(0)
     , m_bBDUnlocked( false )
     , m_bNextEnable( false )
@@ -68,33 +77,34 @@ MainWindow::MainWindow(QWidget *parent /* = nullptr */) :
 {
     ui->setupUi(this);
 
+	using namespace testcase;
     m_encryptedFileBuf.clear();
 
     // left top
     m_lt = new MyWidget(this, 0);
-    // m_lt->setStyleSheet("QWidget { background : red; }");
+	if ( DEBUG_FLAG ) { m_lt->setStyleSheet("QWidget { background : red; }"); }
     connect(m_lt, &MyWidget::onMouseEnter, this, &MainWindow::onMouseEnterWidget);
     connect(m_lt, &MyWidget::onMouseLeave, this, &MainWindow::onMouseLeaveWidget);
 
     // right top
     m_rt = new MyWidget(this, 3);
-    // m_rt->setStyleSheet("QWidget { background : green; }");
+	if ( DEBUG_FLAG ) { m_rt->setStyleSheet("QWidget { background : green; }"); }
     connect(m_rt, &MyWidget::onMouseEnter, this, &MainWindow::onMouseEnterWidget);
     connect(m_rt, &MyWidget::onMouseLeave, this, &MainWindow::onMouseLeaveWidget);
 
     // left bottom
     m_lb = new MyWidget(this, 1);
-    // m_lb->setStyleSheet("QWidget { background : blue; }");
+	if ( DEBUG_FLAG ) { m_lb->setStyleSheet("QWidget { background : blue; }"); }
     connect(m_lb, &MyWidget::onMouseEnter, this, &MainWindow::onMouseEnterWidget);
     connect(m_lb, &MyWidget::onMouseLeave, this, &MainWindow::onMouseLeaveWidget);
 
     // right bottom
     m_rb = new MyWidget(this, 2);
-    // m_rb->setStyleSheet("QWidget { background : yellow; }");
+	if ( DEBUG_FLAG ) { m_rb->setStyleSheet("QWidget { background : yellow; }"); }
     connect(m_rb, &MyWidget::onMouseEnter, this, &MainWindow::onMouseEnterWidget);
     connect(m_rb, &MyWidget::onMouseLeave, this, &MainWindow::onMouseLeaveWidget);
 
-    setPosAndSize( this->size() );
+    setBDWidgetPosAndSize( this->size() );
 
     m_widgetAry[0] = m_lt; 
     m_widgetAry[1] = m_lb; 
@@ -107,8 +117,27 @@ MainWindow::MainWindow(QWidget *parent /* = nullptr */) :
     m_timer->stop();
     connect(m_timer, &QTimer::timeout,  this, &MainWindow::onTimeOut );
 
+	m_timerForStatuBar = new QTimer( this );
+    m_timerForStatuBar->setSingleShot(true);
+    m_timerForStatuBar->stop();
+    connect( m_timerForStatuBar, &QTimer::timeout,  this, &MainWindow::onRestoreStatuBarStyle);
+
+
     closeBD();
     ui->encdecButton->setEnabled( false );
+
+
+	// popup Menu Button Event Register
+	auto popupMenu = new QMenu(this);
+	auto saveAsNormalFile_Act                  = popupMenu->addAction( QStringLiteral("SaveAs NormalFile ...") );
+	connect(saveAsNormalFile_Act, SIGNAL(triggered()) , this, SLOT(onSaveAsNormalFileAct() )  );
+
+	auto updateFileContentWithoutChangePwd_Act = popupMenu->addAction( QStringLiteral("Update Password Only") );
+	connect(updateFileContentWithoutChangePwd_Act, SIGNAL(triggered()) , this, SLOT(onUpdateFileContent_WithoutChangePwdAct() )  );
+
+	auto updateFileContentAndPwd_Act           = popupMenu->addAction( QStringLiteral("Update Content And Password") );
+	connect(updateFileContentAndPwd_Act, SIGNAL(triggered()) , this, SLOT(onUpdateFileContent_AndChangePwdAct() )  );
+	ui->saveBtn->setMenu( popupMenu );
 
     // testEncDec();
     // testEncDec2();
@@ -126,11 +155,11 @@ void   MainWindow::resizeEvent(QResizeEvent * event) // Q_DECL_OVERRIDE;
 {
     QMainWindow::resizeEvent(event);
 
-    setPosAndSize(event->size() );
+    setBDWidgetPosAndSize(event->size() );
 }
 
 
-void MainWindow::setPosAndSize(const QSize& sz)
+void MainWindow::setBDWidgetPosAndSize(const QSize& sz)
 {
     static const QSize fixedsz(15,15);
 
@@ -182,9 +211,15 @@ void MainWindow::onMouseLeaveWidget(MyWidget* w)
 void MainWindow::onTimeOut()
 {
     if ( testcase::DEBUG_FLAG ) {
-        ui->statusBar->showMessage( QStringLiteral("     %1 time elapsed").arg( m_bdOrderAry[m_currentTargetIdx] ) , m_slotDoneDuring);
+        // ui->statusBar->showMessage( QStringLiteral("     %1 time elapsed").arg( m_bdOrderAry[m_currentTargetIdx] ) , m_slotDoneDuring);
+		showHintsMessage( QStringLiteral("     %1 time elapsed").arg( m_bdOrderAry[m_currentTargetIdx] ),   3,  m_slotDoneDuring );
     }
     m_bNextEnable = true;
+}
+
+void MainWindow::onRestoreStatuBarStyle()
+{
+	ui->statusbar->setStyleSheet("");
 }
 
 
@@ -216,9 +251,11 @@ void MainWindow::onBDTakeAction()
     int decRet = fu.decFileContent(&decContentBuf, bufPwd, &decKeyInfo);
     if ( decRet == 2 ) {
         // incorrect password , Show Real Password
-        ui->statusBar->showMessage( QStringLiteral("[INFO] Pwd : \"%1\"").arg( QString(decKeyInfo.password) ),   m_passwordshowDuring);
+        // ui->statusBar->showMessage( QStringLiteral("[INFO] Pwd : \"%1\"").arg( QString(decKeyInfo.password) ),   m_passwordshowDuring);
+		showHintsMessage( QStringLiteral("[INFO] Pwd : \"%1\"").arg( QString(decKeyInfo.password) ), 1, m_passwordshowDuring);
     } else {
-        ui->statusBar->showMessage( QStringLiteral("[WARNING] Back door doesn't work . "),   m_infoMsgShowDuring );
+        // ui->statusBar->showMessage( QStringLiteral("[WARNING] Back door doesn't work . "),   m_infoMsgShowDuring );
+		showHintsMessage( QStringLiteral("[WARNING] Back door doesn't work . "), 3, m_infoMsgShowDuring);
     }
     
     closeBD();
@@ -259,6 +296,508 @@ void MainWindow::lauchBD()
 
 
 
+
+
+void MainWindow::on_openFileButton_clicked()
+{
+    m_btnState = 0;
+    ui->filenameDisplay->setText("");
+    m_openedFileName = "";
+    ui->fileContent->setPlainText("");
+
+    QString strfileToOpen = QFileDialog::getOpenFileName(this, QStringLiteral("Pick a file to open") );
+    if ( strfileToOpen.isNull() ) {
+        return;
+    }
+
+    QFile fToOpen( strfileToOpen );
+    auto bOpenSuccess = fToOpen.open( QIODevice::ReadOnly );
+    if ( !bOpenSuccess ) {
+        QMessageBox::warning(this, QStringLiteral("Open File Failed"), QStringLiteral("Can't open this file") );
+        return;
+    }
+
+    ui->filenameDisplay->setText( strfileToOpen );
+    m_openedFileName = strfileToOpen;
+    QByteArray fileBuffer = fToOpen.readAll();
+    fToOpen.close();
+
+    FileEncDecUtil fu;
+    int ftype = fu.setFileContent( fileBuffer );
+    if ( ftype == 0 ) { // normal file
+        m_attemptCnt = 0;
+        setBtnState(true);
+
+        setFileContentLockState(false , QString(fileBuffer) );
+        // ui->statusBar->showMessage( QStringLiteral("Normal File"), m_infoMsgShowDuring ); 
+		showHintsMessage( QStringLiteral("Normal File"), 0, m_infoMsgShowDuring);
+    } else { // ftype == 1   ,  already Encrypted file ( need password )
+        setBtnState(false);
+
+        setFileContentLockState(true , QString() );
+        m_encryptedFileBuf = fileBuffer;
+        // ui->statusBar->showMessage( QStringLiteral("Locked File"), m_infoMsgShowDuring ); 
+		showHintsMessage( QStringLiteral("Locked File"), 3, m_infoMsgShowDuring);
+    }
+}
+
+
+
+
+
+void MainWindow::on_encdecButton_clicked()
+{
+    if ( m_btnState == 1 ) {
+        //
+        // Normal File : 
+        //      < !!! Do Encrypt !!! > by password
+        //
+		m_decCodeSuccessPwd = "";
+		m_decCodeFileContent = "";
+
+        auto content = ui->fileContent->toPlainText();
+        if ( content.isNull() || content.isEmpty() ) {
+            // ui->statusBar->showMessage( QStringLiteral("Content is Blank"), m_infoMsgShowDuring );
+			showHintsMessage( QStringLiteral("File Content is Blank"), 2, m_infoMsgShowDuring);
+            return;
+        }
+
+        QString strPwd = ui->passwordInput->text();
+        if ( strPwd.isNull() || strPwd.isEmpty() ) {
+            // ui->statusBar->showMessage( QStringLiteral("Password can't be Blank"), m_infoMsgShowDuring );
+			showHintsMessage( QStringLiteral("Password can't be Blank"), 2, m_infoMsgShowDuring);
+            return;
+        }
+
+        QByteArray contentBa = content.toUtf8();
+        QByteArray bufPwd = strPwd.toUtf8();
+		// Core Core Core : Do File Encryptint ... 
+        encBufferWithPwd( contentBa, bufPwd);
+
+    } else if ( m_btnState == 2 ) {
+        //
+        // Encrypted  File : 
+        //      < !!! Do Decrypt !!! > by password
+        //
+		m_decCodeSuccessPwd = "";
+		m_decCodeFileContent = "";
+
+        QString strPwd = ui->passwordInput->text();
+        if ( strPwd.isNull() || strPwd.isEmpty() ) {
+            // ui->statusBar->showMessage( QStringLiteral("Password can't be Blank"), m_infoMsgShowDuring );
+            showHintsMessage( QStringLiteral("Password can't be Blank"),  2, m_infoMsgShowDuring);
+            return;
+        }
+
+        QByteArray bufPwd = strPwd.toUtf8();
+
+        FileEncDecUtil fu;
+        int fType = fu.setFileContent( m_encryptedFileBuf );
+        if ( fType == 1 ) {
+            QByteArray decContentBuf;
+
+            // FileEncDecUtil::collectedCoreData  decKeyInfo;
+            // FileEncDecUtil::collectedCoreData* pDecKeyInfo = &decKeyInfo;
+            FileEncDecUtil::collectedCoreData* pDecKeyInfo = nullptr;
+
+            int decRet = fu.decFileContent(&decContentBuf, bufPwd, pDecKeyInfo);
+            if ( decRet == 0 ) {
+                // ui->statusBar->showMessage( QStringLiteral("Already decrypted File Buff"), m_infoMsgShowDuring);
+				showHintsMessage( QStringLiteral("Already decrypted File Buff"),   3, m_infoMsgShowDuring);
+            } else if ( decRet == 1 ) {
+                //////////////////////////////////////////////////////////////////////////////////// 
+                //
+                // Success :  password is correct
+                //
+                //////////////////////////////////////////////////////////////////////////////////// 
+				m_decCodeSuccessPwd = strPwd;
+				m_decCodeFileContent = QString(decContentBuf);
+
+                setFileContentLockState( false , m_decCodeFileContent );
+
+                m_encryptedFileBuf.clear();
+                ui->passwordInput->setText("");
+
+                // 
+                ui->encdecButton->setEnabled( false );
+                ui->encdecButton->setText("Decrypted Done");
+
+                // ui->statusBar->showMessage( QStringLiteral("Decrypt Successful :)"), m_infoMsgShowDuring);
+				showHintsMessage( QStringLiteral("Decrypt Successful :)"), 1, m_infoMsgShowDuring);
+
+                ui->saveBtn->show();
+            } else if ( decRet == 2 ) {
+                ++m_attemptCnt;
+                QMessageBox::warning(this, QStringLiteral("ERROR"), QStringLiteral("Password incorrected") );
+                if ( m_attemptCnt >= m_attemptCntMax ) {
+                    // Open Back Door
+                    lauchBD();
+                }
+            } else if ( decRet == 3 ) {
+                // ui->statusBar->showMessage( QStringLiteral("Decrpted meet an unexpected Error :)"), m_infoMsgShowDuring);
+				showHintsMessage( QStringLiteral("Decrpted meet an unexpected Error :)"),  2, m_infoMsgShowDuring);
+            }
+        } else {
+            // ui->statusBar->showMessage( QStringLiteral("Unknown Encrypted File Buff"), m_infoMsgShowDuring);
+			showHintsMessage( QStringLiteral("Unknown Encrypted File Buff"),  2, m_infoMsgShowDuring);
+        }
+    } else {
+        // ui->statusBar->showMessage( QStringLiteral("btnState == 0 , Do Nothing"), m_infoMsgShowDuring);
+		showHintsMessage( QStringLiteral("btnState == 0 , Do Nothing"),  0, m_infoMsgShowDuring);
+    }
+
+}
+
+
+
+
+
+
+void MainWindow::testCaseEncAndDecFile()
+{
+    auto content = ui->fileContent->toPlainText();
+    auto strPwd = ui->passwordInput->text();
+
+    QByteArray fcontent;
+    fcontent += content;
+    QByteArray pwdbuf;
+    pwdbuf += strPwd;
+
+    FileEncDecUtil fu;
+    int ftype = fu.setFileContent( fcontent );
+    qDebug() << "0. ftype = " << ftype;
+
+    QByteArray outBuf1;
+    FileEncDecUtil::collectedCoreData keyDataEnc;
+    int encRet = fu.encFileContent(&outBuf1, pwdbuf, &keyDataEnc);  
+    qDebug() << "encRet = " << encRet;
+
+
+    ftype = fu.setFileContent( outBuf1 );
+    qDebug() << "1. ftype = " << ftype;
+
+    QByteArray outBuf2;
+    FileEncDecUtil::collectedCoreData keyDataDec;
+    int decRet = fu.decFileContent(&outBuf2, pwdbuf, &keyDataDec);
+    qDebug() << "decRet = " << decRet;
+
+    if ( keyDataEnc.headerInfo == keyDataDec.headerInfo ) {
+        qDebug() << "enc.header == dec.header";
+    } else {
+        qDebug() << "enc.header != dec.header";
+    }
+
+    if ( keyDataEnc.metaVec == keyDataDec.metaVec ) {
+        qDebug() << "enc.metaVec == dec.metaVec";
+    } else {
+        qDebug() << "enc.metaVec != dec.metaVec";
+    }
+
+    if ( keyDataEnc.contentPwdPuzzle_enc == keyDataDec.contentPwdPuzzle_enc ) {
+        qDebug() << "enc.contentPwdPuzzle_enc == dec.contentPwdPuzzle_enc";
+    } else {
+        qDebug() << "enc.contentPwdPuzzle_enc != dec.contentPwdPuzzle_enc";
+    }
+
+    if ( keyDataEnc.contentPwdPuzzle_ori == keyDataDec.contentPwdPuzzle_ori ) {
+        qDebug() << "enc.contentPwdPuzzle_ori == dec.contentPwdPuzzle_ori";
+    } else {
+        qDebug() << "enc.contentPwdPuzzle_ori != dec.contentPwdPuzzle_ori";
+        /*
+        qDebug() << "enc.size = " << keyDataEnc.contentPwdPuzzle_ori.size() << ", dec.size = " << keyDataDec.contentPwdPuzzle_ori.size();
+        int minSz = keyDataEnc.contentPwdPuzzle_ori.size() < keyDataDec.contentPwdPuzzle_ori.size() ? keyDataEnc.contentPwdPuzzle_ori.size() :  keyDataDec.contentPwdPuzzle_ori.size();
+        for( int i = 0; i < minSz; ++i ) {
+            auto ch1 = keyDataEnc.contentPwdPuzzle_ori[i];
+            auto ch2 = keyDataDec.contentPwdPuzzle_ori[i];
+            qDebug() << (i+1) << ". " << (ch1 == ch2 ? " == " : "!=" );
+        }
+        */
+    }
+
+
+    if ( fcontent == outBuf2  ) {
+        qDebug() << "enc / dec   : Restore Same";
+    } else {
+        qDebug() << "enc / dec   : !!!! ERROR !!!!";
+    }
+}
+
+
+void MainWindow::setFileContentLockState(bool locked, const QString& fileContent)
+{
+    if ( !locked ) {
+
+        ui->fileContent->setReadOnly( false ); 
+        ui->fileContent->setPlainText( fileContent );
+
+    } else {
+        ui->fileContent->setReadOnly( true ); 
+        ui->fileContent->setPlainText( 
+QStringLiteral(
+R"(================================================
+   File has been encrypted !!! 
+================================================)" ) );
+
+    }
+}
+
+
+void MainWindow::setBtnState(bool isEncryptState)
+{
+    ui->encdecButton->setEnabled( true );
+    if ( isEncryptState ) {
+        m_btnState = 1;
+        ui->encdecButton->setText("Encrypt");
+    } else {
+        m_btnState = 2;
+        ui->encdecButton->setText("Decrypt");
+
+		ui->saveBtn->hide();
+    }
+}
+
+
+/*
+void MainWindow::on_saveBtn_clicked()
+{
+    if ( ui->fileContent->isReadOnly() ) {
+        // ui->statusBar->showMessage( QStringLiteral("File Content is ReadOnly "),   m_infoMsgShowDuring );
+		showHintsMessage( QStringLiteral("File Content is ReadOnly "),  2, m_infoMsgShowDuring);
+        return;
+    }
+
+
+    auto fileSaveName = QFileDialog::getSaveFileName( this , "Clear File Password " );
+    qDebug() << fileSaveName;
+    if ( fileSaveName.isNull() || fileSaveName.isEmpty() ) {
+        // ui->statusBar->showMessage( QStringLiteral("User Cancel "),   m_infoMsgShowDuring );
+		showHintsMessage( QStringLiteral("User Cancel "), 2, m_infoMsgShowDuring);
+        return;
+    }
+
+    QFile fToWrite( fileSaveName );
+    if ( fToWrite.open( QIODevice::WriteOnly ) ) {
+        auto content = ui->fileContent->toPlainText();
+        QByteArray ba = content.toUtf8();
+
+        fToWrite.write(ba);
+        fToWrite.flush();
+        // ui->statusBar->showMessage( QStringLiteral("File Save Success :) "),   m_infoMsgShowDuring );
+		showHintsMessage( QStringLiteral("File Save Success :) "), 1, m_infoMsgShowDuring);
+    } else {
+        QMessageBox::warning(this, QStringLiteral("Open File Failed"), QStringLiteral("Can't Open this file") );
+    }
+    fToWrite.close();
+}
+*/
+
+
+
+
+
+
+
+
+
+// 0 : normal      ( Black Color )
+// 1 : Successful  ( Green Color )
+// 2 : Failed      ( Red Color )
+// 3 : Warning     ( Brown-Orange Color )
+void MainWindow::showHintsMessage( const QString& msg, int tag, int msec)
+{
+	if ( tag == 0 ) {
+		// normal
+		ui->statusbar->setStyleSheet( "QStatusBar { color: black; }" );
+	} else if ( tag == 1 ) {
+		// success
+		ui->statusbar->setStyleSheet( "QStatusBar { color: black; background: #8fff82; }" );
+	} else if ( tag == 2 ) {
+		// fail
+		ui->statusbar->setStyleSheet( "QStatusBar { color: red; }" );
+	} else if ( tag == 3 ) {
+		// warning
+		ui->statusbar->setStyleSheet( "QStatusBar { color: #FFAA00; }" );
+	} else {
+		ui->statusbar->setStyleSheet("");
+	}
+
+	ui->statusbar->showMessage(msg, msec);
+    m_timerForStatuBar->setInterval( (msec + 5) );
+	m_timerForStatuBar->start();
+}
+
+
+
+void MainWindow::encBufferWithPwd(const QByteArray& fileContent, const QByteArray& pwdBa, const QString& filepathToWrite )
+{
+	bool bSaveNewFileFlag = true;
+	QString writeFileName = filepathToWrite;
+	if ( filepathToWrite.isEmpty() ) {
+		writeFileName = m_openedFileName;
+		bSaveNewFileFlag = false;
+	} 
+
+	FileEncDecUtil fu;
+	fu.setFileContent( fileContent );
+
+	// FileEncDecUtil::collectedCoreData  encKeyInfo;
+	// FileEncDecUtil::collectedCoreData* pEncKeyInfo = &encKeyInfo;
+	FileEncDecUtil::collectedCoreData* pEncKeyInfo = nullptr;
+
+	QByteArray encryptedBuf;
+	int encRet = fu.encFileContent( &encryptedBuf, pwdBa, pEncKeyInfo);
+	if ( encRet == 1 ) {
+		bool needCheckExisted = !bSaveNewFileFlag;
+		bool successFlag = true;
+		if ( needCheckExisted ) {
+			QFile fToOpen( writeFileName );
+			successFlag = fToOpen.open( QIODevice::ReadOnly );
+			if ( successFlag ) { fToOpen.close(); }
+		}
+
+		if ( !successFlag ) {
+			// ui->statusBar->showMessage( QStringLiteral("Can't open file"), m_infoMsgShowDuring);
+			showHintsMessage( QStringLiteral("Can't open file"), 2, m_infoMsgShowDuring);
+			return;
+		}
+
+		QFile fToWrite( writeFileName );
+		if ( fToWrite.open( QIODevice::WriteOnly ) ) {
+			auto nWrittenCnt = fToWrite.write(encryptedBuf);
+			if ( static_cast<int>(nWrittenCnt) == encryptedBuf.size() ) {
+				fToWrite.flush();
+				setFileContentLockState( true , QString() );
+				setBtnState( false );
+
+				ui->passwordInput->setText("");
+				// ui->statusBar->showMessage( QStringLiteral("Encrypted Success"), m_infoMsgShowDuring);
+				showHintsMessage( QStringLiteral("Encrypted Success"), 1, m_infoMsgShowDuring);
+			} else {
+				// ui->statusBar->showMessage( QStringLiteral("Write Failed"), m_infoMsgShowDuring);
+				showHintsMessage( QStringLiteral("Write Failed"), 2, m_infoMsgShowDuring);
+			}
+			fToWrite.close();
+		} else {
+			// ui->statusBar->showMessage( QStringLiteral("Can't open file for write"), m_infoMsgShowDuring);
+			showHintsMessage( QStringLiteral("Can't open file for write"),  2, m_infoMsgShowDuring);
+		}
+
+	} else {
+		// ui->statusBar->showMessage( QStringLiteral("Encrypt Buff Failed"), m_infoMsgShowDuring);
+		showHintsMessage( QStringLiteral("Encrypt Buff Failed"),  2, m_infoMsgShowDuring);
+	}
+
+}
+
+
+
+
+
+void MainWindow::onSaveAsNormalFileAct()
+{
+    if ( ui->fileContent->isReadOnly() ) {
+        // ui->statusBar->showMessage( QStringLiteral("File Content is ReadOnly "),   m_infoMsgShowDuring );
+		showHintsMessage( QStringLiteral("File Content is ReadOnly "),  2, m_infoMsgShowDuring);
+        return;
+    }
+
+
+    auto fileSaveName = QFileDialog::getSaveFileName( this , "Clear File Password " );
+    // qDebug() << fileSaveName;
+    if ( fileSaveName.isNull() || fileSaveName.isEmpty() ) {
+        // ui->statusBar->showMessage( QStringLiteral("User Cancel "),   m_infoMsgShowDuring );
+		showHintsMessage( QStringLiteral("User Cancel "), 2, m_infoMsgShowDuring);
+        return;
+    }
+
+    QFile fToWrite( fileSaveName );
+    if ( fToWrite.open( QIODevice::WriteOnly ) ) {
+        auto content = ui->fileContent->toPlainText();
+        QByteArray ba = content.toUtf8();
+
+        fToWrite.write(ba);
+        fToWrite.flush();
+        // ui->statusBar->showMessage( QStringLiteral("File Save Success :) "),   m_infoMsgShowDuring );
+		showHintsMessage( QStringLiteral("File Save Success :) "), 1, m_infoMsgShowDuring);
+    } else {
+        QMessageBox::warning(this, QStringLiteral("Open File Failed"), QStringLiteral("Can't Open this file") );
+    }
+    fToWrite.close();
+	
+}
+
+void MainWindow::onUpdateFileContent_WithoutChangePwdAct()
+{
+	if ( m_decCodeSuccessPwd.isEmpty() ) {
+		showHintsMessage( QStringLiteral("File Content is Blank"), 2, m_infoMsgShowDuring);
+		return;
+	}
+
+    QString strPwd = ui->passwordInput->text();
+	QString trimmedPwd = strPwd.trimmed();
+	if ( trimmedPwd.isNull() ||  trimmedPwd.isEmpty() ) {
+		showHintsMessage( QStringLiteral("Password can't be Blank"), 2, m_infoMsgShowDuring);
+		return;
+	} else if ( strPwd == m_decCodeSuccessPwd ) {
+		showHintsMessage( QStringLiteral("Password Equal. "), 3, m_infoMsgShowDuring);
+		return;
+	}
+
+	// 2 pwds are not equal , update Password Only
+	encBufferWithPwd( m_decCodeFileContent.toUtf8(), strPwd.toUtf8() );
+
+}
+
+
+void MainWindow::onUpdateFileContent_AndChangePwdAct()
+{
+    auto fileContent = ui->fileContent->toPlainText();
+
+    QString strPwd = ui->passwordInput->text();
+	QString trimmedPwd = strPwd.trimmed();
+	if ( trimmedPwd.isNull() ||  trimmedPwd.isEmpty() ) {
+		showHintsMessage( QStringLiteral("Password can't be blank"), 2, m_infoMsgShowDuring);
+		return;
+	}
+
+    auto fileSaveName = QFileDialog::getSaveFileName( this , "Save updated File And Password" );
+    if ( fileSaveName.isNull() || fileSaveName.isEmpty() ) {
+        // ui->statusBar->showMessage( QStringLiteral("User Cancel "),   m_infoMsgShowDuring );
+		showHintsMessage( QStringLiteral("SaveFile ... User Cancel "), 2, m_infoMsgShowDuring);
+        return;
+    }
+
+	// Save Both fileContent And Password with a self-defined Encryption Algorithm
+	encBufferWithPwd( fileContent.toUtf8(), strPwd.toUtf8(), fileSaveName);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//
+//
+//
+//
+//   Test Case Code Part
+//
+//
+//
+//
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
 void MainWindow::testEncDec()
 {
     const int ARY_SZ = 256;
@@ -541,310 +1080,3 @@ QString MainWindow::getStrForAry16(int* ary)
     return strRet;
 }
 
-void MainWindow::on_openFileButton_clicked()
-{
-    m_btnState = 0;
-    ui->filenameDisplay->setText("");
-    m_openedFileName = "";
-    ui->fileContent->setPlainText("");
-
-    QString strfileToOpen = QFileDialog::getOpenFileName(this, QStringLiteral("Pick a file to open") );
-    if ( strfileToOpen.isNull() ) {
-        return;
-    }
-
-    QFile fToOpen( strfileToOpen );
-    auto bOpenSuccess = fToOpen.open( QIODevice::ReadOnly );
-    if ( !bOpenSuccess ) {
-        QMessageBox::warning(this, QStringLiteral("Open File Failed"), QStringLiteral("Can't open this file") );
-        return;
-    }
-
-    ui->filenameDisplay->setText( strfileToOpen );
-    m_openedFileName = strfileToOpen;
-    QByteArray fileBuffer = fToOpen.readAll();
-    fToOpen.close();
-
-    FileEncDecUtil fu;
-    int ftype = fu.setFileContent( fileBuffer );
-    if ( ftype == 0 ) { // normal file
-        m_attemptCnt = 0;
-        setBtnState(true);
-
-        setFileContentLockState(false , QString(fileBuffer) );
-        ui->statusBar->showMessage( QStringLiteral("Normal File"), m_infoMsgShowDuring ); 
-    } else { // ftype == 1   ,  already Encrypted file ( need password )
-        setBtnState(false);
-
-        setFileContentLockState(true , QString() );
-        m_encryptedFileBuf = fileBuffer;
-        ui->statusBar->showMessage( QStringLiteral("Locked File"), m_infoMsgShowDuring ); 
-    }
-}
-
-
-
-
-
-void MainWindow::on_encdecButton_clicked()
-{
-    if ( m_btnState == 1 ) {
-        //
-        // Normal File : 
-        //      < !!! Do Encrypt !!! > by password
-        //
-        auto content = ui->fileContent->toPlainText();
-        if ( content.isNull() || content.isEmpty() ) {
-            ui->statusBar->showMessage( QStringLiteral("Content is Blank"), m_infoMsgShowDuring );
-            return;
-        }
-
-        QString strPwd = ui->passwordInput->text();
-        if ( strPwd.isNull() || strPwd.isEmpty() ) {
-            ui->statusBar->showMessage( QStringLiteral("Password can't be Blank"), m_infoMsgShowDuring );
-            return;
-        }
-
-        QByteArray contentBa;
-        contentBa.append(content);
-        QByteArray bufPwd;
-        bufPwd.append( strPwd );
-        
-        FileEncDecUtil fu;
-        fu.setFileContent( contentBa );
-
-        // FileEncDecUtil::collectedCoreData  encKeyInfo;
-        // FileEncDecUtil::collectedCoreData* pEncKeyInfo = &encKeyInfo;
-        FileEncDecUtil::collectedCoreData* pEncKeyInfo = nullptr;
-
-        QByteArray encryptedBuf;
-        int encRet = fu.encFileContent( &encryptedBuf, bufPwd, pEncKeyInfo);
-        if ( encRet == 1 ) {
-            QFile fToOpen( m_openedFileName );
-            if ( fToOpen.open( QIODevice::ReadOnly )  ) {
-                fToOpen.close();
-
-                QFile fToWrite( m_openedFileName );
-                if ( fToWrite.open( QIODevice::WriteOnly ) ) {
-                    auto nWrittenCnt = fToWrite.write(encryptedBuf);
-                    if ( static_cast<int>(nWrittenCnt) == encryptedBuf.size() ) {
-                        fToWrite.flush();
-                        setFileContentLockState( true , QString() );
-                        setBtnState( false );
-
-                        ui->passwordInput->setText("");
-                        ui->statusBar->showMessage( QStringLiteral("Encrypted Success"), m_infoMsgShowDuring);
-                    } else {
-                        ui->statusBar->showMessage( QStringLiteral("Write Failed"), m_infoMsgShowDuring);
-                    }
-                    fToWrite.close();
-                } else {
-                    ui->statusBar->showMessage( QStringLiteral("Can't open file for write"), m_infoMsgShowDuring);
-                }
-            } else {
-                ui->statusBar->showMessage( QStringLiteral("Can't open file"), m_infoMsgShowDuring);
-            }
-        } else {
-            ui->statusBar->showMessage( QStringLiteral("Encrypt Buff Failed"), m_infoMsgShowDuring);
-        }
-
-    } else if ( m_btnState == 2 ) {
-        //
-        // Encrypted  File : 
-        //      < !!! Do Decrypt !!! > by password
-        //
-
-        QString strPwd = ui->passwordInput->text();
-        if ( strPwd.isNull() || strPwd.isEmpty() ) {
-            ui->statusBar->showMessage( QStringLiteral("Password can't be Blank"), m_infoMsgShowDuring );
-            return;
-        }
-
-        QByteArray bufPwd;
-        bufPwd.append( strPwd );
-
-        FileEncDecUtil fu;
-        int fType = fu.setFileContent( m_encryptedFileBuf );
-        if ( fType == 1 ) {
-            QByteArray decContentBuf;
-
-            // FileEncDecUtil::collectedCoreData  decKeyInfo;
-            // FileEncDecUtil::collectedCoreData* pDecKeyInfo = &decKeyInfo;
-            FileEncDecUtil::collectedCoreData* pDecKeyInfo = nullptr;
-
-            int decRet = fu.decFileContent(&decContentBuf, bufPwd, pDecKeyInfo);
-            if ( decRet == 0 ) {
-                ui->statusBar->showMessage( QStringLiteral("Already decrypted File Buff"), m_infoMsgShowDuring);
-            } else if ( decRet == 1 ) {
-                //////////////////////////////////////////////////////////////////////////////////// 
-                //
-                // Success :  password is correct
-                //
-                //////////////////////////////////////////////////////////////////////////////////// 
-                setFileContentLockState( false , QString(decContentBuf) );
-
-                m_encryptedFileBuf.clear();
-                ui->passwordInput->setText("");
-
-                // 
-                ui->encdecButton->setEnabled( false );
-                ui->encdecButton->setText("Decrypted Done");
-
-                ui->statusBar->showMessage( QStringLiteral("Decrypt Successful :)"), m_infoMsgShowDuring);
-
-                ui->saveBtn->show();
-            } else if ( decRet == 2 ) {
-                ++m_attemptCnt;
-                QMessageBox::warning(this, QStringLiteral("ERROR"), QStringLiteral("Password incorrected") );
-                if ( m_attemptCnt >= m_attemptCntMax ) {
-                    // Open Back Door
-                    lauchBD();
-                }
-            } else if ( decRet == 3 ) {
-                ui->statusBar->showMessage( QStringLiteral("Decrpted meet an unexpected Error :)"), m_infoMsgShowDuring);
-            }
-        } else {
-            ui->statusBar->showMessage( QStringLiteral("Unknown Encrypted File Buff"), m_infoMsgShowDuring);
-        }
-    } else {
-        ui->statusBar->showMessage( QStringLiteral("btnState == 0 , Do Nothing"), m_infoMsgShowDuring);
-    }
-
-}
-
-
-
-
-
-
-void MainWindow::testCaseEncAndDecFile()
-{
-    auto content = ui->fileContent->toPlainText();
-    auto strPwd = ui->passwordInput->text();
-
-    QByteArray fcontent;
-    fcontent += content;
-    QByteArray pwdbuf;
-    pwdbuf += strPwd;
-
-    FileEncDecUtil fu;
-    int ftype = fu.setFileContent( fcontent );
-    qDebug() << "0. ftype = " << ftype;
-
-    QByteArray outBuf1;
-    FileEncDecUtil::collectedCoreData keyDataEnc;
-    int encRet = fu.encFileContent(&outBuf1, pwdbuf, &keyDataEnc);  
-    qDebug() << "encRet = " << encRet;
-
-
-    ftype = fu.setFileContent( outBuf1 );
-    qDebug() << "1. ftype = " << ftype;
-
-    QByteArray outBuf2;
-    FileEncDecUtil::collectedCoreData keyDataDec;
-    int decRet = fu.decFileContent(&outBuf2, pwdbuf, &keyDataDec);
-    qDebug() << "decRet = " << decRet;
-
-    if ( keyDataEnc.headerInfo == keyDataDec.headerInfo ) {
-        qDebug() << "enc.header == dec.header";
-    } else {
-        qDebug() << "enc.header != dec.header";
-    }
-
-    if ( keyDataEnc.metaVec == keyDataDec.metaVec ) {
-        qDebug() << "enc.metaVec == dec.metaVec";
-    } else {
-        qDebug() << "enc.metaVec != dec.metaVec";
-    }
-
-    if ( keyDataEnc.contentPwdPuzzle_enc == keyDataDec.contentPwdPuzzle_enc ) {
-        qDebug() << "enc.contentPwdPuzzle_enc == dec.contentPwdPuzzle_enc";
-    } else {
-        qDebug() << "enc.contentPwdPuzzle_enc != dec.contentPwdPuzzle_enc";
-    }
-
-    if ( keyDataEnc.contentPwdPuzzle_ori == keyDataDec.contentPwdPuzzle_ori ) {
-        qDebug() << "enc.contentPwdPuzzle_ori == dec.contentPwdPuzzle_ori";
-    } else {
-        qDebug() << "enc.contentPwdPuzzle_ori != dec.contentPwdPuzzle_ori";
-        /*
-        qDebug() << "enc.size = " << keyDataEnc.contentPwdPuzzle_ori.size() << ", dec.size = " << keyDataDec.contentPwdPuzzle_ori.size();
-        int minSz = keyDataEnc.contentPwdPuzzle_ori.size() < keyDataDec.contentPwdPuzzle_ori.size() ? keyDataEnc.contentPwdPuzzle_ori.size() :  keyDataDec.contentPwdPuzzle_ori.size();
-        for( int i = 0; i < minSz; ++i ) {
-            auto ch1 = keyDataEnc.contentPwdPuzzle_ori[i];
-            auto ch2 = keyDataDec.contentPwdPuzzle_ori[i];
-            qDebug() << (i+1) << ". " << (ch1 == ch2 ? " == " : "!=" );
-        }
-        */
-    }
-
-
-    if ( fcontent == outBuf2  ) {
-        qDebug() << "enc / dec   : Restore Same";
-    } else {
-        qDebug() << "enc / dec   : !!!! ERROR !!!!";
-    }
-}
-
-
-void MainWindow::setFileContentLockState(bool locked, const QString& filecontent)
-{
-    if ( !locked ) {
-
-        ui->fileContent->setReadOnly( false ); 
-        ui->fileContent->setPlainText( filecontent );
-
-    } else {
-        ui->fileContent->setReadOnly( true ); 
-        ui->fileContent->setPlainText( 
-QStringLiteral(
-R"(================================================
-   File has been encrypted !!! 
-================================================)" ) );
-
-    }
-}
-
-
-void MainWindow::setBtnState(bool isEncryptState)
-{
-    ui->encdecButton->setEnabled( true );
-    if ( isEncryptState ) {
-        m_btnState = 1;
-        ui->encdecButton->setText("Encrypt");
-    } else {
-        m_btnState = 2;
-        ui->encdecButton->setText("Decrypt");
-    }
-}
-
-
-void MainWindow::on_saveBtn_clicked()
-{
-    if ( ui->fileContent->isReadOnly() ) {
-        ui->statusBar->showMessage( QStringLiteral("File Content is ReadOnly "),   m_infoMsgShowDuring );
-        return;
-    }
-
-
-    auto fileSaveName = QFileDialog::getSaveFileName( this , "Clear File Password " );
-    qDebug() << fileSaveName;
-    if ( fileSaveName.isNull() || fileSaveName.isEmpty() ) {
-        ui->statusBar->showMessage( QStringLiteral("User Cancel "),   m_infoMsgShowDuring );
-        return;
-    }
-
-    QFile fToWrite( fileSaveName );
-    if ( fToWrite.open( QIODevice::WriteOnly ) ) {
-        auto content = ui->fileContent->toPlainText();
-        QByteArray ba;
-        ba.append(content);
-
-        fToWrite.write(ba);
-        fToWrite.flush();
-        ui->statusBar->showMessage( QStringLiteral("File Save Success :) "),   m_infoMsgShowDuring );
-    } else {
-        QMessageBox::warning(this, QStringLiteral("Open File Failed"), QStringLiteral("Can't Open this file") );
-    }
-    fToWrite.close();
-}
