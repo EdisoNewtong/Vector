@@ -132,7 +132,7 @@ MainWindow::MainWindow(QWidget *parent /* = nullptr */) :
 	auto saveAsNormalFile_Act                  = popupMenu->addAction( QStringLiteral("SaveAs NormalFile ...") );
 	connect(saveAsNormalFile_Act, SIGNAL(triggered()) , this, SLOT(onSaveAsNormalFileAct() )  );
 
-	auto updateFileContentWithoutChangePwd_Act = popupMenu->addAction( QStringLiteral("Update Password Only") );
+	auto updateFileContentWithoutChangePwd_Act = popupMenu->addAction( QStringLiteral("Update File Content Only") );
 	connect(updateFileContentWithoutChangePwd_Act, SIGNAL(triggered()) , this, SLOT(onUpdateFileContent_WithoutChangePwdAct() )  );
 
 	auto updateFileContentAndPwd_Act           = popupMenu->addAction( QStringLiteral("Update Content And Password") );
@@ -733,19 +733,9 @@ void MainWindow::onUpdateFileContent_WithoutChangePwdAct()
 		return;
 	}
 
-    QString strPwd = ui->passwordInput->text();
-	QString trimmedPwd = strPwd.trimmed();
-	if ( trimmedPwd.isNull() ||  trimmedPwd.isEmpty() ) {
-		showHintsMessage( QStringLiteral("Password can't be Blank"), 2, m_infoMsgShowDuring);
-		return;
-	} else if ( strPwd == m_decCodeSuccessPwd ) {
-		showHintsMessage( QStringLiteral("Password Equal. "), 3, m_infoMsgShowDuring);
-		return;
-	}
-
+    auto textBoxContent = ui->fileContent->toPlainText();
 	// 2 pwds are not equal , update Password Only
-	encBufferWithPwd( m_decCodeFileContent.toUtf8(), strPwd.toUtf8() );
-
+	encBufferWithPwd( textBoxContent.toUtf8(), m_decCodeSuccessPwd.toUtf8() );
 }
 
 
@@ -1079,4 +1069,3 @@ QString MainWindow::getStrForAry16(int* ary)
 
     return strRet;
 }
-
