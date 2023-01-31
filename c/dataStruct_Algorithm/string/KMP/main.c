@@ -35,8 +35,31 @@ int BruteForceSearch(const char* src, const char* pattern)
         }
     }
 
-    // travesal till the terminate character ('\0') of the pattern string
-    if ( src[0] != '\0'   &&   pattern[j] == '\0' ) {
+
+    /******************************************************************************************************
+	 *
+	     这里要特别说明一下，一些特殊的情况，如 目标串 或 模式串中有 空串
+
+ --------------------------------------------------------------------------------------------------------------------------------------------------
+    |                              |      数学中，有一个约定:                         |  逻辑与左侧的情况有一定的类似，属于一种特例 :
+    |                              | (空集)是任何(非空集合)的<子集>                   |       A集合 包含于 A集合 (自已包含自己， A是A的子集) : 在任何时刻，<永远>是<成立>的。
+	|                              | Or ( See the following Logic )                   |  因此 返回的结果为 i-j = (0 - 0) = 0;
+	|                              |                                                  |
+    |                              |       if ( p[j] == '\0' ) {                      |  if ( p[j] == '\0' ) {               
+	|                              |       {                                          |  {                                   
+	|                              |            // i = 0 && j = 0;                    |     // i = 0 && j = 0;               
+	|                              |            // Match up loop logic                |     // Match up loop logic           
+	|							   |            //     has <No Chance> to execute     |     //     has <No Chance> to execute
+	|                              |            foundIdx = (i-j);                     |     foundIdx = (i-j);                
+	|                              |       }                                          |  }                                   
+ ---------------------------------------------------------------------------------------------------------------------------------------------------
+	|	 target  = ""              |   target  = "aaa"                                |   target  = ""
+	|	 pattern = "aaa"           |   pattern = ""                                   |   pattern = ""
+	|	 "".find("aaa")   = -1;    |   "aaa".find("") = 0                             |   "".find("") = 0
+	|                              |                                                  |
+	|                              |                                                  |
+	*******************************************************************************************************/
+    if ( pattern[j] == '\0' ) {
         retIdx = i - j;
     }
 
@@ -49,16 +72,27 @@ int BruteForceSearch(const char* src, const char* pattern)
 
 
 
+
+
+
+
+
+
 /***************************************************
-
-  KMP (Knuth-Morris-Pratt) algorithm
-
+*                                                 *
+*                                                 *
+*  KMP (Knuth-Morris-Pratt) algorithm             *
+*                                                 *
+*                                                 *
 ***************************************************/
 void calcNextArray(const char* pattern, int next[], int aryLen)
 {
     int i = 0;
     int k = -1;
     next[0] = -1;
+
+	/*
+    while ( i <  aryLen    )    // in calc NextValue Array function , the final travelsal length is (aryLen) rather than (aryLen-1)    */
     while ( i < (aryLen-1) )
     {
         if ( k == -1 || pattern[i] == pattern[k] )
@@ -82,9 +116,7 @@ void calcNextValArray(const char* pattern, int nextval[], int aryLen)
     nextval[0] = -1;
 
     /*  
-    compare with calcNextArray(...)
-
-    while ( i < (aryLen-1) )   is an ERROR compare expression  */
+	while ( i < (aryLen-1) )     // in calc NextValue Array function , the final travelsal length is  (aryLen-1)  rather than (aryLen) */
     while ( i <  aryLen    )
     {
         if ( k == -1 || pattern[i] == pattern[k] )
@@ -142,7 +174,7 @@ int KMPSearch_NextArray(const char* src, const char* pattern)
 }
 
 
-int KMPSearch_NextValueArray(const char* src, const char* pattern)
+int KMPSearch_NextValue_Array(const char* src, const char* pattern)
 {
     int retIdx = -1; // assign as not found flag first
     int patternLen = 0;
@@ -190,6 +222,8 @@ int main(int argc, char* argv[])
 
     const char* searchString  = argv[1];
     const char* patternString = argv[2];
+	// if ( searchString[0]  == 'x' )  { searchString = "";  }
+	// if ( patternString[0] == 'x' ) { patternString = ""; }
 
     int foundPos = 0;   // BruteForce_1(searchString, patternString);
     
@@ -207,7 +241,11 @@ int main(int argc, char* argv[])
 
     foundPos = BruteForceSearch(searchString, patternString);
     */
-    foundPos = KMPSearch_NextValueArray(searchString, patternString);
+
+
+/*  foundPos = BruteForceSearch(searchString, patternString);     */
+/*  foundPos = KMPSearch_NextArray(searchString, patternString);  */
+    foundPos = KMPSearch_NextValue_Array(searchString, patternString);
     if ( foundPos == -1 ) {
         printf("[INFO] : Can't found \"%s\" inside \"%s\"\n", patternString, searchString );
     } else {
