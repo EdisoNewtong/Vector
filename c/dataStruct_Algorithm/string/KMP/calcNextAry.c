@@ -2,7 +2,9 @@
 #include <stdlib.h>
 
 
-void get_Next_Ary( const char* str, int* nextAry, int aryLen)
+
+
+void get_Next_Ary( const char* pattern, int* nextAry, int aryLen)
 {
     int i = 0;
     int k = -1;
@@ -10,7 +12,7 @@ void get_Next_Ary( const char* str, int* nextAry, int aryLen)
 
     while ( i < (aryLen-1) )
     {
-        if ( k == -1    ||    str[i] == str[k] ) {
+        if ( k == -1    ||    pattern[i] == pattern[k] ) {
             ++i;
             ++k;
             nextAry[i] = k;
@@ -23,18 +25,21 @@ void get_Next_Ary( const char* str, int* nextAry, int aryLen)
 }
 
 
-void get_NextVal_Ary( const char* src, int* nextValAry, int aryLen)
+void get_NextVal_Ary( const char* pattern, int* nextValAry, int aryLen)
 {
     int i = 0;
     int k = -1;
     nextValAry[0] = -1;
 
-    while ( i < aryLen )
+    //
+    // Also see   main.c 中的 calcNextValArray(...) 中的注释内容
+    //
+    while ( i < (aryLen-1) )
     {
-        if ( k == -1    ||    src[i] == src[k] ) {
+        if ( k == -1    ||   pattern[i] == pattern[k] )  {
             ++i;
             ++k;
-            if ( src[i] != src[k] ) {
+            if (  pattern[i] != pattern[k] ) {
                 nextValAry[i] = k;
             } else {
                 nextValAry[i] = nextValAry[k];
@@ -43,6 +48,8 @@ void get_NextVal_Ary( const char* src, int* nextValAry, int aryLen)
             k = nextValAry[k];
         }
     }
+
+
 }
 
 
@@ -100,6 +107,7 @@ int main(int argc, char* argv[], char* env[])
 
     free(nextAry);    nextAry = NULL;
     free(nextValAry); nextValAry = NULL;
+
     return 0;
 
 }

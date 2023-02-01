@@ -1,6 +1,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+/* 
+Test Case :
+ 
+   abcFwwwabcF!
+   abcabaa
+
+   abd345abc6788abd345abd!
+   abd345abc6788abd345aba!
+   abd345abc6788abd345abw!
+
+
+*/
+
 /*
 **************************************************
   BF algorithm
@@ -115,9 +128,62 @@ void calcNextValArray(const char* pattern, int nextval[], int aryLen)
     int k = -1;
     nextval[0] = -1;
 
+
+	/******************************************************************************************************
+	 
+	   这里有一个Bug  while 的条件表达式不能是  i < aryLen
+
+		e.g.
+
+			初始条件为 : 	pattern = "a";  i = 0; k = -1; nextval[0] = -1;  aryLen = 1;
+			那么 while ( i < aryLen ) 条件成立, 进入循环体内 ( 但是 nextval[0] 已经被设置了 )
+			           ( 0 < 1 )
+
+			++i; ( => i=1 )     ++k;  ( => k=0 ) , 此时，bug 就出现了， pattern[1] 是 !!!!<一种数组越界的访问> !!!!  ( Bug-1 Here )
+
+			而 nextval 这个数组的长度应该是 1， 因此无论最终 if 条件是否成立， nextval[1] = xxx;   都要被改写  !!!!< 一种数组越界的写操作 > !!!! ( Bug-2 Here , Bug-2 由 Bug-1 导致 )
+
+			如果 pattern 是一个以 '\0' 结尾的C样式的字符串，那么 pattern[k] != '\0' ，一定成立， nextval[1] = 0; (数组越界操作， 非法写入)
+
+
+
+
+
+			但是 : 如果 pattern 是一个结构体的成员的话，那么就有可能 非法访问 pattern的后续的内存空间
+		e.g.
+			typedef struct WrapPattern {
+			    //            0123456
+				// pattern = "abc-abc"    
+				//    if    other[0] = '-'    nextval[7] = 0 ( illegal access   other[0] by exp : pattern[7] , illegal write nextval[7] )
+				// else if  other[0] = 'w'    nextval[7] = 3 ( illegal access   other[0] by exp : pattern[7] , illegal write nextval[7] )
+				//
+				char pattern[7];           
+				char otherString[4];
+			};
+				
+			条件 (i < aryLen)  被 ++i; 这个语句给破坏之前的逻辑关系，因此非法读取  pattern[ aryLen ] 引发了 nextval[ aryLen ] 的写法
+
+
+
+              可以把  while ( i < (aryLen  ) )
+		      修改成  while ( i < (aryLen-1) )
+
+		或者添加 i 的越界条件判定 
+
+			   ++i; ++k;
+			+ if ( i >= aryLen ) {
+			+    break;
+			+ }
+
+	******************************************************************************************************/
+
+
+    // while ( i <  aryLen    )  // It is a bug (无论 pattern 是以 "\0" 结尾的，或者是一个结构体的数据成员 ，都会诱发 memory bug )
+	
     /*  
-	while ( i < (aryLen-1) )     // in calc NextValue Array function , the final travelsal length is  (aryLen-1)  rather than (aryLen) */
-    while ( i <  aryLen    )
+	while ( i <  (aryLen-1) )     // in calc NextValue Array function , the final travelsal length is  (aryLen-1)  rather than (aryLen) 
+	while ( i <   aryLen    )     // It is a bug (无论 pattern 是以 "\0" 结尾的，或者是一个结构体的数据成员 ，都会诱发 memory bug )        */
+    while ( i <  (aryLen-1) )
     {
         if ( k == -1 || pattern[i] == pattern[k] )
         {
@@ -158,7 +224,6 @@ int KMPSearch_NextArray(const char* src, const char* pattern)
             ++i;
             ++j;
         } else {
-            // jump back to the head pointer of the pattern string
             j = nextAry[j]; 
         }
     }
@@ -184,9 +249,9 @@ int KMPSearch_NextValue_Array(const char* src, const char* pattern)
 
     int* nextValue_Array = (int*)malloc( sizeof(int) * patternLen);
     calcNextValArray(pattern, nextValue_Array, patternLen);
-    for( int idx = 0; idx < patternLen; ++idx ) {
-        printf("%d. '%c' -> nextval = %d\n",idx+1, pattern[idx], nextValue_Array[idx] );
-    }
+    // for( int idx = 0; idx < patternLen; ++idx ) {
+    //     printf("%d. '%c' -> nextval = %d\n",idx+1, pattern[idx], nextValue_Array[idx] );
+    // }
 
     int i = 0;
     int j = 0;
