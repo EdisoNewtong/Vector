@@ -6,28 +6,6 @@
 using namespace std;
 
 
-int getElement1(int* ary, int arysz, int idx, int* pErrorCnt, int* isOK)
-{
-	// use   idx > 0   rather than       idx >= 0
-	if ( idx > 0 && idx < arysz ) {
-		if ( isOK != nullptr ) {
-			*isOK = 1;
-		}
-
-		return ary[idx];
-	} else {
-		if ( pErrorCnt != nullptr ) {
-			++(*pErrorCnt);
-		}
-
-		if ( isOK != nullptr ) {
-			*isOK = 0;
-		}
-		cout << "idx is out of range -> idx = " << idx << "  range:[0," << arysz << ") " << endl;
-
-		return 0;
-	}
-}
 
 
 
@@ -163,8 +141,6 @@ void HeapSort2(int* ary, int n, int* errorCnt)
            shift2(ary, 0, (i-1),   (n),   errorCnt);
     }
 
-
-
 }
 
 
@@ -173,20 +149,85 @@ void HeapSort2(int* ary, int n, int* errorCnt)
 
 
 
-void shift1(int* ary, int low, int high, int arysz, int* pErrorCnt)
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//
+//  Core Core Core :
+//			Original Version
+//
+//
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+int getElement1(int* ary, int arysz, int idx, int* pErrorCnt, int* isOK)
+{
+	// use   idx > 0   rather than       idx >= 0
+	if ( idx > 0 && idx < arysz ) {
+		if ( isOK != nullptr ) {
+			*isOK = 1;
+		}
+
+		return ary[idx];
+	} else {
+		if ( pErrorCnt != nullptr ) {
+			++(*pErrorCnt);
+		}
+
+		if ( isOK != nullptr ) {
+			*isOK = 0;
+		}
+		cout << "idx is out of range -> idx = " << idx << "  range:[0," << arysz << ") " << endl;
+
+		return 0;
+	}
+}
+
+
+
+void shift_Original(int* ary, int low, int high)
+{
+	int pIdx = low; // pIdx => parent index
+    int leftIdx = pIdx * 2;
+
+    int target = ary[pIdx];
+
+    while ( leftIdx <= high )
+    {
+        if ( (leftIdx+1) <= high ) {
+            leftIdx = ( ary[leftIdx+1] > ary[leftIdx] ) ? (leftIdx+1) : leftIdx;
+        }
+
+
+        if ( ary[leftIdx]  > target ) {
+			ary[pIdx] = ary[leftIdx];
+
+            pIdx = leftIdx;
+            leftIdx = 2 * pIdx;
+        } else {
+            break;
+        }
+    }
+
+    ary[pIdx] = target;
+}
+
+
+void shift_OriginalWithIndexCheck(int* ary, int low, int high, int arysz, int* pErrorCnt)
 {
     int bIsOK = 0;
 
-	int pIdx = low;
+	int pIdx = low; // pIdx => parent index
     int leftIdx = pIdx * 2;
 
-    // int target = ary[pIdx];
     int target = getElement1(ary, arysz, pIdx, pErrorCnt, &bIsOK );
 
     while ( leftIdx <= high )
     {
         if ( (leftIdx+1) <= high ) {
-            // leftIdx = ( ary[leftIdx+1] > ary[leftIdx] ) ? (leftIdx+1) : leftIdx;
 			leftIdx = ( getElement1(ary, arysz, (leftIdx+1) , pErrorCnt, &bIsOK ) > getElement1(ary, arysz, (leftIdx), pErrorCnt, &bIsOK ) )
 					  ? (leftIdx+1) : leftIdx;
         }
@@ -194,7 +235,6 @@ void shift1(int* ary, int low, int high, int arysz, int* pErrorCnt)
 
 		getElement1(ary, arysz, (leftIdx), pErrorCnt, &bIsOK );
         if ( ary[leftIdx]  > target ) {
-            // ary[pIdx] = ary[leftIdx];
 			getElement1(ary, arysz, (pIdx), pErrorCnt, &bIsOK );
 			getElement1(ary, arysz, (leftIdx), pErrorCnt, &bIsOK );
 			ary[pIdx] = ary[leftIdx];
@@ -213,43 +253,59 @@ void shift1(int* ary, int low, int high, int arysz, int* pErrorCnt)
 
 
 
+
+
+
 /**************************************************
 
 
 Typical original sample function   from   <<Algorithm Book>>
 
 
-   
-             Dummy-Node
-Array Range :  [0]            [1, n]
+--------------------------------------------------
+Array Range   :  [0,n]
+--------------------------------------------------
+	Dummy-Node    :  [0] 
+	Real Elements :  [1, n]
+
+
+
+             [1]
+            /   \
+           /     \
+          /       \
+        [2]       [3]
+       /  \       /  \
+     [4]  [5]   [6]  [7]
+
+
+
+leftChildIdx  = (2 * parent)
+rightChildIdx = (2 * parent) + 1;
 
 
 ***************************************************/
-void HeapSort1(int* ary, int n, int* errorCnt)
+void HeapSort_Original(int* ary, int n, int* errorCnt)
 {
 	// int errorCnt = 0;
 	int bIsOK = 0;
 
     int i = 0;
     for( i = n/2; i>=1; --i ) {
-        shift1(ary, i, n, (n+1) , errorCnt);
+        shift_Original(ary, i, n, (n+1) , errorCnt);
     }
 
 
     for( i = n; i>=2; --i ) {
         // swap [1] <--> [n]
         {
-            // int last  = ary[i];
-			int last = getElement1(ary, (n+1), i, errorCnt, &bIsOK );
-
-            // ary[i] = ary[1];
-			ary[i] = getElement1(ary, (n+1), 1, errorCnt, &bIsOK );
-
+            int last  = ary[i];
+            ary[i] = ary[1];
             ary[1] = last;
         }
 
 
-        shift1(ary,1, i-1, (n+1), errorCnt);
+        shift_Original(ary,1, i-1, (n+1), errorCnt);
     }
 
 
@@ -327,7 +383,7 @@ void testLineByLine1( const string& filename)
 
         
 		int errorCnt = 0;
-        HeapSort1( pAry, cnt, &errorCnt);
+        HeapSort_Original( pAry, cnt, &errorCnt);
 
         if ( std::is_sorted( pAry+1, pAry + (cnt+1) ) ) {
             ++sortCnt;
