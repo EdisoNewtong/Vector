@@ -61,6 +61,12 @@ void swap2Numbers(int* ary, int idx1, int idx2, int sz)
 		...
 		...
 
+
+	遍历1次数组，在[0,n) 找到最大元素的下标，放在 [0]
+	遍历2次数组，在[1,n) 找到最大元素的下标，放在 [1]
+	遍历3次数组，在[2,n) 找到最大元素的下标，放在 [2]
+	    ...
+
 */
 void selectionSorting(int* ary, int sz, bool isAscendOrder)
 {
@@ -230,7 +236,6 @@ int main(int argc, char* argv[], char* env[])
 
 	return 0;
 }
-
 
 
 

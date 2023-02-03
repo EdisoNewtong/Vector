@@ -54,13 +54,23 @@ void swap2Numbers(int* ary, int idx1, int idx2, int sz)
    Assume sorting by <Ascending> Order
 ************************************************** 
 
+算法思想:
+
+     对 [0,n)   进行冒泡，  永远使最大的数字 沉底 , 最大的数字沉底后，
+	 对 [0,n-1) 进行冒泡，  剔除第2大的沉底数
+	 对 [0,n-2) 进行冒泡，  剔除第3大的沉底数
+	     ...
+	     ...
+	     ...
+
+
    1st turn .  
         Compare every 2 adjacent numbers, if the left one is larger than the right one, swap 2 numbers, until the <Last> pair
-           After the 1st turn, the last number is the most largest one among the array
+           After the 1st turn, the <Last number> is the most largest one among the array
 
    2nd turn .  
         Compare every 2 adjacent numbers, if the left one is larger than the right one, swap 2 numbers, until the <last But One> pair
-           After the 2nd turn, the last but one number is the 2nd largest one among the array
+           After the 2nd turn, the <Last But One number> is the 2nd largest one among the array
 
         ...
         ...
@@ -80,7 +90,7 @@ Compare Pair Detail  |   1-2    |   1-2    |   1-2    |          |
                      |   2-3    |   2-3    |          |          |
                      |   3-4    |          |          |          |
 -------------------- --------------------------------------------------------------------------------
-last pair's right :  |    4     |    3     |    2     |     1    | 
+Pair's groups count: |    4     |    3     |    2     |     1    | 
 -------------------- --------------------------------------------------------------------------------
                      | (5-1)-0  | (5-1)-1  | (5-1)-2  | (5-1)-3  |
 
@@ -241,5 +251,4 @@ int main(int argc, char* argv[], char* env[])
 
     return 0;
 }
-
 
