@@ -32,10 +32,49 @@ int getElement2(int* ary, int arysz, int idx, int* pErrorCnt, int* isOK)
 }
 
 
+/************************************************** 
+
+   Travelsal the range from [nodeIdx, arySz) 
+
+Place the node by the given 'nodeIdx'   into a proper slot , to make the subtree whose rootNode is located by nodeIdx to be the <Max Root Heap>
+
+----------------------------------------------------------------------------------------------------
+Core Core Core :  ( the node at the nodeIdx must be the max node inside the whole subtree whose root node is 'nodeIdx')
+----------------------------------------------------------------------------------------------------
+
+***************************************************/
+void shift2(int* ary, int nodeIdx, int arySz)
+{
+    int pIdx = nodeIdx;
+    int leftIdx = pIdx * 2 + 1;
+    int target = ary[pIdx];
+
+    while ( leftIdx < arySz )
+    {
+        if ( (leftIdx+1) < arySz ) {
+            leftIdx = ary[(leftIdx+1)] > ary[leftIdx] ? (leftIdx+1) : leftIdx;
+        }
+
+        if ( ary[leftIdx] > target ) {
+            ary[pIdx] = ary[leftIdx]; // bubble the greater number to the <Parent> slot
+
+            //
+            // continue sort the <Downer> Subtree nodes
+            //
+            pIdx = leftIdx;
+            leftIdx = pIdx * 2 + 1;
+        } else {
+            break;
+        }
+    }
+
+    // place
+    ary[pIdx] = target;
+}
 
 
 
-void shift2(int* ary, int low, int high, int arysz, int* pErrorCnt)
+void shift2_WithIdxCheck(int* ary, int low, int high, int arysz, int* pErrorCnt)
 {
     int bIsOK = 0;
 
@@ -105,48 +144,99 @@ rightChildIdx = (2 * parent) + 1 + 1 = (2 * parent) + 2;
 Array Range :              [0, n-1]
 
 ***************************************************/
-void HeapSort2(int* ary, int n, int* errorCnt)
+void HeapSort2(int* ary, int arySz)
 {
-	// int errorCnt = 0;
-	int bIsOK = 0;
-
-    int i = 0;
-    // for( i = n/2;     i>=1; --i ) {
-       for( i = (n/2-1); i>=0; --i ) {
-        // shift2(ary, i,  n,    (n+1), errorCnt);
-           shift2(ary, i, (n-1),  (n),   errorCnt);
+    ////////////////////////////////////////////////////
+	//
+	//
+    //   Build the Max-Root-Heap Once
+	//
+	//
+    ////////////////////////////////////////////////////
+    // 因为数组的最后一个元素下标为 (arySz-1)
+	//
+	// 因为对于任何 parentIdx
+	//    leftIdx  = parentIdx * 2 + 1 (一定是奇数)
+	//    rightIdx = parentIdx * 2 + 2 (一定是偶数)
+	//
+	//  因此对于任何一个给定下标的 左儿子 / 右儿子 结点
+	//  leftIdx/2  =  parentIdx     ( 1/2=0.5 , 被取整后，0.5被自动剔除 )
+	//  rightIdx/2 = (parentIdx+1) ( 一定能整除, 但比起正确的值多了1 )
+	//  而无论 leftIdx or rightIdx 的值是多少
+	//  如果左儿子是数组最后一个元素，那么 leftIdx+1  = arySz  ( arySz 是偶数 )
+	//  如果右儿子是数组最后一个元素，那么 rightIdx+1 = arySz  ( arySz 是奇数 )
+	//  那么 表达式 (arySz-2) / 2 一定能正确地计算出 他们对应的父结点的 index
+	//     
+	//     假设 :
+	//     最后一个元素是 <左>儿子
+	//        那么  arySz-1      = parentIdx * 2 + 1
+	//             (arySz-1-1)   = parentIdx * 2 + 1 - 1 = parentIdx * 2
+	//              (arySz-2)/2  = (parentIdx * 2)/2
+	//              (arySz-2)/2  = parentIdx 
+	//
+	//     最后一个元素是 <右>儿子
+	//        那么  arySz-1      = parentIdx * 2 + 2
+	//             (arySz-1-1)   = parentIdx * 2 + 2 - 1 = parentIdx * 2 + 1
+	//              (arySz-2)   = parentIdx * 2 + 1
+	//              (arySz-2)/2 = static_cast<int>( parentIdx + 0.5) = parentIdx; // 舍弃0.5 , 得到 parentIdx
+	//
+	// 另外，不用担心， (arySz-2)/2 是负数的风险，因为 arySz 无论是1 or 2,  条件 i>=0 可以保证下标的合法数
+    for( int i = (arySz-2)/2; i>=0; --i ) {
+		// 必须是 底层 至 上层的顺序，创建大根堆， 这样能使得每一颗子树都能满足大根堆的条件，从而得到整颗树以及所有子树都满足 大根堆，
+		// 因此，当循环结束后， ary[0] 即 树的根结点处，一定是最大的元素
+        shift2(ary, i, arySz);
     }
 
-
-    // for( i = n;     i>=2; --i ) {
-       for( i = (n-1); i>=1; --i ) {
-        // swap [1] <--> [n]
+	// 看一个特殊的例子 : 
+	// 当数组大小为2时，  [0]        [1]
+	//                   MaxOne    SmallOne
+	//
+	// 因此需要交换2者的位置，以达成  从小到大的排序的需求
+    for( int newSz = arySz; newSz >= 2; --newSz )
+    {
+        int lastIdx = newSz-1;
+        // swap [0] <-> last
         {
-			/*   swap [0] <--> [n-1]   */
-
-            // int last  = ary[i];
-			// int last = getElement1(ary, (n+1), i, errorCnt, &bIsOK );
-			   int last = getElement2(ary, (n),   i, errorCnt, &bIsOK );
-
-            // ary[i] = ary[1];
-			// ary[i] = getElement1(ary, (n+1), 1, errorCnt, &bIsOK );
-			   ary[i] = getElement2(ary, (n),   0, errorCnt, &bIsOK );
-
-            // ary[1] = last;
-               ary[0] = last;
+            int maxElement = ary[0];
+            ary[0] = ary[lastIdx];
+            ary[lastIdx] = maxElement;
         }
 
-
-        // shift2(ary, 1,  i-1,   (n+1),  errorCnt);
-           shift2(ary, 0, (i-1),   (n),   errorCnt);
+		//
+		// 使 [0] 元素归位，将 它 所在的子树的最大值 放置在 [0] 处
+		//   lastIdx 为 剔除最后一个元素后的， 数组的长度
+		//
+        // kick  the last elment out of the sort range
+        // sort at range [0, newSz-1 ]
+        shift2(ary, 0, lastIdx);
     }
-
 }
 
 
 
 
+void HeapSort2_WithIdxCheck(int* ary, int n, int* errorCnt)
+{
+	// int errorCnt = 0;
+	int bIsOK = 0;
 
+    for(int  i = (n-2)/2; i>=0; --i ) {
+        shift2_WithIdxCheck(ary, i, n,  (n),   errorCnt);
+    }
+
+
+    for(int  i = n; i>=2; --i )
+	{
+		/*   swap [0] <--> [n-1]   */
+	   int maxNumber = ary[0];
+	   getElement2(ary, (n),(i-1), errorCnt, &bIsOK );
+	   ary[0] = ary[i-1];
+	   ary[i-1] = maxNumber;
+
+	   shift2_WithIdxCheck(ary, 0, (i-1),   (n),   errorCnt);
+	}
+
+}
 
 
 
@@ -285,14 +375,11 @@ rightChildIdx = (2 * parent) + 1;
 
 
 ***************************************************/
-void HeapSort_Original(int* ary, int n, int* errorCnt)
+void HeapSort_Original(int* ary, int n)
 {
-	// int errorCnt = 0;
-	int bIsOK = 0;
-
     int i = 0;
     for( i = n/2; i>=1; --i ) {
-        shift_Original(ary, i, n, (n+1) , errorCnt);
+        shift_Original(ary, i, n);
     }
 
 
@@ -304,8 +391,7 @@ void HeapSort_Original(int* ary, int n, int* errorCnt)
             ary[1] = last;
         }
 
-
-        shift_Original(ary,1, i-1, (n+1), errorCnt);
+        shift_Original(ary,1, i-1);
     }
 
 
@@ -382,8 +468,8 @@ void testLineByLine1( const string& filename)
         vAry.clear();
 
         
-		int errorCnt = 0;
-        HeapSort_Original( pAry, cnt, &errorCnt);
+		int errorCnt = 0; 
+        HeapSort_Original( pAry, cnt);
 
         if ( std::is_sorted( pAry+1, pAry + (cnt+1) ) ) {
             ++sortCnt;
@@ -485,8 +571,9 @@ void testLineByLine2( const string& filename)
         vAry.clear();
 
         
-		int errorCnt = 0;
-        HeapSort2( pAry, cnt, &errorCnt);
+		int errorCnt = 0; (void)errorCnt;
+        // HeapSort2( pAry, cnt, &errorCnt);
+        HeapSort2( pAry, cnt);
         if ( std::is_sorted( pAry,   pAry + (cnt) ) ) {
             ++sortCnt;
             cout << "line : " << lineNo << " is sorted . "; 
