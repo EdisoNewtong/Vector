@@ -86,6 +86,10 @@ void test3()
 
 }
 
+void test4(const string& fmt, const string& a,const string& b)
+{
+    cout << fmt::vformat(fmt.c_str(), fmt::make_format_args(a,b)  ) << endl;
+}
 
 
 int main(int argc, char* argv[], char* env[])
@@ -93,6 +97,9 @@ int main(int argc, char* argv[], char* env[])
     test1();
     test2();
     test3();
+
+    // Run-Time dynamic format string
+    test4( std::string(argv[1]), argv[2], argv[3] );
 
     return 0;
 }

@@ -73,3 +73,31 @@ g++    -Wall   -std=c++20   -lfmt   -o    main    build/main.o
 
 
 
+
+
+
+==================================================
+No Fixed literal format string
+==================================================
+Use  :
+    std::string vformat( std::string_view fmt, std::format_args args );
+
+Notes : 
+    <std::format_args args> is only one arguments
+    if you have a lot of argumenst to format , use <fmt::make_format_args> to wrap all object to be used by formatter
+
+
+
+void test4(const string& fmt, const string& a,const string& b)
+{
+    cout << fmt::vformat(fmt.c_str(), fmt::make_format_args(a,b)  ) << endl;
+}
+
+int main(int argc, char* argv[]) 
+{
+    test4( std::string(argv[1]), argv[2], argv[3] );
+}
+
+
+$ ./main "output : s2 = '{1}',  s1 = '{0}'"     World    Hello
+output : s2 = 'World', s1 = 'Hello'
