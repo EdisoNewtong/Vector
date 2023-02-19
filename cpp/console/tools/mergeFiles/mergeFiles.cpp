@@ -110,7 +110,7 @@ int main(int argc, char* argv[])
             pInputFileToMerge->close(); // close input
 
             outfile.flush();
-            cout << "[INFO] : File-" << (fileIdx+1) << " : \"" << it->first << "\" has been merge into output file. " << endl;
+            cout << "[INFO] : File-" << (fileIdx+1) << " : \"" << it->first << "\" ( " << fileSz << " bytes written ) has been merged into output file. " << endl;
         }
     }
 
