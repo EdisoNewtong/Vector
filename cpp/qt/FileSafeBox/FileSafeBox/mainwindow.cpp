@@ -7,6 +7,7 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QFile>
+#include <QDir>
 
 #include <QMenu>
 #include <QAction>
@@ -305,7 +306,8 @@ void MainWindow::on_openFileButton_clicked()
     m_openedFileName = "";
     ui->fileContent->setPlainText("");
 
-    QString strfileToOpen = QFileDialog::getOpenFileName(this, QStringLiteral("Pick a file to open") );
+    QDir fixedPath( "E:/work/doc/txt" );
+    QString strfileToOpen = QFileDialog::getOpenFileName(this, QStringLiteral("Pick a file to open"), (fixedPath.exists() ? fixedPath.absolutePath() : QString() ) );
     if ( strfileToOpen.isNull() ) {
         return;
     }
