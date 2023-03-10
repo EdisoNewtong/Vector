@@ -75,7 +75,7 @@ private:
     QString getStrForAry16(int* ary);
 
 
-    void setFileContentLockState(bool locked, const QString& fileContent);
+    void setFileContentLockState(int fileNormalBianryEncState, const QString& fileContent);
     void setBtnState(bool isEncryptState);
 
     // Test Case
@@ -97,6 +97,7 @@ private:
 
 	QString         m_decCodeSuccessPwd;
 	QString         m_decCodeFileContent;
+	QByteArray      m_decCodeFileBa;
 
 
     const int m_hoverDuring; // in ms
@@ -111,10 +112,11 @@ private:
     bool         m_bBDUnlocked;
     bool         m_bNextEnable;
     int          m_attemptCnt;
-    int          m_btnState; // 0:Invalid ,   1: Normal File , Do Encrypt     2: Locked File , Do Decrypt ( need Password )
-	
+    int          m_btnState; // 0:Invalid ,   1: Normal Ascii File , Do Encrypt     2: Locked File , Do Decrypt ( need Password ) 
+    int          m_iOpenedFileIsNormalBianry; // 0: Unknown , 1:is ascii normal file   2:is binary normal file   3: is encypted file
 
 
 };
 
 #endif // MAINWINDOW_H
+

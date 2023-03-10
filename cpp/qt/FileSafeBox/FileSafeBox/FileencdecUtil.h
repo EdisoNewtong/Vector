@@ -63,7 +63,7 @@ public:
     FileEncDecUtil(); 
     virtual ~FileEncDecUtil();
 
-    int setFileContent(const QByteArray& content);
+    int setFileContent(const QByteArray& content, int* bIsBinary = nullptr);
     int encFileContent(QByteArray* outBuf, const QByteArray& pwd, FileEncDecUtil::collectedCoreData* pCoreData = nullptr);
     int decFileContent(QByteArray* outBuf, const QByteArray& inputPwd, FileEncDecUtil::collectedCoreData* pCoreData = nullptr);
 protected:
@@ -98,7 +98,7 @@ protected:
     int              m_nCharMetaBits;
     int              m_fileType;
 private:
-    int              checkFilecontentValid(bool isCheckHeaderOnly, FileEncDecUtil::collectedCoreData* pCoreData = nullptr);
+    int              checkFilecontentValid(bool isCheckHeaderOnly, FileEncDecUtil::collectedCoreData* pCoreData = nullptr, int* pIsNormalBinary = nullptr);
     void             printBufAndMetaList(const QByteArray& buf, QList<int>* pMetaList);
     void             printEncMetaVec(const QByteArray& metaVec);
     void             printDecMetaVec1(const QByteArray& metaVec);
@@ -115,3 +115,4 @@ private:
 
 
 #endif
+
