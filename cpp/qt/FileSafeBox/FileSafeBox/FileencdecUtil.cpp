@@ -3,6 +3,7 @@
 
 #include <QtGlobal>
 #include <QDebug>
+#include <QVector>
 #include <QRandomGenerator> 
 #include <QDateTime>
 #include <limits> 
@@ -55,8 +56,15 @@ Encrypt Step
 
 */
 
+
+
+
 namespace testcase {
     static const bool ENABLE_DEBUG = false;
+}
+
+namespace FIXED_CODE {
+	static const uint ReplacementCharacter = 0xFFFD;
 }
 
 //
@@ -119,14 +127,14 @@ FileEncDecUtil::~FileEncDecUtil()
 // Return Value
 // 0 :  normal     file
 // 1 :  encrypted  file
-int FileEncDecUtil::setFileContent(const QByteArray& content)
+int FileEncDecUtil::setFileContent(const QByteArray& content, int* bIsBinary /* = nullptr */ )
 {
     m_fileContent.clear();
     m_fileContent = content;
     m_metaInfoCnt = 0;
 
     auto checkHeaderOnly = true;
-    auto fileRetType = checkFilecontentValid(checkHeaderOnly);
+    auto fileRetType = checkFilecontentValid(checkHeaderOnly, nullptr, bIsBinary );
     m_fileType = fileRetType;
     return fileRetType;
 }
@@ -505,7 +513,7 @@ int FileEncDecUtil::decFileContent(QByteArray* outBuf, const QByteArray& inputPw
     //
     // m_stripHeaderBuf   is uncompressed already
     auto checkHeaderOnly = false;
-    auto fileType = checkFilecontentValid(checkHeaderOnly, pCoreData);
+    auto fileType = checkFilecontentValid(checkHeaderOnly, pCoreData, nullptr);
     if ( fileType != 1 ) {
         if ( ENABLE_DEBUG ) {
             qDebug() << "[DEC] : Checked ! File Content is normal , no need to decrypt ";
@@ -646,7 +654,7 @@ int FileEncDecUtil::decFileContent(QByteArray* outBuf, const QByteArray& inputPw
 }
 
 
-int   FileEncDecUtil::checkFilecontentValid(bool isCheckHeaderOnly, FileEncDecUtil::collectedCoreData* pCoreData /* = nullptr */)
+int   FileEncDecUtil::checkFilecontentValid(bool isCheckHeaderOnly, FileEncDecUtil::collectedCoreData* pCoreData /* = nullptr */, int* pIsNormalBinary /* = nullptr */)
 {
     using namespace testcase;
 
@@ -752,6 +760,66 @@ int   FileEncDecUtil::checkFilecontentValid(bool isCheckHeaderOnly, FileEncDecUt
             } 
         }
     }
+	
+	//
+	// Normal file is ascii file or binary ?
+	//
+	if( retFileType != 1 ) {   // Not  < A Enc file type > , check is binary or not
+		// bufSz <= m_cHeaderLength
+		if ( pIsNormalBinary != nullptr ) {
+			bool isBinary = false;
+
+			for( int i = 0; i < bufSz;  ) {
+				char ch = m_fileContent.at(i);
+				if (        ch == 0x0 ||  ch == 0x7F 
+					 ||  ( (ch>0 && ch < 32)  &&  (ch!=0x9 &&  ch!=0xA  &&  ch!=0xD  ) ) )
+				{
+					isBinary = true;
+					break;
+				}
+				else
+				{
+					int i_code = (ch & 0xFF);
+					if ( i_code > 0 ) {
+						// Valid 1 byte for 1 singlebyte-character
+						++i;
+					} else {
+						// i_code < 0 , multiByte leader byte
+						int matchedLen = -1;
+						for( int chLen = 2; chLen <= 4; ++chLen )
+						{
+							if ( (i+chLen-1) < bufSz ) {
+								QString character( m_fileContent.mid(i, chLen) );
+								auto ucsCodeVec = character.toUcs4();
+								if ( !ucsCodeVec.empty()  &&  (ucsCodeVec.at(0) == FIXED_CODE::ReplacementCharacter) ) {
+									continue; // try append next byte
+								} else {
+									matchedLen = chLen;
+									break;
+								}
+							} else {
+								isBinary = true;
+								break;
+							}
+						}
+
+						if ( isBinary || matchedLen == -1 ) {
+							isBinary = true;
+							break;
+						} else {
+							// Valid   'matchedLen' bytes  for 1 multibytes-character
+							i += matchedLen;
+						}
+
+					}
+					
+				}
+
+			} // end for loop here
+
+			*pIsNormalBinary = (isBinary ? 1 : 0);
+		}
+	}
 
     return retFileType;
 }
@@ -866,6 +934,5 @@ void   FileEncDecUtil::printDecMetaVec2(const QList<QPair<int,int> >& prVec)
                  << endl;
     }
 }
-
 
 

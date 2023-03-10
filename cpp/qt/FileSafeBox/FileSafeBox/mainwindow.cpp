@@ -63,6 +63,7 @@ MainWindow::MainWindow(QWidget *parent /* = nullptr */) :
     , m_encryptedFileBuf()
 	, m_decCodeSuccessPwd()
 	, m_decCodeFileContent()
+	, m_decCodeFileBa()
     , m_hoverDuring( 2500 )
     , m_slotDoneDuring( 800 )
     , m_passwordshowDuring( 2250 )
@@ -75,6 +76,7 @@ MainWindow::MainWindow(QWidget *parent /* = nullptr */) :
     , m_bNextEnable( false )
     , m_attemptCnt(0)
     , m_btnState(0)
+	, m_iOpenedFileIsNormalBianry( 0 )
 {
     ui->setupUi(this);
 
@@ -244,7 +246,7 @@ void MainWindow::showBDWidgets(bool show)
 void MainWindow::onBDTakeAction()
 {
     FileEncDecUtil fu;
-    fu.setFileContent( m_encryptedFileBuf );
+    fu.setFileContent( m_encryptedFileBuf, nullptr );
 
     QByteArray decContentBuf;
     QByteArray bufPwd;
@@ -271,7 +273,7 @@ void MainWindow::closeBD()
     ui->encdecButton->setEnabled( true );
 
     ui->passwordInput->setReadOnly( false );
-    ui->fileContent->setReadOnly( false ); 
+	ui->fileContent->setReadOnly( m_iOpenedFileIsNormalBianry == 2 );
 
     ui->saveBtn->hide();
 }
@@ -291,16 +293,20 @@ void MainWindow::lauchBD()
     ui->encdecButton->setEnabled( false );
 
     ui->passwordInput->setReadOnly( true );
-    setFileContentLockState(true, QString() );
+    setFileContentLockState(3, QString() );
 }
 
 
 
 
-
-
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// File Open Dialog
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
 void MainWindow::on_openFileButton_clicked()
 {
+	m_iOpenedFileIsNormalBianry = 0;
     m_btnState = 0;
     ui->filenameDisplay->setText("");
     m_openedFileName = "";
@@ -324,19 +330,23 @@ void MainWindow::on_openFileButton_clicked()
     QByteArray fileBuffer = fToOpen.readAll();
     fToOpen.close();
 
+	int bIsBinary = 0;
     FileEncDecUtil fu;
-    int ftype = fu.setFileContent( fileBuffer );
+    int ftype = fu.setFileContent( fileBuffer,  &bIsBinary );
     if ( ftype == 0 ) { // normal file
         m_attemptCnt = 0;
         setBtnState(true);
+		m_iOpenedFileIsNormalBianry = (bIsBinary ? 2 : 1);
+        m_decCodeFileBa = fileBuffer;
 
-        setFileContentLockState(false , QString(fileBuffer) );
+        setFileContentLockState( m_iOpenedFileIsNormalBianry , QString(fileBuffer) );
         // ui->statusBar->showMessage( QStringLiteral("Normal File"), m_infoMsgShowDuring ); 
-		showHintsMessage( QStringLiteral("Normal File"), 0, m_infoMsgShowDuring);
+		showHintsMessage( (m_iOpenedFileIsNormalBianry==1 ? QStringLiteral("Normal File") : QStringLiteral("Normal [[Bianry]] File")),  3, 5000);
     } else { // ftype == 1   ,  already Encrypted file ( need password )
         setBtnState(false);
+		m_iOpenedFileIsNormalBianry = 3;
 
-        setFileContentLockState(true , QString() );
+        setFileContentLockState(m_iOpenedFileIsNormalBianry, QString() );
         m_encryptedFileBuf = fileBuffer;
         // ui->statusBar->showMessage( QStringLiteral("Locked File"), m_infoMsgShowDuring ); 
 		showHintsMessage( QStringLiteral("Locked File"), 3, m_infoMsgShowDuring);
@@ -347,6 +357,11 @@ void MainWindow::on_openFileButton_clicked()
 
 
 
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Encrypt the normal file by Password
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
 void MainWindow::on_encdecButton_clicked()
 {
     if ( m_btnState == 1 ) {
@@ -371,7 +386,12 @@ void MainWindow::on_encdecButton_clicked()
             return;
         }
 
-        QByteArray contentBa = content.toUtf8();
+        QByteArray contentBa; 
+		if ( m_iOpenedFileIsNormalBianry == 2 ) {
+			contentBa = m_decCodeFileBa; 
+		} else {
+			contentBa = content.toUtf8();
+		}
         QByteArray bufPwd = strPwd.toUtf8();
 		// Core Core Core : Do File Encryptint ... 
         encBufferWithPwd( contentBa, bufPwd);
@@ -383,6 +403,7 @@ void MainWindow::on_encdecButton_clicked()
         //
 		m_decCodeSuccessPwd = "";
 		m_decCodeFileContent = "";
+		m_decCodeFileBa.clear();
 
         QString strPwd = ui->passwordInput->text();
         if ( strPwd.isNull() || strPwd.isEmpty() ) {
@@ -413,9 +434,17 @@ void MainWindow::on_encdecButton_clicked()
                 //
                 //////////////////////////////////////////////////////////////////////////////////// 
 				m_decCodeSuccessPwd = strPwd;
+                m_decCodeFileBa = decContentBuf;
 				m_decCodeFileContent = QString(decContentBuf);
 
-                setFileContentLockState( false , m_decCodeFileContent );
+				int bIsBinary = 0;
+				FileEncDecUtil fuTmp;
+				int ftype = fuTmp.setFileContent( m_decCodeFileBa ,  &bIsBinary );
+				if ( ftype == 0 ) {
+					m_iOpenedFileIsNormalBianry = (bIsBinary ? 2 : 1);
+				} 
+
+                setFileContentLockState( m_iOpenedFileIsNormalBianry,  m_decCodeFileContent );
 
                 m_encryptedFileBuf.clear();
                 ui->passwordInput->setText("");
@@ -466,7 +495,7 @@ void MainWindow::testCaseEncAndDecFile()
     pwdbuf += strPwd;
 
     FileEncDecUtil fu;
-    int ftype = fu.setFileContent( fcontent );
+    int ftype = fu.setFileContent( fcontent , nullptr );
     qDebug() << "0. ftype = " << ftype;
 
     QByteArray outBuf1;
@@ -475,7 +504,7 @@ void MainWindow::testCaseEncAndDecFile()
     qDebug() << "encRet = " << encRet;
 
 
-    ftype = fu.setFileContent( outBuf1 );
+    ftype = fu.setFileContent( outBuf1 , nullptr );
     qDebug() << "1. ftype = " << ftype;
 
     QByteArray outBuf2;
@@ -525,14 +554,13 @@ void MainWindow::testCaseEncAndDecFile()
 }
 
 
-void MainWindow::setFileContentLockState(bool locked, const QString& fileContent)
+void MainWindow::setFileContentLockState(int fileNormalBianryEncState, const QString& fileContent)
 {
-    if ( !locked ) {
 
-        ui->fileContent->setReadOnly( false ); 
+	if ( fileNormalBianryEncState == 1 || fileNormalBianryEncState == 2 ) {
+        ui->fileContent->setReadOnly( fileNormalBianryEncState == 2  ); 
         ui->fileContent->setPlainText( fileContent );
-
-    } else {
+	} else if ( fileNormalBianryEncState == 3 ) {
         ui->fileContent->setReadOnly( true ); 
         ui->fileContent->setPlainText( 
 QStringLiteral(
@@ -540,7 +568,9 @@ R"(================================================
    File has been encrypted !!! 
 ================================================)" ) );
 
-    }
+	}
+
+
 }
 
 
@@ -640,7 +670,7 @@ void MainWindow::encBufferWithPwd(const QByteArray& fileContent, const QByteArra
 	} 
 
 	FileEncDecUtil fu;
-	fu.setFileContent( fileContent );
+	fu.setFileContent( fileContent , nullptr );
 
 	// FileEncDecUtil::collectedCoreData  encKeyInfo;
 	// FileEncDecUtil::collectedCoreData* pEncKeyInfo = &encKeyInfo;
@@ -664,11 +694,11 @@ void MainWindow::encBufferWithPwd(const QByteArray& fileContent, const QByteArra
 		}
 
 		QFile fToWrite( writeFileName );
-		if ( fToWrite.open( QIODevice::WriteOnly ) ) {
+        if ( fToWrite.open( QIODevice::Truncate | QIODevice::WriteOnly  ) ) {
 			auto nWrittenCnt = fToWrite.write(encryptedBuf);
 			if ( static_cast<int>(nWrittenCnt) == encryptedBuf.size() ) {
 				fToWrite.flush();
-				setFileContentLockState( true , QString() );
+				setFileContentLockState(3, QString() );
 				setBtnState( false );
 
 				ui->passwordInput->setText("");
@@ -699,8 +729,10 @@ void MainWindow::onSaveAsNormalFileAct()
 {
     if ( ui->fileContent->isReadOnly() ) {
         // ui->statusBar->showMessage( QStringLiteral("File Content is ReadOnly "),   m_infoMsgShowDuring );
-		showHintsMessage( QStringLiteral("File Content is ReadOnly "),  2, m_infoMsgShowDuring);
-        return;
+		if ( m_iOpenedFileIsNormalBianry != 2 ) {
+			showHintsMessage( QStringLiteral("File Content is ReadOnly "),  2, m_infoMsgShowDuring);
+        	return;
+		}
     }
 
 
@@ -714,8 +746,13 @@ void MainWindow::onSaveAsNormalFileAct()
 
     QFile fToWrite( fileSaveName );
     if ( fToWrite.open( QIODevice::WriteOnly ) ) {
-        auto content = ui->fileContent->toPlainText();
-        QByteArray ba = content.toUtf8();
+		QByteArray ba;
+		if (  m_iOpenedFileIsNormalBianry == 2 ) {
+			ba = m_decCodeFileBa;
+		} else {
+			auto content = ui->fileContent->toPlainText();
+			ba = content.toUtf8();
+		}
 
         fToWrite.write(ba);
         fToWrite.flush();
