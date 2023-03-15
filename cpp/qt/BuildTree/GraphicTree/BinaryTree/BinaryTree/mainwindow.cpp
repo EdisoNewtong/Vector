@@ -844,8 +844,8 @@ void MainWindow::enumerateNodes(int type, const QVector<treenode*>& nodeList, bo
 						auto currentEnd = 1.0/(sz-1) * i;
 						auto step1 = (previousPercent + currentEnd) / 2.0;
 						auto step2 = currentEnd;
-						m_pEnumerateHVBarAni->setKeyValueAt(step1 , leftTopPt );
-						m_pEnumerateHVBarAni->setKeyValueAt(step2, leftTopPt );
+						m_pEnumerateHVBarAni->setKeyValueAt(step1, leftTopPt);
+						m_pEnumerateHVBarAni->setKeyValueAt(step2, leftTopPt);
 
 						previousPercent = step2;
 					}
@@ -898,7 +898,11 @@ void MainWindow::enumerateNodes(int type, const QVector<treenode*>& nodeList, bo
 
 					if ( i == 0   ) {
 						previousPercent = 1.0/(sz-1) * i;
+						double middlePercent = 1.0/(sz-1) / 2.0;
+						
 						m_pEnumerateMoveRectAni->setKeyValueAt( previousPercent, wrapPos );
+						m_pEnumerateMoveRectAni->setKeyValueAt( middlePercent,   wrapPos );
+						previousPercent = middlePercent;
 					} else {
 						auto currentEnd = 1.0/(sz-1) * i;
 						auto step1 = (previousPercent + currentEnd) / 2.0;
