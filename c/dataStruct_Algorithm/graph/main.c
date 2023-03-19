@@ -64,6 +64,8 @@ typedef struct MatrixGraph
 typedef struct ArcNode  // 某一条边 ( Arc )的顶点信息
 {
 	int adjvexNo;  // 边的某一个端点的编号
+	int weight;
+
 	/******************************************************************************************************
 	    一个顶点可能 与 另外多个点 通过边进行连接， 这些点，可以通过链式存储，被完整的记录下来
        如 A 与 B、C、D 都相通， 那么 
@@ -81,7 +83,6 @@ typedef struct ArcNode  // 某一条边 ( Arc )的顶点信息
 		     D
 	 *******************************************************************************************************/
 	struct ArcNode* nextArcNode;
-	int weight;
 } ArcNode;
 
 typedef struct VertexNode
