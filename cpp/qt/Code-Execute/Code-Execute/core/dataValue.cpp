@@ -1186,25 +1186,27 @@ DataValue DataValue::operator << ( const DataValue& right)
     DataValue retVal;
     retVal.type = this->type;
 
+	bool bModAlgorithmFlag = CmdOptions::needDoBitwiseShift_Mod_Algorithm();
+
     switch( this->type )
     {
     case E_TP_U_INT:
-        retVal.value.uint_val = this->value.uint_val << right.value.uint_val;
+        retVal.value.uint_val = this->value.uint_val << (!bModAlgorithmFlag ? right.value.uint_val : ( right.value.uint_val % ( static_cast<unsigned int>( sizeof(unsigned int) * 8) ) ) );
         break;
     case E_TP_S_INT:
-        retVal.value.sint_val = this->value.sint_val << right.value.sint_val;
+        retVal.value.sint_val = this->value.sint_val << (!bModAlgorithmFlag ? right.value.sint_val : ( right.value.sint_val % ( static_cast<signed int>( sizeof(signed int) * 8) )) );
         break;
     case E_TP_U_LONG:
-        retVal.value.ulong_val = this->value.ulong_val << right.value.ulong_val;
+        retVal.value.ulong_val = this->value.ulong_val << (!bModAlgorithmFlag ? right.value.ulong_val : ( right.value.ulong_val % ( static_cast<unsigned long>( sizeof(unsigned long) * 8) )) );
         break;
     case E_TP_S_LONG:
-        retVal.value.slong_val = this->value.slong_val << right.value.slong_val;
+        retVal.value.slong_val = this->value.slong_val << (!bModAlgorithmFlag ? right.value.slong_val : ( right.value.slong_val % (  static_cast<signed long>( sizeof(signed long) * 8) ) ) );
         break;
     case E_TP_U_LONG_LONG:
-        retVal.value.ulonglong_val = this->value.ulonglong_val << right.value.ulonglong_val;
+        retVal.value.ulonglong_val = this->value.ulonglong_val << (!bModAlgorithmFlag ? right.value.ulonglong_val : ( right.value.ulonglong_val % (  static_cast<unsigned long long>( sizeof(unsigned long long) * 8) )) );
         break;
     case E_TP_S_LONG_LONG:
-        retVal.value.slonglong_val = this->value.slonglong_val << right.value.slonglong_val;
+        retVal.value.slonglong_val = this->value.slonglong_val << (!bModAlgorithmFlag ? right.value.slonglong_val : ( right.value.slonglong_val % (  static_cast<signed long long>( sizeof(signed long long) * 8) ) ) );
         break;
     //case E_TP_FLOAT:
     //    retVal.value.float_val = this->value.float_val % right.value.float_val;
@@ -1252,25 +1254,27 @@ DataValue DataValue::operator >> ( const DataValue& right)
     DataValue retVal;
     retVal.type = this->type;
 
+	bool bModAlgorithmFlag = CmdOptions::needDoBitwiseShift_Mod_Algorithm();
+
     switch( this->type )
     {
     case E_TP_U_INT:
-        retVal.value.uint_val = this->value.uint_val >> right.value.uint_val;
+        retVal.value.uint_val = this->value.uint_val >> (!bModAlgorithmFlag ? right.value.uint_val : (right.value.uint_val % static_cast<unsigned int>( sizeof(unsigned int) * 8 ) ) );
         break;
     case E_TP_S_INT:
-        retVal.value.sint_val = this->value.sint_val >> right.value.sint_val;
+        retVal.value.sint_val = this->value.sint_val >> (!bModAlgorithmFlag ? right.value.sint_val : (right.value.sint_val % static_cast<signed int>( sizeof(signed int) * 8  ) ) );
         break;
     case E_TP_U_LONG:
-        retVal.value.ulong_val = this->value.ulong_val >> right.value.ulong_val;
+        retVal.value.ulong_val = this->value.ulong_val >> (!bModAlgorithmFlag ? right.value.ulong_val : (right.value.ulong_val % static_cast<unsigned long>( sizeof(unsigned long) * 8  ) ) );
         break;
     case E_TP_S_LONG:
-        retVal.value.slong_val = this->value.slong_val >> right.value.slong_val;
+        retVal.value.slong_val = this->value.slong_val >> (!bModAlgorithmFlag ? right.value.slong_val : (right.value.slong_val % static_cast<signed long>( sizeof(unsigned long) * 8  ) ) );
         break;
     case E_TP_U_LONG_LONG:
-        retVal.value.ulonglong_val = this->value.ulonglong_val >> right.value.ulonglong_val;
+        retVal.value.ulonglong_val = this->value.ulonglong_val >> (!bModAlgorithmFlag ? right.value.ulonglong_val : (right.value.ulonglong_val % static_cast<unsigned long long>( sizeof(unsigned long long) * 8  ) ) );
         break;
     case E_TP_S_LONG_LONG:
-        retVal.value.slonglong_val = this->value.slonglong_val >> right.value.slonglong_val;
+        retVal.value.slonglong_val = this->value.slonglong_val >> (!bModAlgorithmFlag ? right.value.slonglong_val : (right.value.slonglong_val % static_cast<signed long long>( sizeof(unsigned long long) * 8  ) ) );
         break;
     //case E_TP_FLOAT:
     //    retVal.value.float_val = this->value.float_val % right.value.float_val;
@@ -2848,6 +2852,3 @@ bool DataValue::isIntOutOfRange(E_DataType leftDt, string& strMinVal, string& st
 
     return !isInRange;
 }
-
-
-

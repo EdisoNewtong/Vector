@@ -59,7 +59,7 @@ void MainWindow::initMenuBar()
 
 void MainWindow::initMenuBar0()
 {
-    constexpr size_t cMenuCnt = 6;
+    constexpr size_t cMenuCnt = 7;
     size_t cIndex = 0;
     QAction* pActionAry[cMenuCnt];
     for( cIndex = 0; cIndex < cMenuCnt; ++cIndex ) {
@@ -67,7 +67,7 @@ void MainWindow::initMenuBar0()
     }
 
     cIndex = 0;
-    QMenu* menu0 = ui->menuBar->addMenu( "Output" );
+    QMenu* menu0 = ui->menuBar->addMenu( "Option" );
 
     auto act = menu0->addAction("Print Var List"); pActionAry[cIndex++] = act; act->setCheckable(true); act->setChecked( CmdOptions::needPrintVaribleFinally() ); act->setData( QVariant(0) );
 
@@ -83,12 +83,16 @@ void MainWindow::initMenuBar0()
     submenu->setEnabled( CmdOptions::needPrintVaribleFinally() );
     m_pPrintSubMenu = submenu;
 
+    //
+    menu0->addSeparator();
+	act = menu0->addAction("Use [Mod Algorithm]  when execute  << or >> ");  pActionAry[cIndex++] = act; act->setCheckable( true ); act->setChecked( CmdOptions::needDoBitwiseShift_Mod_Algorithm() ); act->setData( QVariant(6) );
+    menu0->addSeparator();
+
     for( cIndex = 0; cIndex < cMenuCnt; ++cIndex ) {
         connect( pActionAry[cIndex], SIGNAL( toggled(bool) ), this, SLOT(onMenu0ItemTriggered(bool)) );
     }
 
-    //
-    menu0->addSeparator();
+
     act = menu0->addAction("Save all preferences into cfg file");
     connect(act, SIGNAL( triggered(bool) ), this, SLOT( onSaveToCfg(bool) ) );
 

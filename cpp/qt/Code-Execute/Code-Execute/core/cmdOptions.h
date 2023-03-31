@@ -29,6 +29,8 @@ public:
     static bool needPrintVarible_8();
     static bool isOctalDefaultStyle();
 
+    static bool needDoBitwiseShift_Mod_Algorithm();
+
     static bool isPrintVaribleFormatValid();
 
     static quint32  getFlag();
