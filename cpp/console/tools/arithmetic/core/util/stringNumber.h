@@ -2,6 +2,8 @@
 #define STRING_NUMBER_H
 
 #include <string>
+#include <deque>
+#include <unordered_map>
 using namespace std;
 
 class StringNumber
@@ -53,16 +55,29 @@ public:
     static const StringNumber s_signedLongLongMax8;
     static const StringNumber s_signedLongLongMax10;
     static const StringNumber s_signedLongLongMax16;
+
+
+	static const unordered_map<char, deque<int> > s_OctMap;
+	static const unordered_map<char, deque<int> > s_HexMap;
 protected:
     void processBase8();
     void processBase10();
     void processBase16();
 
+	size_t oct2Bin();
+	size_t dec2Bin();
+	size_t hex2Bin();
+
     string m_strNumber;
     string m_stripedNumber;
     int    m_base;
+	deque<int> m_binaryDigitList;
 public:
     string getStrNumber() const;
+	size_t convert2Bin();
+	void truncateToTargetSize(size_t targetSz);
+	unsigned long      getULongValue();
+	unsigned long long getULongLongValue();
 };
 
 #endif

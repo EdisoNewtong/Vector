@@ -2,6 +2,7 @@
 #include "keywordList.h"
 #include "myException.h"
 #include "charUtil.h"
+#include "stringNumber.h"
 #include <cstdlib>
 using namespace std;
 
@@ -163,29 +164,60 @@ void TokenBase::setTokenContentWithoutSuffix(const std::string& content, const s
             case E_TP_S_INT:
             case E_TP_S_LONG:
                 {
-                    signed long l_num = strtol(noSuffix.c_str(), &str_end, base);
-                    if ( !( str_end == nullptr || ( str_end != nullptr && (*str_end) == '\0' ) ) ) {
-                        MyException e(E_THROW_INVALID_LONG_NUMBER_WHEN_CONVERTING , this->m_beginPos );
-                        e.setDetail( noSuffix );
-                        throw e;
-                    }
+					/***************************************************
+					 
+						strtol("0x80000000", &str_end, 16);   => the api yield the incorrect result number =>  0x7FFFFFFF
+						strtol("0xFEDCBA98", &str_end, 16);   => the api yield the incorrect result number =>  0x7FFFFFFF
 
+
+						Because the leader sign bit is '1'   when process a signed number 
+
+					 ***************************************************/
+
+                    // signed long l_num = strtol(noSuffix.c_str(), &str_end, base);
+                    // if ( !( str_end == nullptr || ( str_end != nullptr && (*str_end) == '\0' ) ) ) {
+                    //     MyException e(E_THROW_INVALID_LONG_NUMBER_WHEN_CONVERTING , this->m_beginPos );
+                    //     e.setDetail( noSuffix );
+                    //     throw e;
+                    // }
+
+					StringNumber strNum(noSuffix, base);
+					size_t cvtBitSz = strNum.convert2Bin();
+					size_t targetDataTypeBitSz = ( (m_dataValue.type == E_TP_S_INT) ?  (sizeof(int) * 8) : (sizeof(long) * 8) );
+
+					if ( cvtBitSz > targetDataTypeBitSz ) {
+						// trunc the cvtBitSz
+						strNum.truncateToTargetSize( targetDataTypeBitSz );
+					} 
+
+					unsigned long l_num = strNum.getULongValue();
                     if ( m_dataType == E_TP_S_INT ) {
                         m_dataValue.value.sint_val = static_cast<int>( l_num );
                     } else {
-                        m_dataValue.value.slong_val = l_num;
+                        m_dataValue.value.slong_val = static_cast<signed long>( l_num );
                     }
                 }
                 break;
             case E_TP_U_INT:
             case E_TP_U_LONG:
                 {
-                    unsigned long ul_num = strtoul(noSuffix.c_str(), &str_end, base);
-                    if ( !( str_end == nullptr || ( str_end != nullptr && (*str_end) == '\0' ) ) ) {
-                        MyException e(E_THROW_INVALID_UNSIGNED_LONG_NUMBER_WHEN_CONVERTING , this->m_beginPos );
-                        e.setDetail( noSuffix );
-                        throw e;
-                    }
+                    // unsigned long ul_num = strtoul(noSuffix.c_str(), &str_end, base);
+                    // if ( !( str_end == nullptr || ( str_end != nullptr && (*str_end) == '\0' ) ) ) {
+                    //     MyException e(E_THROW_INVALID_UNSIGNED_LONG_NUMBER_WHEN_CONVERTING , this->m_beginPos );
+                    //     e.setDetail( noSuffix );
+                    //     throw e;
+                    // }
+
+					StringNumber strNum(noSuffix, base);
+					size_t cvtBitSz = strNum.convert2Bin();
+					size_t targetDataTypeBitSz = ( (m_dataValue.type == E_TP_U_INT) ?  (sizeof(unsigned int) * 8) : (sizeof(unsigned long) * 8) );
+
+					if ( cvtBitSz > targetDataTypeBitSz ) {
+						// trunc the cvtBitSz
+						strNum.truncateToTargetSize( targetDataTypeBitSz );
+					} 
+
+					unsigned long ul_num = strNum.getULongValue();
 
                     if ( m_dataType == E_TP_U_INT  ) {
                         m_dataValue.value.uint_val = static_cast<unsigned int>( ul_num  );
@@ -196,25 +228,45 @@ void TokenBase::setTokenContentWithoutSuffix(const std::string& content, const s
                 break;
             case E_TP_S_LONG_LONG:
                 {
-                    signed long long ll_num = strtoll(noSuffix.c_str(), &str_end, base);
-                    if ( !( str_end == nullptr || ( str_end != nullptr && (*str_end) == '\0' ) ) ) {
-                        MyException e(E_THROW_INVALID_LONG_LONG_NUMBER_WHEN_CONVERTING, this->m_beginPos);
-                        e.setDetail( noSuffix );
-                        throw e;
-                    } 
+                    // signed long long ll_num = strtoll(noSuffix.c_str(), &str_end, base);
+                    // if ( !( str_end == nullptr || ( str_end != nullptr && (*str_end) == '\0' ) ) ) {
+                    //     MyException e(E_THROW_INVALID_LONG_LONG_NUMBER_WHEN_CONVERTING, this->m_beginPos);
+                    //     e.setDetail( noSuffix );
+                    //     throw e;
+                    // } 
 
-                    m_dataValue.value.slonglong_val = ll_num;
+					StringNumber strNum(noSuffix, base);
+					size_t cvtBitSz = strNum.convert2Bin();
+					size_t targetDataTypeBitSz = ( sizeof(signed long long) * 8 );
+
+					if ( cvtBitSz > targetDataTypeBitSz ) {
+						// trunc the cvtBitSz
+						strNum.truncateToTargetSize( targetDataTypeBitSz );
+					}
+
+					unsigned long long ll_num = strNum.getULongLongValue();
+                    m_dataValue.value.slonglong_val = static_cast<signed long long>( ll_num ) ;
                 }
                 break;
             case E_TP_U_LONG_LONG:
                 {
-                    unsigned long long ull_num = strtoull(noSuffix.c_str(), &str_end, base);
-                    if ( !( str_end == nullptr || ( str_end != nullptr && (*str_end) == '\0'  ) ) ) {
-                        MyException e(E_THROW_INVALID_UNSIGNED_LONG_LONG_NUMBER_WHEN_CONVERTING, this->m_beginPos);
-                        e.setDetail( noSuffix );
-                        throw e;
-                    }
+                    // unsigned long long ull_num = strtoull(noSuffix.c_str(), &str_end, base);
+                    // if ( !( str_end == nullptr || ( str_end != nullptr && (*str_end) == '\0'  ) ) ) {
+                    //     MyException e(E_THROW_INVALID_UNSIGNED_LONG_LONG_NUMBER_WHEN_CONVERTING, this->m_beginPos);
+                    //     e.setDetail( noSuffix );
+                    //     throw e;
+                    // }
 
+					StringNumber strNum(noSuffix, base);
+					size_t cvtBitSz = strNum.convert2Bin();
+					size_t targetDataTypeBitSz = ( sizeof(unsigned long long) * 8 );
+
+					if ( cvtBitSz > targetDataTypeBitSz ) {
+						// trunc the cvtBitSz
+						strNum.truncateToTargetSize( targetDataTypeBitSz );
+					} 
+
+					unsigned long long ull_num = strNum.getULongLongValue();
                     m_dataValue.value.ulonglong_val = ull_num;
                 }
                 break;
