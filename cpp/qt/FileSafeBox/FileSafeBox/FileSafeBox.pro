@@ -25,3 +25,5 @@ HEADERS  += mainwindow.h\
             FileencdecUtil.h
 
 FORMS    += mainwindow.ui
+
+RC_ICONS = FileSafeBox.ico

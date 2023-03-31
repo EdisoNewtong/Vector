@@ -20,3 +20,5 @@ SOURCES += main.cpp \
            myhardcodewindow.cpp
 
 HEADERS += myhardcodewindow.h
+
+RC_ICONS = DHB_V2.ico

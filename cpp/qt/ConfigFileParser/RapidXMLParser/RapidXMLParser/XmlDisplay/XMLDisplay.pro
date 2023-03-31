@@ -39,3 +39,5 @@ HEADERS += mainwindow.h \
 
 
 RESOURCES += xmldisplay.qrc
+
+RC_ICONS = RapidXML.ico

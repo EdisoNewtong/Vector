@@ -41,6 +41,8 @@ HEADERS += \
     JSonModel/JsonStandardItem.h \
     SuperTextEdit.h
 
+RC_ICONS = RapidJSON.ico
+
 
 
 
