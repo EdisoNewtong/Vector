@@ -27,6 +27,8 @@ R"([Flag]
     // OctStyle : 0   =>     0xxxx    
     // OctStyle : 1   =>   (0)xxxx
     OctStyle = 0
+	//
+	BitwiseShift_Mod_Algorithm = 0
 
 [DebugOption]
     PRINT_RUNTIME_WARNING = 1
@@ -82,7 +84,9 @@ const vector< pair<string,unsigned long> > CmdOptions::SC_FLAG_MAP{
     { string("Hex = "),      2UL   },
     { string("Bin = "),      3UL   },
     { string("Oct = "),      4UL   },
-    { string("OctStyle = "), 5UL   }
+    { string("OctStyle = "), 5UL   },
+	//////////////////////////////////////////////////
+    { string("BitwiseShift_Mod_Algorithm = "), 6UL   }
 
     // OctStyle = 0
 };
@@ -375,6 +379,9 @@ bool CmdOptions::needPrintVarible_2()      { return ( (s_flag >> 3UL) & 0x1UL) !
 bool CmdOptions::needPrintVarible_8()      { return ( (s_flag >> 4UL) & 0x1UL) != 0; }
 // 0 : default  0xxxxx    1: special format (0)xxxx
 bool CmdOptions::isOctalDefaultStyle()     { return ( (s_flag >> 5UL) & 0x1UL) == 0; }
+
+bool CmdOptions::needDoBitwiseShift_Mod_Algorithm() { return ( (s_flag >> 6UL) & 0x1UL) == 0; }
+
 
 unsigned int CmdOptions::getFlag()        { return s_flag; }
 
