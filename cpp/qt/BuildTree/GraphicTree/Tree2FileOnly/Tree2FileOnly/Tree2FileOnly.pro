@@ -67,6 +67,8 @@ win32:release {
 }
 
 
+RC_ICONS = Tree2File.ico
+
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin

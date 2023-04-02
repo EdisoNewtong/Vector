@@ -66,6 +66,7 @@ win32:release {
             -L../parser/lua/release
 }
 
+RC_ICONS = TreeView.ico
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

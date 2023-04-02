@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Tree &lt;--&gt; File</string>
+   <string>Tree   &lt;=&gt;   File</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="TreeView" name="treeView">

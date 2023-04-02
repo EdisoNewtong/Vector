@@ -22,3 +22,5 @@ HEADERS  += mainwindow.h \
             myhexeditor.h
 
 FORMS    += mainwindow.ui
+
+RC_ICONS = BinaryFileEditor.ico
