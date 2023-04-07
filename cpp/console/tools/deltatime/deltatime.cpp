@@ -298,7 +298,8 @@ int main(int argc, char* argv[], char* env[])
 		inputType = 1;
 	} else if ( arg1 == "--timestamp" ) {
 		inputType = 2;
-	} else if ( (isDt1Type = (arg1 == "--deltatime-1"))  || arg1 == "--deltatime-2" ) {
+	} else if (     (isDt1Type = (arg1 == "--deltatime-1"))  
+                 || arg1 == "--deltatime-2" ) {
 		// 3 : unit in second(s)
 		// 4 : unit in hh:mm:ss
 		inputType = isDt1Type ? 3 : 4;
@@ -595,3 +596,4 @@ int main(int argc, char* argv[], char* env[])
 
 	return 0;
 }
+
