@@ -61,7 +61,7 @@ The following table lists the precedence and associativity of C++ operators. Ope
 |    15      |     ||                                  |  Logical OR                                                  |                          |
 |------------|-----------------------------------------|--------------------------------------------------------------|--------------------------|
 |    16      |    a ? b :c                             |  Ternary conditional[note 2]                                 |  Right-to-left           |
-|            |    throwthrow                           |  operator                                                    |                          |
+|            |    throw                                |  operator                                                    |                          |
 |            |    co_yield                             |  yield-expression (C++20)                                    |                          |
 |            |       =                                 |  Direct assignment (provided by default for C++ classes)     |                          |
 |            |    +=   -=                              |  Compound assignment by sum and difference                   |                          |
@@ -138,7 +138,7 @@ bool           OpInfo::isUnaryOp()
 // static 
 unordered_map<OpUtil::OpType, OpInfo> OpUtil::s_operatorMap{
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /*                                   ( Bin 0/Un:1     |      LR:0 RL:1   |  Priority          |                      Op Type     )     */
+    /*                                            ( Bin 0/Un:1     |      LR:0 RL:1   |  Priority          |                      Op Type     )     */
     make_pair(enumCvt(E_ADD),               OpInfo( BINARY_OP_MASK | ASS_LEFT_2_RIGHT | PRIORITY_MASK(6U)  | static_cast<unsigned int>(E_ADD)               ) ),
      make_pair(enumCvt(E_POSITIVE),         OpInfo(  UNARY_OP_MASK | ASS_RIGHT_2_LEFT | PRIORITY_MASK(3U)  | static_cast<unsigned int>(E_POSITIVE)          ) ),
     make_pair(enumCvt(E_MINUS),             OpInfo( BINARY_OP_MASK | ASS_LEFT_2_RIGHT | PRIORITY_MASK(6U)  | static_cast<unsigned int>(E_MINUS)             ) ),
@@ -158,7 +158,19 @@ unordered_map<OpUtil::OpType, OpInfo> OpUtil::s_operatorMap{
     make_pair(enumCvt(E_OPEN_PARENTHESES),  OpInfo( BINARY_OP_MASK | ASS_RIGHT_2_LEFT | PRIORITY_MASK(2U)  | static_cast<unsigned int>(E_OPEN_PARENTHESES)  ) ),
     make_pair(enumCvt(E_CLOSE_PARENTHESES), OpInfo( BINARY_OP_MASK | ASS_RIGHT_2_LEFT | PRIORITY_MASK(2U)  | static_cast<unsigned int>(E_CLOSE_PARENTHESES) ) ),
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    make_pair(enumCvt(E_ASSIGNMENT),        OpInfo( BINARY_OP_MASK | ASS_RIGHT_2_LEFT | PRIORITY_MASK(16U) | static_cast<unsigned int>(E_ASSIGNMENT)        ) )
+
+    make_pair(enumCvt(E_ASSIGNMENT),        OpInfo( BINARY_OP_MASK | ASS_RIGHT_2_LEFT | PRIORITY_MASK(16U) | static_cast<unsigned int>(E_ASSIGNMENT)        ) ),
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    make_pair(enumCvt(E_ADD_ASSIGNMENT),             OpInfo( BINARY_OP_MASK | ASS_RIGHT_2_LEFT | PRIORITY_MASK(16U) | static_cast<unsigned int>(E_ADD_ASSIGNMENT)        ) ),
+    make_pair(enumCvt(E_MINUS_ASSIGNMENT),           OpInfo( BINARY_OP_MASK | ASS_RIGHT_2_LEFT | PRIORITY_MASK(16U) | static_cast<unsigned int>(E_MINUS_ASSIGNMENT)    ) ),
+    make_pair(enumCvt(E_MULTIPLY_ASSIGNMENT),        OpInfo( BINARY_OP_MASK | ASS_RIGHT_2_LEFT | PRIORITY_MASK(16U) | static_cast<unsigned int>(E_MULTIPLY_ASSIGNMENT)    ) ),
+    make_pair(enumCvt(E_DIVIDE_ASSIGNMENT),          OpInfo( BINARY_OP_MASK | ASS_RIGHT_2_LEFT | PRIORITY_MASK(16U) | static_cast<unsigned int>(E_DIVIDE_ASSIGNMENT)    ) ),
+    make_pair(enumCvt(E_MOD_ASSIGNMENT),             OpInfo( BINARY_OP_MASK | ASS_RIGHT_2_LEFT | PRIORITY_MASK(16U) | static_cast<unsigned int>(E_MOD_ASSIGNMENT)    ) ),
+    make_pair(enumCvt(E_BIT_AND_ASSIGNMENT),         OpInfo( BINARY_OP_MASK | ASS_RIGHT_2_LEFT | PRIORITY_MASK(16U) | static_cast<unsigned int>(E_BIT_AND_ASSIGNMENT)    ) ),
+    make_pair(enumCvt(E_BIT_OR_ASSIGNMENT),          OpInfo( BINARY_OP_MASK | ASS_RIGHT_2_LEFT | PRIORITY_MASK(16U) | static_cast<unsigned int>(E_BIT_OR_ASSIGNMENT)    ) ),
+    make_pair(enumCvt(E_BIT_XOR_ASSIGNMENT),         OpInfo( BINARY_OP_MASK | ASS_RIGHT_2_LEFT | PRIORITY_MASK(16U) | static_cast<unsigned int>(E_BIT_XOR_ASSIGNMENT)    ) ),
+    make_pair(enumCvt(E_BIT_LEFT_SHIFT_ASSIGNMENT),  OpInfo( BINARY_OP_MASK | ASS_RIGHT_2_LEFT | PRIORITY_MASK(16U) | static_cast<unsigned int>(E_BIT_LEFT_SHIFT_ASSIGNMENT)    ) ),
+    make_pair(enumCvt(E_BIT_RIGHT_SHIFT_ASSIGNMENT), OpInfo( BINARY_OP_MASK | ASS_RIGHT_2_LEFT | PRIORITY_MASK(16U) | static_cast<unsigned int>(E_BIT_RIGHT_SHIFT_ASSIGNMENT)    ) )
 };
 
 

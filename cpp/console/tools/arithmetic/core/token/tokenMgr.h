@@ -14,15 +14,14 @@
 #include <unordered_map>
 #include <utility>
 
-#define OPERATOR_CNT       14
-/*
-   + - * / %     : 5
-   & | ^ ~ << >> : 6
-   ( ) =         : 3
-----------------------
- Total          =  14 = ( 5 + 6 + 3 )
-
-*/ 
+#define OPERATOR_CNT       24
+//    + - * / %     : 5
+//    & | ^ ~ << >> : 6
+//    ( ) =         : 3
+//    += -= *= /* %=     &= |= ^=    <<=  >>=    10
+// ----------------------
+//  Total          =  24 = ( 5 + 6 + 3 + 10)
+//
 
 class TokenMgr
 {
@@ -31,8 +30,8 @@ protected:
     {
         E_OperatorType left;
         E_OperatorType right;
-        bool           closeAvaliable;
-        bool           seperateAvaliable;
+        bool           closeAvaliable;    //   means the 2 operators are adjacent without any Space or Comment
+        bool           seperateAvaliable; //   means the 2 operators are not adjacent but there is at least some Space or Comment token in the middle
     };
 
 public:
@@ -61,11 +60,16 @@ protected:
     std::pair<TokenBase*,TokenBase*>  getPreviousToken();
 
     // for tmp expression check use
-    bool is1stTokenKeyWord();
+    bool is1stTokenTypeKeyWord();
 
     E_DataType checkPrefixKeyWordsAndGetDataType(int varIdx, std::string& varname, bool hasEqual);
     void executeCode();
+
+    /********************
+     * Core Core Core   *
+     ********************/
     void buildSuffixExpression(int sentenceType, int varibleIdx);
+
     void checkSuffixExpressionValid();
     void evaluateSuffixExpression();
     void processOperatorStack(TokenBase* previousToken, TokenBase* pToken);
@@ -91,6 +95,19 @@ protected:
     TokenBase* doBitLeftShift(TokenBase* left, TokenBase* right);
     TokenBase* doBitRightShift(TokenBase* left, TokenBase* right);
     TokenBase* doAssignment(TokenBase* left, TokenBase* right);
+
+    TokenBase* do_Add_Assignment(TokenBase* left, TokenBase* right);
+    TokenBase* do_Minus_Assignment(TokenBase* left, TokenBase* right);
+    TokenBase* do_Multiply_Assignment(TokenBase* left, TokenBase* right);
+    TokenBase* do_Divide_Assignment(TokenBase* left, TokenBase* right);
+    TokenBase* do_Mod_Assignment(TokenBase* left, TokenBase* right);
+    TokenBase* do_Bit_And_Assignment(TokenBase* left, TokenBase* right);
+    TokenBase* do_Bit_Or_Assignment(TokenBase* left, TokenBase* right);
+    TokenBase* do_Bit_Xor_Assignment(TokenBase* left, TokenBase* right);
+    TokenBase* do_Bit_LeftShift_Assignment(TokenBase* left, TokenBase* right);
+    TokenBase* do_Bit_RightShift_Assignment(TokenBase* left, TokenBase* right);
+
+
 
     //      Unary Op
     TokenBase* doPositive(TokenBase* op, TokenBase* right);

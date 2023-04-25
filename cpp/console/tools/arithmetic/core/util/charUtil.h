@@ -146,6 +146,7 @@ namespace charutil
         return E_CHAR_UNKNOWN;
     }
 
+    /*
     inline E_OperatorType getOperatorType(const std::string& opStr)
     {
         E_OperatorType retType = E_OPERATOR_UNKNOWN;
@@ -210,6 +211,7 @@ namespace charutil
 
         return retType;
     }
+    */
 
 
     // <Op>   or   <Blank>  or  ';'  or  Unknown-Char
@@ -283,4 +285,3 @@ namespace charutil
 
 
 #endif
-
