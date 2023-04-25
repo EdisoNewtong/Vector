@@ -11,9 +11,9 @@ static const char G_N = '\n';
 void printUsage()
 {
 	cout << R"(Usage :
-    $ deleteLastEOL   <--del>  <filename>
+    $ delOrAddLastEol   <--del>  <filename>
 or
-    $ deleteLastEOL   <--add>  [--win|--unix|--mac] <filename>
+    $ delOrAddLastEol   <--add>  [--win|--unix|--mac] <filename>
 )" << endl;
 }
 
@@ -83,8 +83,25 @@ void addEOL(const string& filename, char* content, unsigned long long fileLength
 	if ( fileLength == 1ULL ) {
 		if ( content[0] == G_R || content[0] == G_N ) {
 			// recover to origin content
-			cout << "[INFO] origin content is end with " << (content[0] == G_R ? "\\r" : "\\n") << ". No need to append EOL." << endl;
+			cout << "[INFO] origin content is end with " << (content[0] == G_R ? "\\r" : "\\n") << ". <Force> append EOL." << endl;
 			outputfile.write( content, static_cast<streamsize>(fileLength) );
+
+			if ( eAddWhichType == -1 ) { // use default => unix
+				cout << "[INFO] Append default '\\n'" << endl;
+				outputfile.write( &defaultInsertCh,    static_cast<streamsize>(1ULL) );
+			} else if ( eAddWhichType == 1 ) { // win
+				cout << "[INFO] Append specfied \\r\\n by the given argument. " << endl;
+				outputfile.write( &G_R,    static_cast<streamsize>(1ULL) );
+				outputfile.write( &G_N,    static_cast<streamsize>(1ULL) );
+			} else if ( eAddWhichType == 2 ) { // unix
+				cout << "[INFO] Append specfied \\n by the given argument. " << endl;
+				outputfile.write( &G_N,    static_cast<streamsize>(1ULL) );
+			} else if ( eAddWhichType == 3 ) { // mac
+				cout << "[INFO] Append specfied \\r by the given argument. " << endl;
+				outputfile.write( &G_R,    static_cast<streamsize>(1ULL) );
+			}
+
+
 		} else {
 			// to append
 			outputfile.write( content, static_cast<streamsize>(fileLength) );
@@ -196,8 +213,23 @@ void addEOL(const string& filename, char* content, unsigned long long fileLength
 			} 
 		} else {
 			// recover to origin content , do not add
-			cout << "[INFO] origin content is end with " << (lastCh == G_R ? "\\r" : "\\n") << ". No need to append EOL." << endl;
+			cout << "[INFO] origin content is end with " << (lastCh == G_R ? "\\r" : "\\n") << ". <Force> append EOL." << endl;
 			outputfile.write( content, static_cast<streamsize>(fileLength) );
+
+			if ( eAddWhichType == -1 ) { // use default => unix
+				cout << "[INFO] Append default '\\n'" << endl;
+				outputfile.write( &defaultInsertCh,    static_cast<streamsize>(1ULL) );
+			} else if ( eAddWhichType == 1 ) { // win
+				cout << "[INFO] Append specfied \\r\\n by the given argument. " << endl;
+				outputfile.write( &G_R,    static_cast<streamsize>(1ULL) );
+				outputfile.write( &G_N,    static_cast<streamsize>(1ULL) );
+			} else if ( eAddWhichType == 2 ) { // unix
+				cout << "[INFO] Append specfied \\n by the given argument. " << endl;
+				outputfile.write( &G_N,    static_cast<streamsize>(1ULL) );
+			} else if ( eAddWhichType == 3 ) { // mac
+				cout << "[INFO] Append specfied \\r by the given argument. " << endl;
+				outputfile.write( &G_R,    static_cast<streamsize>(1ULL) );
+			}
 		}
 	}
 
