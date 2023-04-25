@@ -34,6 +34,16 @@ const TokenMgr::OpPairCfg TokenMgr::s_OpPairCfgTable[s_TABLE_SIZE] = {
     { E_OPEN_PARENTHESES,   E_ADD,       true,          true  },
     { E_CLOSE_PARENTHESES,  E_ADD,       true,          true  },
     { E_ASSIGNMENT,         E_ADD,       true,          true  },
+    { E_ADD_ASSIGNMENT,     E_ADD,       true,          true  },     // +=
+    { E_MINUS_ASSIGNMENT,   E_ADD,       true,          true  },     // -=
+    { E_MULTIPLY_ASSIGNMENT,E_ADD,       true,          true  },     // *=
+    { E_DIVIDE_ASSIGNMENT,  E_ADD,       true,          true  },     // /=
+    { E_MOD_ASSIGNMENT,     E_ADD,       true,          true  },     // %=
+    { E_BIT_AND_ASSIGNMENT, E_ADD,       true,          true  },     // &=
+    { E_BIT_OR_ASSIGNMENT,  E_ADD,       true,          true  },     // |=
+    { E_BIT_XOR_ASSIGNMENT, E_ADD,       true,          true  },     // ^=
+    { E_BIT_LEFT_SHIFT_ASSIGNMENT, E_ADD,true,          true  },    // <<=
+    { E_BIT_RIGHT_SHIFT_ASSIGNMENT,E_ADD,true,          true  },    // >>=
 
     /* left,                right,  closeAvaliable,  seperateAvaliable  */
     // ?                      -
@@ -51,6 +61,16 @@ const TokenMgr::OpPairCfg TokenMgr::s_OpPairCfgTable[s_TABLE_SIZE] = {
     { E_OPEN_PARENTHESES,   E_MINUS,     true,          true  },
     { E_CLOSE_PARENTHESES,  E_MINUS,     true,          true  },
     { E_ASSIGNMENT,         E_MINUS,     true,          true  },
+    { E_ADD_ASSIGNMENT,     E_MINUS,       true,          true  },     // +=
+    { E_MINUS_ASSIGNMENT,   E_MINUS,       true,          true  },     // -=
+    { E_MULTIPLY_ASSIGNMENT,E_MINUS,       true,          true  },     // *=
+    { E_DIVIDE_ASSIGNMENT,  E_MINUS,       true,          true  },     // /=
+    { E_MOD_ASSIGNMENT,     E_MINUS,       true,          true  },     // %=
+    { E_BIT_AND_ASSIGNMENT, E_MINUS,       true,          true  },     // &=
+    { E_BIT_OR_ASSIGNMENT,  E_MINUS,       true,          true  },     // |=
+    { E_BIT_XOR_ASSIGNMENT, E_MINUS,       true,          true  },     // ^=
+    { E_BIT_LEFT_SHIFT_ASSIGNMENT, E_MINUS,true,          true  },    // <<=
+    { E_BIT_RIGHT_SHIFT_ASSIGNMENT,E_MINUS,true,          true  },    // >>=
 
     /* left,                right,  closeAvaliable,  seperateAvaliable  */
     // ?                      *
@@ -68,6 +88,16 @@ const TokenMgr::OpPairCfg TokenMgr::s_OpPairCfgTable[s_TABLE_SIZE] = {
     { E_OPEN_PARENTHESES,   E_MULTIPLY,  false,         false  },
     { E_CLOSE_PARENTHESES,  E_MULTIPLY,   true,          true  },  // (...)*   or  (...)   *
     { E_ASSIGNMENT,         E_MULTIPLY,  false,         false  },
+    { E_ADD_ASSIGNMENT,     E_MULTIPLY,       false,          false  },     // +=
+    { E_MINUS_ASSIGNMENT,   E_MULTIPLY,       false,          false  },     // -=
+    { E_MULTIPLY_ASSIGNMENT,E_MULTIPLY,       false,          false  },     // *=
+    { E_DIVIDE_ASSIGNMENT,  E_MULTIPLY,       false,          false  },     // /=
+    { E_MOD_ASSIGNMENT,     E_MULTIPLY,       false,          false  },     // %=
+    { E_BIT_AND_ASSIGNMENT, E_MULTIPLY,       false,          false  },     // &=
+    { E_BIT_OR_ASSIGNMENT,  E_MULTIPLY,       false,          false  },     // |=
+    { E_BIT_XOR_ASSIGNMENT, E_MULTIPLY,       false,          false  },     // ^=
+    { E_BIT_LEFT_SHIFT_ASSIGNMENT, E_MULTIPLY,false,          false  },    // <<=
+    { E_BIT_RIGHT_SHIFT_ASSIGNMENT,E_MULTIPLY,false,          false  },    // >>=
 
 
     //
@@ -100,6 +130,16 @@ const TokenMgr::OpPairCfg TokenMgr::s_OpPairCfgTable[s_TABLE_SIZE] = {
     { E_OPEN_PARENTHESES,   E_DIVIDE,    false,         false  },
     { E_CLOSE_PARENTHESES,  E_DIVIDE,     true,          true  },  // (...)/   or  (...)   /
     { E_ASSIGNMENT,         E_DIVIDE,    false,         false  },
+    { E_ADD_ASSIGNMENT,     E_DIVIDE,       false,          false  },     // +=
+    { E_MINUS_ASSIGNMENT,   E_DIVIDE,       false,          false  },     // -=
+    { E_MULTIPLY_ASSIGNMENT,E_DIVIDE,       false,          false  },     // *=
+    { E_DIVIDE_ASSIGNMENT,  E_DIVIDE,       false,          false  },     // /=
+    { E_MOD_ASSIGNMENT,     E_DIVIDE,       false,          false  },     // %=
+    { E_BIT_AND_ASSIGNMENT, E_DIVIDE,       false,          false  },     // &=
+    { E_BIT_OR_ASSIGNMENT,  E_DIVIDE,       false,          false  },     // |=
+    { E_BIT_XOR_ASSIGNMENT, E_DIVIDE,       false,          false  },     // ^=
+    { E_BIT_LEFT_SHIFT_ASSIGNMENT, E_DIVIDE,false,          false  },    // <<=
+    { E_BIT_RIGHT_SHIFT_ASSIGNMENT,E_DIVIDE,false,          false  },    // >>=
 
     /* left,                right,  closeAvaliable,  seperateAvaliable  */
     // ?                      %
@@ -117,6 +157,16 @@ const TokenMgr::OpPairCfg TokenMgr::s_OpPairCfgTable[s_TABLE_SIZE] = {
     { E_OPEN_PARENTHESES,   E_MOD,        false,        false  },
     { E_CLOSE_PARENTHESES,  E_MOD,         true,         true  },  // (...)%   or  (...)   %
     { E_ASSIGNMENT,         E_MOD,        false,        false  },
+    { E_ADD_ASSIGNMENT,     E_MOD,        false,        false  },     // +=
+    { E_MINUS_ASSIGNMENT,   E_MOD,        false,        false  },     // -=
+    { E_MULTIPLY_ASSIGNMENT,E_MOD,        false,        false  },     // *=
+    { E_DIVIDE_ASSIGNMENT,  E_MOD,        false,        false  },     // /=
+    { E_MOD_ASSIGNMENT,     E_MOD,        false,        false  },     // %=
+    { E_BIT_AND_ASSIGNMENT, E_MOD,        false,        false  },     // &=
+    { E_BIT_OR_ASSIGNMENT,  E_MOD,        false,        false  },     // |=
+    { E_BIT_XOR_ASSIGNMENT, E_MOD,        false,        false  },     // ^=
+    { E_BIT_LEFT_SHIFT_ASSIGNMENT, E_MOD, false,        false  },    // <<=
+    { E_BIT_RIGHT_SHIFT_ASSIGNMENT,E_MOD, false,        false  },    // >>=
 
     /* left,                right,  closeAvaliable,  seperateAvaliable  */
     // ?                      &
@@ -134,6 +184,16 @@ const TokenMgr::OpPairCfg TokenMgr::s_OpPairCfgTable[s_TABLE_SIZE] = {
     { E_OPEN_PARENTHESES,   E_BIT_AND,    false,        false  },
     { E_CLOSE_PARENTHESES,  E_BIT_AND,     true,         true  },  // (...)&   or  (...)   &
     { E_ASSIGNMENT,         E_BIT_AND,    false,        false  },
+    { E_ADD_ASSIGNMENT,     E_BIT_AND,        false,        false  },     // +=
+    { E_MINUS_ASSIGNMENT,   E_BIT_AND,        false,        false  },     // -=
+    { E_MULTIPLY_ASSIGNMENT,E_BIT_AND,        false,        false  },     // *=
+    { E_DIVIDE_ASSIGNMENT,  E_BIT_AND,        false,        false  },     // /=
+    { E_MOD_ASSIGNMENT,     E_BIT_AND,        false,        false  },     // %=
+    { E_BIT_AND_ASSIGNMENT, E_BIT_AND,        false,        false  },     // &=
+    { E_BIT_OR_ASSIGNMENT,  E_BIT_AND,        false,        false  },     // |=
+    { E_BIT_XOR_ASSIGNMENT, E_BIT_AND,        false,        false  },     // ^=
+    { E_BIT_LEFT_SHIFT_ASSIGNMENT, E_BIT_AND, false,        false  },    // <<=
+    { E_BIT_RIGHT_SHIFT_ASSIGNMENT,E_BIT_AND, false,        false  },    // >>=
 
     /* left,                right,  closeAvaliable,  seperateAvaliable  */
     // ?                      |
@@ -151,6 +211,16 @@ const TokenMgr::OpPairCfg TokenMgr::s_OpPairCfgTable[s_TABLE_SIZE] = {
     { E_OPEN_PARENTHESES,   E_BIT_OR,     false,        false  },
     { E_CLOSE_PARENTHESES,  E_BIT_OR,      true,         true  },  // (...)|   or  (...)   |
     { E_ASSIGNMENT,         E_BIT_OR,     false,        false  },
+    { E_ADD_ASSIGNMENT,     E_BIT_OR,        false,        false  },     // +=
+    { E_MINUS_ASSIGNMENT,   E_BIT_OR,        false,        false  },     // -=
+    { E_MULTIPLY_ASSIGNMENT,E_BIT_OR,        false,        false  },     // *=
+    { E_DIVIDE_ASSIGNMENT,  E_BIT_OR,        false,        false  },     // /=
+    { E_MOD_ASSIGNMENT,     E_BIT_OR,        false,        false  },     // %=
+    { E_BIT_AND_ASSIGNMENT, E_BIT_OR,        false,        false  },     // &=
+    { E_BIT_OR_ASSIGNMENT,  E_BIT_OR,        false,        false  },     // |=
+    { E_BIT_XOR_ASSIGNMENT, E_BIT_OR,        false,        false  },     // ^=
+    { E_BIT_LEFT_SHIFT_ASSIGNMENT, E_BIT_OR, false,        false  },    // <<=
+    { E_BIT_RIGHT_SHIFT_ASSIGNMENT,E_BIT_OR, false,        false  },    // >>=
 
     /* left,                right,  closeAvaliable,  seperateAvaliable  */
     // ?                      ^
@@ -168,6 +238,16 @@ const TokenMgr::OpPairCfg TokenMgr::s_OpPairCfgTable[s_TABLE_SIZE] = {
     { E_OPEN_PARENTHESES,   E_BIT_XOR,    false,        false  },
     { E_CLOSE_PARENTHESES,  E_BIT_XOR,     true,         true  },  // (...)^   or  (...)   ^
     { E_ASSIGNMENT,         E_BIT_XOR,    false,        false  },
+    { E_ADD_ASSIGNMENT,     E_BIT_XOR,        false,        false  },     // +=
+    { E_MINUS_ASSIGNMENT,   E_BIT_XOR,        false,        false  },     // -=
+    { E_MULTIPLY_ASSIGNMENT,E_BIT_XOR,        false,        false  },     // *=
+    { E_DIVIDE_ASSIGNMENT,  E_BIT_XOR,        false,        false  },     // /=
+    { E_MOD_ASSIGNMENT,     E_BIT_XOR,        false,        false  },     // %=
+    { E_BIT_AND_ASSIGNMENT, E_BIT_XOR,        false,        false  },     // &=
+    { E_BIT_OR_ASSIGNMENT,  E_BIT_XOR,        false,        false  },     // |=
+    { E_BIT_XOR_ASSIGNMENT, E_BIT_XOR,        false,        false  },     // ^=
+    { E_BIT_LEFT_SHIFT_ASSIGNMENT, E_BIT_XOR, false,        false  },    // <<=
+    { E_BIT_RIGHT_SHIFT_ASSIGNMENT,E_BIT_XOR, false,        false  },    // >>=
 
     /* left,                right,  closeAvaliable,  seperateAvaliable  */
     // ?                      ~
@@ -185,6 +265,16 @@ const TokenMgr::OpPairCfg TokenMgr::s_OpPairCfgTable[s_TABLE_SIZE] = {
     { E_OPEN_PARENTHESES,   E_BIT_NOT,    true,         true  },
     { E_CLOSE_PARENTHESES,  E_BIT_NOT,    false,        false },  // (...)~    or (...) ~  are neither allowed
     { E_ASSIGNMENT,         E_BIT_NOT,    true,         true  },
+    { E_ADD_ASSIGNMENT,     E_BIT_NOT,        true,     true     },     // +=
+    { E_MINUS_ASSIGNMENT,   E_BIT_NOT,        true,     true     },     // -=
+    { E_MULTIPLY_ASSIGNMENT,E_BIT_NOT,        true,     true     },     // *=
+    { E_DIVIDE_ASSIGNMENT,  E_BIT_NOT,        true,     true     },     // /=
+    { E_MOD_ASSIGNMENT,     E_BIT_NOT,        true,     true     },     // %=
+    { E_BIT_AND_ASSIGNMENT, E_BIT_NOT,        true,     true     },     // &=
+    { E_BIT_OR_ASSIGNMENT,  E_BIT_NOT,        true,     true     },     // |=
+    { E_BIT_XOR_ASSIGNMENT, E_BIT_NOT,        true,     true     },     // ^=
+    { E_BIT_LEFT_SHIFT_ASSIGNMENT, E_BIT_NOT, true,     true     },    // <<=
+    { E_BIT_RIGHT_SHIFT_ASSIGNMENT,E_BIT_NOT, true,     true     },    // >>=
 
     /* left,                right,  closeAvaliable,  seperateAvaliable  */
     // ?                      <<
@@ -202,6 +292,16 @@ const TokenMgr::OpPairCfg TokenMgr::s_OpPairCfgTable[s_TABLE_SIZE] = {
     { E_OPEN_PARENTHESES,   E_BIT_LEFT_SHIFT, false,     false  },
     { E_CLOSE_PARENTHESES,  E_BIT_LEFT_SHIFT, true,      true   },  // (...)<<    or (...) <<  are neither allowed
     { E_ASSIGNMENT,         E_BIT_LEFT_SHIFT, false,     false  },
+    { E_ADD_ASSIGNMENT,     E_BIT_LEFT_SHIFT,        false,     false     },     // +=
+    { E_MINUS_ASSIGNMENT,   E_BIT_LEFT_SHIFT,        false,     false     },     // -=
+    { E_MULTIPLY_ASSIGNMENT,E_BIT_LEFT_SHIFT,        false,     false     },     // *=
+    { E_DIVIDE_ASSIGNMENT,  E_BIT_LEFT_SHIFT,        false,     false     },     // /=
+    { E_MOD_ASSIGNMENT,     E_BIT_LEFT_SHIFT,        false,     false     },     // %=
+    { E_BIT_AND_ASSIGNMENT, E_BIT_LEFT_SHIFT,        false,     false     },     // &=
+    { E_BIT_OR_ASSIGNMENT,  E_BIT_LEFT_SHIFT,        false,     false     },     // |=
+    { E_BIT_XOR_ASSIGNMENT, E_BIT_LEFT_SHIFT,        false,     false     },     // ^=
+    { E_BIT_LEFT_SHIFT_ASSIGNMENT, E_BIT_LEFT_SHIFT, false,     false     },    // <<=
+    { E_BIT_RIGHT_SHIFT_ASSIGNMENT,E_BIT_LEFT_SHIFT, false,     false     },    // >>=
 
     /* left,                right,  closeAvaliable,  seperateAvaliable  */
     // ?                        >> 
@@ -217,8 +317,18 @@ const TokenMgr::OpPairCfg TokenMgr::s_OpPairCfgTable[s_TABLE_SIZE] = {
     { E_BIT_LEFT_SHIFT,     E_BIT_RIGHT_SHIFT, false,    false  },
     { E_BIT_RIGHT_SHIFT,    E_BIT_RIGHT_SHIFT, false,    false  },  
     { E_OPEN_PARENTHESES,   E_BIT_RIGHT_SHIFT, false,    false  },
-    { E_CLOSE_PARENTHESES,  E_BIT_RIGHT_SHIFT, true,     true    },  // (...)>>    or (...) >>  are neither allowed
+    { E_CLOSE_PARENTHESES,  E_BIT_RIGHT_SHIFT, true,     true   },  // (...)>>    or (...) >>  are neither allowed
     { E_ASSIGNMENT,         E_BIT_RIGHT_SHIFT, false,    false  },
+    { E_ADD_ASSIGNMENT,     E_BIT_RIGHT_SHIFT,        false,     false     },     // +=
+    { E_MINUS_ASSIGNMENT,   E_BIT_RIGHT_SHIFT,        false,     false     },     // -=
+    { E_MULTIPLY_ASSIGNMENT,E_BIT_RIGHT_SHIFT,        false,     false     },     // *=
+    { E_DIVIDE_ASSIGNMENT,  E_BIT_RIGHT_SHIFT,        false,     false     },     // /=
+    { E_MOD_ASSIGNMENT,     E_BIT_RIGHT_SHIFT,        false,     false     },     // %=
+    { E_BIT_AND_ASSIGNMENT, E_BIT_RIGHT_SHIFT,        false,     false     },     // &=
+    { E_BIT_OR_ASSIGNMENT,  E_BIT_RIGHT_SHIFT,        false,     false     },     // |=
+    { E_BIT_XOR_ASSIGNMENT, E_BIT_RIGHT_SHIFT,        false,     false     },     // ^=
+    { E_BIT_LEFT_SHIFT_ASSIGNMENT, E_BIT_RIGHT_SHIFT, false,     false     },    // <<=
+    { E_BIT_RIGHT_SHIFT_ASSIGNMENT,E_BIT_RIGHT_SHIFT, false,     false     },    // >>=
 
     /* left,                right,  closeAvaliable,  seperateAvaliable  */
     // ?                      (
@@ -236,6 +346,16 @@ const TokenMgr::OpPairCfg TokenMgr::s_OpPairCfgTable[s_TABLE_SIZE] = {
     { E_OPEN_PARENTHESES,   E_OPEN_PARENTHESES, true,     true  },
     { E_CLOSE_PARENTHESES,  E_OPEN_PARENTHESES, false,    false },  // )(  or     )  (  are neither allowed
     { E_ASSIGNMENT,         E_OPEN_PARENTHESES, true,     true  },
+    { E_ADD_ASSIGNMENT,     E_OPEN_PARENTHESES,        true,     true     },     // +=
+    { E_MINUS_ASSIGNMENT,   E_OPEN_PARENTHESES,        true,     true     },     // -=
+    { E_MULTIPLY_ASSIGNMENT,E_OPEN_PARENTHESES,        true,     true     },     // *=
+    { E_DIVIDE_ASSIGNMENT,  E_OPEN_PARENTHESES,        true,     true     },     // /=
+    { E_MOD_ASSIGNMENT,     E_OPEN_PARENTHESES,        true,     true     },     // %=
+    { E_BIT_AND_ASSIGNMENT, E_OPEN_PARENTHESES,        true,     true     },     // &=
+    { E_BIT_OR_ASSIGNMENT,  E_OPEN_PARENTHESES,        true,     true     },     // |=
+    { E_BIT_XOR_ASSIGNMENT, E_OPEN_PARENTHESES,        true,     true     },     // ^=
+    { E_BIT_LEFT_SHIFT_ASSIGNMENT, E_OPEN_PARENTHESES, true,     true     },    // <<=
+    { E_BIT_RIGHT_SHIFT_ASSIGNMENT,E_OPEN_PARENTHESES, true,     true     },    // >>=
 
     /* left,                right,  closeAvaliable,  seperateAvaliable  */
     // ?                      )
@@ -253,6 +373,16 @@ const TokenMgr::OpPairCfg TokenMgr::s_OpPairCfgTable[s_TABLE_SIZE] = {
     { E_OPEN_PARENTHESES,   E_CLOSE_PARENTHESES, false,   false  },  // () or  (    )   Empty content inside  () is not allowed
     { E_CLOSE_PARENTHESES,  E_CLOSE_PARENTHESES, true,    true   },    // )) or  ) ) are both avaliable
     { E_ASSIGNMENT,         E_CLOSE_PARENTHESES, false,   false  },  // =) = ) are neither allowed
+    { E_ADD_ASSIGNMENT,     E_CLOSE_PARENTHESES,        false,     false     },     // +=
+    { E_MINUS_ASSIGNMENT,   E_CLOSE_PARENTHESES,        false,     false     },     // -=
+    { E_MULTIPLY_ASSIGNMENT,E_CLOSE_PARENTHESES,        false,     false     },     // *=
+    { E_DIVIDE_ASSIGNMENT,  E_CLOSE_PARENTHESES,        false,     false     },     // /=
+    { E_MOD_ASSIGNMENT,     E_CLOSE_PARENTHESES,        false,     false     },     // %=
+    { E_BIT_AND_ASSIGNMENT, E_CLOSE_PARENTHESES,        false,     false     },     // &=
+    { E_BIT_OR_ASSIGNMENT,  E_CLOSE_PARENTHESES,        false,     false     },     // |=
+    { E_BIT_XOR_ASSIGNMENT, E_CLOSE_PARENTHESES,        false,     false     },     // ^=
+    { E_BIT_LEFT_SHIFT_ASSIGNMENT, E_CLOSE_PARENTHESES, false,     false     },    // <<=
+    { E_BIT_RIGHT_SHIFT_ASSIGNMENT,E_CLOSE_PARENTHESES, false,     false     },    // >>=
 
     /* left,                right,  closeAvaliable,  seperateAvaliable  */
     // ?                      =
@@ -266,11 +396,295 @@ const TokenMgr::OpPairCfg TokenMgr::s_OpPairCfgTable[s_TABLE_SIZE] = {
     { E_BIT_XOR,            E_ASSIGNMENT,        false,   false  }, // ^=
     { E_BIT_NOT,            E_ASSIGNMENT,        false,   false  }, // ~=
     { E_BIT_LEFT_SHIFT,     E_ASSIGNMENT,        false,   false  }, // <<= 
-    { E_BIT_RIGHT_SHIFT,    E_ASSIGNMENT,        true,    true   }, // >>=
+    { E_BIT_RIGHT_SHIFT,    E_ASSIGNMENT,        false,   false  }, // >>=
     { E_OPEN_PARENTHESES,   E_ASSIGNMENT,        false,   false  },  // (=
     { E_CLOSE_PARENTHESES,  E_ASSIGNMENT,        false,   false  },  // // )=     or   ) =     e.g.    (a)=3;
-    { E_ASSIGNMENT,         E_ASSIGNMENT,        false,   false  }   // ==     = = are neither allowed
+    { E_ASSIGNMENT,         E_ASSIGNMENT,        false,   false  },  // ==     = = are neither allowed
+    { E_ADD_ASSIGNMENT,     E_ASSIGNMENT,        false,     false     },     // +=
+    { E_MINUS_ASSIGNMENT,   E_ASSIGNMENT,        false,     false     },     // -=
+    { E_MULTIPLY_ASSIGNMENT,E_ASSIGNMENT,        false,     false     },     // *=
+    { E_DIVIDE_ASSIGNMENT,  E_ASSIGNMENT,        false,     false     },     // /=
+    { E_MOD_ASSIGNMENT,     E_ASSIGNMENT,        false,     false     },     // %=
+    { E_BIT_AND_ASSIGNMENT, E_ASSIGNMENT,        false,     false     },     // &=
+    { E_BIT_OR_ASSIGNMENT,  E_ASSIGNMENT,        false,     false     },     // |=
+    { E_BIT_XOR_ASSIGNMENT, E_ASSIGNMENT,        false,     false     },     // ^=
+    { E_BIT_LEFT_SHIFT_ASSIGNMENT, E_ASSIGNMENT, false,     false     },    // <<=
+    { E_BIT_RIGHT_SHIFT_ASSIGNMENT,E_ASSIGNMENT, false,     false     },    // >>=
 
+    ////////////////////////////////////////////////////
+    //
+    // Compound Operator like  '+=' / '-='  ==>  '?="
+    //
+    ////////////////////////////////////////////////////
+    /* left,                right,           closeAvaliable,  seperateAvaliable  */
+    // ?                      +=
+    { E_ADD,                E_ADD_ASSIGNMENT,        false,   false  }, // + +=
+    { E_MINUS,              E_ADD_ASSIGNMENT,        false,   false  }, // - +=
+    { E_MULTIPLY,           E_ADD_ASSIGNMENT,        false,   false  }, // * +=
+    { E_DIVIDE,             E_ADD_ASSIGNMENT,        false,   false  }, // / +=
+    { E_MOD,                E_ADD_ASSIGNMENT,        false,   false  }, // % +=
+    { E_BIT_AND,            E_ADD_ASSIGNMENT,        false,   false  }, // & +=
+    { E_BIT_OR,             E_ADD_ASSIGNMENT,        false,   false  }, // | +=
+    { E_BIT_XOR,            E_ADD_ASSIGNMENT,        false,   false  }, // ^ +=
+    { E_BIT_NOT,            E_ADD_ASSIGNMENT,        false,   false  }, // ~ +=
+    { E_BIT_LEFT_SHIFT,     E_ADD_ASSIGNMENT,        false,   false  }, // << += 
+    { E_BIT_RIGHT_SHIFT,    E_ADD_ASSIGNMENT,        false,   false  }, // >> +=
+    { E_OPEN_PARENTHESES,   E_ADD_ASSIGNMENT,        false,   false  }, // ( +=
+    { E_CLOSE_PARENTHESES,  E_ADD_ASSIGNMENT,        false,   false  }, // ) +=
+    { E_ASSIGNMENT,         E_ADD_ASSIGNMENT,        false,   false  }, // = += 
+    { E_ADD_ASSIGNMENT,     E_ADD_ASSIGNMENT,        false,     false     },     // +=
+	{ E_MINUS_ASSIGNMENT,   E_ADD_ASSIGNMENT,        false,     false     },     // -=
+	{ E_MULTIPLY_ASSIGNMENT,E_ADD_ASSIGNMENT,        false,     false     },     // *=
+	{ E_DIVIDE_ASSIGNMENT,  E_ADD_ASSIGNMENT,        false,     false     },     // /=
+	{ E_MOD_ASSIGNMENT,     E_ADD_ASSIGNMENT,        false,     false     },     // %=
+    { E_BIT_AND_ASSIGNMENT, E_ADD_ASSIGNMENT,        false,     false     },     // &=
+    { E_BIT_OR_ASSIGNMENT,  E_ADD_ASSIGNMENT,        false,     false     },     // |=
+    { E_BIT_XOR_ASSIGNMENT, E_ADD_ASSIGNMENT,        false,     false     },     // ^=
+    { E_BIT_LEFT_SHIFT_ASSIGNMENT, E_ADD_ASSIGNMENT, false,     false     },    // <<=
+    { E_BIT_RIGHT_SHIFT_ASSIGNMENT,E_ADD_ASSIGNMENT, false,     false     },    // >>=
+
+    /* left,                right,           closeAvaliable,  seperateAvaliable  */
+    // ?                      -=
+    { E_ADD,                E_MINUS_ASSIGNMENT,        false,   false  },  // + -=
+    { E_MINUS,              E_MINUS_ASSIGNMENT,        false,   false  },  // - -=
+    { E_MULTIPLY,           E_MINUS_ASSIGNMENT,        false,   false  },  // * -=
+    { E_DIVIDE,             E_MINUS_ASSIGNMENT,        false,   false  },  // / -=
+    { E_MOD,                E_MINUS_ASSIGNMENT,        false,   false  },  // % -=
+    { E_BIT_AND,            E_MINUS_ASSIGNMENT,        false,   false  },  // & -=
+    { E_BIT_OR,             E_MINUS_ASSIGNMENT,        false,   false  },  // | -=
+    { E_BIT_XOR,            E_MINUS_ASSIGNMENT,        false,   false  },  // ^ -=
+    { E_BIT_NOT,            E_MINUS_ASSIGNMENT,        false,   false  },  // ~ -=
+    { E_BIT_LEFT_SHIFT,     E_MINUS_ASSIGNMENT,        false,   false  },  // << -= 
+    { E_BIT_RIGHT_SHIFT,    E_MINUS_ASSIGNMENT,        false,   false  },  // >> -=
+    { E_OPEN_PARENTHESES,   E_MINUS_ASSIGNMENT,        false,   false  },  // ( -=
+    { E_CLOSE_PARENTHESES,  E_MINUS_ASSIGNMENT,        false,   false  },  // ) -=
+    { E_ASSIGNMENT,         E_MINUS_ASSIGNMENT,        false,   false  },  // = -= 
+    { E_ADD_ASSIGNMENT,     E_MINUS_ASSIGNMENT,        false,     false     },     // +=
+    { E_MINUS_ASSIGNMENT,   E_MINUS_ASSIGNMENT,        false,     false     },     // -=
+    { E_MULTIPLY_ASSIGNMENT,E_MINUS_ASSIGNMENT,        false,     false     },     // *=
+    { E_DIVIDE_ASSIGNMENT,  E_MINUS_ASSIGNMENT,        false,     false     },     // /=
+    { E_MOD_ASSIGNMENT,     E_MINUS_ASSIGNMENT,        false,     false     },     // %=
+    { E_BIT_AND_ASSIGNMENT, E_MINUS_ASSIGNMENT,        false,     false     },     // &=
+    { E_BIT_OR_ASSIGNMENT,  E_MINUS_ASSIGNMENT,        false,     false     },     // |=
+    { E_BIT_XOR_ASSIGNMENT, E_MINUS_ASSIGNMENT,        false,     false     },     // ^=
+    { E_BIT_LEFT_SHIFT_ASSIGNMENT, E_MINUS_ASSIGNMENT, false,     false     },    // <<=
+    { E_BIT_RIGHT_SHIFT_ASSIGNMENT,E_MINUS_ASSIGNMENT, false,     false     },    // >>=
+
+    /* left,                right,           closeAvaliable,  seperateAvaliable  */
+    // ?                      *=
+    { E_ADD,                E_MULTIPLY_ASSIGNMENT,        false,   false  }, // + *=
+    { E_MINUS,              E_MULTIPLY_ASSIGNMENT,        false,   false  }, // - *=
+    { E_MULTIPLY,           E_MULTIPLY_ASSIGNMENT,        false,   false  }, // * *=
+    { E_DIVIDE,             E_MULTIPLY_ASSIGNMENT,        false,   false  }, // / *=
+    { E_MOD,                E_MULTIPLY_ASSIGNMENT,        false,   false  }, // % *=
+    { E_BIT_AND,            E_MULTIPLY_ASSIGNMENT,        false,   false  }, // & *=
+    { E_BIT_OR,             E_MULTIPLY_ASSIGNMENT,        false,   false  }, // | *=
+    { E_BIT_XOR,            E_MULTIPLY_ASSIGNMENT,        false,   false  }, // ^ *=
+    { E_BIT_NOT,            E_MULTIPLY_ASSIGNMENT,        false,   false  }, // ~ *=
+    { E_BIT_LEFT_SHIFT,     E_MULTIPLY_ASSIGNMENT,        false,   false  }, // << *= 
+    { E_BIT_RIGHT_SHIFT,    E_MULTIPLY_ASSIGNMENT,        false,   false  }, // >> *=
+    { E_OPEN_PARENTHESES,   E_MULTIPLY_ASSIGNMENT,        false,   false  },  // ( *=
+    { E_CLOSE_PARENTHESES,  E_MULTIPLY_ASSIGNMENT,        false,   false  },  // ) *=
+    { E_ASSIGNMENT,         E_MULTIPLY_ASSIGNMENT,        false,   false  },  // = *= 
+    { E_ADD_ASSIGNMENT,     E_MULTIPLY_ASSIGNMENT,        false,     false     },     // +=
+    { E_MINUS_ASSIGNMENT,   E_MULTIPLY_ASSIGNMENT,        false,     false     },     // -=
+    { E_MULTIPLY_ASSIGNMENT,E_MULTIPLY_ASSIGNMENT,        false,     false     },     // *=
+    { E_DIVIDE_ASSIGNMENT,  E_MULTIPLY_ASSIGNMENT,        false,     false     },     // /=
+    { E_MOD_ASSIGNMENT,     E_MULTIPLY_ASSIGNMENT,        false,     false     },     // %=
+    { E_BIT_AND_ASSIGNMENT, E_MULTIPLY_ASSIGNMENT,        false,     false     },     // &=
+    { E_BIT_OR_ASSIGNMENT,  E_MULTIPLY_ASSIGNMENT,        false,     false     },     // |=
+    { E_BIT_XOR_ASSIGNMENT, E_MULTIPLY_ASSIGNMENT,        false,     false     },     // ^=
+    { E_BIT_LEFT_SHIFT_ASSIGNMENT, E_MULTIPLY_ASSIGNMENT, false,     false     },    // <<=
+    { E_BIT_RIGHT_SHIFT_ASSIGNMENT,E_MULTIPLY_ASSIGNMENT, false,     false     },    // >>=
+
+    /* left,                right,           closeAvaliable,  seperateAvaliable  */
+    // ?                      /=
+    { E_ADD,                E_DIVIDE_ASSIGNMENT,        false,   false  }, // + /=
+    { E_MINUS,              E_DIVIDE_ASSIGNMENT,        false,   false  }, // - /=
+    { E_MULTIPLY,           E_DIVIDE_ASSIGNMENT,        false,   false  }, // * /=
+    { E_DIVIDE,             E_DIVIDE_ASSIGNMENT,        false,   false  }, // / /=
+    { E_MOD,                E_DIVIDE_ASSIGNMENT,        false,   false  }, // % /=
+    { E_BIT_AND,            E_DIVIDE_ASSIGNMENT,        false,   false  }, // & /=
+    { E_BIT_OR,             E_DIVIDE_ASSIGNMENT,        false,   false  }, // | /=
+    { E_BIT_XOR,            E_DIVIDE_ASSIGNMENT,        false,   false  }, // ^ /=
+    { E_BIT_NOT,            E_DIVIDE_ASSIGNMENT,        false,   false  }, // ~ /=
+    { E_BIT_LEFT_SHIFT,     E_DIVIDE_ASSIGNMENT,        false,   false  }, // << /= 
+    { E_BIT_RIGHT_SHIFT,    E_DIVIDE_ASSIGNMENT,        false,   false   }, // >> /=
+    { E_OPEN_PARENTHESES,   E_DIVIDE_ASSIGNMENT,        false,   false  },  // ( /=
+    { E_CLOSE_PARENTHESES,  E_DIVIDE_ASSIGNMENT,        false,   false  },  // ) /=
+    { E_ASSIGNMENT,         E_DIVIDE_ASSIGNMENT,        false,   false  },  // = /= 
+    { E_ADD_ASSIGNMENT,     E_DIVIDE_ASSIGNMENT,        false,     false     },     // +=
+    { E_MINUS_ASSIGNMENT,   E_DIVIDE_ASSIGNMENT,        false,     false     },     // -=
+    { E_MULTIPLY_ASSIGNMENT,E_DIVIDE_ASSIGNMENT,        false,     false     },     // *=
+    { E_DIVIDE_ASSIGNMENT,  E_DIVIDE_ASSIGNMENT,        false,     false     },     // /=
+    { E_MOD_ASSIGNMENT,     E_DIVIDE_ASSIGNMENT,        false,     false     },     // %=
+    { E_BIT_AND_ASSIGNMENT, E_DIVIDE_ASSIGNMENT,        false,     false     },     // &=
+    { E_BIT_OR_ASSIGNMENT,  E_DIVIDE_ASSIGNMENT,        false,     false     },     // |=
+    { E_BIT_XOR_ASSIGNMENT, E_DIVIDE_ASSIGNMENT,        false,     false     },     // ^=
+    { E_BIT_LEFT_SHIFT_ASSIGNMENT, E_DIVIDE_ASSIGNMENT, false,     false     },    // <<=
+    { E_BIT_RIGHT_SHIFT_ASSIGNMENT,E_DIVIDE_ASSIGNMENT, false,     false     },    // >>=
+
+    /* left,                right,           closeAvaliable,  seperateAvaliable  */
+    // ?                      %=
+    { E_ADD,                E_MOD_ASSIGNMENT,        false,   false  }, // + %=
+    { E_MINUS,              E_MOD_ASSIGNMENT,        false,   false  }, // - %=
+    { E_MULTIPLY,           E_MOD_ASSIGNMENT,        false,   false  }, // * %=
+    { E_DIVIDE,             E_MOD_ASSIGNMENT,        false,   false  }, // / %=
+    { E_MOD,                E_MOD_ASSIGNMENT,        false,   false  }, // % %=
+    { E_BIT_AND,            E_MOD_ASSIGNMENT,        false,   false  }, // & %=
+    { E_BIT_OR,             E_MOD_ASSIGNMENT,        false,   false  }, // | %=
+    { E_BIT_XOR,            E_MOD_ASSIGNMENT,        false,   false  }, // ^ %=
+    { E_BIT_NOT,            E_MOD_ASSIGNMENT,        false,   false  }, // ~ %=
+    { E_BIT_LEFT_SHIFT,     E_MOD_ASSIGNMENT,        false,   false  }, // << %= 
+    { E_BIT_RIGHT_SHIFT,    E_MOD_ASSIGNMENT,        false,   false  }, // >> %=
+    { E_OPEN_PARENTHESES,   E_MOD_ASSIGNMENT,        false,   false  },  // ( %=
+    { E_CLOSE_PARENTHESES,  E_MOD_ASSIGNMENT,        false,   false  },  // ) %=
+    { E_ASSIGNMENT,         E_MOD_ASSIGNMENT,        false,   false  },   // = %= 
+    { E_ADD_ASSIGNMENT,     E_MOD_ASSIGNMENT,        false,     false     },     // +=
+    { E_MINUS_ASSIGNMENT,   E_MOD_ASSIGNMENT,        false,     false     },     // -=
+    { E_MULTIPLY_ASSIGNMENT,E_MOD_ASSIGNMENT,        false,     false     },     // *=
+    { E_DIVIDE_ASSIGNMENT,  E_MOD_ASSIGNMENT,        false,     false     },     // /=
+    { E_MOD_ASSIGNMENT,     E_MOD_ASSIGNMENT,        false,     false     },     // %=
+    { E_BIT_AND_ASSIGNMENT, E_MOD_ASSIGNMENT,        false,     false     },     // &=
+    { E_BIT_OR_ASSIGNMENT,  E_MOD_ASSIGNMENT,        false,     false     },     // |=
+    { E_BIT_XOR_ASSIGNMENT, E_MOD_ASSIGNMENT,        false,     false     },     // ^=
+    { E_BIT_LEFT_SHIFT_ASSIGNMENT, E_MOD_ASSIGNMENT, false,     false     },    // <<=
+    { E_BIT_RIGHT_SHIFT_ASSIGNMENT,E_MOD_ASSIGNMENT, false,     false     },    // >>=
+
+    /* left,                right,           closeAvaliable,  seperateAvaliable  */
+    // ?                      &=
+    { E_ADD,                E_BIT_AND_ASSIGNMENT,        false,   false  }, // + &=
+    { E_MINUS,              E_BIT_AND_ASSIGNMENT,        false,   false  }, // - &=
+    { E_MULTIPLY,           E_BIT_AND_ASSIGNMENT,        false,   false  }, // * &=
+    { E_DIVIDE,             E_BIT_AND_ASSIGNMENT,        false,   false  }, // / &=
+    { E_MOD,                E_BIT_AND_ASSIGNMENT,        false,   false  }, // % &=
+    { E_BIT_AND,            E_BIT_AND_ASSIGNMENT,        false,   false  }, // & &=
+    { E_BIT_OR,             E_BIT_AND_ASSIGNMENT,        false,   false  }, // | &=
+    { E_BIT_XOR,            E_BIT_AND_ASSIGNMENT,        false,   false  }, // ^ &=
+    { E_BIT_NOT,            E_BIT_AND_ASSIGNMENT,        false,   false  }, // ~ &=
+    { E_BIT_LEFT_SHIFT,     E_BIT_AND_ASSIGNMENT,        false,   false  }, // << &= 
+    { E_BIT_RIGHT_SHIFT,    E_BIT_AND_ASSIGNMENT,        false,   false  }, // >> &=
+    { E_OPEN_PARENTHESES,   E_BIT_AND_ASSIGNMENT,        false,   false  },  // ( &=
+    { E_CLOSE_PARENTHESES,  E_BIT_AND_ASSIGNMENT,        false,   false  },  // ) &=
+    { E_ASSIGNMENT,         E_BIT_AND_ASSIGNMENT,        false,   false  },   // = &= 
+    { E_ADD_ASSIGNMENT,     E_BIT_AND_ASSIGNMENT,        false,     false     },     // +=
+    { E_MINUS_ASSIGNMENT,   E_BIT_AND_ASSIGNMENT,        false,     false     },     // -=
+    { E_MULTIPLY_ASSIGNMENT,E_BIT_AND_ASSIGNMENT,        false,     false     },     // *=
+    { E_DIVIDE_ASSIGNMENT,  E_BIT_AND_ASSIGNMENT,        false,     false     },     // /=
+    { E_MOD_ASSIGNMENT,     E_BIT_AND_ASSIGNMENT,        false,     false     },     // %=
+    { E_BIT_AND_ASSIGNMENT, E_BIT_AND_ASSIGNMENT,        false,     false     },     // &=
+    { E_BIT_OR_ASSIGNMENT,  E_BIT_AND_ASSIGNMENT,        false,     false     },     // |=
+    { E_BIT_XOR_ASSIGNMENT, E_BIT_AND_ASSIGNMENT,        false,     false     },     // ^=
+    { E_BIT_LEFT_SHIFT_ASSIGNMENT, E_BIT_AND_ASSIGNMENT, false,     false     },    // <<=
+    { E_BIT_RIGHT_SHIFT_ASSIGNMENT,E_BIT_AND_ASSIGNMENT, false,     false     },    // >>=
+
+    /* left,                right,           closeAvaliable,  seperateAvaliable  */
+    // ?                      |=
+    { E_ADD,                E_BIT_OR_ASSIGNMENT,        false,   false  }, // + |=
+    { E_MINUS,              E_BIT_OR_ASSIGNMENT,        false,   false  }, // - |=
+    { E_MULTIPLY,           E_BIT_OR_ASSIGNMENT,        false,   false  }, // * |=
+    { E_DIVIDE,             E_BIT_OR_ASSIGNMENT,        false,   false  }, // / |=
+    { E_MOD,                E_BIT_OR_ASSIGNMENT,        false,   false  }, // % |=
+    { E_BIT_AND,            E_BIT_OR_ASSIGNMENT,        false,   false  }, // & |=
+    { E_BIT_OR,             E_BIT_OR_ASSIGNMENT,        false,   false  }, // | |=
+    { E_BIT_XOR,            E_BIT_OR_ASSIGNMENT,        false,   false  }, // ^ |=
+    { E_BIT_NOT,            E_BIT_OR_ASSIGNMENT,        false,   false  }, // ~ |=
+    { E_BIT_LEFT_SHIFT,     E_BIT_OR_ASSIGNMENT,        false,   false  }, // << |= 
+    { E_BIT_RIGHT_SHIFT,    E_BIT_OR_ASSIGNMENT,        false,   false  }, // >> |=
+    { E_OPEN_PARENTHESES,   E_BIT_OR_ASSIGNMENT,        false,   false  },  // ( |=
+    { E_CLOSE_PARENTHESES,  E_BIT_OR_ASSIGNMENT,        false,   false  },  // ) |=
+    { E_ASSIGNMENT,         E_BIT_OR_ASSIGNMENT,        false,   false  },   // = |= 
+    { E_ADD_ASSIGNMENT,     E_BIT_OR_ASSIGNMENT,        false,     false     },     // +=
+    { E_MINUS_ASSIGNMENT,   E_BIT_OR_ASSIGNMENT,        false,     false     },     // -=
+    { E_MULTIPLY_ASSIGNMENT,E_BIT_OR_ASSIGNMENT,        false,     false     },     // *=
+    { E_DIVIDE_ASSIGNMENT,  E_BIT_OR_ASSIGNMENT,        false,     false     },     // /=
+    { E_MOD_ASSIGNMENT,     E_BIT_OR_ASSIGNMENT,        false,     false     },     // %=
+    { E_BIT_AND_ASSIGNMENT, E_BIT_OR_ASSIGNMENT,        false,     false     },     // &=
+    { E_BIT_OR_ASSIGNMENT,  E_BIT_OR_ASSIGNMENT,        false,     false     },     // |=
+    { E_BIT_XOR_ASSIGNMENT, E_BIT_OR_ASSIGNMENT,        false,     false     },     // ^=
+    { E_BIT_LEFT_SHIFT_ASSIGNMENT, E_BIT_OR_ASSIGNMENT, false,     false     },    // <<=
+    { E_BIT_RIGHT_SHIFT_ASSIGNMENT,E_BIT_OR_ASSIGNMENT, false,     false     },    // >>=
+
+    /* left,                right,           closeAvaliable,  seperateAvaliable  */
+    // ?                      ^=
+    { E_ADD,                E_BIT_XOR_ASSIGNMENT,        false,   false  }, // + ^=
+    { E_MINUS,              E_BIT_XOR_ASSIGNMENT,        false,   false  }, // - ^=
+    { E_MULTIPLY,           E_BIT_XOR_ASSIGNMENT,        false,   false  }, // * ^=
+    { E_DIVIDE,             E_BIT_XOR_ASSIGNMENT,        false,   false  }, // / ^=
+    { E_MOD,                E_BIT_XOR_ASSIGNMENT,        false,   false  }, // % ^=
+    { E_BIT_AND,            E_BIT_XOR_ASSIGNMENT,        false,   false  }, // & ^=
+    { E_BIT_OR,             E_BIT_XOR_ASSIGNMENT,        false,   false  }, // | ^=
+    { E_BIT_XOR,            E_BIT_XOR_ASSIGNMENT,        false,   false  }, // ^ ^=
+    { E_BIT_NOT,            E_BIT_XOR_ASSIGNMENT,        false,   false  }, // ~ ^=
+    { E_BIT_LEFT_SHIFT,     E_BIT_XOR_ASSIGNMENT,        false,   false  }, // << ^= 
+    { E_BIT_RIGHT_SHIFT,    E_BIT_XOR_ASSIGNMENT,        false,   false  }, // >> ^=
+    { E_OPEN_PARENTHESES,   E_BIT_XOR_ASSIGNMENT,        false,   false  },  // ( ^=
+    { E_CLOSE_PARENTHESES,  E_BIT_XOR_ASSIGNMENT,        false,   false  },  // ) ^=
+    { E_ASSIGNMENT,         E_BIT_XOR_ASSIGNMENT,        false,   false  },   // = ^= 
+    { E_ADD_ASSIGNMENT,     E_BIT_XOR_ASSIGNMENT,        false,     false     },     // +=
+    { E_MINUS_ASSIGNMENT,   E_BIT_XOR_ASSIGNMENT,        false,     false     },     // -=
+    { E_MULTIPLY_ASSIGNMENT,E_BIT_XOR_ASSIGNMENT,        false,     false     },     // *=
+    { E_DIVIDE_ASSIGNMENT,  E_BIT_XOR_ASSIGNMENT,        false,     false     },     // /=
+    { E_MOD_ASSIGNMENT,     E_BIT_XOR_ASSIGNMENT,        false,     false     },     // %=
+    { E_BIT_AND_ASSIGNMENT, E_BIT_XOR_ASSIGNMENT,        false,     false     },     // &=
+    { E_BIT_OR_ASSIGNMENT,  E_BIT_XOR_ASSIGNMENT,        false,     false     },     // |=
+    { E_BIT_XOR_ASSIGNMENT, E_BIT_XOR_ASSIGNMENT,        false,     false     },     // ^=
+    { E_BIT_LEFT_SHIFT_ASSIGNMENT, E_BIT_XOR_ASSIGNMENT, false,     false     },    // <<=
+    { E_BIT_RIGHT_SHIFT_ASSIGNMENT,E_BIT_XOR_ASSIGNMENT, false,     false     },    // >>=
+
+    /* left,                right,           closeAvaliable,  seperateAvaliable  */
+    // ?                      <<=
+    { E_ADD,                E_BIT_LEFT_SHIFT_ASSIGNMENT,        false,   false  }, // + <<=
+    { E_MINUS,              E_BIT_LEFT_SHIFT_ASSIGNMENT,        false,   false  }, // - <<=
+    { E_MULTIPLY,           E_BIT_LEFT_SHIFT_ASSIGNMENT,        false,   false  }, // * <<=
+    { E_DIVIDE,             E_BIT_LEFT_SHIFT_ASSIGNMENT,        false,   false  }, // / <<=
+    { E_MOD,                E_BIT_LEFT_SHIFT_ASSIGNMENT,        false,   false  }, // % <<=
+    { E_BIT_AND,            E_BIT_LEFT_SHIFT_ASSIGNMENT,        false,   false  }, // & <<=
+    { E_BIT_OR,             E_BIT_LEFT_SHIFT_ASSIGNMENT,        false,   false  }, // | <<=
+    { E_BIT_XOR,            E_BIT_LEFT_SHIFT_ASSIGNMENT,        false,   false  }, // ^ <<=
+    { E_BIT_NOT,            E_BIT_LEFT_SHIFT_ASSIGNMENT,        false,   false  }, // ~ <<=
+    { E_BIT_LEFT_SHIFT,     E_BIT_LEFT_SHIFT_ASSIGNMENT,        false,   false  }, //  <<   <<= 
+    { E_BIT_RIGHT_SHIFT,    E_BIT_LEFT_SHIFT_ASSIGNMENT,        false,   false  }, // >>  <<=
+    { E_OPEN_PARENTHESES,   E_BIT_LEFT_SHIFT_ASSIGNMENT,        false,   false  },  // (   <<=
+    { E_CLOSE_PARENTHESES,  E_BIT_LEFT_SHIFT_ASSIGNMENT,        false,   false  },  // )   <<=
+    { E_ASSIGNMENT,         E_BIT_LEFT_SHIFT_ASSIGNMENT,        false,   false  },   // =   <<= 
+    { E_ADD_ASSIGNMENT,     E_BIT_LEFT_SHIFT_ASSIGNMENT,        false,     false     },     // += <<
+    { E_MINUS_ASSIGNMENT,   E_BIT_LEFT_SHIFT_ASSIGNMENT,        false,     false     },     // -= <<
+    { E_MULTIPLY_ASSIGNMENT,E_BIT_LEFT_SHIFT_ASSIGNMENT,        false,     false     },     // *= <<
+    { E_DIVIDE_ASSIGNMENT,  E_BIT_LEFT_SHIFT_ASSIGNMENT,        false,     false     },     // /= <<
+    { E_MOD_ASSIGNMENT,     E_BIT_LEFT_SHIFT_ASSIGNMENT,        false,     false     },     // %=
+    { E_BIT_AND_ASSIGNMENT, E_BIT_LEFT_SHIFT_ASSIGNMENT,        false,     false     },     // &=
+    { E_BIT_OR_ASSIGNMENT,  E_BIT_LEFT_SHIFT_ASSIGNMENT,        false,     false     },     // |=
+    { E_BIT_XOR_ASSIGNMENT, E_BIT_LEFT_SHIFT_ASSIGNMENT,        false,     false     },     // ^=
+    { E_BIT_LEFT_SHIFT_ASSIGNMENT, E_BIT_LEFT_SHIFT_ASSIGNMENT, false,     false     },    // <<=
+    { E_BIT_RIGHT_SHIFT_ASSIGNMENT,E_BIT_LEFT_SHIFT_ASSIGNMENT, false,     false     },    // >>=
+
+    /* left,                right,           closeAvaliable,  seperateAvaliable  */
+    // ?                      >>=
+    { E_ADD,                E_BIT_RIGHT_SHIFT_ASSIGNMENT,        false,   false  }, // + >>=
+    { E_MINUS,              E_BIT_RIGHT_SHIFT_ASSIGNMENT,        false,   false  }, // - >>=
+    { E_MULTIPLY,           E_BIT_RIGHT_SHIFT_ASSIGNMENT,        false,   false  }, // * >>=
+    { E_DIVIDE,             E_BIT_RIGHT_SHIFT_ASSIGNMENT,        false,   false  }, // / >>=
+    { E_MOD,                E_BIT_RIGHT_SHIFT_ASSIGNMENT,        false,   false  }, // % >>=
+    { E_BIT_AND,            E_BIT_RIGHT_SHIFT_ASSIGNMENT,        false,   false  }, // & >>=
+    { E_BIT_OR,             E_BIT_RIGHT_SHIFT_ASSIGNMENT,        false,   false  }, // | >>=
+    { E_BIT_XOR,            E_BIT_RIGHT_SHIFT_ASSIGNMENT,        false,   false  }, // ^ >>=
+    { E_BIT_NOT,            E_BIT_RIGHT_SHIFT_ASSIGNMENT,        false,   false  }, // ~ >>=
+    { E_BIT_LEFT_SHIFT,     E_BIT_RIGHT_SHIFT_ASSIGNMENT,        false,   false  }, //  <<   >>= 
+    { E_BIT_RIGHT_SHIFT,    E_BIT_RIGHT_SHIFT_ASSIGNMENT,        false,   false  }, // >>  >>=
+    { E_OPEN_PARENTHESES,   E_BIT_RIGHT_SHIFT_ASSIGNMENT,        false,   false  },  // (   >>=
+    { E_CLOSE_PARENTHESES,  E_BIT_RIGHT_SHIFT_ASSIGNMENT,        false,   false  },  // )   >>=
+    { E_ASSIGNMENT,         E_BIT_RIGHT_SHIFT_ASSIGNMENT,        false,   false  },   // =   >>= 
+    { E_ADD_ASSIGNMENT,     E_BIT_RIGHT_SHIFT_ASSIGNMENT,        false,     false     },  //  += 
+    { E_MINUS_ASSIGNMENT,   E_BIT_RIGHT_SHIFT_ASSIGNMENT,        false,     false     },  //  -= 
+    { E_MULTIPLY_ASSIGNMENT,E_BIT_RIGHT_SHIFT_ASSIGNMENT,        false,     false     },  //  *= 
+    { E_DIVIDE_ASSIGNMENT,  E_BIT_RIGHT_SHIFT_ASSIGNMENT,        false,     false     },  //  /= 
+    { E_MOD_ASSIGNMENT,     E_BIT_RIGHT_SHIFT_ASSIGNMENT,        false,     false     },     // %=
+    { E_BIT_AND_ASSIGNMENT, E_BIT_RIGHT_SHIFT_ASSIGNMENT,        false,     false     },     // &=
+    { E_BIT_OR_ASSIGNMENT,  E_BIT_RIGHT_SHIFT_ASSIGNMENT,        false,     false     },     // |=
+    { E_BIT_XOR_ASSIGNMENT, E_BIT_RIGHT_SHIFT_ASSIGNMENT,        false,     false     },     // ^=
+    { E_BIT_LEFT_SHIFT_ASSIGNMENT, E_BIT_RIGHT_SHIFT_ASSIGNMENT, false,     false     },    // <<=
+    { E_BIT_RIGHT_SHIFT_ASSIGNMENT,E_BIT_RIGHT_SHIFT_ASSIGNMENT, false,     false     }     // >>=
 };
 
 // static 
@@ -515,99 +929,58 @@ void TokenMgr::executeCode()
         return;
     }
     
-    int sentenceType = -1;
 
     // Sequence / operator   Only
     int vecSz = static_cast<int>( m_oneSentence.size() );
 
     // if ( vecSz < 2 ) {
-    //     MyException e(E_THROW_SENTENCE_TOO_LESS_TOKEN, m_oneSentence.front()->getBeginPos() );
+    //     MyException e(E_THROW_SENTENCE_LESS_TOKEN, m_oneSentence.front()->getBeginPos() );
     //     // e.setDetail( m_oneSentence.front()->getBeginPos().getPos() );
     //     throw e;
     // } 
 
-    // vecSz >=2
-    int equal1stIdx = -1;
-    int equal2ndIdx = -1;
-    int equalCnt = 0; // '=' count
+    int firstTypeKeyWordIdx = -1;
+    int secondVaribleNameIdx = -1;
+    int thirdAssignmentIdx = -1;
+
+    int assignmentOpCnt = 0;
+    int variadicAssignmentCnt = 0;
     for( auto idx = 0; idx < vecSz;  ++idx )
     {
         TokenBase* pToken = m_oneSentence.at(idx);
         auto tokenType = pToken->getTokenType();
-        // tokenVec.push_back( tokenType );
+        auto opType    = pToken->getOperatorType();
 
-        if ( tokenType == E_TOKEN_OPERATOR   &&   pToken->getOperatorType() == E_ASSIGNMENT ) {
-            ++equalCnt;
-            if ( equalCnt == 1 ) {
-                equal1stIdx = idx;
-            } else if ( equalCnt == 2 ) {
-                equal2ndIdx = idx;
+        if ( idx == 0         &&  is1stTokenTypeKeyWord() ) {
+            firstTypeKeyWordIdx = 0;
+        } else if ( idx == 1  &&  (tokenType == E_TOKEN_EXPRESSION   &&    pToken->isVarible()) ) {
+            secondVaribleNameIdx = 1;
+        } else if ( idx == 2  &&  (tokenType == E_TOKEN_OPERATOR     &&    pToken->getOperatorType() == E_ASSIGNMENT ) ) {
+            thirdAssignmentIdx = 2;
+        }
+
+        /***************************************************
+          Variadic Assignment Operator Condition
+        ***************************************************/
+        if (         tokenType == E_TOKEN_OPERATOR
+              &&   (opType >= E_ASSIGNMENT && opType <= E_BIT_RIGHT_SHIFT_ASSIGNMENT) ) {
+            if ( opType == E_ASSIGNMENT ) {
+                ++assignmentOpCnt;
             }
+
+            ++variadicAssignmentCnt;
         }
     }
 
-    if ( equalCnt >= 2 ) {
-        MyException e(E_THROW_SENTENCE_TOO_MORE_ASSIGNMENT, m_oneSentence.at(equal2ndIdx)->getBeginPos() );
-        // e.setDetail( m_oneSentence.at(equal2ndIdx)->getBeginPos().getPos() );
-        throw e;
-    }
-
-    E_DataType defDt = E_TP_UNKNOWN;
-    string varname;
-    auto varIdx = 0;
-    auto hasTokenEqual = (equalCnt != 0);
-    if ( equalCnt == 0 ) {
-        if ( is1stTokenKeyWord() ) {
-            // 1. int a;
-            varIdx = (vecSz - 1);
-            defDt = checkPrefixKeyWordsAndGetDataType(varIdx, varname, hasTokenEqual);
-            sentenceType = 1;
-        } else {
-            //   e.g.  a+b;   3;
-            varIdx = 0;
-            sentenceType = 4; // all token is either expression ( can't not be keyword ) or operator
-        }
-    } else {
-        // 1 '='
-        // make sure  there must be at least 1 content before and after  '='
-        if ( equal1stIdx == 0 ) {
-            MyException e(E_THROW_SENTENCE_NO_EXPR_BEFORE_ASSIGNMENT, m_oneSentence.front()->getBeginPos() );
-            // e.setDetail( m_oneSentence.front()->getBeginPos().getPos() );
-            throw e;
-        } else if ( equal1stIdx == (vecSz -1) ) {
-            MyException e(E_THROW_SENTENCE_NO_EXPR_AFTER_ASSIGNMENT , m_oneSentence.back()->getBeginPos() );
-            // e.setDetail( m_oneSentence.back()->getBeginPos().getPos() );
-            throw e;
-        }
-
-        varIdx = (equal1stIdx - 1);
-        // equal1stIdx >=1
-        if ( equal1stIdx > 1 ) {
-            defDt  = checkPrefixKeyWordsAndGetDataType(varIdx, varname, hasTokenEqual);
-            // 2. int a = 3;
-            sentenceType = 2;
-        } else {
-            // equal1stIdx == 1  =>     varname = expression
-            auto varElement = m_oneSentence.at(varIdx);
-            if ( !(varElement->getTokenType() == E_TOKEN_EXPRESSION &&    varElement->isVarible()) ) {
-                MyException e(E_THROW_SENTENCE_DEFINITION_SUFFIX_IS_NOT_VARIBLE , varElement->getBeginPos() );
-                // e.setDetail( varElement->getBeginPos().getPos() );
-                throw e;
-            }
-            varname = varElement->getTokenContent();
-            // 3. a = 3;
-            sentenceType = 3;
-        }
-    }
-
+ 
     /*
     --------------------------------------------------
-        Only 3 kinds of format are all allowed
+        Only 4 kinds of format are all allowed
     --------------------------------------------------
 
-        1. DataType    varible                   (;)    type-id = 1
-        2. DataType    varible = expression      (;)    type=id = 2
-        3.             varible = expression      (;)    type-id = 3
+        1. DataType    varible                   (;)    type-id = 1    |  e.g. :   int index;
+        2. DataType    varible = expression      (;)    type=id = 2    |  e.g. :   int index = 1+a;
+        3.             varible = expression      (;)    type-id = 3    |  e.g. :       index = 3*b;
         4. Tmp expression                        (;)    such as     a + b * c;
 
         ///////////////////////////////////////////////////////////////////////
@@ -617,16 +990,90 @@ void TokenMgr::executeCode()
         ///////////////////////////////////////////////////////////////////////
 
     */
+    int sentenceType = 0;
 
+    E_DataType defDt = E_TP_UNKNOWN;
+    string varname;
+    auto varIdx = -1;
+    auto hasTokenEqual = (assignmentOpCnt > 0);
+    if ( firstTypeKeyWordIdx == 0 && secondVaribleNameIdx == 1 ) {
+        // e.g. :        int a;    /       int a = ...;
+        varIdx = 1;
+        if ( vecSz == 2 ) {
+            // e.g.    :  int a;
+            defDt = checkPrefixKeyWordsAndGetDataType(varIdx, varname, hasTokenEqual);
+            sentenceType = 1;
+        } else if ( thirdAssignmentIdx == 2 ) {
+            // e.g.    :  int a =  <expr ... > ;
+            defDt  = checkPrefixKeyWordsAndGetDataType(varIdx, varname, hasTokenEqual);
+            sentenceType = 2;
+        }
+    } else {
+        if ( variadicAssignmentCnt > 0 ) {
+            //  maybe  :   a = <expr>;    /   a += <expr>;
+            TokenBase* varElement = nullptr;
+            TokenBase* pToken = nullptr;
+            if (   (  (pToken = m_oneSentence.at(0)) != nullptr )
+                  &&   pToken->getTokenType() == E_TOKEN_OPERATOR
+                  && ( pToken->getOperatorType() >= E_ASSIGNMENT   &&  pToken->getOperatorType() <= E_BIT_RIGHT_SHIFT_ASSIGNMENT ) 
+            )
+            {
+                MyException e(E_THROW_SENTENCE_NO_EXPR_BEFORE_ASSIGNMENT, m_oneSentence.front()->getBeginPos() );
+                throw e;
+            }
+            else if (   (  (pToken = m_oneSentence.at(vecSz-1)) != nullptr )
+                       &&   pToken->getTokenType() == E_TOKEN_OPERATOR
+                       && ( pToken->getOperatorType() >= E_ASSIGNMENT   &&  pToken->getOperatorType() <= E_BIT_RIGHT_SHIFT_ASSIGNMENT ) 
+            )
+            {
+                MyException e(E_THROW_SENTENCE_NO_EXPR_AFTER_ASSIGNMENT , m_oneSentence.back()->getBeginPos() );
+                throw e;
+            }
+
+            pToken = nullptr;
+            if (     ((varElement = pToken = m_oneSentence.at(0)) != nullptr )
+                  && ( pToken->getTokenType() == E_TOKEN_EXPRESSION &&  pToken->isVarible() ) ) 
+            {
+                if (        vecSz >=2
+                      &&  ((pToken = m_oneSentence.at(1)) != nullptr )  
+                      &&  (pToken->getOperatorType() >= E_ASSIGNMENT   &&  pToken->getOperatorType() <= E_BIT_RIGHT_SHIFT_ASSIGNMENT ) )
+                {
+                    varIdx = 0;
+                    varname = varElement->getTokenContent();
+                    sentenceType = 3;
+                }
+                else
+                {
+                    MyException e(E_THROW_SENTENCE_2ND_IS_NOT_A_VARIADIC_ASSIGNMENT, varElement->getBeginPos() );
+                    throw e;
+                }
+            }
+            else
+            {
+                MyException e(E_THROW_SENTENCE_DEFINITION_PREFIX_IS_NOT_VARIBLE , varElement->getBeginPos() );
+                throw e;
+            }
+        } else {
+            // Tmp expression    : e.g.    a + b * c
+            TokenBase* pToken = nullptr;
+            if (   (  (pToken = m_oneSentence.at(0)) != nullptr )
+                  &&   pToken->getTokenType() == E_TOKEN_EXPRESSION &&  pToken->isVarible() )
+            {
+                varIdx = 0;
+                sentenceType = 4;
+            }
+        }
+    }
+
+    if ( sentenceType == 0 ) {
+        MyException e(E_THROW_SENTENCE_DEFINITION_PREFIX_IS_NOT_VARIBLE , m_oneSentence.at(0)->getBeginPos() );
+        throw e;
+    }
 
     auto sentenceVarElement = m_oneSentence.at(varIdx);
     VaribleInfo* pVaribleInfo = nullptr;
-    if ( sentenceType == 1 ) {
+    if ( sentenceType == 1 || sentenceType == 2 ) {
         // 1. e.g.  unsigned int a;
-        pVaribleInfo = VariblePool::getPool()->create_a_new_varible(defDt, varname, sentenceVarElement->getBeginPos().line );
-        sentenceVarElement->setDataType( pVaribleInfo->dataVal.type );
-        sentenceVarElement->setRealValue( pVaribleInfo->dataVal );
-    } else if ( sentenceType == 2 ) {
         // 2. e.g.  unsigned int           a = 3;
         pVaribleInfo = VariblePool::getPool()->create_a_new_varible(defDt, varname, sentenceVarElement->getBeginPos().line );
         sentenceVarElement->setDataType( pVaribleInfo->dataVal.type );
@@ -639,9 +1086,11 @@ void TokenMgr::executeCode()
             e.setDetail( varname );
             throw e;
         }
-    } 
+    }
 
-
+    //
+    //   sentenceType == 1  ==>    int a;
+    //
     if ( sentenceType != 1 ) {
         //                              == 4 && set need process tmp expression as    true
         if ( sentenceType != 4   ||   CmdOptions::needProcessTmpExpressionWithoutAssignment() ) {
@@ -654,7 +1103,6 @@ void TokenMgr::executeCode()
             printSuffixExpression(3);
             m_suffixExpression.clear(); // clear the only 1 element
         }
-
     }
 
 
@@ -667,6 +1115,9 @@ void TokenMgr::executeCode()
 
 
 
+/************************************************************
+ *                  Core Core Core                          *
+*************************************************************/
 void TokenMgr::buildSuffixExpression(int sentenceType, int varibleIdx)
 {
     int sententSz = static_cast<int>( m_oneSentence.size() );
@@ -763,9 +1214,10 @@ void TokenMgr::checkSuffixExpressionValid()
 }
 
 
-bool TokenMgr::is1stTokenKeyWord()
+bool TokenMgr::is1stTokenTypeKeyWord()
 {
     auto headtoken = m_oneSentence.front();
+    //                                                           here  : keyWord must be  type-key-word : int/long/ ... 
     return headtoken->getTokenType() == E_TOKEN_EXPRESSION  &&   headtoken->isKeyword();
 }
 
@@ -1057,6 +1509,36 @@ TokenBase* TokenMgr::doBinaryOp(TokenBase* left, TokenBase* op, TokenBase* right
     case E_ASSIGNMENT:
         genTmpExp = doAssignment(left,right);
         break;
+    case E_ADD_ASSIGNMENT:                 // +=
+        genTmpExp = do_Add_Assignment(left, right);
+        break;
+    case E_MINUS_ASSIGNMENT:               // -=
+        genTmpExp = do_Minus_Assignment(left, right);
+        break;
+    case E_MULTIPLY_ASSIGNMENT:            // *=
+        genTmpExp = do_Multiply_Assignment(left, right);
+        break;
+    case E_DIVIDE_ASSIGNMENT:              // /=
+        genTmpExp = do_Divide_Assignment(left, right);
+        break;
+    case E_MOD_ASSIGNMENT:                 // %=
+        genTmpExp = do_Mod_Assignment(left, right);
+        break;
+    case E_BIT_AND_ASSIGNMENT:             // &=
+        genTmpExp = do_Bit_And_Assignment(left, right);
+        break;
+    case E_BIT_OR_ASSIGNMENT:              // |=
+        genTmpExp = do_Bit_Or_Assignment(left, right);
+        break;
+    case E_BIT_XOR_ASSIGNMENT:             // ^=
+        genTmpExp = do_Bit_Xor_Assignment(left, right);
+        break;
+    case E_BIT_LEFT_SHIFT_ASSIGNMENT:      // <<=
+        genTmpExp = do_Bit_LeftShift_Assignment(left, right);
+        break;
+    case E_BIT_RIGHT_SHIFT_ASSIGNMENT:     // >>=
+        genTmpExp = do_Bit_RightShift_Assignment(left, right);
+        break;
     default:
         break;
     }
@@ -1167,7 +1649,7 @@ E_DataType TokenMgr::checkPrefixKeyWordsAndGetDataType(int varIdx, string& varna
 
     auto varElement = m_oneSentence.at(varIdx);
     if ( !(varElement->getTokenType() == E_TOKEN_EXPRESSION    &&   varElement->isVarible()) ) {
-        MyException e(E_THROW_SENTENCE_DEFINITION_SUFFIX_IS_NOT_VARIBLE , varElement->getBeginPos() );
+        MyException e(E_THROW_SENTENCE_DEFINITION_PREFIX_IS_NOT_VARIBLE , varElement->getBeginPos() );
         throw e;
     }
     varname = varElement->getTokenContent();
@@ -1800,6 +2282,58 @@ TokenBase* TokenMgr::doAssignment(TokenBase* left, TokenBase* right)
 
     return ret;
 }
+
+
+TokenBase* TokenMgr::do_Add_Assignment(TokenBase* left, TokenBase* right)
+{
+    return doAssignment( left,  doAdd(left, right) );
+}
+
+TokenBase* TokenMgr::do_Minus_Assignment(TokenBase* left, TokenBase* right)
+{
+    return doAssignment( left,  doMinus(left, right) );
+}
+
+TokenBase* TokenMgr::do_Multiply_Assignment(TokenBase* left, TokenBase* right)
+{
+    return doAssignment( left,  doMultiply(left, right) );
+}
+
+TokenBase* TokenMgr::do_Divide_Assignment(TokenBase* left, TokenBase* right)
+{
+    return doAssignment( left,  doDivide(left, right) );
+}
+
+TokenBase* TokenMgr::do_Mod_Assignment(TokenBase* left, TokenBase* right)
+{
+    return doAssignment( left,  doMod(left, right) );
+}
+
+TokenBase* TokenMgr::do_Bit_And_Assignment(TokenBase* left, TokenBase* right)
+{
+    return doAssignment( left,  doBitAnd(left, right) );
+}
+
+TokenBase* TokenMgr::do_Bit_Or_Assignment(TokenBase* left, TokenBase* right)
+{
+    return doAssignment( left,  doBitOr(left, right) );
+}
+
+TokenBase* TokenMgr::do_Bit_Xor_Assignment(TokenBase* left, TokenBase* right)
+{
+    return doAssignment( left,  doBitXor(left, right) );
+}
+
+TokenBase* TokenMgr::do_Bit_LeftShift_Assignment(TokenBase* left, TokenBase* right)
+{
+    return doAssignment( left,  doBitLeftShift(left, right) );
+}
+
+TokenBase* TokenMgr::do_Bit_RightShift_Assignment(TokenBase* left, TokenBase* right)
+{
+    return doAssignment( left,  doBitRightShift(left, right) );
+}
+
 
 
 //####################################################################################################

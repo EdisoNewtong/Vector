@@ -56,6 +56,17 @@ string EnumUtil::enumName(E_OperatorType tp)
     INNER_ENUM_2_STRING_MAP(E_OPEN_PARENTHESES)
     INNER_ENUM_2_STRING_MAP(E_CLOSE_PARENTHESES)
     INNER_ENUM_2_STRING_MAP(E_ASSIGNMENT)
+    ///////////////////////////////////////////////////
+    INNER_ENUM_2_STRING_MAP(E_ADD_ASSIGNMENT)
+    INNER_ENUM_2_STRING_MAP(E_MINUS_ASSIGNMENT)
+    INNER_ENUM_2_STRING_MAP(E_MULTIPLY_ASSIGNMENT)
+    INNER_ENUM_2_STRING_MAP(E_DIVIDE_ASSIGNMENT)
+    INNER_ENUM_2_STRING_MAP(E_MOD_ASSIGNMENT)
+    INNER_ENUM_2_STRING_MAP(E_BIT_AND_ASSIGNMENT)
+    INNER_ENUM_2_STRING_MAP(E_BIT_OR_ASSIGNMENT)
+    INNER_ENUM_2_STRING_MAP(E_BIT_XOR_ASSIGNMENT)
+    INNER_ENUM_2_STRING_MAP(E_BIT_LEFT_SHIFT_ASSIGNMENT)
+    INNER_ENUM_2_STRING_MAP(E_BIT_RIGHT_SHIFT_ASSIGNMENT)
     default:
         retstr = string("??? E_OperatorType ??? | value = ") + to_string( static_cast<int>(tp) );
         break;
@@ -220,12 +231,13 @@ string EnumUtil::enumName(E_ExceptionType tp)
     INNER_ENUM_2_STRING_MAP(E_THROW_VARIBLE_NOT_DEFINED)
     INNER_ENUM_2_STRING_MAP(E_THROW_VARIBLE_NOT_INITIALIZED_BEFORE_USED)
 
-    INNER_ENUM_2_STRING_MAP(E_THROW_SENTENCE_TOO_LESS_TOKEN)
-    INNER_ENUM_2_STRING_MAP(E_THROW_SENTENCE_TOO_MORE_ASSIGNMENT)
+    INNER_ENUM_2_STRING_MAP(E_THROW_SENTENCE_LESS_TOKEN)
+    INNER_ENUM_2_STRING_MAP(E_THROW_SENTENCE_MORE_TOKEN)
 
     INNER_ENUM_2_STRING_MAP(E_THROW_SENTENCE_PREFIX_TOKENS_ARE_INVALID)
     INNER_ENUM_2_STRING_MAP(E_THROW_SENTENCE_PREFIX_TOKENS_BEFORE_EQUAL_ARE_INVALID)
-    INNER_ENUM_2_STRING_MAP(E_THROW_SENTENCE_DEFINITION_SUFFIX_IS_NOT_VARIBLE)
+    INNER_ENUM_2_STRING_MAP(E_THROW_SENTENCE_DEFINITION_PREFIX_IS_NOT_VARIBLE)
+    INNER_ENUM_2_STRING_MAP(E_THROW_SENTENCE_2ND_IS_NOT_A_VARIADIC_ASSIGNMENT)
     INNER_ENUM_2_STRING_MAP(E_THROW_SENTENCE_DEFINITION_TOO_MANY_KEYWORDS)
     INNER_ENUM_2_STRING_MAP(E_THROW_SENTENCE_NO_EXPR_BEFORE_ASSIGNMENT)
     INNER_ENUM_2_STRING_MAP(E_THROW_SENTENCE_NO_EXPR_AFTER_ASSIGNMENT)
@@ -296,62 +308,121 @@ string EnumUtil::enumName(ParserBase::E_PARSER_TYPE tp)
 
 
 // static 
-E_OperatorType EnumUtil::getOpType(const char& firstCh, bool isUnary /* = false */)
+E_OperatorType EnumUtil::getOpType(const string& opSepStr, bool isUnary /* = false*/ )
 {
+    int  lenOfOp = static_cast<int>( opSepStr.size() );
+    char firstCh = opSepStr.at(0);
     E_OperatorType retOpTp = E_OPERATOR_UNKNOWN;
-    switch ( firstCh )
-    {
-    case '+':
-        retOpTp = (!isUnary ?  E_ADD : E_POSITIVE);
-        break;
-    case '-':
-        retOpTp = (!isUnary ?  E_MINUS : E_NEGATIVE);
-        break;
-    case '*':
-        retOpTp = E_MULTIPLY;
-        break;
-    case '/':
-        retOpTp = E_DIVIDE;
-        break;
-    case '%':
-        retOpTp = E_MOD;
-        break;
-    case '&':
-        retOpTp = E_BIT_AND;
-        break;
-    case '|':
-        retOpTp = E_BIT_OR;
-        break;
-    case '^':
-        retOpTp = E_BIT_XOR;
-        break;
-    case '~':
-        retOpTp = E_BIT_NOT;
-        break;
-    case '<':
-        retOpTp = E_BIT_LEFT_SHIFT;
-        break;
-    case '>':
-        retOpTp = E_BIT_RIGHT_SHIFT;
-        break;
-    case '(':
-        retOpTp = E_OPEN_PARENTHESES;
-        break;
-    case ')':
-        retOpTp = E_CLOSE_PARENTHESES;
-        break;
-    case '=':
-        retOpTp = E_ASSIGNMENT;
-        break;
-    default:
+    if ( lenOfOp == 1 ) {
+        switch ( firstCh )
         {
-            MyException e(E_THROW_INVALID_OPERATOR);
-            e.setDetail( string(1, firstCh) );
-            throw e;
+        case '+':
+            retOpTp = (!isUnary ?  E_ADD : E_POSITIVE);
+            break;
+        case '-':
+            retOpTp = (!isUnary ?  E_MINUS : E_NEGATIVE);
+            break;
+        case '*':
+            retOpTp = E_MULTIPLY;
+            break;
+        case '/':
+            retOpTp = E_DIVIDE;
+            break;
+        case '%':
+            retOpTp = E_MOD;
+            break;
+        case '&':
+            retOpTp = E_BIT_AND;
+            break;
+        case '|':
+            retOpTp = E_BIT_OR;
+            break;
+        case '^':
+            retOpTp = E_BIT_XOR;
+            break;
+        case '~':
+            retOpTp = E_BIT_NOT;
+            break;
+        case '(':
+            retOpTp = E_OPEN_PARENTHESES;
+            break;
+        case ')':
+            retOpTp = E_CLOSE_PARENTHESES;
+            break;
+        case '=':
+            retOpTp = E_ASSIGNMENT;
+            break;
+        default:
+            {
+                MyException e(E_THROW_INVALID_OPERATOR);
+                e.setDetail( string(1, firstCh) );
+                throw e;
+            }
+            break;
         }
-        break;
+    } else if ( lenOfOp == 2 ) {
+        char secondCh = opSepStr.at(1);
+        switch( secondCh )
+        {
+        case '=':
+            {
+                switch( firstCh )
+                {
+                case '+':
+                    retOpTp = E_ADD_ASSIGNMENT;
+                    break;
+                case '-':
+                    retOpTp = E_MINUS_ASSIGNMENT;
+                    break;
+                case '*':
+                    retOpTp = E_MULTIPLY_ASSIGNMENT;
+                    break;
+                case '/':
+                    retOpTp = E_DIVIDE_ASSIGNMENT;
+                    break;
+                case '%':
+                    retOpTp = E_MOD_ASSIGNMENT;
+                    break;
+                case '&':
+                    retOpTp = E_BIT_AND_ASSIGNMENT;
+                    break;
+                case '|':
+                    retOpTp = E_BIT_OR_ASSIGNMENT;
+                    break;
+                case '^':
+                    retOpTp = E_BIT_XOR_ASSIGNMENT;
+                    break;
+                default:
+                    {
+                        MyException e(E_THROW_INVALID_OPERATOR);
+                        e.setDetail( opSepStr );
+                        throw e;
+                    }
+                    break;
+                }
+            }
+            break;
+        case '<':
+            retOpTp = E_BIT_LEFT_SHIFT;
+            break;
+        case '>':
+            retOpTp = E_BIT_RIGHT_SHIFT;
+            break;
+        default:
+            {
+                MyException e(E_THROW_INVALID_OPERATOR);
+                e.setDetail( opSepStr );
+                throw e;
+            }
+            break;
+        }
+    } else if ( lenOfOp == 3 ) {
+        if ( opSepStr == "<<=" ) {
+            retOpTp = E_BIT_LEFT_SHIFT_ASSIGNMENT;
+        } else if ( opSepStr == ">>=" ) {
+            retOpTp = E_BIT_RIGHT_SHIFT_ASSIGNMENT;
+        }
     }
 
     return retOpTp;
 }
-

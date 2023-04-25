@@ -3,6 +3,7 @@ a-z A-Z   _                                                               // Alp
 0-9                                                                       // Number Type
 
 +    -    *    /    %    &    |    ^    ~    <<    >>    (    )    =      // Operator Type
++=   -=   */   /=   %=   &=   |=   ^=        <<=   >>=                    // Operator : Compound Assignment Type
 
 .   ;                                                                     // Other Type
 
