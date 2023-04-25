@@ -17,7 +17,7 @@ public:
     static std::string enumName(E_ExceptionType tp);
     static std::string enumName(ParserBase::E_PARSER_TYPE tp);
 
-    static E_OperatorType getOpType(const char& firstCh, bool isUnary = false);
+    static E_OperatorType getOpType(const std::string& opSepStr, bool isUnary = false);
 
 private:
     EnumUtil() = delete;
@@ -27,4 +27,3 @@ private:
 };
 
 #endif
-

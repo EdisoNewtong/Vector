@@ -26,62 +26,132 @@ ParserBase::E_PARSER_TYPE OperatorParser::appendChar(const ChInfo& rChInfo,  E_P
 
     char curCh = rChInfo.ch;
 
+    auto previousSz = static_cast<int>( m_parsedSeq.size() );
     auto firstCh = m_parsedSeq.at(0);
     auto isCurOp = isOperator(curCh);
     if ( isCurOp ) {
-        // 2nd is an operator type
-        switch ( firstCh )
-        {
-        case '/':
+        // 2nd or next character is an operator type
+        if ( previousSz == 1 ) {
+            switch ( firstCh )
             {
-                if ( curCh == '/' ) {
+            case '+':
+            case '-':
+            case '*':
+            /******************************************************
+            case '/':
+            *******************************************************/
+            case '%':
+            case '&':
+            case '|':
+            case '^':
+                {
+                    if ( curCh == '=' ) {
+                        //  +=   -=   *=   %=         &=   |=   ^=
+                        setEndPosFlag = true;
+                        m_parsedSeq += curCh;
+                        afterAction = E_GENERATE_TOKEN_SWITCH_TO_DEFAULT_STEP_NEXT;
+                        retType = ParserBase::E_BASE;
+                    } else {
+                        if ( firstCh == '+' ) {
+                            if ( curCh == '+' ) {
+                                //    "++"
+                            }
+                        } else if ( firstCh == '-' ) {
+                            if ( curCh == '-' ) {
+                                //    "--"
+                            }
+                        }
+
+                        setEndPosFlag = true;
+
+                        afterAction = E_GENERATE_TOKEN_SWITCH_TO_DEFAULT_KEEP_CURSOR;
+                        retType = ParserBase::E_BASE;
+                    }
+                }
+                break;
+            ////////////////////////////////////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////////////////////////////
+            case '/':
+                {
+                    if ( curCh == '/' || curCh == '*' ) {
+                        // Comment prefix sequence matched
+                        setEndPosFlag = true;
+                        m_parsedSeq += curCh;
+                        afterAction = E_TRANSFER_TO_OTHER;
+                        retType = ( (curCh == '/') ? ParserBase::E_SINGLE_LINE_COMMENT : ParserBase::E_MULTI_LINE_COMMENT );
+                    } else if ( curCh == '=' ) {
+                        setEndPosFlag = true;
+                        m_parsedSeq = "/=";
+                        afterAction = E_GENERATE_TOKEN_SWITCH_TO_DEFAULT_STEP_NEXT;
+                        retType = ParserBase::E_BASE;
+                    } else {
+                        afterAction = E_GENERATE_TOKEN_SWITCH_TO_DEFAULT_KEEP_CURSOR;
+                        retType = ParserBase::E_BASE;
+                    }
+                }
+                break;
+            case '<':
+                {
+
+                    if ( curCh != '<' ) {
+                         MyException e(E_THROW_INVALID_CHAR_AFTER_LEFT_BRACKET, rChInfo );
+                         throw e;
+                    }
+
+                    /***************************************************
+                        Valid : Wait for next '='   or other character
+                        Keep current parser
+                    ****************************************************/
+
                     setEndPosFlag = true;
-                    m_parsedSeq = "//";
-                    afterAction = E_TRANSFER_TO_OTHER;
-                    retType = ParserBase::E_SINGLE_LINE_COMMENT;
-                } else if ( curCh == '*' ) {
+                    m_parsedSeq += curCh;
+
+                    // m_parsedSeq = "<<";
+                    // afterAction = E_GENERATE_TOKEN_SWITCH_TO_DEFAULT_STEP_NEXT;
+                    // retType = ParserBase::E_BASE;
+                }
+                break;
+            case '>':
+                {
+                    if ( curCh != '>' ) {
+                        MyException e(E_THROW_INVALID_CHAR_AFTER_RIGHT_BRACKET, rChInfo );
+                        throw e;
+                    }
+
+                    /***************************************************
+                        Valid : Wait for next '='   or other character
+                        Keep current parser
+                    ****************************************************/
+
                     setEndPosFlag = true;
-                    m_parsedSeq = "/*";
-                    afterAction = E_TRANSFER_TO_OTHER;
-                    retType = ParserBase::E_MULTI_LINE_COMMENT;
-                } else {
+                    m_parsedSeq += curCh;
+
+                    // m_parsedSeq = ">>";
+                    // afterAction = E_GENERATE_TOKEN_SWITCH_TO_DEFAULT_STEP_NEXT;
+                    // retType = ParserBase::E_BASE;
+                }
+                break;
+            default:
+                {
                     afterAction = E_GENERATE_TOKEN_SWITCH_TO_DEFAULT_KEEP_CURSOR;
                     retType = ParserBase::E_BASE;
                 }
+                break;
             }
-            break;
-        case '<':
-            {
-                if ( curCh == '<' ) {
-                    setEndPosFlag = true;
-                    m_parsedSeq = "<<";
-                    afterAction = E_GENERATE_TOKEN_SWITCH_TO_DEFAULT_STEP_NEXT;
-                    retType = ParserBase::E_BASE;
-                } else {
-                     MyException e(E_THROW_INVALID_CHAR_AFTER_LEFT_BRACKET, rChInfo );
-                     throw e;
-                }
-            }
-            break;
-        case '>':
-            {
-                if ( curCh == '>' ) {
-                    setEndPosFlag = true;
-                    m_parsedSeq = ">>";
-                    afterAction = E_GENERATE_TOKEN_SWITCH_TO_DEFAULT_STEP_NEXT;
-                    retType = ParserBase::E_BASE;
-                } else {
-                    MyException e(E_THROW_INVALID_CHAR_AFTER_RIGHT_BRACKET, rChInfo );
-                    throw e;
-                }
-            }
-            break;
-        default:
-            afterAction = E_GENERATE_TOKEN_SWITCH_TO_DEFAULT_KEEP_CURSOR;
-            retType = ParserBase::E_BASE;
-            break;
-        }
+        } else if ( previousSz == 2 ) {
+            if ( (m_parsedSeq == "<<" || m_parsedSeq == ">>")   &&    curCh == '=' ) {
+                setEndPosFlag = true;
+                m_parsedSeq += curCh;
+                afterAction = E_GENERATE_TOKEN_SWITCH_TO_DEFAULT_STEP_NEXT;
+                retType = ParserBase::E_BASE;
+            } else {
 
+                afterAction  = E_GENERATE_TOKEN_SWITCH_TO_DEFAULT_KEEP_CURSOR;
+                retType = ParserBase::E_BASE;
+            }
+        }
     } else {
         // 2nd is not an operator type
         afterAction  = E_GENERATE_TOKEN_SWITCH_TO_DEFAULT_KEEP_CURSOR;
@@ -101,8 +171,8 @@ TokenBase* OperatorParser::generateToken() // override;
 {
     TokenBase* pGenToken = new TokenBase(E_TOKEN_OPERATOR);
 
-    auto firstCh = m_parsedSeq.at(0);
-    auto opTp = EnumUtil::getOpType(firstCh);
+    // auto firstCh = m_parsedSeq.at(0);
+    auto opTp = EnumUtil::getOpType(m_parsedSeq);
 
     pGenToken->setOpType( opTp );
     pGenToken->setTokenContent( m_parsedSeq );
@@ -127,9 +197,17 @@ bool OperatorParser::isParsedSeqValid(std::string& errorMsg) // override
             bret = true;
         }
     } else if ( sz == 2 ) {
-        bret = (m_parsedSeq == "<<" ||  m_parsedSeq == ">>");
+        const auto& the_2ndCh = m_parsedSeq.at(1);
+        /*
+               += , -= , *= , /= , %= , &= , |= , ^=                        <<                      >>            */
+        bret = (the_2ndCh == '='                         || m_parsedSeq == "<<" ||  m_parsedSeq == ">>");
         if ( !bret  ) {
-            errorMsg = "Operator with 2 chars is neither  <<   nor   >>";
+            errorMsg = "Operator with 2 chars is not one format of the following 3 type :  \"<<\"   |   \">>\"   |   \"[+-*/%&|^]=\"  ";
+        }
+    } else if ( sz == 3 ) {
+        bret = (m_parsedSeq == "<<=" ||  m_parsedSeq == ">>=");
+        if ( !bret  ) {
+            errorMsg = "Operator with 3 chars is neither  <<=   nor   >>=";
         }
     } else {
         bret = false;
