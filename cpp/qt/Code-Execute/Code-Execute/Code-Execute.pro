@@ -18,6 +18,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
+    SuperTextEdit.cpp \
     ##################################################
     core/buff.cpp \
     core/cmdOptions.cpp \
@@ -47,6 +48,7 @@ SOURCES += \
 
 HEADERS += \
     mainwindow.h \
+    SuperTextEdit.h \
     ##################################################
     core/buff.h \
     core/cmdOptions.h \

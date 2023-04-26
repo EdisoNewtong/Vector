@@ -7,14 +7,14 @@
     <x>0</x>
     <y>0</y>
     <width>1002</width>
-    <height>562</height>
+    <height>583</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>ArithMetic</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QPlainTextEdit" name="codeEdit">
+   <widget class="SuperTextEdit" name="codeEdit">
     <property name="geometry">
      <rect>
       <x>20</x>
@@ -48,13 +48,19 @@
     <property name="geometry">
      <rect>
       <x>700</x>
-      <y>450</y>
+      <y>460</y>
       <width>271</width>
       <height>61</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <family>Arial</family>
+      <pointsize>20</pointsize>
+     </font>
+    </property>
     <property name="text">
-     <string>Execute</string>
+     <string>Run </string>
     </property>
    </widget>
   </widget>
@@ -70,6 +76,13 @@
    </property>
   </widget>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>SuperTextEdit</class>
+   <extends>QPlainTextEdit</extends>
+   <header>SuperTextEdit.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
