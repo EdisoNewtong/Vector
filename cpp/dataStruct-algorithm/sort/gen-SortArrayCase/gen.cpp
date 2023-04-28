@@ -385,7 +385,7 @@ $ gen <N>   [--bin=<filename>]
 *****************************************************************************************************/
 int main(int argc, char* argv[])
 {
-    EndianCheck ec; ec.shortNum = 0x1BCD;
+    EndianCheck ec; ec.shortNum = 0xABCD;
     // 0 :    Big-Endian |    1 : Little-Endian
     g_iLittleEndianFlag = (ec.buf[0] == 0xAB   &&   ec.buf[1] == 0xCD) ? 0 : 1;
     cout << "\t" << (g_iLittleEndianFlag ? " Little-Endian" : " Big-Endian") << endl;
