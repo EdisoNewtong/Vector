@@ -29,8 +29,36 @@ SuperTextEdit::SuperTextEdit(QWidget *parent /* = nullptr */)
 	, m_EOL_R("\r")
 	, m_EOL_N("\n")
 {
+
+    const auto deltaNumberWidget = 3;
+    const auto deltaEolWidget = 3;
+
     lineNumberArea = new LineNumberArea(this);
-    newEOLArea     = new EndOfLineArea(this);
+    auto fntNumber = lineNumberArea->font();
+    auto ps = fntNumber.pointSize();
+    if ( ps != -1 ) {
+        // specified by point unit
+        fntNumber.setPointSize( ps + deltaNumberWidget );
+    } else {
+        // specified by pixel unit
+        fntNumber.setPixelSize( fntNumber.pixelSize() + deltaNumberWidget );
+    }
+    lineNumberArea->setFont( fntNumber );
+
+
+    newEOLArea  = new EndOfLineArea(this);
+    auto eolFnt = newEOLArea->font();
+    ps = eolFnt.pointSize();
+    if ( ps != -1 ) {
+        // specified by point unit
+        eolFnt.setPointSize( ps + deltaEolWidget );
+    } else {
+        // specified by pixel unit
+        eolFnt.setPixelSize( eolFnt.pixelSize() + deltaEolWidget );
+    }
+    newEOLArea->setFont( eolFnt );
+
+
 	// in able drag single file into this widget , fast open it and show it's content
 	setAcceptDrops(true);
 
@@ -67,14 +95,14 @@ int SuperTextEdit::lineNumberAreaWidth()
         ++digits;
     }
 
-    int space = 5 + fontMetrics().width(QLatin1Char('9')) * digits;
+    int space = 6 + lineNumberArea->fontMetrics().horizontalAdvance( QLatin1Char('9') ) * digits;
     return space;
 }
 
 
 int SuperTextEdit::eolAreaWidth()
 {
-	return 50;
+	return 6 + newEOLArea->fontMetrics().horizontalAdvance(  QStringLiteral("\\r\\n") );
 }
 
 
@@ -115,15 +143,18 @@ void SuperTextEdit::updateLineNumberArea(const QRect &rect, int dy)
 void SuperTextEdit::resizeEvent(QResizeEvent *e)
 {
     QPlainTextEdit::resizeEvent(e);
+
     QRect cr = contentsRect();
 
 	QRect rect1(cr.left(), cr.top(), lineNumberAreaWidth(), cr.height());
     lineNumberArea->setGeometry( rect1 );
 
 	// Core Core Core :
-	//    When the verticalBar is shown, it will occur a certain space  ( e->size() will reduce the vBar->width() )
+    //    When the verticalBar is shown, it will occupy a certain space  ( e->size() will reduce the vBar->width() )
     QRect rect2(cr.left() + lineNumberAreaWidth() + e->size().width(), cr.top(), eolAreaWidth(), cr.height());
     newEOLArea->setGeometry( rect2 );
+
+
 }
 
 //![resizeEvent]
@@ -174,8 +205,8 @@ void SuperTextEdit::lineNumberAreaPaintEvent(QPaintEvent *event)
         if (block.isVisible() && bottom >= event->rect().top()) {
             QString number = QString::number(blockNumber + 1);
             painter.setPen(theCursor.blockNumber() == blockNumber ? Qt::red : Qt::black);
-            painter.drawText(0, top, lineNumberArea->width(), fontMetrics().height(),
-                             Qt::AlignRight, number);
+            painter.drawText(0, top, lineNumberArea->width(), lineNumberArea->fontMetrics().height(),
+                             Qt::AlignCenter, number);
         } 
 
         block = block.next();
@@ -222,7 +253,7 @@ void SuperTextEdit::eolAreaPaintEvent(QPaintEvent *event)
 							} else {
 								eolstr = "\\r";
 							}
-							painter.drawText(0, top, eolAreaWidth(), fontMetrics().height(),
+							painter.drawText(0, top, eolAreaWidth(), newEOLArea->fontMetrics().height(),
 											 Qt::AlignLeft, eolstr );
 						}
 
