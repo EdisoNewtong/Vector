@@ -10,7 +10,21 @@
 
 SuperTextEdit::SuperTextEdit(QWidget *parent) : QPlainTextEdit(parent)
 {
+    const auto deltaNumberWidget = 2;
+
     lineNumberArea = new LineNumberArea(this);
+    auto fntNumber = lineNumberArea->font();
+    auto ps = fntNumber.pointSize();
+    if ( ps != -1 ) {
+        // specified by point unit
+        fntNumber.setPointSize( ps + deltaNumberWidget );
+    } else {
+        // specified by pixel unit
+        fntNumber.setPixelSize( fntNumber.pixelSize() + deltaNumberWidget );
+    }
+    lineNumberArea->setFont( fntNumber );
+
+
 	// in able drag single file into this widget , fast open it and show it's content
 	setAcceptDrops(true);
 
@@ -35,7 +49,8 @@ int SuperTextEdit::lineNumberAreaWidth()
         ++digits;
     }
 
-    int space = 5 + fontMetrics().width(QLatin1Char('9')) * digits;
+    // int space = 5 + fontMetrics().width(QLatin1Char('9')) * digits;
+    int space = 5 + lineNumberArea->fontMetrics().horizontalAdvance( QLatin1Char('9')) * digits;
     return space;
 }
 
@@ -123,8 +138,8 @@ void SuperTextEdit::lineNumberAreaPaintEvent(QPaintEvent *event)
         if (block.isVisible() && bottom >= event->rect().top()) {
             QString number = QString::number(blockNumber + 1);
             painter.setPen(Qt::black);
-            painter.drawText(0, top, lineNumberArea->width(), fontMetrics().height(),
-                             Qt::AlignRight, number);
+            painter.drawText(0, top, lineNumberArea->width(), lineNumberArea->fontMetrics().height(),
+                             Qt::AlignCenter, number);
         }
 
         block = block.next();
