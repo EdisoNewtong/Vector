@@ -10,7 +10,7 @@ Chap03 : New Language Features
     3.1.6    New String Literals
     3.1.7    Keyword   noexcept
     3.1.8    Keyword   constexpr
-    3.1.9    New Template Features
+    3.1.9    New Template Features ( Variadic Template ( Variadic => 可变的,这里的可变指的是 : 模板的参数的数量 是 可变长的 ) )
     3.1.10   Lambdas
     3.1.11   Keyword decltype
     3.1.12   New Function Declaration Syntax
