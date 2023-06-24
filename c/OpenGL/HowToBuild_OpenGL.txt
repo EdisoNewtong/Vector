@@ -1,7 +1,20 @@
+======================================================================================================================================================
+In Ubantu like Linux :
+======================================================================================================================================================
+    Enter the following command to install the development environment for OpenGL in the given ordering
+    Then OpenGL development environment is well ready to work for you.
+
+$ sudo apt-get install libgl1-mesa-dev
+$ sudo apt-get install libglu1-mesa-dev
+$ sudo apt-get install freeglut3-dev 
+
+
+
+
+======================================================================================================================================================
 
 1. 
 $ apt-get install freeglut3 freeglut3-dev libglew-dev
-
 
 2. 
 $ apt-get install mesa-utils
@@ -11,16 +24,16 @@ $ apt-get install mesa-utils
 
 <Or>
 
-    Enter sudo apt-get update
-    Enter sudo apt-get install freeglut3
-    Enter sudo apt-get install freeglut3-dev
-    Enter sudo apt-get install binutils-gold
-    Enter sudo apt-get install g++ cmake
-    Enter sudo apt-get install libglew-dev
-    Enter sudo apt-get install g++
-    Enter sudo apt-get install mesa-common-dev
-    Enter sudo apt-get install build-essential
-    Enter sudo apt-get install libglew1.5-dev libglm-dev
+$ sudo apt-get update
+$ sudo apt-get install freeglut3
+$ sudo apt-get install freeglut3-dev
+$ sudo apt-get install binutils-gold
+$ sudo apt-get install g++ cmake
+$ sudo apt-get install libglew-dev
+$ sudo apt-get install g++
+$ sudo apt-get install mesa-common-dev
+$ sudo apt-get install build-essential
+$ sudo apt-get install libglew1.5-dev libglm-dev
 
 ======================================================================================================================================================
 
@@ -44,5 +57,7 @@ $ apt-get install mesa-utils
 
 Get The information about the OpenGL and GLX implementation running on a given X display , To do this, enter
 $ glxinfo
+
+
 
 
