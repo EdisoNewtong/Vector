@@ -4,9 +4,12 @@ In Ubantu like Linux :
     Enter the following command to install the development environment for OpenGL in the given ordering
     Then OpenGL development environment is well ready to work for you.
 
+// Package #1  "freeglut3-dev"     is a  *** Must ***
+$ sudo apt-get install freeglut3-dev 
+
+// Package 2~3 is optional , it rely on the compiler's process result
 $ sudo apt-get install libgl1-mesa-dev
 $ sudo apt-get install libglu1-mesa-dev
-$ sudo apt-get install freeglut3-dev 
 
 
 
