@@ -75,6 +75,26 @@ return require('packer').startup(function(use)
   use 'folke/tokyonight.nvim'
 
 
+  --------------------------------------------------
+  -- For rainbow color parentheses pair appearance
+  --------------------------------------------------
   use 'p00f/nvim-ts-rainbow'
+
+
+
+  --------------------------------------------------
+  -- nvim-tree
+  --------------------------------------------------
+  use {
+    'nvim-tree/nvim-tree.lua',
+    requires = {
+      'nvim-tree/nvim-web-devicons', -- optional
+    },
+  }
+
+  --------------------------------------------------
+  -- coc
+  --------------------------------------------------
+  use {'neoclide/coc.nvim', branch = 'release'}
 
 end)
