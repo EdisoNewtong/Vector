@@ -824,7 +824,12 @@ void TokenMgr::pushToken(TokenBase* pToken)
     }
 
     auto tokenType = pToken->getTokenType();
+
+    // ****************************************************
+    // the key logic ( critical )
+    // ****************************************************
     auto pr = checkTokenValidFromPreviousRelationship(pToken);
+
     auto isValid = pr.first;
     if ( !isValid ) {
         auto previousToken = pr.second;
@@ -866,6 +871,7 @@ void TokenMgr::pushToken(TokenBase* pToken)
             detailstr += " @";
             detailstr += pToken->getBeginPos().getPos(0);
         }
+
         detailstr += " is not allowed";
         e.setDetail(detailstr);
         throw e;
@@ -1683,9 +1689,22 @@ bool TokenMgr::hasPreviousExistOpenParentheses()
 }
 
 
+// *********************************************************************************************
+// *** Core Core Core *** Function 
+// *********************************************************************************************
 //
-// *** Core Core Core *** Function
-//   Key Logic
+// Core Core Core * 3
+// Core Core Core * 3
+// Core Core Core * 3
+//
+//======================================================================================================================================================
+//
+//      : This function is check two adjacent token's relationship is valid or not
+//
+//======================================================================================================================================================
+//
+//   Key Logic    
+//
 pair<bool,TokenBase*> TokenMgr::checkTokenValidFromPreviousRelationship(TokenBase* toBePushed)
 {
     auto avaliable = false;
