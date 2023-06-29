@@ -63,7 +63,7 @@ Token Type
 
 
 //
-// binary operation
+// Other Characters 
 //
 a-zA-Z0-9   _
 
@@ -85,6 +85,8 @@ a-zA-Z0-9   _
 // Support function invoke
 //
 
+//    Defined in header file <cmath>
+
 // Variadic function
 //--------------------------------
 //       Basic operations   
@@ -93,7 +95,6 @@ abs(...)
     float       abs( float arg );
     double      abs( double arg );
     long double abs( long double arg );
-    Defined in header <cmath>
     float       fabs ( float arg );
     float       fabsf( float arg );
     double      fabs ( double arg );
