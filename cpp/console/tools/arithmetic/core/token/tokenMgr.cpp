@@ -811,7 +811,7 @@ TokenMgr::~TokenMgr()
 
 void TokenMgr::pushToken(TokenBase* pToken)
 {
-    using namespace charutil;
+    using namespace charUtil;
 
     if ( pToken == nullptr ) {
         MyException e(E_THROW_NULL_PTR);
@@ -1609,7 +1609,7 @@ void TokenMgr::popUntilOpenParentheses()
 
 E_DataType TokenMgr::checkPrefixKeyWordsAndGetDataType(int varIdx, string& varname, bool hasTokenEqual )
 {
-    using namespace charutil;
+    using namespace charUtil;
 
     E_DataType dt = E_TP_UNKNOWN;
 
@@ -1928,7 +1928,7 @@ pair<TokenBase*,TokenBase*> TokenMgr::getPreviousToken()
 //      Binary Op
 TokenBase* TokenMgr::doAdd(TokenBase* left, TokenBase* right)
 {
-    using namespace charutil;
+    using namespace charUtil;
 
     string leftContent  = left->getExpressionContent();
     string rightContent = right->getExpressionContent();
@@ -1950,7 +1950,7 @@ TokenBase* TokenMgr::doAdd(TokenBase* left, TokenBase* right)
 
 TokenBase* TokenMgr::doMinus(TokenBase* left, TokenBase* right)
 {
-    using namespace charutil;
+    using namespace charUtil;
 
     string leftContent  = left->getExpressionContent();
     string rightContent = right->getExpressionContent();
@@ -1974,7 +1974,7 @@ TokenBase* TokenMgr::doMinus(TokenBase* left, TokenBase* right)
 
 TokenBase* TokenMgr::doMultiply(TokenBase* left, TokenBase* right)
 {
-    using namespace charutil;
+    using namespace charUtil;
 
     string leftContent  = left->getExpressionContent();
     string rightContent = right->getExpressionContent();
@@ -1996,7 +1996,7 @@ TokenBase* TokenMgr::doMultiply(TokenBase* left, TokenBase* right)
 
 TokenBase* TokenMgr::doDivide(TokenBase* left, TokenBase* right)
 {
-    using namespace charutil;
+    using namespace charUtil;
 
     string leftContent  = left->getExpressionContent();
     string rightContent = right->getExpressionContent();
@@ -2031,7 +2031,7 @@ TokenBase* TokenMgr::doDivide(TokenBase* left, TokenBase* right)
 
 TokenBase* TokenMgr::doMod(TokenBase* left, TokenBase* right)
 {
-    using namespace charutil;
+    using namespace charUtil;
 
     string leftContent  = left->getExpressionContent();
     string rightContent = right->getExpressionContent();
@@ -2075,7 +2075,7 @@ TokenBase* TokenMgr::doMod(TokenBase* left, TokenBase* right)
 
 TokenBase* TokenMgr::doBitAnd(TokenBase* left, TokenBase* right)
 {
-    using namespace charutil;
+    using namespace charUtil;
 
     string leftContent  = left->getExpressionContent();
     string rightContent = right->getExpressionContent();
@@ -2110,7 +2110,7 @@ TokenBase* TokenMgr::doBitAnd(TokenBase* left, TokenBase* right)
 
 TokenBase* TokenMgr::doBitOr(TokenBase* left, TokenBase* right)
 {
-    using namespace charutil;
+    using namespace charUtil;
 
     string leftContent  = left->getExpressionContent();
     string rightContent = right->getExpressionContent();
@@ -2145,7 +2145,7 @@ TokenBase* TokenMgr::doBitOr(TokenBase* left, TokenBase* right)
 
 TokenBase* TokenMgr::doBitXor(TokenBase* left, TokenBase* right)
 {
-    using namespace charutil;
+    using namespace charUtil;
 
     string leftContent  = left->getExpressionContent();
     string rightContent = right->getExpressionContent();
@@ -2181,7 +2181,7 @@ TokenBase* TokenMgr::doBitXor(TokenBase* left, TokenBase* right)
 
 TokenBase* TokenMgr::doBitLeftShift(TokenBase* left, TokenBase* right)
 {
-    using namespace charutil;
+    using namespace charUtil;
 
     string leftContent  = left->getExpressionContent();
     string rightContent = right->getExpressionContent();
@@ -2222,7 +2222,7 @@ TokenBase* TokenMgr::doBitLeftShift(TokenBase* left, TokenBase* right)
 
 TokenBase* TokenMgr::doBitRightShift(TokenBase* left, TokenBase* right)
 {
-    using namespace charutil;
+    using namespace charUtil;
 
     string leftContent  = left->getExpressionContent();
     string rightContent = right->getExpressionContent();
@@ -2259,7 +2259,7 @@ TokenBase* TokenMgr::doBitRightShift(TokenBase* left, TokenBase* right)
 
 TokenBase* TokenMgr::doAssignment(TokenBase* left, TokenBase* right)
 {
-    using namespace charutil;
+    using namespace charUtil;
 
     VaribleInfo* toBeAssignmentVar = nullptr;
     auto content = left->getTokenContent();
@@ -2360,7 +2360,7 @@ TokenBase* TokenMgr::do_Bit_RightShift_Assignment(TokenBase* left, TokenBase* ri
 //      Unary Op
 TokenBase* TokenMgr::doPositive(TokenBase* op, TokenBase* right)
 {
-    using namespace charutil;
+    using namespace charUtil;
 
 
     string rightContent = right->getExpressionContent();
@@ -2385,7 +2385,7 @@ TokenBase* TokenMgr::doPositive(TokenBase* op, TokenBase* right)
 
 TokenBase* TokenMgr::doNegative(TokenBase* op, TokenBase* right)
 {
-    using namespace charutil;
+    using namespace charUtil;
 
     string rightContent = right->getExpressionContent();
     string finalExpr = SC_OP_NEGATIVE_BEGIN + rightContent;
@@ -2412,7 +2412,7 @@ TokenBase* TokenMgr::doNegative(TokenBase* op, TokenBase* right)
 
 TokenBase* TokenMgr::doBitNot(TokenBase* op, TokenBase* right)
 {
-    using namespace charutil;
+    using namespace charUtil;
 
     string rightContent = right->getExpressionContent();
     string finalExpr = SC_OP_BIT_NOT_BEGIN + rightContent;
@@ -2600,7 +2600,7 @@ void TokenMgr::popAllOperatorStack()
 
 void TokenMgr::traceOperatorStack(TokenBase* pToken, bool push)
 {
-    using namespace charutil;
+    using namespace charUtil;
 
     if ( CmdOptions::needTraceOperatorStackSuffixExpressionChange()  ) {
         if ( push ) {
@@ -2615,7 +2615,7 @@ void TokenMgr::traceOperatorStack(TokenBase* pToken, bool push)
 
 void TokenMgr::traceSuffixExpression(TokenBase* pToken, bool push)
 {
-    using namespace charutil;
+    using namespace charUtil;
 
     if ( CmdOptions::needTraceOperatorStackSuffixExpressionChange()  ) {
         if ( push ) {
@@ -2630,7 +2630,7 @@ void TokenMgr::traceSuffixExpression(TokenBase* pToken, bool push)
 // pop from OpStack , push it into SuffixExpression list
 void TokenMgr::traceOpMove2SuffixExpression(TokenBase* pToken)
 {
-    using namespace charutil;
+    using namespace charUtil;
 
     if ( CmdOptions::needTraceOperatorStackSuffixExpressionChange()  ) {
         auto tokenContent = pToken->getTokenContent();
@@ -2645,7 +2645,7 @@ void TokenMgr::traceOpMove2SuffixExpression(TokenBase* pToken)
 void TokenMgr::traceSomeTokensFromOpMove2SuffixExpression(const list<TokenBase*>& lst, bool specialFlag)
 {
     if ( CmdOptions::needTraceOperatorStackSuffixExpressionChange()  ) {
-        using namespace charutil;
+        using namespace charUtil;
         if ( lst.empty() ) { return; }
 
         int cnt     = 0;
@@ -2713,7 +2713,7 @@ void TokenMgr::tracePositiveNegativeFlag(TokenBase* pToken, E_OperatorType op)
 
 void TokenMgr::tracePushedTokenWarning(TokenBase* pToken)
 {
-    using namespace charutil;
+    using namespace charUtil;
 
     auto strWarning = pToken->getWarningContent();
     if (  CmdOptions::needPrintParseRuntimeWarning()    &&   !strWarning.empty() ) {
@@ -2733,7 +2733,7 @@ void TokenMgr::tracePushedTokenWarning(TokenBase* pToken)
 
 void TokenMgr::tracebitShiftWarning(bool isLeftBitShift, TokenBase* left,  TokenBase* right)
 {
-    using namespace charutil;
+    using namespace charUtil;
 
     // Core Core Core : config this flag
     static const bool SC_B_SHOULD_ALWAYS_CHECK_RIGHT_VALUE = true;
@@ -2812,7 +2812,7 @@ void TokenMgr::tracebitShiftWarning(bool isLeftBitShift, TokenBase* left,  Token
 
 void TokenMgr::traceNegativeOperation(TokenBase* right)
 {
-    using namespace charutil;
+    using namespace charUtil;
 
     if ( CmdOptions::needPrintParseRuntimeWarning()  ) {
         if ( right->isVarible()  ) {
@@ -2850,7 +2850,7 @@ void TokenMgr::traceTmpOpResult(const std::string& expr, DataValue& retValue)
 void TokenMgr::traceUnInitializedVarWhenUsed(TokenBase* pToken)
 {
 
-    using namespace charutil;
+    using namespace charUtil;
 
     if ( CmdOptions::needPrintParseRuntimeWarning() ) {
         cerr << SC_WARNING_TITLE;
@@ -2863,7 +2863,7 @@ void TokenMgr::traceUnInitializedVarWhenUsed(TokenBase* pToken)
 
 void TokenMgr::traceBlankStatement()
 {
-    using namespace charutil;
+    using namespace charUtil;
 
     if ( CmdOptions::needPrintParseRuntimeWarning() &&  CmdOptions::needTreatBlankStatementAsWarning()  ) {
         cerr << SC_WARNING_TITLE;
@@ -2876,7 +2876,7 @@ void TokenMgr::traceBlankStatement()
 
 void TokenMgr::traceAssignOverFlow(TokenBase* leftVar, TokenBase* rightFixedInt)
 {
-    using namespace charutil;
+    using namespace charUtil;
 
     if ( CmdOptions::needCheckFixedLiteralIntRangeWhenAssign()   &&   rightFixedInt->isFixedLiteral() ) {
         TypeBaseInfo  leftVarTpInfo(  leftVar->getDataType() );

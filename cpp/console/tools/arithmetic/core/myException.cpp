@@ -128,7 +128,7 @@ string MyException::getDetail()
 
 string MyException::getExceptionDetail() const
 {
-    using namespace charutil;
+    using namespace charUtil;
 
     string detail;
     auto it = s_exceptionMap.find(m_errorCode);
@@ -165,7 +165,7 @@ E_ExceptionType MyException::getCode()
 /*
 const char* MyException::what() const noexcept // throw()
 {
-    using namespace charutil;
+    using namespace charUtil;
 
     string detail;
     auto it = s_exceptionMap.find(m_errorCode);

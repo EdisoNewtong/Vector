@@ -4,7 +4,7 @@
 #include "commonEnum.h"
 #include <string>
 
-namespace charutil
+namespace charUtil
 {
     static const std::string SPACE_1 = std::string(1,' ');
     static const std::string SPACE_2 = std::string(2,' ');
@@ -200,9 +200,9 @@ namespace charutil
 
                 } else {
                     // sz == 2
-                    if ( opStr == charutil::SC_OP_BIT_LEFT_SHIFT ) {
+                    if ( opStr == charUtil::SC_OP_BIT_LEFT_SHIFT ) {
                         retType = E_BIT_LEFT_SHIFT;
-                    } else if ( opStr == charutil::SC_OP_BIT_RIGHT_SHIFT ) {
+                    } else if ( opStr == charUtil::SC_OP_BIT_RIGHT_SHIFT ) {
                         retType = E_BIT_RIGHT_SHIFT;
                     }
                 }

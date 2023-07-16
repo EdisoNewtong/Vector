@@ -92,7 +92,7 @@ void GlobalDirector::switchParser(ParserBase::E_PARSER_TYPE type)
 
 void GlobalDirector::doParse()
 {
-    using namespace charutil;
+    using namespace charUtil;
 
     if ( m_buff == nullptr ) {
         return;

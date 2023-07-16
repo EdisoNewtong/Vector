@@ -402,7 +402,7 @@ void TokenBase::setRealValue(const DataValue& value)
 
 string    TokenBase::getExpressionContent()
 {
-    using namespace charutil;
+    using namespace charUtil;
 
     string retExpr = getTokenContent();
 

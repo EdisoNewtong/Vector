@@ -19,7 +19,7 @@ OperatorParser::~OperatorParser()
 // virtual 
 ParserBase::E_PARSER_TYPE OperatorParser::appendChar(const ChInfo& rChInfo,  E_ParserAction& afterAction) // override;
 {
-    using namespace charutil;
+    using namespace charUtil;
 
     auto setEndPosFlag = false;
     ParserBase::E_PARSER_TYPE retType = m_type;
