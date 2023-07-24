@@ -1,0 +1,158 @@
+
+
+1.  TokenBase(E_TokenType tp);
+
+
+// forcely set token-type as   E_TOKEN_EXPRESSION 
+2.  TokenBase(E_DataType dt); // fixed literal such as   123  3.14  => treat as an expression with a dataType such as int/float etc.
+
+####################################################################################################
+
+E_TokenType
+{
+    E_TOKEN_UNKNOWN = 0,
+    //--------------------------------------------------
+    E_TOKEN_BLANK, E_TOKEN_SINGLE_LINE_COMMENT, E_TOKEN_MULTI_LINE_COMMENT,
+    //--------------------------------------------------
+
+    E_TOKEN_EXPRESSION, E_TOKEN_OPERATOR, E_TOKEN_SEMICOLON,
+}
+
+####################################################################################################
+
+E_DataType
+{
+    E_TP_UNKNOWN,
+    E_TP_CHAR,    E_TP_U_CHAR,  E_TP_S_CHAR,  
+    E_TP_U_SHORT, E_TP_S_SHORT, 
+    E_TP_U_INT,   E_TP_S_INT,   
+    E_TP_U_LONG,  E_TP_S_LONG,  
+    E_TP_U_LONG_LONG, E_TP_S_LONG_LONG, 
+
+    E_TP_FLOAT,       
+    E_TP_DOUBLE,      
+}
+
+########################################################################################################################################################################################################
+
+    E_TOKEN_BLANK,                   E_TOKEN_SINGLE_LINE_COMMENT,    E_TOKEN_MULTI_LINE_COMMENT,
+//----------------------------------------------------------------------------------------------------
+    E_TOKEN_EXPRESSION,           E_TOKEN_OPERATOR,      E_TOKEN_SEMICOLON
+
+########################################################################################################################################################################################################
+
+Core Core Core
+
+    Number literal is a kind of E_TOKEN_EXPRESSION which has a specific DataType   
+
+                     Varible
+                   /
+E_TOKEN_EXPRESSION
+                   \ 
+                     Fixed Literal
+
+
+Expect Blank, Comment ( Because Blank and Comment can be existed in any place ) 
+The Valid Token remain 3 kinds of token :    
+
+1. expression 
+2. operator 
+3. semicolon  
+
+The semicolon :   ';'    is the terminal token for a statement 
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Inside a statement
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+So inside a statement , There only existes 2 kinds of token. One is <Expr> and the other is <Operator>
+
+Any adjacent two tokens has the following possible order :
+----------------------------------------------------------------------------------------------------
+Case #1.   <Operator>  <Operator>    :   such as   + (      or         +=      or    ((      ...
+Case #2.   <Operator>  <Expr>        :   such as   + a
+Case #3.   <Expr>  <Operator>        :   a +
+Case #4.   <Expr>  <Expr>            :   int a ( here 'int' is a special token which is a reserved key word for parser rather than a normal varible name )
+----------------------------------------------------------------------------------------------------
+
+We can lay down a regulation for whether the given two adjacent tokens' relationship is valid or not
+
+; a
+; +
+
+a ;
++ ;
+
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+At the beginning  of Statement
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+<Semicolon>  <Semicolon>
+<Semicolon>  <Expr>
+<Semicolon>  <Operator>
+
+
+
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+At the end of Statement 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+1. evaluate the suffix-expression ( Build the suffix-expression during each token being pushed ) immediately
+
+    <Expr>       <Semicolon>
+    <Operator>   <Semicolon>
+
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Operator Parser in detail
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+All the operator type are listed in the following :
+
+//////////////////////////////////////////////////
+// Unary Operator
+//////////////////////////////////////////////////
+// Positive and Negative / Bit Flip     
+       +           -           ~       
+
+
+//////////////////////////////////////////////////
+// Binary Operator
+//////////////////////////////////////////////////
+// Plus , Minus , Multiply , Divide , Mod
+   +       -         *         /       %
+
+// Bit And / Or / XOR
+        &    |     ^
+
+
+//  Bit Left Shift / Right Shift
+         <<             >>
+
+//  Single Assignment 
+          =
+
+//  Compound Assignment
+     +=    -=     *=     /=    %=     
+     <<=   >>=
+     &=    |=     ^=
+
+// Comma
+     ,
+
+
+//  Parenthesis   Util
+    (        )
+
+Operator available character list :
+####################################################################################################
++ - * / %      & | ^ ~      <   >  =          ,   (   )
+####################################################################################################
+
+
+Operator Parser do the following step :  
+1. parse arbitrary !!! < successive > !!! operator character one after another  // What I need to !!! < emphesis >!!! is successive , without any blank or comment 
+2. till meet a character which is not in the operator available character list 
+    or reach the max length of available operator        // <<=
+    or not include in the available operator type list.  //  +-  , the given sequence stand for do negative first and then do positive
+
+
+
