@@ -117,8 +117,13 @@ enum E_ExceptionType
     E_THROW_CODE_CANNOT_REACH_HERE,
     E_THROW_NULL_PTR,
 
-    E_THROW_INVALID_CHAR_AFTER_LEFT_BRACKET,      // << : OK ,  <a  , a is not allowed
-    E_THROW_INVALID_CHAR_AFTER_RIGHT_BRACKET,     // >> : OK ,  >a  , a is not allowed
+    E_THROW_UNSUPPORTED_FEATURE_LESS_THAN,        // << : OK ,  less than ( a < b ) is an unsupported feature
+    E_THROW_UNSUPPORTED_FEATURE_GREATER_THAN,     // >> : OK ,  greater than ( a > b ) is an unsupported feature
+
+    E_THROW_UNSUPPORTED_FEATURE_NO_GREATER_THAN,  // << : OK ,  no greater than ( a <= b ) is an unsupported feature
+    E_THROW_UNSUPPORTED_FEATURE_NO_LESS_THAN,     // >> : OK ,  no less than ( a >= b ) is an unsupported feature
+
+    E_THROW_UNSUPPORTED_FEATURE_EQUAL_TO,        // == is an unsupported feature
 
     //////////////////////////////////////////////////
     E_THROW_INVALID_PARSEDSTR_TO_GENERATE_TOKEN,
@@ -190,6 +195,9 @@ enum E_ExceptionType
 
     E_THROW_INVALID_SUFFIX_EXPRESSION,
     E_THROW_LAST_VALID_TOKEN_IS_NOT_SEMICOLON,
+
+    E_THROW_UNSUPPORTED_FEATURE_INCREASEMENTAL_1, // ++ is not supported in this version
+    E_THROW_UNSUPPORTED_FEATURE_DECREASEMENTAL_1, // -- is not supported in this version
 
 };
 

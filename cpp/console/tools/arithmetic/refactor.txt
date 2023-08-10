@@ -149,10 +149,11 @@ Operator available character list :
 
 
 Operator Parser do the following step :  
-1. parse arbitrary !!! < successive > !!! operator character one after another  // What I need to !!! < emphesis >!!! is successive , without any blank or comment 
-2. till meet a character which is not in the operator available character list 
-    or reach the max length of available operator        // <<=
-    or not include in the available operator type list.  //  +-  , the given sequence stand for do negative first and then do positive
+************************************************************************************************************************************************************************
+1. Parse arbitrary !!! < successive > !!! operator character one after another   // What I need to !!! < emphesis >!!! is successive , without any blank or comment 
+2. Till meet a character which is not in the operator available character list 
+    or reach the max length of available operator ( as long as possible )        // <<=
+    or not include in the available operator type list.                          //  +-  , the given sequence stand for do negative first and then do positive
 
 
 

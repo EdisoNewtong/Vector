@@ -9,8 +9,14 @@ unordered_map<MyException::ErrorType,string>    MyException::s_exceptionMap{
     { enumCvt(E_THROW_CODE_CANNOT_REACH_HERE),                  "Strange ! code can't reach here. "},
     { enumCvt(E_THROW_NULL_PTR),                                "NULL pointer "},
 
-    { enumCvt(E_THROW_INVALID_CHAR_AFTER_LEFT_BRACKET),         "Invalid char after '<' "},
-    { enumCvt(E_THROW_INVALID_CHAR_AFTER_RIGHT_BRACKET),        "Invalid char after '>' "},
+    { enumCvt(E_THROW_UNSUPPORTED_FEATURE_LESS_THAN),           "Unsupported operator feature '<' , less than " },
+    { enumCvt(E_THROW_UNSUPPORTED_FEATURE_GREATER_THAN),        "Unsupported operator feature '>' , greater than " },
+
+    { enumCvt(E_THROW_UNSUPPORTED_FEATURE_NO_GREATER_THAN),        "Unsupported operator feature '<=' , no greater than "},
+    { enumCvt(E_THROW_UNSUPPORTED_FEATURE_NO_LESS_THAN),           "Unsupported operator feature '>=' , no less than "},
+
+    { enumCvt(E_THROW_UNSUPPORTED_FEATURE_EQUAL_TO),           "Unsupported operator feature '==' , equal to "},
+    
 
     { enumCvt(E_THROW_INVALID_PARSEDSTR_TO_GENERATE_TOKEN),     "Invalid parsed sequence "},
     { enumCvt(E_THROW_INVALID_CHAR_IN_DECIMAL_SEQ),             "Malformed decimal string "},
@@ -75,6 +81,9 @@ unordered_map<MyException::ErrorType,string>    MyException::s_exceptionMap{
     { enumCvt(E_THROW_BIT_RIGHTSHIFT_CANNOT_APPLY_ON_FLOAT),             "Bit-Right-Shift can't apply on float " },
     { enumCvt(E_THROW_INVALID_SUFFIX_EXPRESSION),                        "Invalid suffix expression " },
     { enumCvt(E_THROW_LAST_VALID_TOKEN_IS_NOT_SEMICOLON),                "Final valid token is not ';' " },
+
+    { enumCvt(E_THROW_UNSUPPORTED_FEATURE_INCREASEMENTAL_1),                "++ ( self increasemental operator feature ) is not supported in version " },
+    { enumCvt(E_THROW_UNSUPPORTED_FEATURE_DECREASEMENTAL_1),                "-- ( self decreasemental operator feature ) is not supported in version " },
 };
 
 
