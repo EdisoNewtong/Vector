@@ -51,9 +51,9 @@ public:
 protected:
     TokenMgr();
     virtual ~TokenMgr();
-    static bool isCommentType(E_TokenType tp);
-    static bool isBlankType(E_TokenType tp);
-    static bool isIgnoredType(E_TokenType tp);
+    static bool isCommentType(TokenBase* pToken);
+    static bool isBlankType(TokenBase* pToken);
+    static bool isIgnoredType(TokenBase* pToken);
 
     bool hasPreviousExistOpenParentheses();
     std::pair<bool,TokenBase*>        checkTokenValidFromPreviousRelationship(TokenBase* toBePushed);

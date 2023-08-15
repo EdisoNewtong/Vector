@@ -247,9 +247,12 @@ bool OperatorParser::isParsedSeqValid(std::string& errorMsg) // override
     auto sz = static_cast<int>( m_parsedSeq.size() );
     if ( sz == 1 ) {
         const auto& ch = m_parsedSeq.front();
-        if ( ch == '<' || ch == '>' ) {
+        if ( ch == '<'  ) {
             bret = false;
-            errorMsg = "Operator with 1 char is incomplete , <  or > ";
+            errorMsg = "Operator \"Less than\" '<'  is unsupported feature. ";
+        } else if ( ch == '>' ) {
+            bret = false;
+            errorMsg = "Operator \"Greater than\" '>'  is unsupported feature. ";
         } else {
             bret = true;
         }

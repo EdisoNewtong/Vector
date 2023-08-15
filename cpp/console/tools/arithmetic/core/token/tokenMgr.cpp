@@ -433,10 +433,10 @@ const TokenMgr::OpPairCfg TokenMgr::s_OpPairCfgTable[s_TABLE_SIZE] = {
     { E_CLOSE_PARENTHESES,  E_ADD_ASSIGNMENT,        false,   false  }, // ) +=
     { E_ASSIGNMENT,         E_ADD_ASSIGNMENT,        false,   false  }, // = += 
     { E_ADD_ASSIGNMENT,     E_ADD_ASSIGNMENT,        false,     false     },     // +=
-	{ E_MINUS_ASSIGNMENT,   E_ADD_ASSIGNMENT,        false,     false     },     // -=
-	{ E_MULTIPLY_ASSIGNMENT,E_ADD_ASSIGNMENT,        false,     false     },     // *=
-	{ E_DIVIDE_ASSIGNMENT,  E_ADD_ASSIGNMENT,        false,     false     },     // /=
-	{ E_MOD_ASSIGNMENT,     E_ADD_ASSIGNMENT,        false,     false     },     // %=
+    { E_MINUS_ASSIGNMENT,   E_ADD_ASSIGNMENT,        false,     false     },     // -=
+    { E_MULTIPLY_ASSIGNMENT,E_ADD_ASSIGNMENT,        false,     false     },     // *=
+    { E_DIVIDE_ASSIGNMENT,  E_ADD_ASSIGNMENT,        false,     false     },     // /=
+    { E_MOD_ASSIGNMENT,     E_ADD_ASSIGNMENT,        false,     false     },     // %=
     { E_BIT_AND_ASSIGNMENT, E_ADD_ASSIGNMENT,        false,     false     },     // &=
     { E_BIT_OR_ASSIGNMENT,  E_ADD_ASSIGNMENT,        false,     false     },     // |=
     { E_BIT_XOR_ASSIGNMENT, E_ADD_ASSIGNMENT,        false,     false     },     // ^=
@@ -749,22 +749,37 @@ TokenMgr* TokenMgr::getInstance()
 
 
 // static
-bool TokenMgr::isCommentType(E_TokenType tp)
+bool TokenMgr::isCommentType(TokenBase* pToken)
 {
-    return tp == E_TOKEN_SINGLE_LINE_COMMENT || tp == E_TOKEN_MULTI_LINE_COMMENT;
+    if ( pToken == nullptr ) {
+        return false;
+    }
+
+    auto tp = pToken->getTokenType();
+    return    ( tp == E_TOKEN_SINGLE_LINE_COMMENT 
+            ||  tp == E_TOKEN_MULTI_LINE_COMMENT );
 }
 
 
 // static 
-bool TokenMgr::isBlankType(E_TokenType tp)
+bool TokenMgr::isBlankType(TokenBase* pToken)
 {
-    return tp == E_TOKEN_BLANK;
+    return pToken!=nullptr &&  ( pToken->getTokenType() == E_TOKEN_BLANK );
 }
 
 // static 
-bool TokenMgr::isIgnoredType(E_TokenType tp)
+bool TokenMgr::isIgnoredType(TokenBase* pToken)
 {
-    return TokenMgr::isBlankType(tp) || TokenMgr::isCommentType(tp);
+    if ( pToken == nullptr ) {
+        return false;
+    }
+
+    auto tp = pToken->getTokenType();
+    return    ( tp == E_TOKEN_BLANK
+            ||   ( tp == E_TOKEN_SINGLE_LINE_COMMENT 
+            ||     tp == E_TOKEN_MULTI_LINE_COMMENT )
+    );
+
 }
 
 
@@ -837,15 +852,14 @@ void TokenMgr::pushToken(TokenBase* pToken)
 
         string detailstr;
         if ( previousToken == nullptr ) {
-            detailstr += "nullptr";
+            detailstr += (pToken->getTokenContent() + SINGLE_QUOTO);
             detailstr += SPACE_2;
             detailstr += "After '";
-            detailstr += (pToken->getTokenContent() + SINGLE_QUOTO);
+            detailstr += "nullptr";
         } else {
             //  previousToken != nullptr
             // auto preTp = previousToken->getTokenType();
 
-            auto leftContent = previousToken->getTokenContent();
 
             //if ( preTp  == E_TOKEN_OPERATOR ) {
             //    detailstr += EnumUtil::enumName( previousToken->getOperatorType() );
@@ -853,13 +867,15 @@ void TokenMgr::pushToken(TokenBase* pToken)
             //    detailstr += EnumUtil::enumName( preTp );
             //}
 
-            detailstr += (SPACE_1 + SINGLE_QUOTO + leftContent + SINGLE_QUOTO);
+            auto rightContent = pToken->getTokenContent();
+            detailstr += (SINGLE_QUOTO + rightContent + SINGLE_QUOTO);
             // detailstr += " @";
             // detailstr += previousToken->getBeginPos().getPos(0);
 
-
-            auto rightContent = pToken->getTokenContent();
             detailstr += " After ";
+
+            auto leftContent = previousToken->getTokenContent();
+            detailstr += (SPACE_1 + SINGLE_QUOTO + leftContent + SINGLE_QUOTO);
 
             //if ( tokenType == E_TOKEN_OPERATOR ) {
             //    detailstr += EnumUtil::enumName( pToken->getOperatorType() );
@@ -867,7 +883,6 @@ void TokenMgr::pushToken(TokenBase* pToken)
             //    detailstr += EnumUtil::enumName( tokenType );
             //}
 
-            detailstr += (SINGLE_QUOTO + rightContent + SINGLE_QUOTO);
             detailstr += " @";
             detailstr += pToken->getBeginPos().getPos(0);
         }
@@ -886,7 +901,7 @@ void TokenMgr::pushToken(TokenBase* pToken)
 
     //      Skip :  Blank / Single-Comment / Multi-Comment   <===   such types can be ignored
     //      Operator or Sequence or    ;
-    if ( !( TokenMgr::isIgnoredType(tokenType) ) ) {
+    if ( !( TokenMgr::isIgnoredType(pToken) ) ) {
         // int pushedIdx = static_cast<int>( m_validTokenList.size() );
         m_validTokenList.push_back( pToken );
 
@@ -1902,7 +1917,7 @@ pair<TokenBase*,TokenBase*> TokenMgr::getPreviousToken()
             hasbeenSet = true;
         }
 
-        if ( pToken!=nullptr  &&  (!TokenMgr::isIgnoredType(  pToken->getTokenType() ) ) ) {
+        if (  !TokenMgr::isIgnoredType(  pToken )  ) {
             pNoneBlankCommentToken = pToken;
             break;
         }
