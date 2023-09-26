@@ -12,8 +12,8 @@ unordered_map<MyException::ErrorType,string>    MyException::s_exceptionMap{
     { enumCvt(E_THROW_UNSUPPORTED_FEATURE_LESS_THAN),           "Unsupported operator feature '<' , less than " },
     { enumCvt(E_THROW_UNSUPPORTED_FEATURE_GREATER_THAN),        "Unsupported operator feature '>' , greater than " },
 
-    { enumCvt(E_THROW_UNSUPPORTED_FEATURE_NO_GREATER_THAN),        "Unsupported operator feature '<=' , no greater than "},
-    { enumCvt(E_THROW_UNSUPPORTED_FEATURE_NO_LESS_THAN),           "Unsupported operator feature '>=' , no less than "},
+    { enumCvt(E_THROW_UNSUPPORTED_FEATURE_NO_GREATER_THAN),        "Unsupported operator feature '<=' ( No Greater Than ) "},
+    { enumCvt(E_THROW_UNSUPPORTED_FEATURE_NO_LESS_THAN),           "Unsupported operator feature '>=' ( No Less Than ) "},
 
     { enumCvt(E_THROW_UNSUPPORTED_FEATURE_EQUAL_TO),           "Unsupported operator feature '==' , equal to "},
     
@@ -82,8 +82,10 @@ unordered_map<MyException::ErrorType,string>    MyException::s_exceptionMap{
     { enumCvt(E_THROW_INVALID_SUFFIX_EXPRESSION),                        "Invalid suffix expression " },
     { enumCvt(E_THROW_LAST_VALID_TOKEN_IS_NOT_SEMICOLON),                "Final valid token is not ';' " },
 
-    { enumCvt(E_THROW_UNSUPPORTED_FEATURE_INCREASEMENTAL_1),                "++ ( self increasemental operator feature ) is not supported in version " },
-    { enumCvt(E_THROW_UNSUPPORTED_FEATURE_DECREASEMENTAL_1),                "-- ( self decreasemental operator feature ) is not supported in version " },
+    { enumCvt(E_THROW_UNSUPPORTED_FEATURE_INCREASEMENTAL_1),             "++ ( self increasemental operator feature ) is not supported in version " },
+    { enumCvt(E_THROW_UNSUPPORTED_FEATURE_DECREASEMENTAL_1),             "-- ( self decreasemental operator feature ) is not supported in version " },
+
+    { enumCvt(E_THROW_FIRST_TOKEN_IS_INVALID),                              "First token is not valid. " },
 };
 
 

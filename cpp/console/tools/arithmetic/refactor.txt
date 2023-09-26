@@ -70,8 +70,8 @@ Any adjacent two tokens has the following possible order :
 ----------------------------------------------------------------------------------------------------
 Case #1.   <Operator>  <Operator>    :   such as   + (      or         +=      or    ((      ...
 Case #2.   <Operator>  <Expr>        :   such as   + a
-Case #3.   <Expr>  <Operator>        :   a +
-Case #4.   <Expr>  <Expr>            :   int a ( here 'int' is a special token which is a reserved key word for parser rather than a normal varible name )
+Case #3.   <Expr>      <Operator>    :   a +
+Case #4.   <Expr>      <Expr>        :   int a ( here 'int' is a special token which is a reserved key word for the parser rather than a normal varible name )
 ----------------------------------------------------------------------------------------------------
 
 We can lay down a regulation for whether the given two adjacent tokens' relationship is valid or not
@@ -120,8 +120,8 @@ All the operator type are listed in the following :
 // Plus , Minus , Multiply , Divide , Mod
    +       -         *         /       %
 
-// Bit And / Or / XOR
-        &    |     ^
+// Bit And / Or / XOR /   Bit Flip
+        &    |     ^  /      ~
 
 
 //  Bit Left Shift / Right Shift

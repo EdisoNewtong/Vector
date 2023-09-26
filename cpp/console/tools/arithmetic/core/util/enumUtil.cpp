@@ -272,6 +272,7 @@ string EnumUtil::enumName(E_ExceptionType tp)
     INNER_ENUM_2_STRING_MAP(E_THROW_UNSUPPORTED_FEATURE_INCREASEMENTAL_1)   // ++ is not supported
     INNER_ENUM_2_STRING_MAP(E_THROW_UNSUPPORTED_FEATURE_DECREASEMENTAL_1)   // -- is not supported
 
+    INNER_ENUM_2_STRING_MAP(E_THROW_FIRST_TOKEN_IS_INVALID)   
 
     default:
         retstr = string("??? E_ExceptionType ??? | value = ") + to_string( static_cast<int>(tp) );

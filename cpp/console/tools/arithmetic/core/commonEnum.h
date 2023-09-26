@@ -120,8 +120,8 @@ enum E_ExceptionType
     E_THROW_UNSUPPORTED_FEATURE_LESS_THAN,        // << : OK ,  less than ( a < b ) is an unsupported feature
     E_THROW_UNSUPPORTED_FEATURE_GREATER_THAN,     // >> : OK ,  greater than ( a > b ) is an unsupported feature
 
-    E_THROW_UNSUPPORTED_FEATURE_NO_GREATER_THAN,  // << : OK ,  no greater than ( a <= b ) is an unsupported feature
-    E_THROW_UNSUPPORTED_FEATURE_NO_LESS_THAN,     // >> : OK ,  no less than ( a >= b ) is an unsupported feature
+    E_THROW_UNSUPPORTED_FEATURE_NO_GREATER_THAN,  // << : OK ,  No Greater Than ( a <= b ) is an unsupported feature
+    E_THROW_UNSUPPORTED_FEATURE_NO_LESS_THAN,     // >> : OK ,  No Less Than ( a >= b ) is an unsupported feature
 
     E_THROW_UNSUPPORTED_FEATURE_EQUAL_TO,        // == is an unsupported feature
 
@@ -198,6 +198,9 @@ enum E_ExceptionType
 
     E_THROW_UNSUPPORTED_FEATURE_INCREASEMENTAL_1, // ++ is not supported in this version
     E_THROW_UNSUPPORTED_FEATURE_DECREASEMENTAL_1, // -- is not supported in this version
+
+    E_THROW_FIRST_TOKEN_IS_INVALID,
+
 
 };
 

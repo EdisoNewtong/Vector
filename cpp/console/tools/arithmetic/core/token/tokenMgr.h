@@ -44,8 +44,13 @@ public:
 
 
 public:
+    // Core Core Core : Key Logic
     void pushToken(TokenBase* pToken);
     std::pair<bool,std::string> isLastValidTokenSemicolonOrEmpty();
+
+    // Scan all token inside the whole list, and decide whether it is full of comment(s) or blank(s)
+    bool isAllTokensTrivial();
+
     static void setUnInitializedVaribleAsError(bool flag);
     static void setNeedTreatBlankStatementAsWarning(bool flag);
 protected:
@@ -56,8 +61,12 @@ protected:
     static bool isIgnoredType(TokenBase* pToken);
 
     bool hasPreviousExistOpenParentheses();
-    std::pair<bool,TokenBase*>        checkTokenValidFromPreviousRelationship(TokenBase* toBePushed);
+    std::pair<bool,TokenBase*>        checkAdjacentTokensRelationship_IsValid(TokenBase* toBePushed);
     std::pair<TokenBase*,TokenBase*>  getPreviousToken();
+
+    bool process_SemicolonWithPriorToken(TokenBase* toBePushed, TokenBase* priorToken);
+    bool process_SequenceWithPriorToken(TokenBase* toBePushed, TokenBase* priorToken);
+    bool process_OperatorWithPriorToken(TokenBase* toBePushed, TokenBase* priorToken, TokenBase* priorClosestToken);
 
     // for tmp expression check use
     bool is1stTokenTypeKeyWord();

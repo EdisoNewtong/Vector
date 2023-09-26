@@ -822,8 +822,9 @@ TokenMgr::~TokenMgr()
 
 
 
-
-
+//
+// Core Core Core : Key Logic
+//
 void TokenMgr::pushToken(TokenBase* pToken)
 {
     using namespace charUtil;
@@ -843,7 +844,7 @@ void TokenMgr::pushToken(TokenBase* pToken)
     // ****************************************************
     // the key logic ( critical )
     // ****************************************************
-    auto pr = checkTokenValidFromPreviousRelationship(pToken);
+    auto pr = checkAdjacentTokensRelationship_IsValid(pToken);
 
     auto isValid = pr.first;
     if ( !isValid ) {
@@ -852,10 +853,12 @@ void TokenMgr::pushToken(TokenBase* pToken)
 
         string detailstr;
         if ( previousToken == nullptr ) {
-            detailstr += (pToken->getTokenContent() + SINGLE_QUOTO);
-            detailstr += SPACE_2;
-            detailstr += "After '";
-            detailstr += "nullptr";
+            detailstr += "First Token ";
+            detailstr += (SINGLE_QUOTO + pToken->getTokenContent() + SINGLE_QUOTO);
+
+            // detailstr += SPACE_2;
+            // detailstr += "After '";
+            // detailstr += "nullptr";
         } else {
             //  previousToken != nullptr
             // auto preTp = previousToken->getTokenType();
@@ -1708,10 +1711,6 @@ bool TokenMgr::hasPreviousExistOpenParentheses()
 // *** Core Core Core *** Function 
 // *********************************************************************************************
 //
-// Core Core Core * 3
-// Core Core Core * 3
-// Core Core Core * 3
-//
 //======================================================================================================================================================
 //
 //      : This function is check two adjacent token's relationship is valid or not
@@ -1720,176 +1719,54 @@ bool TokenMgr::hasPreviousExistOpenParentheses()
 //
 //   Key Logic    
 //
-pair<bool,TokenBase*> TokenMgr::checkTokenValidFromPreviousRelationship(TokenBase* toBePushed)
+pair<bool,TokenBase*> TokenMgr::checkAdjacentTokensRelationship_IsValid(TokenBase* toBePushed)
 {
     auto avaliable = false;
-    auto needProcess = false;
     TokenBase* previousToken = nullptr;
 
-    auto pr = getPreviousToken();
-    if ( pr.first == nullptr ) {
-        avaliable = true;
-        return make_pair(true, previousToken);
-    }
-
     auto toBePushedTp = toBePushed->getTokenType();
+    /***************************************************
+         pair.first  : Skip Space && Comment , Valid one
+         pair.second : the Closest One
+    ****************************************************/
+    auto pr = getPreviousToken();
+    auto previousValidToken = pr.first;
+    auto previousClosestToken = pr.second;
+
     switch ( toBePushedTp )
     {
     case E_TOKEN_BLANK:
     case E_TOKEN_SINGLE_LINE_COMMENT:
     case E_TOKEN_MULTI_LINE_COMMENT:
         {
-            needProcess = false;
             avaliable = true;
-            previousToken = pr.first;
+            previousToken = previousValidToken;
         }
         break;
     case E_TOKEN_EXPRESSION:
+        {
+            avaliable = process_SequenceWithPriorToken( toBePushed, previousValidToken);
+            previousToken = previousValidToken;
+        }
+        break;
     case E_TOKEN_OPERATOR:
+        {
+            avaliable = process_OperatorWithPriorToken( toBePushed, previousValidToken, previousClosestToken);
+            previousToken = previousValidToken;
+        }
+        break;
     case E_TOKEN_SEMICOLON:
-        needProcess = true;
+        {
+            avaliable = process_SemicolonWithPriorToken( toBePushed, previousValidToken);
+            previousToken = previousValidToken;
+        }
         break;
     default:
         break;
     }
 
-
-    if ( !needProcess ) {
-        return make_pair(avaliable, previousToken);
-    }
-    //
-    // else : Expression , Operator , Semicolon 
-    //     => Need process in the following statement
-    //
-
-    if ( toBePushedTp == E_TOKEN_SEMICOLON ) {
-        previousToken = pr.first;
-        if ( previousToken != nullptr ) {
-            if ( previousToken->getTokenType() == E_TOKEN_OPERATOR ) {
-                // Operator type
-                if (  previousToken->getOperatorType() == E_CLOSE_PARENTHESES ) {
-                    avaliable = true;
-                } else {
-                    avaliable = false;
-                }
-            } else {
-                // None operator type , e.g.  1. ;;   2. aaa;
-                avaliable = true;
-            }
-        } else {
-            // previousToken == nullptr , 
-            // ';' is the 1st token to be pushed
-            avaliable = true;
-        }
-
-        return make_pair(avaliable, previousToken);
-    }
-
-
-    //  toBePushedTp is an Sequence or Operator
-    if ( toBePushedTp == E_TOKEN_EXPRESSION ) {
-        previousToken = pr.first;
-        if ( previousToken != nullptr ) {
-            auto previousTp = previousToken->getTokenType();
-            if ( previousTp == E_TOKEN_SEMICOLON ) {
-                avaliable = true;
-            } else if ( previousTp == E_TOKEN_EXPRESSION ) {
-                // avaliable = false; // "a b"     is not avaliable
-                if ( previousToken->isKeyword() ) {
-                    if ( toBePushed->isKeyword() ) {
-                        avaliable = true;
-                    } else if ( toBePushed->isVarible() ) {
-                        avaliable = true;
-                    } else {
-                        avaliable = false; // fixed literal  
-                    }
-                } else  {
-                    // previous is not keyword , may be varible or fixed literanl
-                    avaliable = false;
-                }
-            } else {
-                // previousTp is an operator type
-                if ( previousToken->getOperatorType() == E_CLOSE_PARENTHESES ) {
-                    avaliable = false;
-                } else {
-                    // e.g.     +;   -;  *; /; %;    ....
-                    avaliable = true;
-                }
-            }
-        } else {
-            avaliable = true; // previousToken is nullptr , sequence is the 1st token to be pushed
-        }
-    } else {
-        // toBePushedTp is an operator
-        auto curOpType = toBePushed->getOperatorType();
-        TokenBase* previousValidToken   = pr.first;
-        TokenBase* previousClosestToken = pr.second;
-        if ( previousValidToken == nullptr ) {
-            previousToken = previousValidToken;
-            avaliable = false;
-        } else {
-            // previousValidToken != nullptr
-            auto preTp = previousValidToken->getTokenType();
-            if ( preTp == E_TOKEN_SEMICOLON ) {
-                previousToken = previousValidToken;
-                if (      curOpType == E_OPEN_PARENTHESES 
-                     ||  (curOpType == E_ADD   || curOpType == E_POSITIVE) 
-                     ||  (curOpType == E_MINUS || curOpType == E_NEGATIVE)  )
-                {
-                    avaliable = true; // ;(
-                } else {
-                    avaliable = false;
-                }
-            } else if ( preTp == E_TOKEN_EXPRESSION ) {
-                previousToken = previousValidToken;
-                if ( curOpType == E_BIT_NOT || curOpType == E_OPEN_PARENTHESES ) {
-                    // e.g.     idx~  or   idx(    is  invalid
-                    avaliable = false;
-                } else { // e.g.  idx+ , idx- ... , idx) , idx=
-                    avaliable = true;
-                }
-            } else {
-                // previous is an operator too ,     leftOp   rightOp
-                auto foundMatched = false;
-                auto closeFlag = false;
-                auto sepFlag   = false;
-                for( int idx = 0; idx < TokenMgr::s_TABLE_SIZE; ++idx )
-                {
-                    if(     TokenMgr::s_OpPairCfgTable[idx].left  == previousValidToken->getOperatorType()  
-                        &&  TokenMgr::s_OpPairCfgTable[idx].right == curOpType ) 
-                    {
-                        closeFlag = TokenMgr::s_OpPairCfgTable[idx].closeAvaliable;
-                        sepFlag   = TokenMgr::s_OpPairCfgTable[idx].seperateAvaliable;
-                        foundMatched = true;
-                        break;
-                    }
-                }
-
-                previousToken = previousValidToken;
-                if ( foundMatched ) {
-                    if ( closeFlag && sepFlag ) {
-                        avaliable = true;
-                    } else if ( !closeFlag && !sepFlag ) {
-                        avaliable = false;
-                    } else {
-                        if ( !closeFlag && sepFlag ) {
-                            if ( previousClosestToken == previousValidToken  ) {
-                                avaliable = false;
-                            } else {
-                                avaliable = true;
-                            }
-                        } else {
-                            // never execute code to here
-                        }
-                    }
-                } else {
-                    avaliable = false;
-                }
-            }
-        }
-    }
-
     return make_pair(avaliable, previousToken);
+
 }
 
 
@@ -1904,19 +1781,12 @@ pair<TokenBase*,TokenBase*> TokenMgr::getPreviousToken()
         return make_pair(nullptr,nullptr);
     }
 
-    // closest
-
-    auto hasbeenSet = false;
-    TokenBase* pTheClosestToken = nullptr;
+    
+    TokenBase* pTheClosestToken = m_allTokenList.back(); // the vector has at least one token , set the last token as the closest token
     TokenBase* pNoneBlankCommentToken = nullptr;
     for( auto rit = m_allTokenList.rbegin(); rit != m_allTokenList.rend(); ++rit )
     {
         auto pToken = *rit;
-        if ( !hasbeenSet ) {
-            pTheClosestToken = pToken;
-            hasbeenSet = true;
-        }
-
         if (  !TokenMgr::isIgnoredType(  pToken )  ) {
             pNoneBlankCommentToken = pToken;
             break;
@@ -2915,3 +2785,162 @@ void TokenMgr::traceAssignOverFlow(TokenBase* leftVar, TokenBase* rightFixedInt)
         
     }
 }
+
+//
+// Scan all token inside the whole list, and decide whether it is full of comment(s) or blank(s)
+//
+bool TokenMgr::isAllTokensTrivial()
+{
+    // if ( m_allTokenList.empty() ) {
+    //     return true;
+    // }
+
+    // bool bSkipFlag = true;
+    for( auto it = m_validTokenList.cbegin();  it != m_validTokenList.cend(); ++it ) {
+        if ( !TokenMgr::isIgnoredType( *it ) ) {
+            // bSkipFlag = false;
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool TokenMgr::process_SemicolonWithPriorToken(TokenBase* toBePushed, TokenBase* priorToken)
+{
+    if ( priorToken == nullptr ) {
+        return true;
+    }
+
+    if (        priorToken->isKeyword() 
+         ||   ( priorToken->getTokenType() == E_TOKEN_OPERATOR && priorToken->getOperatorType() != E_CLOSE_PARENTHESES )  ) {
+        return false;
+    }
+
+    return true;
+}
+
+bool TokenMgr::process_SequenceWithPriorToken(TokenBase* toBePushed, TokenBase* priorToken)
+{
+    if ( priorToken == nullptr ) {
+        return true;
+    }
+
+    auto preType = priorToken->getTokenType();
+    if ( preType == E_TOKEN_SEMICOLON ) {
+        return true;
+    } else if ( preType == E_TOKEN_EXPRESSION  ) {
+        if ( priorToken->isKeyword() && ( toBePushed->isVarible() || toBePushed->isKeyword() ) ) {
+            return true;
+        } else {
+            return false;
+        }
+    } else {
+        // preType == E_TOKEN_OPERATOR
+        if ( toBePushed->isKeyword() ) {
+            return false;
+        } else if ( priorToken->getOperatorType() == E_CLOSE_PARENTHESES ) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+}
+
+bool TokenMgr::process_OperatorWithPriorToken(TokenBase* toBePushed, TokenBase* priorToken, TokenBase* priorClosestToken)
+{
+    auto opType = toBePushed->getOperatorType();
+    if ( priorToken == nullptr  ) {
+        if (   opType == E_ADD   || opType == E_POSITIVE 
+            || opType == E_MINUS || opType == E_NEGATIVE
+            || opType == E_BIT_NOT
+            || opType == E_OPEN_PARENTHESES ) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    auto preType = priorToken->getTokenType();
+    if ( preType == E_TOKEN_SEMICOLON ) {
+        if (   opType == E_ADD   || opType == E_POSITIVE 
+            || opType == E_MINUS || opType == E_NEGATIVE
+            || opType == E_BIT_NOT
+            || opType == E_OPEN_PARENTHESES ) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    if ( preType == E_TOKEN_EXPRESSION ) {
+        if ( priorToken->isVarible() ) {
+            if (  opType == E_BIT_NOT ) {
+                return false;
+            } else if ( opType == E_OPEN_PARENTHESES ) {
+                // TODO : function call ?
+                // e.g.   sin( ... ) 
+                return false;
+            } else {
+                return true;
+            }
+        } else if ( priorToken->isKeyword() ) {
+            return false;
+        } else {
+            // int / float :  fixed literal number
+            if (       opType == E_BIT_NOT 
+                    || opType == E_OPEN_PARENTHESES 
+                    || (opType >= E_ASSIGNMENT && opType <= E_BIT_RIGHT_SHIFT_ASSIGNMENT) ) 
+            {
+                return false;
+            } else {
+                return true;
+            }
+        }
+    }
+
+
+    if ( preType == E_TOKEN_OPERATOR ) {
+        auto foundMatched = false;
+        auto closeFlag = false;
+        auto sepFlag   = false;
+        for( int idx = 0; idx < TokenMgr::s_TABLE_SIZE; ++idx )
+        {
+            if(     TokenMgr::s_OpPairCfgTable[idx].left  == priorToken->getOperatorType()  
+                &&  TokenMgr::s_OpPairCfgTable[idx].right == opType ) 
+            {
+                closeFlag = TokenMgr::s_OpPairCfgTable[idx].closeAvaliable;
+                sepFlag   = TokenMgr::s_OpPairCfgTable[idx].seperateAvaliable;
+                foundMatched = true;
+                break;
+            }
+        }
+
+        auto avaliable = false;
+        if ( foundMatched ) {
+            if ( closeFlag && sepFlag ) {
+                avaliable = true;
+            } else if ( !closeFlag && !sepFlag ) {
+                avaliable = false;
+            } else {
+                if ( !closeFlag && sepFlag ) {
+                    if ( priorToken == priorClosestToken   ) {
+                        avaliable = false;
+                    } else {
+                        avaliable = true;
+                    }
+                } 
+                /* else {
+                    // never execute code to here
+                } 
+                */
+            }
+        }
+
+        return avaliable;
+    }
+
+    return false;
+}
+
+

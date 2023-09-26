@@ -200,6 +200,9 @@ void GlobalDirector::doParse()
         throw e;
     }
 
+    if ( TokenMgr::getInstance()->isAllTokensTrivial() ) {
+        cout << "All Tokens is blank or comment. No statements to be excuted ! " << endl;
+    }
 
     printAllVaribles();
 }
