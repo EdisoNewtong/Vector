@@ -15,12 +15,10 @@ enum E_CharType
 
 enum E_OperatorType
 {
-    E_OPERATOR_UNKNOWN = 0,
+    // E_OPERATOR_UNKNOWN = 0,
 
-    E_ADD,      // +  , e.g.   a + b
-     E_POSITIVE, // +  , e.g.   +a
+    E_ADD = 0,      // +  , e.g.   a + b
     E_MINUS,    // -  , e.g.   a - b
-     E_NEGATIVE, // -  , e.g.   -a
     E_MULTIPLY, // *
     E_DIVIDE,   // /
     E_MOD,      // %
@@ -34,8 +32,8 @@ enum E_OperatorType
 
     E_OPEN_PARENTHESES,   // (
     E_CLOSE_PARENTHESES,  // )
-    E_ASSIGNMENT,         // =
-
+                          
+    E_ASSIGNMENT,                     // =
     E_ADD_ASSIGNMENT,                 // +=
     E_MINUS_ASSIGNMENT,               // -=
     E_MULTIPLY_ASSIGNMENT,            // *=
@@ -46,6 +44,11 @@ enum E_OperatorType
     E_BIT_XOR_ASSIGNMENT,             // ^=
     E_BIT_LEFT_SHIFT_ASSIGNMENT,      // <<=
     E_BIT_RIGHT_SHIFT_ASSIGNMENT,     // >>=
+                                      //
+        E_POSITIVE, // +  , e.g.   +a
+        E_NEGATIVE, // -  , e.g.   -a
+
+    E_OPERATOR_UNKNOWN 
 
 };
 
