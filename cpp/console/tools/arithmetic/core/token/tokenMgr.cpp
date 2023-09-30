@@ -1682,7 +1682,7 @@ void TokenMgr::executeCode()
                     auto mapedDtIt = s_keywordsDataTypeMap.find(strDataType);
                     if ( mapedDtIt == s_keywordsDataTypeMap.end() ) {
                         MyException e(E_THROW_SENTENCE_UNKNOWN_DATA_TYPE , m_oneSentence.at(firstNotKeyWordIdx)->getBeginPos() );
-                        e.setDetail( strDataType );
+                        e.setDetail( string("\"") +  strDataType + string("\"") );
                         throw e;
                     }
 
@@ -2333,8 +2333,8 @@ E_DataType TokenMgr::checkPrefixKeyWordsAndGetDataType(int varIdx, string& varna
 
     auto it = s_keywordsDataTypeMap.find(keywordsSeq);
     if ( it == s_keywordsDataTypeMap.end() ) {
-        MyException e(E_THROW_SENTENCE_UNKNOWN_DATA_TYPE);
-        e.setDetail( keywordsSeq );
+        MyException e(E_THROW_SENTENCE_UNKNOWN_DATA_TYPE, varElement->getBeginPos() );
+        e.setDetail( string("\"") + keywordsSeq + string("\"") );
         throw e;
     }
 
