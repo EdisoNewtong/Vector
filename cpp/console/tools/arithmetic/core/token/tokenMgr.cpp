@@ -318,7 +318,7 @@ const TokenMgr::OpPairCfg TokenMgr::s_OpPairCfgTable[OPERATOR_CNT][OPERATOR_CNT]
         TokenMgr::OpPairCfg( false, false ),     // (  << 
         TokenMgr::OpPairCfg( false, false ),     // (  >> 
         TokenMgr::OpPairCfg( true, true ),       // (  ( 
-        TokenMgr::OpPairCfg( false, false ),     // (  ) 
+        TokenMgr::OpPairCfg( false, false ),     // (  )   // if function feature is implemented , set false,false  ==>  true, true
         TokenMgr::OpPairCfg( false, false ),     // (  = 
         TokenMgr::OpPairCfg( false, false ),     // (  += 
         TokenMgr::OpPairCfg( false, false ),     // (  -= 
@@ -345,17 +345,19 @@ const TokenMgr::OpPairCfg TokenMgr::s_OpPairCfgTable[OPERATOR_CNT][OPERATOR_CNT]
         TokenMgr::OpPairCfg( true, true ),     // )  >> 
         TokenMgr::OpPairCfg( false, false ),   // )  ( 
         TokenMgr::OpPairCfg( true, true ),     // )  ) 
-        TokenMgr::OpPairCfg( false, false ),   // )  = 
-        TokenMgr::OpPairCfg( false, false ),   // )  += 
-        TokenMgr::OpPairCfg( false, false ),   // )  -= 
-        TokenMgr::OpPairCfg( false, false ),   // )  *= 
-        TokenMgr::OpPairCfg( false, false ),   // )  /= 
-        TokenMgr::OpPairCfg( false, false ),   // )  %= 
-        TokenMgr::OpPairCfg( false, false ),   // )  &= 
-        TokenMgr::OpPairCfg( false, false ),   // )  |= 
-        TokenMgr::OpPairCfg( false, false ),   // )  ^= 
-        TokenMgr::OpPairCfg( false, false ),   // )  <<= 
-        TokenMgr::OpPairCfg( false, false )    // )  >>= 
+        // TokenMgr::OpPairCfg( false, false ),     // )  =      (a) = 3;      is valid
+        // (a) = 3;  or  (a)=3;      is valid
+        TokenMgr::OpPairCfg( true, true ),     // )  = 
+        TokenMgr::OpPairCfg( true, true ),     // )  += 
+        TokenMgr::OpPairCfg( true, true ),     // )  -= 
+        TokenMgr::OpPairCfg( true, true ),     // )  *= 
+        TokenMgr::OpPairCfg( true, true ),     // )  /= 
+        TokenMgr::OpPairCfg( true, true ),     // )  %= 
+        TokenMgr::OpPairCfg( true, true ),     // )  &= 
+        TokenMgr::OpPairCfg( true, true ),     // )  |= 
+        TokenMgr::OpPairCfg( true, true ),     // )  ^= 
+        TokenMgr::OpPairCfg( true, true ),     // )  <<= 
+        TokenMgr::OpPairCfg( true, true )      // )  >>= 
     },
     {   //  E_ASSIGNMENT
         TokenMgr::OpPairCfg( true, true ),     // =  + 
@@ -1584,6 +1586,7 @@ void TokenMgr::executeCode()
 
     if ( m_oneSentence.empty() ) {
         traceBlankStatement();
+        clearTmpGenTokenPool();
         return;
     }
     
@@ -1597,39 +1600,6 @@ void TokenMgr::executeCode()
     //     throw e;
     // } 
 
-    int firstTypeKeyWordIdx = -1;
-    int secondVaribleNameIdx = -1;
-    int thirdAssignmentIdx = -1;
-
-    int assignmentOpCnt = 0;
-    int variadicAssignmentCnt = 0;
-    for( auto idx = 0; idx < vecSz;  ++idx )
-    {
-        TokenBase* pToken = m_oneSentence.at(idx);
-        auto tokenType = pToken->getTokenType();
-        auto opType    = pToken->getOperatorType();
-
-        if ( idx == 0         &&  is1stTokenTypeKeyWord() ) {
-            firstTypeKeyWordIdx = 0;
-        } else if ( idx == 1  &&  (tokenType == E_TOKEN_EXPRESSION   &&    pToken->isVarible()) ) {
-            secondVaribleNameIdx = 1;
-        } else if ( idx == 2  &&  (tokenType == E_TOKEN_OPERATOR     &&    pToken->getOperatorType() == E_ASSIGNMENT ) ) {
-            thirdAssignmentIdx = 2;
-        }
-
-        /***************************************************
-          Variadic Assignment Operator Condition
-        ***************************************************/
-        if (         tokenType == E_TOKEN_OPERATOR
-              &&   (opType >= E_ASSIGNMENT && opType <= E_BIT_RIGHT_SHIFT_ASSIGNMENT) ) {
-            if ( opType == E_ASSIGNMENT ) {
-                ++assignmentOpCnt;
-            }
-
-            ++variadicAssignmentCnt;
-        }
-    }
-
  
     /*
     --------------------------------------------------
@@ -1638,8 +1608,7 @@ void TokenMgr::executeCode()
 
         1. DataType    varible                   (;)    type-id = 1    |  e.g. :   int index;
         2. DataType    varible = expression      (;)    type=id = 2    |  e.g. :   int index = 1+a;
-        3.             varible = expression      (;)    type-id = 3    |  e.g. :       index = 3*b;
-        4. Tmp expression                        (;)    such as     a + b * c;
+        3. Tmp expression                        (;)    such as  a = 3;  / a += 3;  /   a + b * c;
 
         ///////////////////////////////////////////////////////////////////////
         //
@@ -1649,110 +1618,160 @@ void TokenMgr::executeCode()
 
     */
     int sentenceType = 0;
-
+    bool isFirstKeyWord = is1stTokenTypeKeyWord();
     E_DataType defDt = E_TP_UNKNOWN;
     string varname;
-    auto varIdx = -1;
-    auto hasTokenEqual = (assignmentOpCnt > 0);
-    if ( firstTypeKeyWordIdx == 0 && secondVaribleNameIdx == 1 ) {
-        // e.g. :        int a;    /       int a = ...;
-        varIdx = 1;
-        if ( vecSz == 2 ) {
-            // e.g.    :  int a;
-            defDt = checkPrefixKeyWordsAndGetDataType(varIdx, varname, hasTokenEqual);
-            sentenceType = 1;
-        } else if ( thirdAssignmentIdx == 2 ) {
-            // e.g.    :  int a =  <expr ... > ;
-            defDt  = checkPrefixKeyWordsAndGetDataType(varIdx, varname, hasTokenEqual);
-            sentenceType = 2;
+    int varibleIdx = 0;
+
+    if ( isFirstKeyWord ) {
+        // such as  
+        //          int a
+        //          long int a
+        //          unsigned long long int a
+        /*
+            require extra dataType keyword
+                                   varible Name
+                                   =  or  ;
+        */
+        int firstNotKeyWordIdx = -1;
+        int firstNotKeyWordType = -1;
+        int additionalSuccessiveKeyWordsCnt = 0;
+        string strDataType = m_oneSentence.at(0)->getTokenContent();
+        for( auto idx = 1; idx < vecSz; ++idx )
+        {
+            TokenBase* pToken = m_oneSentence.at(idx);
+            auto tokenType = pToken->getTokenType();
+            if ( tokenType == E_TOKEN_EXPRESSION  ) {
+                if ( pToken->isKeyword() ) {
+                    strDataType += " ";
+                    strDataType += pToken->getTokenContent();
+
+                    ++additionalSuccessiveKeyWordsCnt;
+                } else if ( pToken->isVarible() ) {
+                    varibleIdx = idx;
+                    firstNotKeyWordIdx = idx;
+                    firstNotKeyWordType = 0; // 0 :  first Un-Keyword token is Varible Type
+                    break;
+                } else {
+                    firstNotKeyWordIdx = idx;
+                    firstNotKeyWordType = 1;     // 1 :  first Un-Keyword token is fixed number literal such as  3   3.14   3f
+                    break;
+                }
+            } else {
+                firstNotKeyWordIdx = idx;
+                firstNotKeyWordType = 2;     // 2 :  first Un-Keyword token is Operator Type
+                break;
+            }
+        }
+
+
+
+        if ( firstNotKeyWordIdx == -1 ) {
+            MyException e(E_THROW_ALL_TOKENS_ARE_KEYWORD, m_oneSentence.front()->getBeginPos() );
+            throw e;
+        } else {
+            if ( firstNotKeyWordType == 0 ) {
+                // Varible Type
+                int keyWordCnt = additionalSuccessiveKeyWordsCnt + 1;
+                if ( keyWordCnt > TokenMgr::s_MAX_KEYWORDS_CNT ) {
+                    MyException e(E_THROW_TOO_MANY_KEYWORDS, m_oneSentence.at(firstNotKeyWordIdx-1)->getEndPos() );
+                    e.setDetail( strDataType );
+                    throw e;
+                } else {
+                    // keyWordCnt <= TokenMgr::s_MAX_KEYWORDS_CNT
+                    auto mapedDtIt = s_keywordsDataTypeMap.find(strDataType);
+                    if ( mapedDtIt == s_keywordsDataTypeMap.end() ) {
+                        MyException e(E_THROW_SENTENCE_UNKNOWN_DATA_TYPE , m_oneSentence.at(firstNotKeyWordIdx)->getBeginPos() );
+                        e.setDetail( strDataType );
+                        throw e;
+                    }
+
+                    defDt = mapedDtIt->second;
+                    varname = m_oneSentence.at( firstNotKeyWordIdx )->getTokenContent();
+                }
+
+                // <keyword0>  <keyword1> <keywordLast>     varible
+                if ( firstNotKeyWordIdx == (vecSz-1) ) {
+                    // e.g.    int a;
+                    sentenceType = 1;
+                } else {
+                    // int a ?
+                    TokenBase* nextToken = nullptr;
+                    if (                                 (firstNotKeyWordIdx+1 < vecSz)
+                         && (nextToken = m_oneSentence.at(firstNotKeyWordIdx+1)) != nullptr 
+                         && (nextToken->getTokenType() == E_TOKEN_OPERATOR &&  nextToken->getOperatorType() == E_ASSIGNMENT)  ) { 
+                        // <keyword> ...    <varible> = 
+                        // such as    int a = ...
+                        sentenceType = 2;
+                    } else {
+                        if ( nextToken == nullptr ) {
+                            MyException e(E_THROW_SENTENCE_DEFINITION_HAS_MISSED_AN_ASSIGNMENT_OPERATOR);
+                            throw e;
+                        } else {
+                            MyException e(E_THROW_SENTENCE_DEFINITION_HAS_MISSED_AN_ASSIGNMENT_OPERATOR ,  nextToken->getBeginPos()   );
+                            throw e;
+                        }
+                    }
+                }
+            } else if ( firstNotKeyWordType == 1 || firstNotKeyWordType == 2 ) {
+                // firstNotKeyWordType == 1 , not allowed       such as.  :   int 3  /   int 3.14 
+                // firstNotKeyWordType == 2 , not allowed       such as.  :   int +
+                MyException e(E_THROW_SENTENCE_DEFINITION_PREFIX_IS_NOT_VARIBLE, m_oneSentence.at(firstNotKeyWordIdx)->getBeginPos()  );
+                throw e;
+            }
         }
     } else {
-        if ( variadicAssignmentCnt > 0 ) {
-            //  maybe  :   a = <expr>;    /   a += <expr>;
-            TokenBase* varElement = nullptr;
-            TokenBase* pToken = nullptr;
-            if (   (  (pToken = m_oneSentence.at(0)) != nullptr )
-                  &&   pToken->getTokenType() == E_TOKEN_OPERATOR
-                  && ( pToken->getOperatorType() >= E_ASSIGNMENT   &&  pToken->getOperatorType() <= E_BIT_RIGHT_SHIFT_ASSIGNMENT ) 
-            )
-            {
-                MyException e(E_THROW_SENTENCE_NO_EXPR_BEFORE_ASSIGNMENT, m_oneSentence.front()->getBeginPos() );
-                throw e;
-            }
-            else if (   (  (pToken = m_oneSentence.at(vecSz-1)) != nullptr )
-                       &&   pToken->getTokenType() == E_TOKEN_OPERATOR
-                       && ( pToken->getOperatorType() >= E_ASSIGNMENT   &&  pToken->getOperatorType() <= E_BIT_RIGHT_SHIFT_ASSIGNMENT ) 
-            )
-            {
-                MyException e(E_THROW_SENTENCE_NO_EXPR_AFTER_ASSIGNMENT , m_oneSentence.back()->getBeginPos() );
-                throw e;
-            }
-
-            pToken = nullptr;
-            if (     ((varElement = pToken = m_oneSentence.at(0)) != nullptr )
-                  && ( pToken->getTokenType() == E_TOKEN_EXPRESSION &&  pToken->isVarible() ) ) 
-            {
-                if (        vecSz >=2
-                      &&  ((pToken = m_oneSentence.at(1)) != nullptr )  
-                      &&  (pToken->getOperatorType() >= E_ASSIGNMENT   &&  pToken->getOperatorType() <= E_BIT_RIGHT_SHIFT_ASSIGNMENT ) )
-                {
-                    varIdx = 0;
-                    varname = varElement->getTokenContent();
-                    sentenceType = 3;
-                }
-                else
-                {
-                    MyException e(E_THROW_SENTENCE_2ND_IS_NOT_A_VARIADIC_ASSIGNMENT, varElement->getBeginPos() );
-                    throw e;
-                }
-            }
-            else
-            {
-                MyException e(E_THROW_SENTENCE_DEFINITION_PREFIX_IS_NOT_VARIBLE , varElement->getBeginPos() );
-                throw e;
-            }
-        } else {
-            // Tmp expression    : e.g.    a + b * c
-            TokenBase* pToken = nullptr;
-            if (   (  (pToken = m_oneSentence.at(0)) != nullptr )
-                  &&   pToken->getTokenType() == E_TOKEN_EXPRESSION &&  pToken->isVarible() )
-            {
-                varIdx = 0;
-                sentenceType = 4;
-            }
-        }
+        //  assigment expression  /  temp expression 
+        //  a = 3;                /   3+4  / a+3     /   (a) = 4;
+        sentenceType = 3;
     }
 
-    if ( sentenceType == 0 ) {
-        MyException e(E_THROW_SENTENCE_DEFINITION_PREFIX_IS_NOT_VARIBLE , m_oneSentence.at(0)->getBeginPos() );
+
+    VaribleInfo* pVaribleInfo = nullptr;
+    TokenBase* sentenceVarElement = nullptr;
+    if ( sentenceType == -1 ) {
+        MyException e(E_THROW_SENTENCE_DEFINITION_PREFIX_IS_NOT_VARIBLE, m_oneSentence.at( varibleIdx )->getBeginPos()  );
         throw e;
     }
 
-    auto sentenceVarElement = m_oneSentence.at(varIdx);
-    VaribleInfo* pVaribleInfo = nullptr;
-    if ( sentenceType == 1 || sentenceType == 2 ) {
-        // 1. e.g.  unsigned int a;
-        // 2. e.g.  unsigned int           a = 3;
+    if ( sentenceType == 1 ||  sentenceType == 2 ) {
+        sentenceVarElement = m_oneSentence.at(varibleIdx);
         pVaribleInfo = VariblePool::getPool()->create_a_new_varible(defDt, varname, sentenceVarElement->getBeginPos().line );
-        sentenceVarElement->setDataType( pVaribleInfo->dataVal.type );
-        sentenceVarElement->setRealValue( pVaribleInfo->dataVal );
-    } else if ( sentenceType == 3 ) {
-        // 3. e.g.               a   = 3;
-        pVaribleInfo = VariblePool::getPool()->getVaribleByName(varname);
-        if ( pVaribleInfo == nullptr ) {
-            MyException e(E_THROW_VARIBLE_NOT_DEFINED, sentenceVarElement->getBeginPos() );
-            e.setDetail( varname );
-            throw e;
+        if ( pVaribleInfo != nullptr  ) {
+            if ( sentenceVarElement != nullptr ) { 
+                sentenceVarElement->setDataType( pVaribleInfo->dataVal.type );
+                sentenceVarElement->setRealValue( pVaribleInfo->dataVal );
+            } else {
+                MyException e(E_THROW_VARIBLE_IS_MISSING);
+                e.setDetail( string("Index ") + to_string( varibleIdx ) + string(" ") + m_oneSentence.at( varibleIdx )->getTokenContent() + string(" is not a varible") );
+                throw e;
+            }
+        }
+
+        // e.g.   int a;
+    } 
+
+    bool hasAssignmentOrVariadicAssignment = false;
+    for( auto idx = 0; idx < vecSz; ++idx )
+    {
+        TokenBase* pToken = m_oneSentence.at(idx);
+        auto tokenType = pToken->getTokenType();
+
+        E_OperatorType opType = E_OPERATOR_UNKNOWN;
+        if ( tokenType == E_TOKEN_OPERATOR  ) {  
+            opType = pToken->getOperatorType();
+            if ( opType >= E_ASSIGNMENT &&  opType <= E_BIT_RIGHT_SHIFT_ASSIGNMENT ) {
+                hasAssignmentOrVariadicAssignment = true;
+                break;
+            }
         }
     }
 
-    //
-    //   sentenceType == 1  ==>    int a;
-    //
     if ( sentenceType != 1 ) {
-        //                              == 4 && set need process tmp expression as    true
-        if ( sentenceType != 4   ||   CmdOptions::needProcessTmpExpressionWithoutAssignment() ) {
-            buildSuffixExpression(sentenceType, varIdx);
+        // sentenceType == 2  :    e.g.   int a = ...;
+        // sentenceType == 3  :    e.g.       a = ...;      or    a+b
+        if ( hasAssignmentOrVariadicAssignment || CmdOptions::needProcessTmpExpressionWithoutAssignment() ) {
+            buildSuffixExpression(sentenceType, (sentenceType==2 ? varibleIdx : 0) );
             checkSuffixExpressionValid();
             popAllOperatorStack();
             printSuffixExpression(2);
@@ -1763,10 +1782,10 @@ void TokenMgr::executeCode()
         }
     }
 
-
     // After Execute , clear
     m_oneSentence.clear();
     clearTmpGenTokenPool();
+
 }
 
 
@@ -1876,7 +1895,7 @@ bool TokenMgr::is1stTokenTypeKeyWord()
 {
     auto headtoken = m_oneSentence.front();
     //                                                           here  : keyWord must be  type-key-word : int/long/ ... 
-    return headtoken->getTokenType() == E_TOKEN_EXPRESSION  &&   headtoken->isKeyword();
+    return headtoken!=nullptr && headtoken->getTokenType() == E_TOKEN_EXPRESSION  &&   headtoken->isKeyword();
 }
 
 
