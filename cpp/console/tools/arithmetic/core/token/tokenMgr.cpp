@@ -1757,9 +1757,8 @@ void TokenMgr::executeCode()
         TokenBase* pToken = m_oneSentence.at(idx);
         auto tokenType = pToken->getTokenType();
 
-        E_OperatorType opType = E_OPERATOR_UNKNOWN;
         if ( tokenType == E_TOKEN_OPERATOR  ) {  
-            opType = pToken->getOperatorType();
+            E_OperatorType opType = pToken->getOperatorType();
             if ( opType >= E_ASSIGNMENT &&  opType <= E_BIT_RIGHT_SHIFT_ASSIGNMENT ) {
                 hasAssignmentOrVariadicAssignment = true;
                 break;
@@ -1770,16 +1769,18 @@ void TokenMgr::executeCode()
     if ( sentenceType != 1 ) {
         // sentenceType == 2  :    e.g.   int a = ...;
         // sentenceType == 3  :    e.g.       a = ...;      or    a+b
-        if ( hasAssignmentOrVariadicAssignment || CmdOptions::needProcessTmpExpressionWithoutAssignment() ) {
-            buildSuffixExpression(sentenceType, (sentenceType==2 ? varibleIdx : 0) );
-            checkSuffixExpressionValid();
-            popAllOperatorStack();
-            printSuffixExpression(2);
+        buildSuffixExpression(sentenceType, (sentenceType==2 ? varibleIdx : 0) );
+        checkSuffixExpressionValid();
+        popAllOperatorStack();
+        printSuffixExpression(2);
 
+        // Core Core Core
+        // Should Open flag "PROCESS_TMP_EXPRESSION_WITHOUT_ASSIGNMENT" as true
+        if ( hasAssignmentOrVariadicAssignment || CmdOptions::needProcessTmpExpressionWithoutAssignment()   ) {
             evaluateSuffixExpression();
-            printSuffixExpression(3);
-            m_suffixExpression.clear(); // clear the only 1 element
         }
+        printSuffixExpression(3);
+        m_suffixExpression.clear(); // clear the only 1 element
     }
 
     // After Execute , clear
@@ -3531,7 +3532,7 @@ bool TokenMgr::process_OperatorWithPriorToken(TokenBase* toBePushed, TokenBase* 
             if (  opType == E_BIT_NOT ) {
                 return false;
             } else if ( opType == E_OPEN_PARENTHESES ) {
-                // TODO : function call ?
+                // TODO for future feature use : function call ?
                 // e.g.   sin( ... ) 
                 return false;
             } else {
