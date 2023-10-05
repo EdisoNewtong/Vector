@@ -1738,6 +1738,13 @@ void TokenMgr::executeCode()
         sentenceVarElement = m_oneSentence.at(varibleIdx);
         pVaribleInfo = VariblePool::getPool()->create_a_new_varible(defDt, varname, sentenceVarElement->getBeginPos().line );
         if ( pVaribleInfo != nullptr  ) {
+            // Random the new alloced varible's value
+            if ( sentenceType == 1 ) {
+                VariblePool::getPool()->randomVaribleValue( varname );
+            }
+            
+
+
             if ( sentenceVarElement != nullptr ) { 
                 sentenceVarElement->setDataType( pVaribleInfo->dataVal.type );
                 sentenceVarElement->setRealValue( pVaribleInfo->dataVal );
@@ -1781,7 +1788,7 @@ void TokenMgr::executeCode()
         }
         printSuffixExpression(3);
         m_suffixExpression.clear(); // clear the only 1 element
-    }
+    } 
 
     // After Execute , clear
     m_oneSentence.clear();
