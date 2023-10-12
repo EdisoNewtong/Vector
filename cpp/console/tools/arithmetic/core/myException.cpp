@@ -88,6 +88,8 @@ unordered_map<MyException::ErrorType,string>    MyException::s_exceptionMap{
 
     { enumCvt(E_THROW_UNSUPPORTED_FEATURE_INCREASEMENTAL_1),             "++ ( self increasemental operator feature ) is not supported in version " },
     { enumCvt(E_THROW_UNSUPPORTED_FEATURE_DECREASEMENTAL_1),             "-- ( self decreasemental operator feature ) is not supported in version " },
+    { enumCvt(E_THROW_UNSUPPORTED_FEATURE_LOGIC_AND),                    "&& ( logic and operator feature ) is not supported in version " },
+    { enumCvt(E_THROW_UNSUPPORTED_FEATURE_LOGIC_OR),                     "|| ( logic or  operator feature ) is not supported in version " },
 
     { enumCvt(E_THROW_FIRST_TOKEN_IS_INVALID),                              "First token is not valid. " },
 
@@ -211,4 +213,3 @@ const char* MyException::what() const noexcept // throw()
     // return detail.c_str();
 }
 */
-

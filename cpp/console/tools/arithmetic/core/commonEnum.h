@@ -205,6 +205,10 @@ enum E_ExceptionType
     E_THROW_UNSUPPORTED_FEATURE_INCREASEMENTAL_1, // ++ is not supported in this version
     E_THROW_UNSUPPORTED_FEATURE_DECREASEMENTAL_1, // -- is not supported in this version
 
+    E_THROW_UNSUPPORTED_FEATURE_LOGIC_AND,       // && is not supported in this version
+    E_THROW_UNSUPPORTED_FEATURE_LOGIC_OR,        // || is not supported in this version
+
+
     E_THROW_FIRST_TOKEN_IS_INVALID,
 
     // fix a big bug : multi keywords is not allowed at this program

@@ -73,6 +73,18 @@ ParserBase::E_PARSER_TYPE OperatorParser::appendChar(const ChInfo& rChInfo,  E_P
                                 MyException e(E_THROW_UNSUPPORTED_FEATURE_DECREASEMENTAL_1, rChInfo );
                                 throw e;
                             }
+                        } else if ( firstCh == '&' ) {
+                            if ( curCh == '&' ) {
+                                //    "&&"
+                                MyException e(E_THROW_UNSUPPORTED_FEATURE_LOGIC_AND, rChInfo );
+                                throw e;
+                            }
+                        } else if ( firstCh == '|' ) {
+                            if ( curCh == '|' ) {
+                                //    "||"
+                                MyException e(E_THROW_UNSUPPORTED_FEATURE_LOGIC_OR,  rChInfo );
+                                throw e;
+                            }
                         }
 
                         setEndPosFlag = true;
@@ -276,5 +288,4 @@ bool OperatorParser::isParsedSeqValid(std::string& errorMsg) // override
 
     return bret;
 }
-
 
