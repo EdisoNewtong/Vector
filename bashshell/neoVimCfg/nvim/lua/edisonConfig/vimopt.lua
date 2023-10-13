@@ -36,6 +36,8 @@ local neoVimOpt = {
         --vim.keymap.set("n", "<F6>" , vim.cmd("tab split") )
 
         --vim.keymap.set("n", "<C-H>" , 
+        --
+	    vim.cmd("autocmd BufWritePre * set noeol | set binary")
     end
 }
 
