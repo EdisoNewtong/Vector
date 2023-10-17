@@ -9,8 +9,14 @@ unordered_map<MyException::ErrorType,string>    MyException::s_exceptionMap{
     { enumCvt(E_THROW_CODE_CANNOT_REACH_HERE),                  "Strange ! code can't reach here. "},
     { enumCvt(E_THROW_NULL_PTR),                                "NULL pointer "},
 
-    { enumCvt(E_THROW_INVALID_CHAR_AFTER_LEFT_BRACKET),         "Invalid char after '<' "},
-    { enumCvt(E_THROW_INVALID_CHAR_AFTER_RIGHT_BRACKET),        "Invalid char after '>' "},
+    { enumCvt(E_THROW_UNSUPPORTED_FEATURE_LESS_THAN),           "Unsupported operator feature '<' , less than " },
+    { enumCvt(E_THROW_UNSUPPORTED_FEATURE_GREATER_THAN),        "Unsupported operator feature '>' , greater than " },
+
+    { enumCvt(E_THROW_UNSUPPORTED_FEATURE_NO_GREATER_THAN),        "Unsupported operator feature '<=' ( No Greater Than ) "},
+    { enumCvt(E_THROW_UNSUPPORTED_FEATURE_NO_LESS_THAN),           "Unsupported operator feature '>=' ( No Less Than ) "},
+
+    { enumCvt(E_THROW_UNSUPPORTED_FEATURE_EQUAL_TO),           "Unsupported operator feature '==' , equal to "},
+    
 
     { enumCvt(E_THROW_INVALID_PARSEDSTR_TO_GENERATE_TOKEN),     "Invalid parsed sequence "},
     { enumCvt(E_THROW_INVALID_CHAR_IN_DECIMAL_SEQ),             "Malformed decimal string "},
@@ -18,6 +24,7 @@ unordered_map<MyException::ErrorType,string>    MyException::s_exceptionMap{
     { enumCvt(E_THROW_INVALID_CHAR_IN_HEX_SEQ),                 "Malformed hex string "},
     { enumCvt(E_THROW_INVALID_CHAR_IN_FLOAT_SEQ),               "Malformed float string "},
     { enumCvt(E_THROW_INVALID_CHAR_IN_VARIBLE_SEQ),             "Malformed varible string "},
+
 
     { enumCvt(E_THROW_INVALID_NUMBER_BASE),                     "Invalid number Base "},
     { enumCvt(E_THROW_DIFFERENT_NUMBER_BASE),                   "Compare different number base "},
@@ -43,6 +50,7 @@ unordered_map<MyException::ErrorType,string>    MyException::s_exceptionMap{
     { enumCvt(E_THROW_VARIBLE_CANNOT_BE_KEYWORD),               "Varible can't be keyword "},
     { enumCvt(E_THROW_VARIBLE_NOT_DEFINED),                     "Varible is undefined " },
     { enumCvt(E_THROW_VARIBLE_NOT_INITIALIZED_BEFORE_USED),     "Varible hasn't been initialized before used " },
+    { enumCvt(E_THROW_VARIBLE_IS_MISSING),                      "Varible is missing" },
 
     { enumCvt(E_THROW_SENTENCE_LESS_TOKEN),                     "Sentence has too few tokens " },
     { enumCvt(E_THROW_SENTENCE_MORE_TOKEN),                     "Sentence has too more assignment " },
@@ -55,6 +63,8 @@ unordered_map<MyException::ErrorType,string>    MyException::s_exceptionMap{
     { enumCvt(E_THROW_SENTENCE_NO_EXPR_BEFORE_ASSIGNMENT),               "Sentence no expression before assignment " },
     { enumCvt(E_THROW_SENTENCE_NO_EXPR_AFTER_ASSIGNMENT),                "Sentence no expression after assignment " },
     { enumCvt(E_THROW_SENTENCE_UNKNOWN_DATA_TYPE),                       "Sentence unknown data type " },
+    { enumCvt(E_THROW_SENTENCE_TPYE_IS_UNDETERMINDED),                   "Sentence type is undeterminded " },
+
     { enumCvt(E_THROW_NO_MATCHED_OPEN_PARENTHESES),                      "Sentence no matched '(' while pushing   ')' " },
     { enumCvt(E_THROW_CANNOT_PUSH_TOKEN_KEYWORD),                        "Keyword can't existed after '=' " },
 
@@ -75,6 +85,18 @@ unordered_map<MyException::ErrorType,string>    MyException::s_exceptionMap{
     { enumCvt(E_THROW_BIT_RIGHTSHIFT_CANNOT_APPLY_ON_FLOAT),             "Bit-Right-Shift can't apply on float " },
     { enumCvt(E_THROW_INVALID_SUFFIX_EXPRESSION),                        "Invalid suffix expression " },
     { enumCvt(E_THROW_LAST_VALID_TOKEN_IS_NOT_SEMICOLON),                "Final valid token is not ';' " },
+
+    { enumCvt(E_THROW_UNSUPPORTED_FEATURE_INCREASEMENTAL_1),             "++ ( self increasemental operator feature ) is not supported in version " },
+    { enumCvt(E_THROW_UNSUPPORTED_FEATURE_DECREASEMENTAL_1),             "-- ( self decreasemental operator feature ) is not supported in version " },
+    { enumCvt(E_THROW_UNSUPPORTED_FEATURE_LOGIC_AND),                    "&& ( logic and operator feature ) is not supported in version " },
+    { enumCvt(E_THROW_UNSUPPORTED_FEATURE_LOGIC_OR),                     "|| ( logic or  operator feature ) is not supported in version " },
+
+    { enumCvt(E_THROW_FIRST_TOKEN_IS_INVALID),                              "First token is not valid. " },
+
+    { enumCvt(E_THROW_ALL_TOKENS_ARE_KEYWORD),                              "All sentence which is full of keywords is syntax error. " },
+    { enumCvt(E_THROW_TOO_MANY_KEYWORDS),                                   "The keywords' count is exceeded the limit.  " },
+    { enumCvt(E_THROW_SENTENCE_DEFINITION_HAS_MISSED_AN_ASSIGNMENT_OPERATOR),  "The sentence defination has missed an assignment operator. " }
+
 };
 
 
@@ -128,7 +150,7 @@ string MyException::getDetail()
 
 string MyException::getExceptionDetail() const
 {
-    using namespace charutil;
+    using namespace charUtil;
 
     string detail;
     auto it = s_exceptionMap.find(m_errorCode);
@@ -165,7 +187,7 @@ E_ExceptionType MyException::getCode()
 /*
 const char* MyException::what() const noexcept // throw()
 {
-    using namespace charutil;
+    using namespace charUtil;
 
     string detail;
     auto it = s_exceptionMap.find(m_errorCode);
@@ -191,4 +213,3 @@ const char* MyException::what() const noexcept // throw()
     // return detail.c_str();
 }
 */
-

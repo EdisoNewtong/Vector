@@ -28,10 +28,13 @@ class TokenMgr
 protected:
     struct OpPairCfg
     {
-        E_OperatorType left;
-        E_OperatorType right;
-        bool           closeAvaliable;    //   means the 2 operators are adjacent without any Space or Comment
-        bool           seperateAvaliable; //   means the 2 operators are not adjacent but there is at least some Space or Comment token in the middle
+        OpPairCfg(bool flag1, bool flag2) : closeAvaliable(flag1), seperateAvaliable(flag2) { };
+
+        // E_OperatorType left;
+        // E_OperatorType right;
+
+        bool           closeAvaliable;    //   permission for  the 2 operators are adjacent without any Space or Comment
+        bool           seperateAvaliable; //   permission for  the 2 operators are not adjacent but there is at least some Space or Comment token in the middle
     };
 
 public:
@@ -44,20 +47,29 @@ public:
 
 
 public:
+    // Core Core Core : Key Logic
     void pushToken(TokenBase* pToken);
     std::pair<bool,std::string> isLastValidTokenSemicolonOrEmpty();
+
+    // Scan all token inside the whole list, and decide whether it is full of comment(s) or blank(s)
+    bool isAllTokensTrivial();
+
     static void setUnInitializedVaribleAsError(bool flag);
     static void setNeedTreatBlankStatementAsWarning(bool flag);
 protected:
     TokenMgr();
     virtual ~TokenMgr();
-    static bool isCommentType(E_TokenType tp);
-    static bool isBlankType(E_TokenType tp);
-    static bool isIgnoredType(E_TokenType tp);
+    static bool isCommentType(TokenBase* pToken);
+    static bool isBlankType(TokenBase* pToken);
+    static bool isIgnoredType(TokenBase* pToken);
 
     bool hasPreviousExistOpenParentheses();
-    std::pair<bool,TokenBase*>        checkTokenValidFromPreviousRelationship(TokenBase* toBePushed);
+    std::pair<bool,TokenBase*>        checkAdjacentTokensRelationship_IsValid(TokenBase* toBePushed);
     std::pair<TokenBase*,TokenBase*>  getPreviousToken();
+
+    bool process_SemicolonWithPriorToken(TokenBase* toBePushed, TokenBase* priorToken);
+    bool process_SequenceWithPriorToken(TokenBase* toBePushed, TokenBase* priorToken);
+    bool process_OperatorWithPriorToken(TokenBase* toBePushed, TokenBase* priorToken, TokenBase* priorClosestToken);
 
     // for tmp expression check use
     bool is1stTokenTypeKeyWord();
@@ -145,7 +157,9 @@ protected:
 protected:
     static TokenMgr* s_gInstance;
 
-    static const OpPairCfg s_OpPairCfgTable[s_TABLE_SIZE];
+    // static const OpPairCfg s_OpPairCfgTable[OPERATOR_CNT * OPERATOR_CNT];
+    static const OpPairCfg s_OpPairCfgTable[OPERATOR_CNT][OPERATOR_CNT];
+
     static const int s_MAX_KEYWORDS_CNT;
     static const std::unordered_map<std::string, E_DataType> s_keywordsDataTypeMap;
     static std::list<TokenBase*> s_generatedTmpTokenPool;
@@ -167,3 +181,4 @@ protected:
 };
 
 #endif
+

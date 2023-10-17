@@ -110,7 +110,7 @@ string CmdOptions::getDefaultCfgFileName()
 // static 
 pair<bool,string> CmdOptions::parseCmdArgs(const vector<string>& args)
 {
-    using namespace charutil;
+    using namespace charUtil;
     string errorMsg;
 
     vector<string> unknowArgList;
@@ -347,7 +347,7 @@ void CmdOptions::printDataTypeRangeIfNecessary()
 // static 
 string CmdOptions::getUserManual()
 {
-    using namespace charutil;
+    using namespace charUtil;
 
     string strUserManul;
     strUserManul += "====================================================================================================\n";
