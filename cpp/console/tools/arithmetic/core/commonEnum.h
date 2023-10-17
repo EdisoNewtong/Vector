@@ -15,7 +15,7 @@ enum E_CharType
 
 enum E_OperatorType
 {
-    // E_OPERATOR_UNKNOWN = 0,
+    E_OPERATOR_UNKNOWN = -1,
 
     E_ADD = 0,      // +  , e.g.   a + b
     E_MINUS,    // -  , e.g.   a - b
@@ -48,7 +48,7 @@ enum E_OperatorType
         E_POSITIVE, // +  , e.g.   +a
         E_NEGATIVE, // -  , e.g.   -a
 
-    E_OPERATOR_UNKNOWN 
+    // E_OPERATOR_UNKNOWN 
 
 };
 
