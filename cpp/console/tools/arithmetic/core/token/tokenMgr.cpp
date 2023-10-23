@@ -1485,7 +1485,7 @@ void TokenMgr::pushToken(TokenBase* pToken)
     auto isValid = pr.first;
     if ( !isValid ) {
         auto previousToken = pr.second;
-        MyException e(E_THROW_INVALID_TOKEN_RELATIONSHIP);
+        MyException e(E_THROW_INVALID_TOKEN_RELATIONSHIP, pToken->getBeginPos() );
 
         string detailstr;
         if ( previousToken == nullptr ) {
