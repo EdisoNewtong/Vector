@@ -96,7 +96,7 @@ void GlobalDirector::switchParser(ParserBase::E_PARSER_TYPE type)
 
 void GlobalDirector::doParse()
 {
-    using namespace charutil;
+    using namespace charUtil;
 
     if ( m_buff == nullptr ) {
         return;
@@ -205,6 +205,14 @@ void GlobalDirector::doParse()
         throw e;
     }
 
+    if ( TokenMgr::getInstance()->isAllTokensTrivial() ) {
+		if ( m_pTextEdit != nullptr ) {
+			// cout << "All Tokens is blank or comment. No statements to be excuted ! " << endl;
+			auto outputstr = m_pTextEdit->toPlainText();
+			outputstr +=  QStringLiteral("All Tokens is blank or comment. No statements to be excuted ! \n"); 
+			m_pTextEdit->setPlainText(  outputstr );
+		}
+    }
 
     printAllVaribles();
 }
@@ -293,5 +301,4 @@ void GlobalDirector::setTextEditor(QPlainTextEdit* pEdit)
 {
     m_pTextEdit = pEdit;
 }
-
 

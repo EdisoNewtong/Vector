@@ -25,7 +25,7 @@ MultilineCommentParser::~MultilineCommentParser()
 // virtual 
 ParserBase::E_PARSER_TYPE MultilineCommentParser::appendChar(const ChInfo& rChInfo,  E_ParserAction& afterAction) // override;
 {
-    using namespace charutil;
+    using namespace charUtil;
 
     m_endChPos = rChInfo;
 
@@ -99,4 +99,3 @@ bool MultilineCommentParser::isParsedSeqValid(string& errorMsg) // override;
 
     return bret;
 }
-

@@ -69,6 +69,14 @@ VaribleInfo* VariblePool::getVaribleByName(const std::string& varname)
 }
         
 
+void VariblePool::randomVaribleValue(const std::string& varname)
+{
+    auto varibleObject = getVaribleByName(varname);
+    if ( varibleObject != nullptr ) {
+        varibleObject->dataVal.randomInternalValue();
+    }
+}
+
 
 
 VaribleInfo* VariblePool::create_a_new_varible(E_DataType dt, const std::string& varname, int defline)
@@ -123,4 +131,3 @@ QString VariblePool::printAllVaribles(unsigned int flag)
 
     return retstr;
 }
-

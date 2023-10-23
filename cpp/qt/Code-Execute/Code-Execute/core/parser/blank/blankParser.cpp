@@ -22,7 +22,7 @@ BlankParser::~BlankParser()
 // virtual 
 ParserBase::E_PARSER_TYPE BlankParser::appendChar(const ChInfo& rChInfo, E_ParserAction& afterAction) // override;
 {
-    using namespace charutil;
+    using namespace charUtil;
 
     ParserBase::E_PARSER_TYPE retType = m_type;
 
@@ -42,7 +42,7 @@ ParserBase::E_PARSER_TYPE BlankParser::appendChar(const ChInfo& rChInfo, E_Parse
 // virtual 
 bool BlankParser::isParsedSeqValid(std::string& errorMsg) // override;
 {
-    using namespace charutil;
+    using namespace charUtil;
 
     auto isAllBlank = true;
     int sz = static_cast<int>( m_parsedSeq.size() );
@@ -71,5 +71,4 @@ TokenBase* BlankParser::generateToken() // override;
     return pGenToken;
 }
 */
-
 

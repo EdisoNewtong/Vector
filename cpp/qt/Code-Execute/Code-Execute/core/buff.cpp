@@ -21,7 +21,7 @@ ChInfo::ChInfo()
 
 string ChInfo::getPos(int flag /* = 1 */) const
 {
-    using namespace charutil;
+    using namespace charUtil;
 
     string positionStr;
     positionStr = (to_string(line) + ":" + to_string(column) + " (idx=" + to_string(cursorIdx) + ") ");
@@ -74,7 +74,7 @@ Buff::~Buff()
 
 void Buff::moveNext()
 {
-    using namespace charutil;
+    using namespace charUtil;
 
     if ( isAtEnd() ) {
         return;
@@ -206,6 +206,5 @@ ChInfo& Buff::getCursor()
 {
     return m_chCursor;
 }
-
 
 

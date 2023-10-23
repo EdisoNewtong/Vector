@@ -5,6 +5,10 @@
 #include <sstream>
 #include <iomanip>
 #include <limits>
+
+#include <ctime>
+#include <random>    // to generate random number
+
 using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2541,6 +2545,18 @@ bool DataValue::isMinimumNegativeNumber()
 
     return bret;
 }
+
+
+void DataValue::randomInternalValue()
+{
+    auto seed = time(nullptr);
+    // default_random_engine dftEng;       // no   seed constructor
+    default_random_engine dftEng(seed);   // with seed constructor
+
+    uniform_int_distribution<unsigned long long> range( numeric_limits<unsigned long long>::min(),  numeric_limits<unsigned long>::max() );
+    this->value.ulonglong_val = range( dftEng );
+}
+
 
 
 bool DataValue::isIntOutOfRange(E_DataType leftDt, string& strMinVal, string& strMaxVal)

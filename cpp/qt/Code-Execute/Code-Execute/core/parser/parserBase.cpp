@@ -52,7 +52,7 @@ void ParserBase::resetInternalState()
 
 ParserBase::E_PARSER_TYPE ParserBase::appendChar(const ChInfo& rChInfo, E_ParserAction& afterAction)
 {
-    using namespace charutil;
+    using namespace charUtil;
 
     m_beginChPos = rChInfo;
     m_endChPos   = rChInfo;
@@ -154,7 +154,6 @@ bool ParserBase::isParsedSeqValid(string& errorMsg)
 // {
 //     return m_endChPos;
 // }
-
 
 
 

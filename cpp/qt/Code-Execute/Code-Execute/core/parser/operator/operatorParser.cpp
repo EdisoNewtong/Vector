@@ -16,10 +16,18 @@ OperatorParser::~OperatorParser()
 }
 
 
+/******************************************************************************************************************************************************
+
+  First of all , the 1st character must be a kind of operator
+
+
+  This function's purpose is to parse the subsequent character(s) as long as possible
+
+******************************************************************************************************************************************************/
 // virtual 
 ParserBase::E_PARSER_TYPE OperatorParser::appendChar(const ChInfo& rChInfo,  E_ParserAction& afterAction) // override;
 {
-    using namespace charutil;
+    using namespace charUtil;
 
     auto setEndPosFlag = false;
     ParserBase::E_PARSER_TYPE retType = m_type;
@@ -32,6 +40,7 @@ ParserBase::E_PARSER_TYPE OperatorParser::appendChar(const ChInfo& rChInfo,  E_P
     if ( isCurOp ) {
         // 2nd or next character is an operator type
         if ( previousSz == 1 ) {
+			// Now parse the 2nd operator character
             switch ( firstCh )
             {
             case '+':
@@ -45,8 +54,9 @@ ParserBase::E_PARSER_TYPE OperatorParser::appendChar(const ChInfo& rChInfo,  E_P
             case '|':
             case '^':
                 {
+
                     if ( curCh == '=' ) {
-                        //  +=   -=   *=   %=         &=   |=   ^=
+                        //  such as : +=   -=   *=   %=         &=   |=   ^=
                         setEndPosFlag = true;
                         m_parsedSeq += curCh;
                         afterAction = E_GENERATE_TOKEN_SWITCH_TO_DEFAULT_STEP_NEXT;
@@ -55,12 +65,28 @@ ParserBase::E_PARSER_TYPE OperatorParser::appendChar(const ChInfo& rChInfo,  E_P
                         if ( firstCh == '+' ) {
                             if ( curCh == '+' ) {
                                 //    "++"
+                                MyException e(E_THROW_UNSUPPORTED_FEATURE_INCREASEMENTAL_1, rChInfo );
+                                throw e;
                             }
                         } else if ( firstCh == '-' ) {
                             if ( curCh == '-' ) {
                                 //    "--"
+                                MyException e(E_THROW_UNSUPPORTED_FEATURE_DECREASEMENTAL_1, rChInfo );
+                                throw e;
                             }
-                        }
+                        } else if ( firstCh == '&' ) {
+                            if ( curCh == '&' ) {
+                                //    "&&"
+                                MyException e(E_THROW_UNSUPPORTED_FEATURE_LOGIC_AND, rChInfo );
+                                throw e;
+                            }
+                        } else if ( firstCh == '|' ) {
+                            if ( curCh == '|' ) {
+                                //    "||"
+                                MyException e(E_THROW_UNSUPPORTED_FEATURE_LOGIC_OR,  rChInfo );
+                                throw e;
+							}
+						}
 
                         setEndPosFlag = true;
 
@@ -95,11 +121,21 @@ ParserBase::E_PARSER_TYPE OperatorParser::appendChar(const ChInfo& rChInfo,  E_P
             case '<':
                 {
 
+                    // check the 2nd character is '<' or not
                     if ( curCh != '<' ) {
-                         MyException e(E_THROW_INVALID_CHAR_AFTER_LEFT_BRACKET, rChInfo );
-                         throw e;
+                        if ( curCh == '=' ) {
+                             // <=
+                             MyException e(E_THROW_UNSUPPORTED_FEATURE_NO_GREATER_THAN, rChInfo );
+                             throw e;
+                        } else {
+                            MyException e(E_THROW_UNSUPPORTED_FEATURE_LESS_THAN, rChInfo );
+                            throw e;
+                        }
                     }
 
+                    //
+                    // now the operator is  : <<
+                    //
                     /***************************************************
                         Valid : Wait for next '='   or other character
                         Keep current parser
@@ -115,11 +151,21 @@ ParserBase::E_PARSER_TYPE OperatorParser::appendChar(const ChInfo& rChInfo,  E_P
                 break;
             case '>':
                 {
+                    // check the 2nd character is '>' or not
                     if ( curCh != '>' ) {
-                        MyException e(E_THROW_INVALID_CHAR_AFTER_RIGHT_BRACKET, rChInfo );
-                        throw e;
+                        if ( curCh == '=' ) {
+                            MyException e(E_THROW_UNSUPPORTED_FEATURE_NO_LESS_THAN, rChInfo );
+                            throw e;
+                        } else {
+                            // > only   ( a > b )
+                            MyException e(E_THROW_UNSUPPORTED_FEATURE_GREATER_THAN, rChInfo );
+                            throw e;
+                        }
                     }
 
+                    //
+                    // now the operator is  : >>
+                    //
                     /***************************************************
                         Valid : Wait for next '='   or other character
                         Keep current parser
@@ -131,6 +177,18 @@ ParserBase::E_PARSER_TYPE OperatorParser::appendChar(const ChInfo& rChInfo,  E_P
                     // m_parsedSeq = ">>";
                     // afterAction = E_GENERATE_TOKEN_SWITCH_TO_DEFAULT_STEP_NEXT;
                     // retType = ParserBase::E_BASE;
+                }
+                break;
+            case '=':
+                {
+                    if ( curCh == '=' ) {
+                        // ==   ( a == b )
+                        MyException e(E_THROW_UNSUPPORTED_FEATURE_EQUAL_TO, rChInfo );
+                        throw e;
+                    }
+
+                    afterAction = E_GENERATE_TOKEN_SWITCH_TO_DEFAULT_KEEP_CURSOR;
+                    retType = ParserBase::E_BASE;
                 }
                 break;
             default:
@@ -153,7 +211,20 @@ ParserBase::E_PARSER_TYPE OperatorParser::appendChar(const ChInfo& rChInfo,  E_P
             }
         }
     } else {
-        // 2nd is not an operator type
+
+        if ( previousSz == 1 ) {
+            if ( firstCh == '<'  ) {
+                 // <   only  ( a < b )
+                 MyException e(E_THROW_UNSUPPORTED_FEATURE_LESS_THAN, rChInfo );
+                 throw e;
+            } else if ( firstCh == '>' ) {
+                 MyException e(E_THROW_UNSUPPORTED_FEATURE_GREATER_THAN, rChInfo );
+                 throw e;
+            }
+        }
+
+        // 2nd or 3rd ch is not an operator type
+        
         afterAction  = E_GENERATE_TOKEN_SWITCH_TO_DEFAULT_KEEP_CURSOR;
         retType = ParserBase::E_BASE;
     }
@@ -190,9 +261,13 @@ bool OperatorParser::isParsedSeqValid(std::string& errorMsg) // override
     auto sz = static_cast<int>( m_parsedSeq.size() );
     if ( sz == 1 ) {
         const auto& ch = m_parsedSeq.front();
-        if ( ch == '<' || ch == '>' ) {
+
+        if ( ch == '<'  ) {
             bret = false;
-            errorMsg = "Operator with 1 char is incomplete , <  or > ";
+            errorMsg = "Operator \"Less than\" '<'  is unsupported feature. ";
+        } else if ( ch == '>' ) {
+            bret = false;
+            errorMsg = "Operator \"Greater than\" '>'  is unsupported feature. ";
         } else {
             bret = true;
         }
@@ -216,5 +291,3 @@ bool OperatorParser::isParsedSeqValid(std::string& errorMsg) // override
 
     return bret;
 }
-
-

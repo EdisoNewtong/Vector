@@ -48,7 +48,7 @@ SequenceParser::~SequenceParser()
 // virtual 
 ParserBase::E_PARSER_TYPE SequenceParser::appendChar(const ChInfo& rChInfo,  E_ParserAction& afterAction) // override;
 {
-    using namespace charutil;
+    using namespace charUtil;
     // m_endChPos = rChInfo;
 
     auto retType = m_type;
@@ -85,7 +85,7 @@ ParserBase::E_PARSER_TYPE SequenceParser::appendChar(const ChInfo& rChInfo,  E_P
 //virtual 
 void SequenceParser::pushHeadChar(char ch, const ChInfo& rChInfo) // override
 {
-    using namespace charutil;
+    using namespace charUtil;
 
     //  push the 1st character
     ParserBase::pushHeadChar(ch, rChInfo);
@@ -145,7 +145,7 @@ void SequenceParser::resetInternalState() // override;
 
 ParserBase::E_PARSER_TYPE SequenceParser::appendForType_int(const ChInfo& rChInfo, E_ParserAction& afterAction)
 {
-    using namespace charutil;
+    using namespace charUtil;
 
     char ch = rChInfo.ch;
 
@@ -326,7 +326,7 @@ ParserBase::E_PARSER_TYPE SequenceParser::appendForType_int(const ChInfo& rChInf
 
 ParserBase::E_PARSER_TYPE SequenceParser::SequenceParser::appendForType_oct(const ChInfo& rChInfo, E_ParserAction& afterAction)
 {
-    using namespace charutil;
+    using namespace charUtil;
 
     ParserBase::E_PARSER_TYPE retType = m_type;
 
@@ -439,7 +439,7 @@ ParserBase::E_PARSER_TYPE SequenceParser::SequenceParser::appendForType_oct(cons
 
 ParserBase::E_PARSER_TYPE SequenceParser::SequenceParser::appendForType_hex(const ChInfo& rChInfo, E_ParserAction& afterAction)
 {
-    using namespace charutil;
+    using namespace charUtil;
 
     ParserBase::E_PARSER_TYPE retType = m_type;
 
@@ -556,7 +556,7 @@ ParserBase::E_PARSER_TYPE SequenceParser::SequenceParser::appendForType_hex(cons
 
 ParserBase::E_PARSER_TYPE SequenceParser::appendForType_float(const ChInfo& rChInfo, E_ParserAction& afterAction)
 {
-    using namespace charutil;
+    using namespace charUtil;
 
     ParserBase::E_PARSER_TYPE retType = m_type;
     string throwSeq = m_parsedSeq;
@@ -863,7 +863,7 @@ ParserBase::E_PARSER_TYPE SequenceParser::appendForType_float(const ChInfo& rChI
 
 ParserBase::E_PARSER_TYPE SequenceParser::appendForType_varible(const ChInfo& rChInfo, E_ParserAction& afterAction)
 {
-    using namespace charutil;
+    using namespace charUtil;
 
     string throwSeq = m_parsedSeq;
     char ch = rChInfo.ch;
@@ -1019,7 +1019,7 @@ void SequenceParser::increase_float_suffix_lL_CntAndCheck(const ChInfo& rChInfo)
 
 bool SequenceParser::hasNumberBeforeOrAfterDot(bool beforeDot)
 {
-    using namespace charutil;
+    using namespace charUtil;
 
     string strPrefixBeforeDot;
 
@@ -1058,7 +1058,7 @@ bool SequenceParser::hasNumberBeforeOrAfterDot(bool beforeDot)
 
 int  SequenceParser::getNumberAfter_eE()
 {
-    using namespace charutil;
+    using namespace charUtil;
 
     auto pos_e = m_parsedSeq.rfind('e');
     auto pos_E = m_parsedSeq.rfind('E');
@@ -1082,7 +1082,7 @@ int  SequenceParser::getNumberAfter_eE()
 
 bool SequenceParser::isOctValid()
 {
-    using namespace charutil;
+    using namespace charUtil;
 
     string stripSuffix = m_parsedSeq;
     if ( !m_int_suffix_string.empty() ) {
@@ -1104,7 +1104,7 @@ bool SequenceParser::isOctValid()
 
 std::string SequenceParser::surroundDoubleQuoto(const std::string str)
 {
-    using namespace charutil;
+    using namespace charUtil;
 
     string retstr = DOUBLE_QUOTO + str + DOUBLE_QUOTO;
     return retstr;
@@ -1147,7 +1147,7 @@ void  SequenceParser::throw_Varible_exception(const ChInfo& rChInfo, const strin
 
 bool SequenceParser::isValid_Decimal()
 {
-    using namespace charutil;
+    using namespace charUtil;
 
     string parsedStr = m_parsedSeq;
     if ( !m_int_suffix_string.empty() ){
@@ -1171,7 +1171,7 @@ bool SequenceParser::isValid_Decimal()
 
 bool SequenceParser::isValid_Octal()
 {
-    using namespace charutil;
+    using namespace charUtil;
 
     string parsedStr = m_parsedSeq;
     if ( !m_int_suffix_string.empty() ){
@@ -1195,7 +1195,7 @@ bool SequenceParser::isValid_Octal()
 
 bool SequenceParser::isValid_Hex()
 {
-    using namespace charutil;
+    using namespace charUtil;
 
     string parsedStr = m_parsedSeq;
     int sz = static_cast<int>( parsedStr.size() );
@@ -1233,7 +1233,7 @@ bool SequenceParser::isValid_Hex()
 
 bool SequenceParser::isValid_Float()
 {
-    using namespace charutil;
+    using namespace charUtil;
 
     string parsedStr = m_parsedSeq;
     auto suffixCnt = m_float_fFSuffixCnt + m_float_lLSuffixCnt;
@@ -1390,7 +1390,7 @@ bool SequenceParser::isValid_Float()
 
 bool SequenceParser::isValid_Varible()
 {
-    using namespace charutil;
+    using namespace charUtil;
 
     if ( m_parsedSeq.empty() ) {
         return false;
@@ -1567,7 +1567,7 @@ TokenBase* SequenceParser::generateToken() // override;
 
 E_DataType SequenceParser::calcFixedLiteralDataType()
 {
-    using namespace charutil;
+    using namespace charUtil;
 
     E_DataType dt = E_TP_UNKNOWN;
 
@@ -1953,5 +1953,4 @@ E_DataType SequenceParser::calcFixedLiteralDataType()
 
     return dt;
 }
-
 

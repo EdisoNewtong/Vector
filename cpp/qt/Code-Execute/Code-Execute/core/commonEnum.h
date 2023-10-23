@@ -15,12 +15,10 @@ enum E_CharType
 
 enum E_OperatorType
 {
-    E_OPERATOR_UNKNOWN = 0,
+    E_OPERATOR_UNKNOWN = -1,
 
-    E_ADD,      // +  , e.g.   a + b
-     E_POSITIVE, // +  , e.g.   +a
+    E_ADD = 0,      // +  , e.g.   a + b
     E_MINUS,    // -  , e.g.   a - b
-     E_NEGATIVE, // -  , e.g.   -a
     E_MULTIPLY, // *
     E_DIVIDE,   // /
     E_MOD,      // %
@@ -34,8 +32,8 @@ enum E_OperatorType
 
     E_OPEN_PARENTHESES,   // (
     E_CLOSE_PARENTHESES,  // )
-    E_ASSIGNMENT,         // =
-
+                          
+    E_ASSIGNMENT,                     // =
     E_ADD_ASSIGNMENT,                 // +=
     E_MINUS_ASSIGNMENT,               // -=
     E_MULTIPLY_ASSIGNMENT,            // *=
@@ -46,6 +44,11 @@ enum E_OperatorType
     E_BIT_XOR_ASSIGNMENT,             // ^=
     E_BIT_LEFT_SHIFT_ASSIGNMENT,      // <<=
     E_BIT_RIGHT_SHIFT_ASSIGNMENT,     // >>=
+                                      //
+        E_POSITIVE, // +  , e.g.   +a
+        E_NEGATIVE, // -  , e.g.   -a
+
+    // E_OPERATOR_UNKNOWN 
 
 };
 
@@ -117,8 +120,13 @@ enum E_ExceptionType
     E_THROW_CODE_CANNOT_REACH_HERE,
     E_THROW_NULL_PTR,
 
-    E_THROW_INVALID_CHAR_AFTER_LEFT_BRACKET,      // << : OK ,  <a  , a is not allowed
-    E_THROW_INVALID_CHAR_AFTER_RIGHT_BRACKET,     // >> : OK ,  >a  , a is not allowed
+    E_THROW_UNSUPPORTED_FEATURE_LESS_THAN,        // << : OK ,  less than ( a < b ) is an unsupported feature
+    E_THROW_UNSUPPORTED_FEATURE_GREATER_THAN,     // >> : OK ,  greater than ( a > b ) is an unsupported feature
+
+    E_THROW_UNSUPPORTED_FEATURE_NO_GREATER_THAN,  // << : OK ,  No Greater Than ( a <= b ) is an unsupported feature
+    E_THROW_UNSUPPORTED_FEATURE_NO_LESS_THAN,     // >> : OK ,  No Less Than ( a >= b ) is an unsupported feature
+
+    E_THROW_UNSUPPORTED_FEATURE_EQUAL_TO,        // == is an unsupported feature
 
     //////////////////////////////////////////////////
     E_THROW_INVALID_PARSEDSTR_TO_GENERATE_TOKEN,
@@ -157,6 +165,7 @@ enum E_ExceptionType
     E_THROW_VARIBLE_CANNOT_BE_KEYWORD,
     E_THROW_VARIBLE_NOT_DEFINED,
     E_THROW_VARIBLE_NOT_INITIALIZED_BEFORE_USED,
+    E_THROW_VARIBLE_IS_MISSING,
 
     E_THROW_SENTENCE_LESS_TOKEN,
     E_THROW_SENTENCE_MORE_TOKEN,
@@ -170,6 +179,8 @@ enum E_ExceptionType
     E_THROW_SENTENCE_NO_EXPR_AFTER_ASSIGNMENT,
     E_THROW_SENTENCE_2ND_IS_NOT_A_VARIADIC_ASSIGNMENT,
     E_THROW_SENTENCE_UNKNOWN_DATA_TYPE,
+    E_THROW_SENTENCE_TPYE_IS_UNDETERMINDED,
+
     E_THROW_NO_MATCHED_OPEN_PARENTHESES,
     E_THROW_CANNOT_PUSH_TOKEN_KEYWORD,
 
@@ -190,6 +201,24 @@ enum E_ExceptionType
 
     E_THROW_INVALID_SUFFIX_EXPRESSION,
     E_THROW_LAST_VALID_TOKEN_IS_NOT_SEMICOLON,
+
+    E_THROW_UNSUPPORTED_FEATURE_INCREASEMENTAL_1, // ++ is not supported in this version
+    E_THROW_UNSUPPORTED_FEATURE_DECREASEMENTAL_1, // -- is not supported in this version
+
+    E_THROW_UNSUPPORTED_FEATURE_LOGIC_AND,       // && is not supported in this version
+    E_THROW_UNSUPPORTED_FEATURE_LOGIC_OR,        // || is not supported in this version
+
+
+    E_THROW_FIRST_TOKEN_IS_INVALID,
+
+    // fix a big bug : multi keywords is not allowed at this program
+    //     int      :  is OK
+    //     short    :  is OK
+    //     unsigned int :  run-time error
+    E_THROW_ALL_TOKENS_ARE_KEYWORD,
+    E_THROW_TOO_MANY_KEYWORDS,
+    E_THROW_SENTENCE_DEFINITION_HAS_MISSED_AN_ASSIGNMENT_OPERATOR,
+
 
 };
 

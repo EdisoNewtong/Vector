@@ -35,6 +35,7 @@ public:
 public:
     VaribleInfo* create_a_new_varible(E_DataType dt, const std::string& varname, int defline);
     VaribleInfo* getVaribleByName(const std::string& varname);
+    void         randomVaribleValue(const std::string& varname);
 
     QString printAllVaribles(unsigned int flag);
 protected:

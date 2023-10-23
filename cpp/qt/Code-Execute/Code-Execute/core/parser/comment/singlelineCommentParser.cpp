@@ -24,7 +24,7 @@ SinglelineCommentParser::~SinglelineCommentParser()
 // virtual 
 ParserBase::E_PARSER_TYPE SinglelineCommentParser::appendChar(const ChInfo& rChInfo,  E_ParserAction& afterAction) // override;
 {
-    using namespace charutil;
+    using namespace charUtil;
 
     auto retType = m_type;
 
@@ -99,7 +99,7 @@ void SinglelineCommentParser::resetInternalState() // override;
 // virtual 
 bool SinglelineCommentParser::isParsedSeqValid(string& errorMSg) // override;
 {
-    using namespace charutil;
+    using namespace charUtil;
     auto bret = false;
 
     string prefix2 = m_parsedSeq.substr(0,2);
@@ -112,5 +112,4 @@ bool SinglelineCommentParser::isParsedSeqValid(string& errorMSg) // override;
 
     return bret;
 }
-
 
