@@ -75,6 +75,15 @@ autocmd BufWritePre *  {
 }
 
 
+" or 
+"""""""""""""""""""""""""""""""""""""""""""""""""""
+"
+" autocmd BufWritePre *  set noeol | set binary
+"
+""""""""""""""""""""""""""""""""""""""""""""""""""
+
+
+
 " if has("gui_running")
 	set guioptions-=e
 	set guioptions-=T
@@ -121,6 +130,5 @@ autocmd BufWritePre *  {
 
 	set guifont=Menlo\ Regular:h22
 " endif
-
 
 
