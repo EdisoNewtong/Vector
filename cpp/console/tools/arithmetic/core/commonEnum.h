@@ -44,13 +44,38 @@ enum E_OperatorType
     E_BIT_XOR_ASSIGNMENT,             // ^=
     E_BIT_LEFT_SHIFT_ASSIGNMENT,      // <<=
     E_BIT_RIGHT_SHIFT_ASSIGNMENT,     // >>=
-                                      //
+	// new feature for function call
+    E_COMMA,                          // ,
+
         E_POSITIVE, // +  , e.g.   +a
         E_NEGATIVE, // -  , e.g.   -a
 
     // E_OPERATOR_UNKNOWN 
 
 };
+
+enum E_OpAnotherFlag
+{
+	E_OP_FLAG_UNKNOWN = 0,
+
+	E_OP_FLAG_OPEN_PARENTHESES_PRIORITY_PREMOTE,    // a = ( b + c ) * d
+													//     ^
+	E_OP_FLAG_OPEN_PARENTHESES_FUNCTION_START,      // a = sin( angle )
+													//        ^
+
+	E_OP_FLAG_CLOSE_PARENTHESES_PRIORITY_PREMOTE,   //  a = ( b + c ) * d
+													//              ^
+	E_OP_FLAG_CLOSE_PARENTHESES_FUNCTION_END,       //  a = sin( angle ) 
+													//                 ^
+
+	E_OP_COMMA_NORMAL,            //  a = 3 , 5
+                                  //        ^
+	E_OP_COMMA_FUNCTION_ARG_SEP,  // function( a , b )
+								  //             ^
+	E_OP_COMMA_DEFINATION_SEP     //   int a , b , c
+								  //         ^   ^
+};
+
 
 enum E_TokenType
 {

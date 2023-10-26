@@ -27,6 +27,9 @@ namespace charUtil
     static const std::string SC_OP_BIT_LEFT_SHIFT     = " << ";
     static const std::string SC_OP_BIT_RIGHT_SHIFT    = " >> ";
     static const std::string SC_OP_BIT_ASSIGNMENT     = " = ";
+
+    static const std::string SC_OP_COMMA              = " , ";
+
     static const std::string SC_OP_POSITIVE_BEGIN     = "+";
     static const std::string SC_OP_NEGATIVE_BEGIN     = "-";
     static const std::string SC_OP_BIT_NOT_BEGIN      = "~";
@@ -104,6 +107,8 @@ namespace charUtil
                   || ch == '('
                   || ch == ')'
                   || ch == '=' 
+				  // a new feature for function call
+				  || ch == ','
                 );
 
     }

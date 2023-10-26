@@ -49,6 +49,9 @@ public:
 
     void           setWarningContent( const std::string& content);
     std::string    getWarningContent();
+
+	void            setContextRoleForOp(const E_OpAnotherFlag& flag);
+	E_OpAnotherFlag getContextRoleForOp();
 protected:
     E_TokenType    m_tokenType;
 
@@ -68,6 +71,13 @@ protected:
     //
     ////////////////////////////////////////////////////////////////////////////////////////////////////////
     unsigned char  m_expTypeFlag;
+
+	// function call is under develop ,    
+	// 
+	//      ','( Comma )  ,    
+	//      '(' ( Open Parenthese )    
+	//       play role flag
+	E_OpAnotherFlag m_opFlag;
 
     std::string    m_token_content;
 

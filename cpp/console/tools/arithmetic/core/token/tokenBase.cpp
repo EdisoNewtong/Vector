@@ -14,6 +14,7 @@ TokenBase::TokenBase(E_TokenType tp)
     , m_opType(E_OPERATOR_UNKNOWN)
     , m_dataType(E_TP_UNKNOWN)
     , m_expTypeFlag(0U)
+	, m_opFlag( E_OP_FLAG_UNKNOWN )
     , m_token_content()
     , m_beginPos()
     , m_endPos()
@@ -29,6 +30,7 @@ TokenBase::TokenBase(E_DataType dt)
     , m_opType(E_OPERATOR_UNKNOWN)
     , m_dataType(dt)
     , m_expTypeFlag(0U)
+	, m_opFlag( E_OP_FLAG_UNKNOWN )
     , m_token_content()
     , m_beginPos()
     , m_endPos()
@@ -434,4 +436,16 @@ void   TokenBase::setWarningContent( const std::string& content)
 string    TokenBase::getWarningContent()
 {
     return m_warningContent;
+}
+
+
+
+void  TokenBase::setContextRoleForOp(const E_OpAnotherFlag& flag)
+{
+	m_opFlag = flag;
+}
+
+E_OpAnotherFlag  TokenBase::getContextRoleForOp()
+{
+	return m_opFlag;
 }

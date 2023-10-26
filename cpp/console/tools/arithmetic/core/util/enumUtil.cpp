@@ -67,6 +67,8 @@ string EnumUtil::enumName(E_OperatorType tp)
     INNER_ENUM_2_STRING_MAP(E_BIT_XOR_ASSIGNMENT)
     INNER_ENUM_2_STRING_MAP(E_BIT_LEFT_SHIFT_ASSIGNMENT)
     INNER_ENUM_2_STRING_MAP(E_BIT_RIGHT_SHIFT_ASSIGNMENT)
+	// New feature for function call
+    INNER_ENUM_2_STRING_MAP(E_COMMA)
     default:
         retstr = string("??? E_OperatorType ??? | value = ") + to_string( static_cast<int>(tp) );
         break;
@@ -376,6 +378,9 @@ E_OperatorType EnumUtil::getOpType(const string& opSepStr, bool isUnary /* = fal
             break;
         case '=':
             retOpTp = E_ASSIGNMENT;
+            break;
+        case ',':
+            retOpTp = E_COMMA;
             break;
         default:
             {

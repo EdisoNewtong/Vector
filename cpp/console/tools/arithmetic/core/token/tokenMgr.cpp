@@ -43,7 +43,8 @@ const TokenMgr::OpPairCfg TokenMgr::s_OpPairCfgTable[OPERATOR_CNT][OPERATOR_CNT]
          TokenMgr::OpPairCfg( false, false ),     // +  |= 
          TokenMgr::OpPairCfg( false, false ),     // +  ^= 
          TokenMgr::OpPairCfg( false, false ),     // +  <<= 
-         TokenMgr::OpPairCfg( false, false )      // +  >>= 
+         TokenMgr::OpPairCfg( false, false ),     // +  >>= 
+         TokenMgr::OpPairCfg( false, false )      // +  ,
     },
     {   //  E_MINUS
         TokenMgr::OpPairCfg( true, true ),       // -  + 
@@ -69,7 +70,8 @@ const TokenMgr::OpPairCfg TokenMgr::s_OpPairCfgTable[OPERATOR_CNT][OPERATOR_CNT]
         TokenMgr::OpPairCfg( false, false ),     // -  |= 
         TokenMgr::OpPairCfg( false, false ),     // -  ^= 
         TokenMgr::OpPairCfg( false, false ),     // -  <<= 
-        TokenMgr::OpPairCfg( false, false )      // -  >>= 
+        TokenMgr::OpPairCfg( false, false ),     // -  >>= 
+        TokenMgr::OpPairCfg( false, false )      // -  ,
     },
     {   //  E_MULTIPLY
         TokenMgr::OpPairCfg( true, true ),       // *  + 
@@ -95,7 +97,8 @@ const TokenMgr::OpPairCfg TokenMgr::s_OpPairCfgTable[OPERATOR_CNT][OPERATOR_CNT]
         TokenMgr::OpPairCfg( false, false ),     // *  |= 
         TokenMgr::OpPairCfg( false, false ),     // *  ^= 
         TokenMgr::OpPairCfg( false, false ),     // *  <<= 
-        TokenMgr::OpPairCfg( false, false )      // *  >>= 
+        TokenMgr::OpPairCfg( false, false ),     // *  >>= 
+        TokenMgr::OpPairCfg( false, false )      // *  ,
     },
     {   //  E_DIVIDE
         TokenMgr::OpPairCfg( true, true ),       // /  + 
@@ -121,7 +124,8 @@ const TokenMgr::OpPairCfg TokenMgr::s_OpPairCfgTable[OPERATOR_CNT][OPERATOR_CNT]
         TokenMgr::OpPairCfg( false, false ),     // /  |= 
         TokenMgr::OpPairCfg( false, false ),     // /  ^= 
         TokenMgr::OpPairCfg( false, false ),     // /  <<= 
-        TokenMgr::OpPairCfg( false, false )      // /  >>= 
+        TokenMgr::OpPairCfg( false, false ),     // /  >>= 
+        TokenMgr::OpPairCfg( false, false )      // /  ,
     },
     {   //  E_MOD
         TokenMgr::OpPairCfg( true, true ),       // %  + 
@@ -147,7 +151,8 @@ const TokenMgr::OpPairCfg TokenMgr::s_OpPairCfgTable[OPERATOR_CNT][OPERATOR_CNT]
         TokenMgr::OpPairCfg( false, false ),     // %  |= 
         TokenMgr::OpPairCfg( false, false ),     // %  ^= 
         TokenMgr::OpPairCfg( false, false ),     // %  <<= 
-        TokenMgr::OpPairCfg( false, false )      // %  >>= 
+        TokenMgr::OpPairCfg( false, false ),     // %  >>= 
+        TokenMgr::OpPairCfg( false, false )      // %  ,
     },
     {   //  E_BIT_AND
         TokenMgr::OpPairCfg( true, true ),       // &  + 
@@ -173,7 +178,8 @@ const TokenMgr::OpPairCfg TokenMgr::s_OpPairCfgTable[OPERATOR_CNT][OPERATOR_CNT]
         TokenMgr::OpPairCfg( false, false ),     // &  |= 
         TokenMgr::OpPairCfg( false, false ),     // &  ^= 
         TokenMgr::OpPairCfg( false, false ),     // &  <<= 
-        TokenMgr::OpPairCfg( false, false )      // &  >>= 
+        TokenMgr::OpPairCfg( false, false ),     // &  >>= 
+        TokenMgr::OpPairCfg( false, false )      // &  ,
     },
     {   //  E_BIT_OR
         TokenMgr::OpPairCfg( true, true ),       // |  + 
@@ -199,7 +205,8 @@ const TokenMgr::OpPairCfg TokenMgr::s_OpPairCfgTable[OPERATOR_CNT][OPERATOR_CNT]
         TokenMgr::OpPairCfg( false, false ),     // |  |= 
         TokenMgr::OpPairCfg( false, false ),     // |  ^= 
         TokenMgr::OpPairCfg( false, false ),     // |  <<= 
-        TokenMgr::OpPairCfg( false, false )      // |  >>= 
+        TokenMgr::OpPairCfg( false, false ),     // |  >>= 
+        TokenMgr::OpPairCfg( false, false )      // |  ,
     },
     {   //  E_BIT_XOR
         TokenMgr::OpPairCfg( true, true ),       // ^  + 
@@ -225,7 +232,8 @@ const TokenMgr::OpPairCfg TokenMgr::s_OpPairCfgTable[OPERATOR_CNT][OPERATOR_CNT]
         TokenMgr::OpPairCfg( false, false ),     // ^  |= 
         TokenMgr::OpPairCfg( false, false ),     // ^  ^= 
         TokenMgr::OpPairCfg( false, false ),     // ^  <<= 
-        TokenMgr::OpPairCfg( false, false )      // ^  >>= 
+        TokenMgr::OpPairCfg( false, false ),     // ^  >>= 
+        TokenMgr::OpPairCfg( false, false )      // ^  ,
     },
     {   //  E_BIT_NOT
         TokenMgr::OpPairCfg( true, true ),       // ~  + 
@@ -251,7 +259,8 @@ const TokenMgr::OpPairCfg TokenMgr::s_OpPairCfgTable[OPERATOR_CNT][OPERATOR_CNT]
         TokenMgr::OpPairCfg( false, false ),     // ~  |= 
         TokenMgr::OpPairCfg( false, false ),     // ~  ^= 
         TokenMgr::OpPairCfg( false, false ),     // ~  <<= 
-        TokenMgr::OpPairCfg( false, false )      // ~  >>= 
+        TokenMgr::OpPairCfg( false, false ),     // ~  >>= 
+        TokenMgr::OpPairCfg( false, false )      // ~  ,
     },
     {   //  E_BIT_LEFT_SHIFT
         TokenMgr::OpPairCfg( true, true ),       // <<  + 
@@ -277,7 +286,8 @@ const TokenMgr::OpPairCfg TokenMgr::s_OpPairCfgTable[OPERATOR_CNT][OPERATOR_CNT]
         TokenMgr::OpPairCfg( false, false ),     // <<  |= 
         TokenMgr::OpPairCfg( false, false ),     // <<  ^= 
         TokenMgr::OpPairCfg( false, false ),     // <<  <<= 
-        TokenMgr::OpPairCfg( false, false )      // <<  >>= 
+        TokenMgr::OpPairCfg( false, false ),     // <<  >>= 
+        TokenMgr::OpPairCfg( false, false )      // <<  ,
     },
     {   //  E_BIT_RIGHT_SHIFT
         TokenMgr::OpPairCfg( true, true ),       // >>  + 
@@ -303,7 +313,8 @@ const TokenMgr::OpPairCfg TokenMgr::s_OpPairCfgTable[OPERATOR_CNT][OPERATOR_CNT]
         TokenMgr::OpPairCfg( false, false ),     // >>  |= 
         TokenMgr::OpPairCfg( false, false ),     // >>  ^= 
         TokenMgr::OpPairCfg( false, false ),     // >>  <<= 
-        TokenMgr::OpPairCfg( false, false )     // >>  >>= 
+        TokenMgr::OpPairCfg( false, false ),    // >>  >>= 
+        TokenMgr::OpPairCfg( false, false )     // >>  ,
     },
     {   //  E_OPEN_PARENTHESES
         TokenMgr::OpPairCfg( true, true ),       // (  + 
@@ -329,7 +340,8 @@ const TokenMgr::OpPairCfg TokenMgr::s_OpPairCfgTable[OPERATOR_CNT][OPERATOR_CNT]
         TokenMgr::OpPairCfg( false, false ),     // (  |= 
         TokenMgr::OpPairCfg( false, false ),     // (  ^= 
         TokenMgr::OpPairCfg( false, false ),     // (  <<= 
-        TokenMgr::OpPairCfg( false, false )      // (  >>= 
+        TokenMgr::OpPairCfg( false, false ),     // (  >>= 
+        TokenMgr::OpPairCfg( false, false )      //  (  ,
     },
     {   //  E_CLOSE_PARENTHESES
         TokenMgr::OpPairCfg( true, true ),     // )  + 
@@ -357,7 +369,8 @@ const TokenMgr::OpPairCfg TokenMgr::s_OpPairCfgTable[OPERATOR_CNT][OPERATOR_CNT]
         TokenMgr::OpPairCfg( true, true ),     // )  |= 
         TokenMgr::OpPairCfg( true, true ),     // )  ^= 
         TokenMgr::OpPairCfg( true, true ),     // )  <<= 
-        TokenMgr::OpPairCfg( true, true )      // )  >>= 
+        TokenMgr::OpPairCfg( true, true ),     // )  >>= 
+        TokenMgr::OpPairCfg( true, true )      // )  ,     such as : int a = (3),4;
     },
     {   //  E_ASSIGNMENT
         TokenMgr::OpPairCfg( true, true ),     // =  + 
@@ -383,7 +396,8 @@ const TokenMgr::OpPairCfg TokenMgr::s_OpPairCfgTable[OPERATOR_CNT][OPERATOR_CNT]
         TokenMgr::OpPairCfg( false, false ),   // =  |= 
         TokenMgr::OpPairCfg( false, false ),   // =  ^= 
         TokenMgr::OpPairCfg( false, false ),   // =  <<= 
-        TokenMgr::OpPairCfg( false, false )    // =  >>= 
+        TokenMgr::OpPairCfg( false, false ),   // =  >>= 
+        TokenMgr::OpPairCfg( false, false )    // = ,
     },
     {   //  E_ADD_ASSIGNMENT
         TokenMgr::OpPairCfg( true, true ),     // +=  + 
@@ -409,7 +423,8 @@ const TokenMgr::OpPairCfg TokenMgr::s_OpPairCfgTable[OPERATOR_CNT][OPERATOR_CNT]
         TokenMgr::OpPairCfg( false, false ),   // +=  |= 
         TokenMgr::OpPairCfg( false, false ),   // +=  ^= 
         TokenMgr::OpPairCfg( false, false ),   // +=  <<= 
-        TokenMgr::OpPairCfg( false, false )    // +=  >>= 
+        TokenMgr::OpPairCfg( false, false ),   // +=  >>= 
+        TokenMgr::OpPairCfg( false, false )    // += ,
     },
     {   //  E_MINUS_ASSIGNMENT
         TokenMgr::OpPairCfg( true, true ),     // -=  + 
@@ -435,7 +450,8 @@ const TokenMgr::OpPairCfg TokenMgr::s_OpPairCfgTable[OPERATOR_CNT][OPERATOR_CNT]
         TokenMgr::OpPairCfg( false, false ),   // -=  |= 
         TokenMgr::OpPairCfg( false, false ),   // -=  ^= 
         TokenMgr::OpPairCfg( false, false ),   // -=  <<= 
-        TokenMgr::OpPairCfg( false, false )    // -=  >>= 
+        TokenMgr::OpPairCfg( false, false ),   // -=  >>= 
+        TokenMgr::OpPairCfg( false, false )    // -= ,
     },
     {   //  E_MULTIPLY_ASSIGNMENT
         TokenMgr::OpPairCfg( true, true ),     // *=  + 
@@ -461,7 +477,8 @@ const TokenMgr::OpPairCfg TokenMgr::s_OpPairCfgTable[OPERATOR_CNT][OPERATOR_CNT]
         TokenMgr::OpPairCfg( false, false ),   // *=  |= 
         TokenMgr::OpPairCfg( false, false ),   // *=  ^= 
         TokenMgr::OpPairCfg( false, false ),   // *=  <<= 
-        TokenMgr::OpPairCfg( false, false )    // *=  >>= 
+        TokenMgr::OpPairCfg( false, false ),   // *=  >>= 
+        TokenMgr::OpPairCfg( false, false )    // *= ,
     },
     {   //  E_DIVIDE_ASSIGNMENT
         TokenMgr::OpPairCfg( true, true ),     // /=  + 
@@ -487,7 +504,8 @@ const TokenMgr::OpPairCfg TokenMgr::s_OpPairCfgTable[OPERATOR_CNT][OPERATOR_CNT]
         TokenMgr::OpPairCfg( false, false ),   // /=  |= 
         TokenMgr::OpPairCfg( false, false ),   // /=  ^= 
         TokenMgr::OpPairCfg( false, false ),   // /=  <<= 
-        TokenMgr::OpPairCfg( false, false )    // /=  >>= 
+        TokenMgr::OpPairCfg( false, false ),   // /=  >>= 
+        TokenMgr::OpPairCfg( false, false )    // /= ,
     },
     {   //  E_MOD_ASSIGNMENT
         TokenMgr::OpPairCfg( true, true ),     // %=  + 
@@ -513,7 +531,8 @@ const TokenMgr::OpPairCfg TokenMgr::s_OpPairCfgTable[OPERATOR_CNT][OPERATOR_CNT]
         TokenMgr::OpPairCfg( false, false ),   // %=  |= 
         TokenMgr::OpPairCfg( false, false ),   // %=  ^= 
         TokenMgr::OpPairCfg( false, false ),   // %=  <<= 
-        TokenMgr::OpPairCfg( false, false )    // %=  >>= 
+        TokenMgr::OpPairCfg( false, false ),   // %=  >>= 
+        TokenMgr::OpPairCfg( false, false )    // %= ,
     },
     {   //  E_BIT_AND_ASSIGNMENT
         TokenMgr::OpPairCfg( true, true ),     // &=  + 
@@ -539,7 +558,8 @@ const TokenMgr::OpPairCfg TokenMgr::s_OpPairCfgTable[OPERATOR_CNT][OPERATOR_CNT]
         TokenMgr::OpPairCfg( false, false ),   // &=  |= 
         TokenMgr::OpPairCfg( false, false ),   // &=  ^= 
         TokenMgr::OpPairCfg( false, false ),   // &=  <<= 
-        TokenMgr::OpPairCfg( false, false )    // &=  >>= 
+        TokenMgr::OpPairCfg( false, false ),   // &=  >>= 
+        TokenMgr::OpPairCfg( false, false )    // &= ,
     },
     {   //  E_BIT_OR_ASSIGNMENT
         TokenMgr::OpPairCfg( true, true ),     // |=  + 
@@ -565,7 +585,8 @@ const TokenMgr::OpPairCfg TokenMgr::s_OpPairCfgTable[OPERATOR_CNT][OPERATOR_CNT]
         TokenMgr::OpPairCfg( false, false ),   // |=  |= 
         TokenMgr::OpPairCfg( false, false ),   // |=  ^= 
         TokenMgr::OpPairCfg( false, false ),   // |=  <<= 
-        TokenMgr::OpPairCfg( false, false )    // |=  >>= 
+        TokenMgr::OpPairCfg( false, false ),   // |=  >>= 
+        TokenMgr::OpPairCfg( false, false )    // |= ,
     },
     {   //  E_BIT_XOR_ASSIGNMENT
         TokenMgr::OpPairCfg( true, true ),     // ^=  + 
@@ -591,7 +612,8 @@ const TokenMgr::OpPairCfg TokenMgr::s_OpPairCfgTable[OPERATOR_CNT][OPERATOR_CNT]
         TokenMgr::OpPairCfg( false, false ),   // ^=  |= 
         TokenMgr::OpPairCfg( false, false ),   // ^=  ^= 
         TokenMgr::OpPairCfg( false, false ),   // ^=  <<= 
-        TokenMgr::OpPairCfg( false, false )    // ^=  >>= 
+        TokenMgr::OpPairCfg( false, false ),   // ^=  >>= 
+        TokenMgr::OpPairCfg( false, false )    // ^= ,
     },
     {   //  E_BIT_LEFT_SHIFT_ASSIGNMENT
         TokenMgr::OpPairCfg( true, true ),     // <<=  + 
@@ -617,7 +639,8 @@ const TokenMgr::OpPairCfg TokenMgr::s_OpPairCfgTable[OPERATOR_CNT][OPERATOR_CNT]
         TokenMgr::OpPairCfg( false, false ),   // <<=  |= 
         TokenMgr::OpPairCfg( false, false ),   // <<=  ^= 
         TokenMgr::OpPairCfg( false, false ),   // <<=  <<= 
-        TokenMgr::OpPairCfg( false, false )    // <<=  >>= 
+        TokenMgr::OpPairCfg( false, false ),   // <<=  >>= 
+        TokenMgr::OpPairCfg( false, false )    // <<= ,
     },
     {   //  E_BIT_RIGHT_SHIFT_ASSIGNMENT
         TokenMgr::OpPairCfg( true, true ),     // >>=  + 
@@ -643,7 +666,35 @@ const TokenMgr::OpPairCfg TokenMgr::s_OpPairCfgTable[OPERATOR_CNT][OPERATOR_CNT]
         TokenMgr::OpPairCfg( false, false ),   // >>=  |= 
         TokenMgr::OpPairCfg( false, false ),   // >>=  ^= 
         TokenMgr::OpPairCfg( false, false ),   // >>=  <<= 
-        TokenMgr::OpPairCfg( false, false )    // >>=  >>= 
+        TokenMgr::OpPairCfg( false, false ),   // >>=  >>= 
+        TokenMgr::OpPairCfg( false, false )    // >>= ,
+    },
+	{   //  E_COMMA
+        TokenMgr::OpPairCfg( true, true ),     // ,  + 
+        TokenMgr::OpPairCfg( true, true ),     // ,  - 
+        TokenMgr::OpPairCfg( false, false ),   // ,  * 
+        TokenMgr::OpPairCfg( false, false ),   // ,  / 
+        TokenMgr::OpPairCfg( false, false ),   // ,  % 
+        TokenMgr::OpPairCfg( false, false ),   // ,  & 
+        TokenMgr::OpPairCfg( false, false ),   // ,  | 
+        TokenMgr::OpPairCfg( false, false ),   // ,  ^ 
+        TokenMgr::OpPairCfg( true, true ),     // ,  ~ 
+        TokenMgr::OpPairCfg( false, false ),   // ,  << 
+        TokenMgr::OpPairCfg( false, false ),   // ,  >> 
+        TokenMgr::OpPairCfg( true, true ),     // ,  (   such as  :   a = 3, ( 4+5);
+        TokenMgr::OpPairCfg( false, false ),   // ,  ) 
+        TokenMgr::OpPairCfg( false, false ),   // ,  = 
+        TokenMgr::OpPairCfg( false, false ),   // ,  += 
+        TokenMgr::OpPairCfg( false, false ),   // ,  -= 
+        TokenMgr::OpPairCfg( false, false ),   // ,  *= 
+        TokenMgr::OpPairCfg( false, false ),   // ,  /= 
+        TokenMgr::OpPairCfg( false, false ),   // ,  %= 
+        TokenMgr::OpPairCfg( false, false ),   // ,  &= 
+        TokenMgr::OpPairCfg( false, false ),   // ,  |= 
+        TokenMgr::OpPairCfg( false, false ),   // ,  ^= 
+        TokenMgr::OpPairCfg( false, false ),   // ,  <<= 
+        TokenMgr::OpPairCfg( false, false ),   // ,  >>= 
+        TokenMgr::OpPairCfg( false, false )    // , ,
     }
 };
 

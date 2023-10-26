@@ -14,13 +14,14 @@
 #include <unordered_map>
 #include <utility>
 
-#define OPERATOR_CNT       24
+#define OPERATOR_CNT       25
 //    + - * / %     : 5
 //    & | ^ ~ << >> : 6
 //    ( ) =         : 3
 //    += -= *= /* %=     &= |= ^=    <<=  >>=    10
+//    ,             : 1
 // ----------------------
-//  Total          =  24 = ( 5 + 6 + 3 + 10)
+//  Total          =  25 = ( 5 + 6 + 3 + 10 + 1)
 //
 
 class TokenMgr
@@ -181,4 +182,3 @@ protected:
 };
 
 #endif
-
