@@ -25,7 +25,7 @@
 | 19 | 左方括号       | [ 5B          |  ［ EF BC BB (U+00FF3B) |        [ 5B          |      【 E3 80 90 (U+003010)                             |      ［ EF BC BB (U+00FF3B) |      【 E3 80 90 (U+003010)                       | 
 | 20 | 左花括号       | { 7B          |  ｛ EF BD 9B (U+00FF5B) |        { 7B          |        { 7B                                             |      ｛ EF BD 9B (U+00FF5B) |      ｛ EF BD 9B (U+00FF5B)                       | 
 | 21 | 右方括号       | ] 5D          |  ］ EF BC BD (U+00FF3D) |        ] 5D          |      】 E3 80 91 (U+003011)                             |      ］ EF BC BD (U+00FF3D) |      】 E3 80 91 (U+003011)                       | 
-| 22 | 右花括号       | } 7D          |  ｝ EF BD 9D (U+00FF5D) |        } 7D          |      】 E3 80 91 (U+003011)                             |      ｝ EF BD 9D (U+00FF5D) |      ｝ EF BD 9D (U+00FF5D)                       | 
+| 22 | 右花括号       | } 7D          |  ｝ EF BD 9D (U+00FF5D) |        } 7D          |      } 7D                                               |      ｝ EF BD 9D (U+00FF5D) |      ｝ EF BD 9D (U+00FF5D)                       | 
 | 23 | 反 斜杠        | \ 5C          |  ＼ EF BC BC (U+00FF3C) |        \ 5C          |      、 E3 80 81 (U+003001)                             |      ＼ EF BC BC (U+00FF3C) |      ＼ EF BC BC (U+00FF3C)                       | 
 | 24 | 分隔竖线       | \| 7C         |  ｜ EF BD 9C (U+00FF5C) |        \| 7C         |        \| 7C                                            |      ｜ EF BD 9C (U+00FF5C) |      ｜ EF BD 9C (U+00FF5C)                       | 
 | 25 | 分 号          | ; 3B          |  ； EF BC 9B (U+00FF1B) |        ; 3B          |      ； EF BC 9B (U+00FF1B)                             |      ； EF BC 9B (U+00FF1B) |      ； EF BC 9B (U+00FF1B)                       | 
@@ -38,3 +38,5 @@
 | 32 | 右尖括号       | > 3E          |  ＞ EF BC 9E (U+00FF1E) |        > 3E          |      》 E3 80 8B (U+00300B)                             |      ＞ EF BC 9E (U+00FF1E) |      》 E3 80 8B (U+00300B)                       | 
 | 33 | 除 号          | / 2F          |  ／ EF BC 8F (U+00FF0F) |        / 2F          |      、 E3 80 81 (U+003001)                             |      ／ EF BC 8F (U+00FF0F) |      、 E3 80 81 (U+003001)                       | 
 | 34 | 问 号          | ? 3F          |  ？ EF BC 9F (U+00FF1F) |        ? 3F          |      ？ EF BC 9F (U+00FF1F)                             |      ？ EF BC 9F (U+00FF1F) |      ？ EF BC 9F (U+00FF1F)                       | 
+ 
+
