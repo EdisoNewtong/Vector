@@ -1,0 +1,13 @@
+
+a，b，c
+d　e　f
+g｀h｀i
+g·h·i
+
+j……k……l
+
+j……k…l……w
+j…k……l…w
+
+j＿k＿l
+j—k——l
