@@ -38,13 +38,37 @@ struct processArg
 struct nextCandidateMap {
 	// int  originalCount;
 	char replaceWith;
+#ifdef USE_POINTER_VERSION_DATA_STRUCT
+	unordered_map<char, nextCandidateMap*> nextMap;
+#else
 	unordered_map<char, nextCandidateMap> nextMap;
+#endif
 	nextCandidateMap() : /* originalCount(0), */ replaceWith(0), nextMap() { }
+
+#ifdef USE_POINTER_VERSION_DATA_STRUCT
+	virtual ~nextCandidateMap() {
+		for ( auto it = nextMap.begin(); it != nextMap.end(); ++it ) {
+			if ( it->second != nullptr ) {
+				delete it->second;
+				it->second = nullptr;
+			}
+		}
+
+		nextMap.clear();
+	}
+#endif
+
 };
 
 
 
-using NextMap = unordered_map<char, nextCandidateMap>;
+#ifdef USE_POINTER_VERSION_DATA_STRUCT
+	using NextMap = unordered_map<char, nextCandidateMap*>;
+#else
+	using NextMap = unordered_map<char, nextCandidateMap>;
+#endif
+
+
 using NextMapPtr = NextMap*;
 
 void insertInfoMap(const string& toInsertStr, NextMap* pWhichList, char toReplaceWith)
@@ -56,16 +80,32 @@ void insertInfoMap(const string& toInsertStr, NextMap* pWhichList, char toReplac
 			auto foundIt = pWhichList->find( singleCh );
 			if ( foundIt == pWhichList->end() ) {
 				if ( charIdx < (strLen-1) ) {
+#ifdef USE_POINTER_VERSION_DATA_STRUCT
+					auto pNewNextMap = new nextCandidateMap();
+					pWhichList->insert( make_pair(singleCh , pNewNextMap ) );
+					pWhichList = &(pNewNextMap->nextMap);
+#else
 					pWhichList->insert( make_pair(singleCh , nextCandidateMap() ) );
 					pWhichList = &( (pWhichList->find(singleCh)->second).nextMap );
+#endif
 				} else {
-					//  charIdx == (strLen-1)
+#ifdef USE_POINTER_VERSION_DATA_STRUCT
+					auto pNewNextMap = new nextCandidateMap();
+					pNewNextMap->replaceWith = toReplaceWith;
+					pWhichList->insert( make_pair(singleCh , pNewNextMap  ) );
+					// pWhichList->find(singleCh)->second->replaceWith = toReplaceWith;
+#else
 					pWhichList->insert( make_pair(singleCh , nextCandidateMap() ) );
-					(pWhichList->find(singleCh)->second).replaceWith = toReplaceWith;
+					pWhichList->find(singleCh)->second.replaceWith = toReplaceWith;
+#endif
 					pWhichList = nullptr;
 				}
 			} else {
+#ifdef USE_POINTER_VERSION_DATA_STRUCT
+				pWhichList = &(foundIt->second)->nextMap;
+#else
 				pWhichList = &(foundIt->second).nextMap;
+#endif
 			}
 		} 
 		// else {
@@ -83,13 +123,21 @@ void printSpecialDataStruct(const NextMap& data, int layer)
 
 	for( auto it = data.begin(); it != data.end(); ++it ) {
 		int code = static_cast<int>( it->first & 0xFF);
+#ifdef USE_POINTER_VERSION_DATA_STRUCT
+		NextMap nextLayer = it->second->nextMap;
+#else
 		NextMap nextLayer = it->second.nextMap;
+#endif
 		cout << string(layer,'\t') << std::uppercase << std::hex << code;
 		if ( !nextLayer.empty() ) {
 			cout << endl;
 			printSpecialDataStruct( nextLayer, layer+1);
 		} else {
+#ifdef USE_POINTER_VERSION_DATA_STRUCT
+			cout << "   replace  ==> '" << it->second->replaceWith << "\' " << endl;
+#else
 			cout << "   replace  ==> '" << it->second.replaceWith << "\' " << endl;
+#endif
 		}
 	}
 }
@@ -466,8 +514,13 @@ void tryReplaceChinesePuncPunctuation(const processArg& arg, const NextMap& cfgL
 				++matchedCnt;
 				toReplacedStr += targetCh;
 
+#ifdef USE_POINTER_VERSION_DATA_STRUCT
+				char repacedWithCh = it->second->replaceWith;
+				pMap = &(it->second->nextMap);
+#else
 				char repacedWithCh = it->second.replaceWith;
 				pMap = &(it->second.nextMap);
+#endif
 
 				if ( pMap!=nullptr ) {
 					// all matched
@@ -615,8 +668,13 @@ int main(int argc, char* argv[])
 	}
 
 	string errorMsg;
-	NextMap cfgList;  // using NextMap = unordered_map<char, nextCandidateMap>;
+#ifdef USE_POINTER_VERSION_DATA_STRUCT
+	NextMapPtr pCfgList = new NextMap();
+#else
+	NextMap cfgList;
 	NextMapPtr pCfgList = &cfgList;
+#endif
+
 	auto bReadCfgRet = readReplacedCfgTable( pArg.cfgFile, pCfgList, errorMsg);
 	if ( !bReadCfgRet ) {
 		cout << "[ERROR] : " << errorMsg << endl;
@@ -624,16 +682,23 @@ int main(int argc, char* argv[])
 	} else {
 		auto printLog = 0; 
 		if ( printLog ) {
-			// using NextMap = unordered_map<char, nextCandidateMap>;
 			int layer = 0;
+#ifdef USE_POINTER_VERSION_DATA_STRUCT
+			printSpecialDataStruct(*pCfgList, layer);
+#else
 			printSpecialDataStruct(cfgList, layer);
+#endif
 		}
 	}
 
 	size_t fileSz = 0;
 	fileCharInfo* pFileContent = nullptr;
 	vector<int> lineRecord;
+#ifdef USE_POINTER_VERSION_DATA_STRUCT
+	tryReplaceChinesePuncPunctuation( pArg, *pCfgList, pFileContent, fileSz, lineRecord);
+#else
 	tryReplaceChinesePuncPunctuation( pArg, cfgList, pFileContent, fileSz, lineRecord);
+#endif
 	if ( b_G_printProcessedLineDetail ) {
 		cout << endl << endl;
 		for( size_t idx = 0; idx < lineRecord.size(); ++idx ) {
@@ -646,6 +711,13 @@ int main(int argc, char* argv[])
 		delete [] pFileContent;
 		pFileContent = nullptr;
 	}
+
+#ifdef USE_POINTER_VERSION_DATA_STRUCT
+	if ( pCfgList != nullptr ) {
+		delete pCfgList;
+		pCfgList = nullptr;
+	}
+#endif 
 
 	return 0;
 }
