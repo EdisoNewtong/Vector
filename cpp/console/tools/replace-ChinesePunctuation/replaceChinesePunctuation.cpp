@@ -5,7 +5,7 @@
 #include <unordered_map>
 using namespace std;
 
-bool b_G_printProcessedLineDetail = true;
+bool b_G_printProcessedLineDetail = false;
 
 static const string G_DEFAULT_CFG_FILE { "replaceTable.cfg" };
 static const string G_STR_COMMENT_BEGIN {"//"};
@@ -24,15 +24,6 @@ struct processArg
 	bool bOverrideFlag;
 };
 
-
-// ,    2C     =>   EF BC 8C (U+00FF0C)
-// struct replacementInfo
-// {
-// 	char spCh;
-// 	char replaceWith;
-//     bool needToDelete;
-// 	vector<string> whichStringToReplace;
-// };
 
 
 struct nextCandidateMap {
@@ -233,6 +224,8 @@ bool readReplacedCfgTable(const string& cfgFileName, NextMapPtr  pCfgList, strin
 				if ( ch2 == G_CH_SEP ) {
 					// to delete the matched character string
 					//            e.g.       ,:＠,＃,～
+					//                        ^          // if the second char is ':'
+					//
 					//  this will delete one of the following characters  ＠ ＃ ～ when matched
 					spCh = line.at(0);
 					if ( !(spCh >=32 && spCh < 127) ) {
@@ -326,9 +319,9 @@ string printUsage()
 {
 	static const string USAGE = R"( Default config file named "replaceTable.cfg"
 ----------------------------------------------------------------------------------------------------------------------------------------------
-$ replaceChinesePunctuation (--nolog) ( --scanonly ) ( --cfgfile <config File Name> ) --input <input File Name>
+$ replaceChinesePunctuation [--nolog] [ --scanonly ] [ --cfgfile <config File Name> ] --input <input File Name>
 or
-$ replaceChinesePunctuation (--nolog) (--cfgfile <config File Name>) --input <input File Name> ( --output <output File Name> | --override ) 
+$ replaceChinesePunctuation [--nolog] [--cfgfile <config File Name>] --input <input File Name> [ --output <output File Name> | --override ] 
 ----------------------------------------------------------------------------------------------------------------------------------------------
 
 )";
@@ -530,7 +523,7 @@ void tryReplaceChinesePuncPunctuation(const processArg& arg, const NextMap& cfgL
 							if ( processedIdx>=0 && processedIdx < iFileSz ) {
 								if ( reverseIdx == (matchedCnt-1) ) {
 									if ( G_CH_DELETE == repacedWithCh ) {
-										fileContent[processedIdx].replaceFlag = fileCharInfo::E_DO_DELETE; // do delete
+										fileContent[processedIdx].replaceFlag = fileCharInfo::E_DO_DELETE; // Do Delete
 									} else {
 										fileContent[processedIdx].replaceFlag = fileCharInfo::E_DO_REPLACE; // do real replace action 
 										fileContent[processedIdx].replacedWithCh = repacedWithCh;
@@ -543,7 +536,7 @@ void tryReplaceChinesePuncPunctuation(const processArg& arg, const NextMap& cfgL
 										
 									}
 								} else {
-									fileContent[processedIdx].replaceFlag = fileCharInfo::E_DO_DELETE; // do delete  
+									fileContent[processedIdx].replaceFlag = fileCharInfo::E_DO_DELETE; // Do Delete  
 								}
 							}
 						}
@@ -615,10 +608,18 @@ void tryReplaceChinesePuncPunctuation(const processArg& arg, const NextMap& cfgL
 			    	fileOut << fileContent[i].originalCh;
 			    	break;
 			    case fileCharInfo::E_DO_REPLACE:
-			    	fileOut << fileContent[i].replacedWithCh;
+					{
+						if ( fileContent[i].replacedWithCh != 0 ) {
+							// Do Replace
+							fileOut << fileContent[i].replacedWithCh;
+						} else {
+							// Keep Original
+							fileOut << fileContent[i].originalCh;
+						}
+					}
 			    	break;
 			    case fileCharInfo::E_DO_DELETE:
-			    	// Do Nothing
+			    	// Do Nothing , <Skip> it without writing
 			    	break;
 			    default:
 			    	break;
@@ -637,10 +638,18 @@ void tryReplaceChinesePuncPunctuation(const processArg& arg, const NextMap& cfgL
 			    	cout << fileContent[i].originalCh;
 			    	break;
 			    case fileCharInfo::E_DO_REPLACE:
-			    	cout << fileContent[i].replacedWithCh;
+					{
+						if ( fileContent[i].replacedWithCh != 0) {
+							// Do Replace
+							cout << fileContent[i].replacedWithCh;
+						} else {
+							// Keep Original
+							cout << fileContent[i].originalCh;
+						}
+					}
 			    	break;
 			    case fileCharInfo::E_DO_DELETE:
-			    	// Do Nothing
+			    	// Do Nothing , <Skip> it without writing
 			    	break;
 			    default:
 			    	break;
@@ -721,4 +730,4 @@ int main(int argc, char* argv[])
 
 	return 0;
 }
- 
+
