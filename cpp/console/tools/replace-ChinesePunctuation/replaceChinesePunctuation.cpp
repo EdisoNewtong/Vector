@@ -493,7 +493,7 @@ void tryReplaceChinesePuncPunctuation(const processArg& arg, const NextMap& cfgL
                 if ( matchedCnt > 0 ) {
 					// restore from original state , Keep it as original
 					for( int reverseIdx = 1; reverseIdx <=matchedCnt; ++reverseIdx ) {
-						int processedIdx = i - reverseIdx;
+						int processedIdx = static_cast<int>(i) - reverseIdx;
 						if ( processedIdx>=0 && processedIdx < iFileSz ) {
 							fileContent[processedIdx].replaceFlag = fileCharInfo::E_KEEP;
 						}
@@ -519,7 +519,7 @@ void tryReplaceChinesePuncPunctuation(const processArg& arg, const NextMap& cfgL
 					// all matched
 					if ( pMap->empty() ) {
 						for( int reverseIdx = 0; reverseIdx < matchedCnt; ++reverseIdx ) {
-							int processedIdx = i - reverseIdx;
+							int processedIdx = static_cast<int>(i) - reverseIdx;
 							if ( processedIdx>=0 && processedIdx < iFileSz ) {
 								if ( reverseIdx == (matchedCnt-1) ) {
 									if ( G_CH_DELETE == repacedWithCh ) {
@@ -730,4 +730,3 @@ int main(int argc, char* argv[])
 
 	return 0;
 }
-
