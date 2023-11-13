@@ -7,7 +7,7 @@ using namespace std;
 
 bool b_G_printProcessedLineDetail = false;
 
-static const string G_DEFAULT_CFG_FILE { "replaceTable.cfg" };
+static const string G_DEFAULT_CFG_FILE { "configTable.cfg" };
 static const string G_STR_COMMENT_BEGIN {"//"};
 static const char G_CH_SEP {':'};
 static const char G_CH_DELETE = 127; // special character with delete flag
@@ -17,7 +17,7 @@ static const char G_CH_DELETE = 127; // special character with delete flag
 struct processArg
 {
 	string inputFile;
-	bool   scanOnly;
+	bool   outputSummary;
 	string cfgFile;
 	bool hasOutputFlag;
 	string outputFile;
@@ -140,7 +140,8 @@ struct fileCharInfo
 		E_NOT_DECIDE = 0,
 		E_KEEP, 
 		E_DO_REPLACE, 
-		E_DO_DELETE
+		E_DO_DELETE,
+		E_DO_FORCE_DELETE,
 	};
 
 	int lineNo;
@@ -154,6 +155,7 @@ struct fileCharInfo
 	//   3 : skip / to be deleted
 	E_REPLACE_FLAG replaceFlag = E_NOT_DECIDE;
 	char replacedWithCh;
+	string originalSequence;
 };
 
 
@@ -317,11 +319,11 @@ bool isFileExisted(const string& fileName)
 
 string printUsage()
 {
-	static const string USAGE = R"( Default config file named "replaceTable.cfg"
+	static const string USAGE = R"( Default config file named "configTable.cfg"
 ----------------------------------------------------------------------------------------------------------------------------------------------
-$ replaceChinesePunctuation [--nolog] [ --scanonly ] [ --cfgfile <config File Name> ] --input <input File Name>
+$ replaceChinesePunctuation  [--verbose] [--cfgfile <config File Name>] --input <input File Name>
 or
-$ replaceChinesePunctuation [--nolog] [--cfgfile <config File Name>] --input <input File Name> [ --output <output File Name> | --override ] 
+$ replaceChinesePunctuation  [--verbose] [--cfgfile <config File Name>] --input <input File Name> [ --output <output File Name> | --override ] 
 ----------------------------------------------------------------------------------------------------------------------------------------------
 
 )";
@@ -329,16 +331,15 @@ $ replaceChinesePunctuation [--nolog] [--cfgfile <config File Name>] --input <in
 }
 
 
-bool parseArgs(int argc, char* argv[], processArg& pArg)
+bool parseArgs(int argc, char* argv[], processArg& arg)
 {
-	const string KEY_WORD_SCAN_ONLY { "--scanonly" };
+	const string KEY_WORD_PRINT_VERBOSE { "--verbose" };
 	const string KEY_WORD_CFG_FILE { "--cfgfile" };
 	const string KEY_WORD_INPUT_FILE { "--input" };
 	const string KEY_WORD_OUTPUT_FILE { "--output" };
 	const string KEY_WORD_OVERRIDE { "--override" };
-	const string KEY_WORD_NO_LOG { "--nolog" };
 
-	bool hasScanOnlyKeyWord = false;
+	bool hasPrintVerbose = false;
 	bool hasCfgFileKeyWord = false;   int cfgArg = -1;
 	bool hasInputKeyWord = false;     int inputArg = -1;
 	bool hasOutputKeyWord = false;    int outputArg = -1;
@@ -346,8 +347,8 @@ bool parseArgs(int argc, char* argv[], processArg& pArg)
 
 	for( auto i = 1; i < argc; ++i ) {
 		string strArg( argv[i] );
-		if ( strArg == KEY_WORD_SCAN_ONLY ) {
-			hasScanOnlyKeyWord = true;
+		if ( strArg == KEY_WORD_PRINT_VERBOSE ) {
+			hasPrintVerbose = true;	
 		} else if ( strArg == KEY_WORD_CFG_FILE ) {
 			hasCfgFileKeyWord = true;
 			cfgArg = i+1;
@@ -359,9 +360,7 @@ bool parseArgs(int argc, char* argv[], processArg& pArg)
 			outputArg = i+1;
 		} else if ( strArg == KEY_WORD_OVERRIDE ) {
 			hasOverrideKeyWord = true;
-		} else if ( strArg == KEY_WORD_NO_LOG ) {
-			b_G_printProcessedLineDetail = false;
-		}
+		} 
 	}
 
 	// check input file
@@ -379,7 +378,7 @@ bool parseArgs(int argc, char* argv[], processArg& pArg)
 		cout << "[ERROR] Input file  " << string( argv[inputArg] ) << " is not existed. " << endl;
 		return false;
 	}
-	pArg.inputFile = string( argv[inputArg] );
+	arg.inputFile = string( argv[inputArg] );
 
 	if ( hasCfgFileKeyWord ) {
 		if ( cfgArg >= argc ) {
@@ -392,23 +391,17 @@ bool parseArgs(int argc, char* argv[], processArg& pArg)
 			return false;
 		}
 
-		pArg.cfgFile = string( argv[cfgArg] );
+		arg.cfgFile = string( argv[cfgArg] );
 	} else {
 		if ( !isFileExisted( G_DEFAULT_CFG_FILE ) ) {
 			cout << "[ERROR] Config file " << G_DEFAULT_CFG_FILE << " is not existed. " <<  endl;
 			return false;
 		}
 	}
-	pArg.cfgFile = ( hasCfgFileKeyWord ? string( argv[cfgArg] ) : G_DEFAULT_CFG_FILE);
+	arg.cfgFile = ( hasCfgFileKeyWord ? string( argv[cfgArg] ) : G_DEFAULT_CFG_FILE);
 
-	if ( hasScanOnlyKeyWord  ) {
-		if ( hasOutputKeyWord || hasOverrideKeyWord ) {
-			cout << "[ERROR] : " << KEY_WORD_SCAN_ONLY << "   and   " << KEY_WORD_OUTPUT_FILE << " / " << KEY_WORD_OVERRIDE << "is mutual excusive. " << endl;
-			return false;
-		}
-	}
 
-	pArg.scanOnly = hasScanOnlyKeyWord;
+	arg.outputSummary = hasPrintVerbose;
 	if ( hasOutputKeyWord && hasOverrideKeyWord ) {
 		cout << "[ERROR] : " <<  KEY_WORD_OUTPUT_FILE << " and " << KEY_WORD_OVERRIDE << " are mutual excusive. " << endl;
 		return false;
@@ -420,26 +413,26 @@ bool parseArgs(int argc, char* argv[], processArg& pArg)
 			return false;
 		}
 		
-		if ( string(argv[outputArg]) == pArg.inputFile ) {
+		if ( string(argv[outputArg]) == arg.inputFile ) {
 			cout << "[WARNING] the program will override the input file without any confirm. " << endl;
 		}
-		pArg.hasOutputFlag = true;
-		pArg.outputFile = string(argv[outputArg]);
-		pArg.bOverrideFlag = false;
+		arg.hasOutputFlag = true;
+		arg.outputFile = string(argv[outputArg]);
+		arg.bOverrideFlag = false;
 
 	} else if ( hasOverrideKeyWord ) {
-		pArg.hasOutputFlag = false;
-		pArg.bOverrideFlag = true;
+		arg.hasOutputFlag = false;
+		arg.bOverrideFlag = true;
 	} else {
-		pArg.hasOutputFlag = false;
-		pArg.bOverrideFlag = false;
+		arg.hasOutputFlag = false;
+		arg.bOverrideFlag = false;
     }
 
 	return true;
 }
 
 
-void tryReplaceChinesePuncPunctuation(const processArg& arg, const NextMap& cfgList, fileCharInfo*& fileContent, size_t& fileSz, vector<int>& recordList)
+void tryReplaceChinesePuncPunctuation(const processArg& arg, const NextMap& cfgList, fileCharInfo*& fileContent, size_t& fileSz, vector<fileCharInfo>& recordList)
 {
 	const string inputfile = arg.inputFile;
 	ifstream f( inputfile.c_str(), ios::in | ios::binary);
@@ -476,7 +469,6 @@ void tryReplaceChinesePuncPunctuation(const processArg& arg, const NextMap& cfgL
 	NextMapPtr pRootMap = const_cast<NextMapPtr>( &cfgList );
 	NextMapPtr pMap = pRootMap;
 
-	// vector<int> recordList;
 	recordList.clear();
 	int iFileSz = static_cast<int>( fileSz );
 	for( size_t i = 0; i < fileSz; ++i )
@@ -523,16 +515,22 @@ void tryReplaceChinesePuncPunctuation(const processArg& arg, const NextMap& cfgL
 							if ( processedIdx>=0 && processedIdx < iFileSz ) {
 								if ( reverseIdx == (matchedCnt-1) ) {
 									if ( G_CH_DELETE == repacedWithCh ) {
-										fileContent[processedIdx].replaceFlag = fileCharInfo::E_DO_DELETE; // Do Delete
+										fileContent[processedIdx].replaceFlag = fileCharInfo::E_DO_FORCE_DELETE; // Do Delete
+										fileContent[processedIdx].originalSequence = toReplacedStr;
+																										   //
+										recordList.push_back( fileContent[processedIdx] );
 									} else {
 										fileContent[processedIdx].replaceFlag = fileCharInfo::E_DO_REPLACE; // do real replace action 
 										fileContent[processedIdx].replacedWithCh = repacedWithCh;
+										fileContent[processedIdx].originalSequence = toReplacedStr;
 
-										if ( recordList.empty() ) {
-											recordList.push_back(1);
-										} else {
-											++(recordList.back());
-										}
+										recordList.push_back( fileContent[processedIdx] );
+
+										// if ( recordList.empty() ) {
+										// 	recordList.push_back( *(fileContent[processedIdx]) );
+										// } else {
+										// 	++(recordList.back());
+										// }
 										
 									}
 								} else {
@@ -541,21 +539,10 @@ void tryReplaceChinesePuncPunctuation(const processArg& arg, const NextMap& cfgL
 							}
 						}
 
-						if ( arg.scanOnly ) {
-							if ( G_CH_DELETE != repacedWithCh ) {
-								cout << "[INFO] Replace '" << toReplacedStr << "' with  '" << repacedWithCh << "' @Line " << lineNo << ":" << columnNo << " ." << endl;
-							} else {
-								cout << "[INFO] Delete '" << toReplacedStr << " @Line " << lineNo << ":" << columnNo << " ." << endl;
-							}
-						}
-
 						pMap = pRootMap;
 						matchedCnt = 0;
 						toReplacedStr = "";
 					} 
-					// else {
-					// 	// pMap = pRootMap;
-					// }
 				}
 			}
 		}
@@ -564,10 +551,11 @@ void tryReplaceChinesePuncPunctuation(const processArg& arg, const NextMap& cfgL
 			++lineNo;
 			columnNo = 1;
 
+			/*
 			if ( i < (fileSz-1) ) {
-				// new line
 				recordList.push_back( 0 );
 			}
+			*/
 		} else {
 			++columnNo;
 		}
@@ -578,8 +566,7 @@ void tryReplaceChinesePuncPunctuation(const processArg& arg, const NextMap& cfgL
 		fileBuf = nullptr;
 	}
 
-
-	if ( arg.hasOutputFlag || arg.bOverrideFlag ) {
+	if (  arg.hasOutputFlag || arg.bOverrideFlag ) {
 		string outputfileName;
 		// output -> a given file name
 		if ( arg.bOverrideFlag ) {
@@ -603,11 +590,11 @@ void tryReplaceChinesePuncPunctuation(const processArg& arg, const NextMap& cfgL
 		for ( size_t i = 0; i < fileSz; ++i ) {
 			auto eNum_flag = fileContent[i].replaceFlag;
 			switch ( eNum_flag ) {
-			    case fileCharInfo::E_NOT_DECIDE:
-			    case fileCharInfo::E_KEEP:
-			    	fileOut << fileContent[i].originalCh;
-			    	break;
-			    case fileCharInfo::E_DO_REPLACE:
+				case fileCharInfo::E_NOT_DECIDE:
+				case fileCharInfo::E_KEEP:
+					fileOut << fileContent[i].originalCh;
+					break;
+				case fileCharInfo::E_DO_REPLACE:
 					{
 						if ( fileContent[i].replacedWithCh != 0 ) {
 							// Do Replace
@@ -617,12 +604,13 @@ void tryReplaceChinesePuncPunctuation(const processArg& arg, const NextMap& cfgL
 							fileOut << fileContent[i].originalCh;
 						}
 					}
-			    	break;
-			    case fileCharInfo::E_DO_DELETE:
-			    	// Do Nothing , <Skip> it without writing
-			    	break;
-			    default:
-			    	break;
+					break;
+				case fileCharInfo::E_DO_DELETE:
+				case fileCharInfo::E_DO_FORCE_DELETE:
+					// Do Nothing , <Skip> it without writing
+					break;
+				default:
+					break;
 			}
 		}
 
@@ -633,11 +621,11 @@ void tryReplaceChinesePuncPunctuation(const processArg& arg, const NextMap& cfgL
 		for ( size_t i = 0; i < fileSz; ++i ) {
 			auto eNum_flag = fileContent[i].replaceFlag;
 			switch ( eNum_flag ) {
-			    case fileCharInfo::E_NOT_DECIDE:
-			    case fileCharInfo::E_KEEP:
-			    	cout << fileContent[i].originalCh;
-			    	break;
-			    case fileCharInfo::E_DO_REPLACE:
+				case fileCharInfo::E_NOT_DECIDE:
+				case fileCharInfo::E_KEEP:
+					cout << fileContent[i].originalCh;
+					break;
+				case fileCharInfo::E_DO_REPLACE:
 					{
 						if ( fileContent[i].replacedWithCh != 0) {
 							// Do Replace
@@ -647,18 +635,20 @@ void tryReplaceChinesePuncPunctuation(const processArg& arg, const NextMap& cfgL
 							cout << fileContent[i].originalCh;
 						}
 					}
-			    	break;
-			    case fileCharInfo::E_DO_DELETE:
-			    	// Do Nothing , <Skip> it without writing
-			    	break;
-			    default:
-			    	break;
+					break;
+				case fileCharInfo::E_DO_DELETE:
+				case fileCharInfo::E_DO_FORCE_DELETE:
+					// Do Nothing , <Skip> it without writing
+					break;
+				default:
+					break;
 			}
 		}
 		cout.flush();
 
 		f.close();
 	}
+
 }
 
 int main(int argc, char* argv[])
@@ -668,8 +658,8 @@ int main(int argc, char* argv[])
 		return -1;
 	}
 
-	processArg pArg;
-	auto bArgParsedFlag = parseArgs(argc, argv, pArg);
+	processArg argObj;
+	auto bArgParsedFlag = parseArgs(argc, argv, argObj);
 	if ( !bArgParsedFlag ) {
 		cout << "[ERROR] Parse argument Failed. " << endl;
 		cout << printUsage() << endl;
@@ -684,7 +674,7 @@ int main(int argc, char* argv[])
 	NextMapPtr pCfgList = &cfgList;
 #endif
 
-	auto bReadCfgRet = readReplacedCfgTable( pArg.cfgFile, pCfgList, errorMsg);
+	auto bReadCfgRet = readReplacedCfgTable( argObj.cfgFile, pCfgList, errorMsg);
 	if ( !bReadCfgRet ) {
 		cout << "[ERROR] : " << errorMsg << endl;
 		return -1;
@@ -702,19 +692,53 @@ int main(int argc, char* argv[])
 
 	size_t fileSz = 0;
 	fileCharInfo* pFileContent = nullptr;
-	vector<int> lineRecord;
+	vector<fileCharInfo> lineRecord;
 #ifdef USE_POINTER_VERSION_DATA_STRUCT
-	tryReplaceChinesePuncPunctuation( pArg, *pCfgList, pFileContent, fileSz, lineRecord);
+	tryReplaceChinesePuncPunctuation( argObj, *pCfgList, pFileContent, fileSz, lineRecord);
 #else
-	tryReplaceChinesePuncPunctuation( pArg, cfgList, pFileContent, fileSz, lineRecord);
+	tryReplaceChinesePuncPunctuation( argObj, cfgList, pFileContent, fileSz, lineRecord);
 #endif
-	if ( b_G_printProcessedLineDetail ) {
-		cout << endl << endl;
-		for( size_t idx = 0; idx < lineRecord.size(); ++idx ) {
-			cout << "Line " << (idx+1) << ", hit count is [" << lineRecord.at(idx) << "]. " << endl;
+
+	if ( argObj.outputSummary ) {
+		cout << endl;
+		int iCountInsideLine = 0;
+		int lineNo = 0;
+		  // first  : lineNo
+		  // second : matched count
+		vector< pair<int,int> > lineCnt;
+		for( const auto& e : lineRecord ) {
+			if ( e.lineNo != lineNo ) {
+				cout << e.lineNo << ". " << endl;
+				// line changed
+				iCountInsideLine = 1;
+				if ( lineNo == 0 ) {
+					// 1st init 
+					lineCnt.push_back( make_pair(e.lineNo, iCountInsideLine) );
+				} else {
+					lineCnt.push_back( make_pair(lineNo, iCountInsideLine) );
+				}
+
+				lineNo = e.lineNo;
+
+				if ( e.replaceFlag == fileCharInfo::E_DO_REPLACE ) {
+					cout << "\t" << iCountInsideLine << ". \"" << e.originalSequence << "\" " << "Do Replace @"  << lineNo << ":" << e.columnNo << " -> '"<< e.replacedWithCh << "'" <<  endl;
+				} else {
+					cout << "\t" << iCountInsideLine << ". \"" << e.originalSequence << "\" " <<  "Do Force Delete @" << lineNo << ":" << e.columnNo << endl;
+				}
+			} else {
+				// line not changed
+				if ( !lineCnt.empty() ) {
+					++(lineCnt.back().second);
+
+					if ( e.replaceFlag == fileCharInfo::E_DO_REPLACE ) {
+						cout << "\t" << (lineCnt.back().second) << ". \"" << e.originalSequence << "\" " << "Do Replace @"  << lineNo << ":" << e.columnNo << " -> '"<< e.replacedWithCh << "'" <<  endl;
+					} else {
+						cout << "\t" << (lineCnt.back().second) << ". \"" << e.originalSequence << "\" " <<  "Do Force Delete @" << lineNo << ":" << e.columnNo << endl;
+					}
+				}
+			}
 		}
 	}
-	
 
 	if ( fileSz > 0  &&  pFileContent != nullptr ) {
 		delete [] pFileContent;
@@ -730,3 +754,4 @@ int main(int argc, char* argv[])
 
 	return 0;
 }
+
