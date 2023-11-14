@@ -5,7 +5,14 @@
 #include <unordered_map>
 using namespace std;
 
-bool b_G_printProcessedLineDetail = false;
+
+#ifndef _WIN32 
+ #include <unistd.h>
+#else
+ #include <windows.h>
+#endif
+
+
 
 static const string G_DEFAULT_CFG_FILE { "configTable.cfg" };
 static const string G_STR_COMMENT_BEGIN {"//"};
@@ -99,11 +106,102 @@ void insertInfoMap(const string& toInsertStr, NextMap* pWhichList, char toReplac
 #endif
 			}
 		} 
-		// else {
-		// 	// TODO
-		// }
 	}
 }
+
+//
+// get the abs path for the current running process :
+// e.g.    "/usr/bin/ls"    =>   "/usr/bin/"  ( result path contains the last seperate char   '/' )
+//
+string getBinaryPath(const string& strProgName, char* env[])
+{
+    string retPath;
+    string platformSeperate;
+
+#ifndef _WIN32 
+    //  Unix/Linux Implementation Here
+    platformSeperate = "/";
+
+    const size_t C_PATH_LEN = 1024;
+    char bufPath[C_PATH_LEN] = { 0 };
+    // get the abs path for the running bin   e.g.   /usr/bin/ll
+    size_t nsize = readlink("/proc/self/exe", bufPath, C_PATH_LEN);
+    // cout << "nsize = " << std::dec << nsize << endl;
+    // cout << "bufPath = " << std::dec << bufPath << endl;
+    if ( bufPath[0] != 0 ) {
+        if ( nsize < C_PATH_LEN ) {
+            bufPath[nsize] = '\0';
+        }
+    } else {
+        // in MacOS Platform , the prog : '/proc/self/exe' is not existed , so use char* env[] to get the prog running path
+        int foundIdx = -1;
+        int iidx = 0;
+        const string searchHead("_=");
+        string pathprefix;
+        while ( env[iidx] ) {
+            string sOpt(env[iidx]);
+            auto foundpos = sOpt.find(searchHead);
+            if ( foundpos == 0 ) {
+                foundIdx = iidx;
+                pathprefix = sOpt.substr( searchHead.size() );
+                break;
+            }
+            ++iidx;
+        }
+
+        auto sz = 0;
+        if ( foundIdx != -1 ) {
+            sz = static_cast<int>(pathprefix.size());
+            for( int idx = 0; idx < sz; ++idx ) 
+            {
+                bufPath[idx] = pathprefix.at(idx);
+            }
+            bufPath[sz] = '\0';
+        } else { // foundIdx == -1
+            auto fSlashPos = strProgName.find("/");
+            if ( fSlashPos == string::npos ) {
+                bufPath[0] = '.';
+                bufPath[1] = '/';
+                bufPath[2] = '\0';
+            } else {
+                sz = static_cast<int>(strProgName.size());
+                for( int idx = 0; idx < sz; ++idx ) 
+                {
+                    bufPath[idx] = strProgName.at(idx);
+                }
+                bufPath[sz] = '\0';
+            }
+        }
+    }
+
+#else
+    (void)strProgName;
+    (void)env;
+    //  Windows  Implementation Here
+    platformSeperate = "\\";
+
+    constexpr size_t C_PATH_LEN = MAX_PATH + 1;
+    HMODULE handleModule = nullptr;
+    char bufPath[C_PATH_LEN] = { 0 };
+    size_t fileSz = static_cast<size_t>( ::GetModuleFileNameA(handleModule, bufPath, MAX_PATH) );
+    if ( fileSz < C_PATH_LEN ) {
+        bufPath[fileSz] = '\0';
+    }
+
+#endif
+
+
+    string runningFullPath(bufPath);
+    auto pos = runningFullPath.rfind(platformSeperate);
+    string runningPath(runningFullPath);
+    if ( pos != string::npos ) {
+        runningPath = runningFullPath.substr(0, pos+1);
+    }
+
+    retPath = runningPath;
+    return retPath;
+}
+
 
 
 void printSpecialDataStruct(const NextMap& data, int layer)
@@ -319,7 +417,7 @@ bool isFileExisted(const string& fileName)
 
 string printUsage()
 {
-	static const string USAGE = R"( Default config file named "configTable.cfg"
+	static const string USAGE = R"(Usage :  
 ----------------------------------------------------------------------------------------------------------------------------------------------
 $ replaceChinesePunctuation  [--verbose] [--cfgfile <config File Name>] --input <input File Name>
 or
@@ -331,7 +429,7 @@ $ replaceChinesePunctuation  [--verbose] [--cfgfile <config File Name>] --input 
 }
 
 
-bool parseArgs(int argc, char* argv[], processArg& arg)
+bool parseArgs(int argc, char* argv[], processArg& arg, const string& runingProgramAbsPath )
 {
 	const string KEY_WORD_PRINT_VERBOSE { "--verbose" };
 	const string KEY_WORD_CFG_FILE { "--cfgfile" };
@@ -393,12 +491,13 @@ bool parseArgs(int argc, char* argv[], processArg& arg)
 
 		arg.cfgFile = string( argv[cfgArg] );
 	} else {
-		if ( !isFileExisted( G_DEFAULT_CFG_FILE ) ) {
+		if ( !isFileExisted( runingProgramAbsPath + G_DEFAULT_CFG_FILE ) ) {
 			cout << "[ERROR] Config file " << G_DEFAULT_CFG_FILE << " is not existed. " <<  endl;
 			return false;
 		}
+
+		arg.cfgFile = ( hasCfgFileKeyWord ? string( argv[cfgArg] ) : (runingProgramAbsPath + G_DEFAULT_CFG_FILE) );
 	}
-	arg.cfgFile = ( hasCfgFileKeyWord ? string( argv[cfgArg] ) : G_DEFAULT_CFG_FILE);
 
 
 	arg.outputSummary = hasPrintVerbose;
@@ -465,6 +564,8 @@ void tryReplaceChinesePuncPunctuation(const processArg& arg, const NextMap& cfgL
 	int columnNo = 1;
 	int matchedCnt = 0;
 	string toReplacedStr;
+	int replacementActionCnt = 0;
+	int deleteActionCnt = 0;
 
 	NextMapPtr pRootMap = const_cast<NextMapPtr>( &cfgList );
 	NextMapPtr pMap = pRootMap;
@@ -519,12 +620,15 @@ void tryReplaceChinesePuncPunctuation(const processArg& arg, const NextMap& cfgL
 										fileContent[processedIdx].originalSequence = toReplacedStr;
 																										   //
 										recordList.push_back( fileContent[processedIdx] );
+
+										++deleteActionCnt;
 									} else {
 										fileContent[processedIdx].replaceFlag = fileCharInfo::E_DO_REPLACE; // do real replace action 
 										fileContent[processedIdx].replacedWithCh = repacedWithCh;
 										fileContent[processedIdx].originalSequence = toReplacedStr;
 
 										recordList.push_back( fileContent[processedIdx] );
+										++replacementActionCnt;
 
 										// if ( recordList.empty() ) {
 										// 	recordList.push_back( *(fileContent[processedIdx]) );
@@ -614,56 +718,78 @@ void tryReplaceChinesePuncPunctuation(const processArg& arg, const NextMap& cfgL
 			}
 		}
 
+		if ( !(replacementActionCnt > 0 || deleteActionCnt > 0) ) {
+			cout << "[INFO] Nothing matched to be replaced . Duplicate the given file to a new file :  " << outputfileName << endl;
+		} else {
+			int total = replacementActionCnt + deleteActionCnt;
+			cout << "[INFO] There " << (total>1 ? "are " : "is ") << total << " change(s) to process [Replace/Delete] " << endl;
+		}
+
 		fileOut.flush();
 		fileOut.close();
 	} else {
 		// output --> stdout
-		for ( size_t i = 0; i < fileSz; ++i ) {
-			auto eNum_flag = fileContent[i].replaceFlag;
-			switch ( eNum_flag ) {
-				case fileCharInfo::E_NOT_DECIDE:
-				case fileCharInfo::E_KEEP:
-					cout << fileContent[i].originalCh;
-					break;
-				case fileCharInfo::E_DO_REPLACE:
-					{
-						if ( fileContent[i].replacedWithCh != 0) {
-							// Do Replace
-							cout << fileContent[i].replacedWithCh;
-						} else {
-							// Keep Original
-							cout << fileContent[i].originalCh;
+		if ( replacementActionCnt > 0 || deleteActionCnt > 0 ) {
+			for ( size_t i = 0; i < fileSz; ++i ) {
+				auto eNum_flag = fileContent[i].replaceFlag;
+				switch ( eNum_flag ) {
+					case fileCharInfo::E_NOT_DECIDE:
+					case fileCharInfo::E_KEEP:
+						cout << fileContent[i].originalCh;
+						break;
+					case fileCharInfo::E_DO_REPLACE:
+						{
+							if ( fileContent[i].replacedWithCh != 0) {
+								// Do Replace
+								cout << fileContent[i].replacedWithCh;
+							} else {
+								// Keep Original
+								cout << fileContent[i].originalCh;
+							}
 						}
-					}
-					break;
-				case fileCharInfo::E_DO_DELETE:
-				case fileCharInfo::E_DO_FORCE_DELETE:
-					// Do Nothing , <Skip> it without writing
-					break;
-				default:
-					break;
+						break;
+					case fileCharInfo::E_DO_DELETE:
+					case fileCharInfo::E_DO_FORCE_DELETE:
+						// Do Nothing , <Skip> it without writing
+						break;
+					default:
+						break;
+				}
 			}
+			cout.flush();
+		} else {
+			cout << "[INFO] Nothing matched to be replaced . Keep Original. " << endl;
 		}
-		cout.flush();
 
 		f.close();
 	}
 
 }
 
-int main(int argc, char* argv[])
+int main(int argc, char* argv[], char* env[])
 {
+    string runningPath = getBinaryPath(string(argv[0]), env);
 	if ( argc < 2 ) {
 		cout << printUsage() << endl;
 		return -1;
 	}
 
 	processArg argObj;
-	auto bArgParsedFlag = parseArgs(argc, argv, argObj);
+	auto bArgParsedFlag = parseArgs(argc, argv, argObj, runningPath);
 	if ( !bArgParsedFlag ) {
 		cout << "[ERROR] Parse argument Failed. " << endl;
 		cout << printUsage() << endl;
 		return -1;
+	} else {
+		auto printArgDetail = 0;
+		if ( printArgDetail ) {
+			cout << "inputFile = " << argObj.inputFile << endl;
+			cout << "outputSummary = " << argObj.outputSummary << endl;
+			cout << "cfgFile = " << argObj.cfgFile << endl;
+			cout << "hasOutputFlag = " << argObj.hasOutputFlag << endl;
+			cout << "outputFile = " << argObj.outputFile << endl;
+			cout << "bOverrideFlag = " << argObj.bOverrideFlag << endl;
+		}
 	}
 
 	string errorMsg;
@@ -701,6 +827,11 @@ int main(int argc, char* argv[])
 
 	if ( argObj.outputSummary ) {
 		cout << endl;
+
+		if ( lineRecord.empty() ) {
+			cout << "[INFO] Replacement List is !! Empty !! ." << endl;
+		}
+
 		int iCountInsideLine = 0;
 		int lineNo = 0;
 		  // first  : lineNo
