@@ -16,6 +16,8 @@
 #include <QList>
 #include <QTextEdit>
 
+#include <QGridLayout>
+
 static auto SG_debugFlag = true;
 
 
@@ -26,6 +28,8 @@ MainWindow::MainWindow(QWidget *parent)
     , m_pCfgFile( nullptr ) 
 {
     ui->setupUi(this);
+
+    setupLayout();
 
     initCfgFile();
     initMenuBar();
@@ -46,6 +50,17 @@ MainWindow::~MainWindow()
         delete m_pCfgFile;
         m_pCfgFile = nullptr;
     }
+}
+
+void MainWindow::setupLayout()
+{
+    auto* pGridLayout = new QGridLayout();
+
+    pGridLayout->addWidget( ui->codeEdit,   0, 0 , 7, 5 );
+    pGridLayout->addWidget( ui->outputEdit, 7, 0,  3, 5 );
+    pGridLayout->addWidget( ui->pushButton, 10, 4,  1, 1 );
+
+    ui->centralwidget->setLayout( pGridLayout );
 }
 
 

@@ -24,6 +24,9 @@ private slots:
     void on_pushButton_clicked();
 
 private:
+    void setupLayout();
+
+
     void initMenuBar();
     void initMenuBar0();
     void initMenuBar1();
