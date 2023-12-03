@@ -411,12 +411,12 @@ string    TokenBase::getExpressionContent()
     if ( isTmpExpression() ) {
         int sz = static_cast<int>( retExpr.size() );
         if ( sz >= 2 ) {
-            if (    !(   retExpr.front() == STR_OPEN_PARENTHESES.at(0)
-                      && retExpr.back()  == STR_CLOSE_PARENTHESES.at(0) ) )
+            if (    !(   retExpr.front() == STR_OPEN_PARENTHESIS.at(0)
+                      && retExpr.back()  == STR_CLOSE_PARENTHESIS.at(0) ) )
             {
-                retExpr = (STR_OPEN_PARENTHESES + SPACE_1
+                retExpr = (STR_OPEN_PARENTHESIS + SPACE_1
                            + retExpr 
-                           + SPACE_1 + STR_CLOSE_PARENTHESES);
+                           + SPACE_1 + STR_CLOSE_PARENTHESIS);
             }
         } 
     } 

@@ -154,8 +154,8 @@ unordered_map<OpUtil::OpType, OpInfo> OpUtil::s_operatorMap{
     make_pair(enumCvt(E_BIT_LEFT_SHIFT),    OpInfo( BINARY_OP_MASK | ASS_LEFT_2_RIGHT | PRIORITY_MASK(7U)  | static_cast<unsigned int>(E_BIT_LEFT_SHIFT)    ) ),
     make_pair(enumCvt(E_BIT_RIGHT_SHIFT),   OpInfo( BINARY_OP_MASK | ASS_LEFT_2_RIGHT | PRIORITY_MASK(7U)  | static_cast<unsigned int>(E_BIT_RIGHT_SHIFT)   ) ),
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    make_pair(enumCvt(E_OPEN_PARENTHESES),  OpInfo( BINARY_OP_MASK | ASS_RIGHT_2_LEFT | PRIORITY_MASK(2U)  | static_cast<unsigned int>(E_OPEN_PARENTHESES)  ) ),
-    make_pair(enumCvt(E_CLOSE_PARENTHESES), OpInfo( BINARY_OP_MASK | ASS_RIGHT_2_LEFT | PRIORITY_MASK(2U)  | static_cast<unsigned int>(E_CLOSE_PARENTHESES) ) ),
+    make_pair(enumCvt(E_OPEN_PARENTHESIS),  OpInfo( BINARY_OP_MASK | ASS_RIGHT_2_LEFT | PRIORITY_MASK(2U)  | static_cast<unsigned int>(E_OPEN_PARENTHESIS)  ) ),
+    make_pair(enumCvt(E_CLOSE_PARENTHESIS), OpInfo( BINARY_OP_MASK | ASS_RIGHT_2_LEFT | PRIORITY_MASK(2U)  | static_cast<unsigned int>(E_CLOSE_PARENTHESIS) ) ),
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     make_pair(enumCvt(E_ASSIGNMENT),        OpInfo( BINARY_OP_MASK | ASS_RIGHT_2_LEFT | PRIORITY_MASK(16U) | static_cast<unsigned int>(E_ASSIGNMENT)        ) ),

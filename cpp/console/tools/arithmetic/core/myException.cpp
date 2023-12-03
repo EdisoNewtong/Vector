@@ -65,7 +65,7 @@ unordered_map<MyException::ErrorType,string>    MyException::s_exceptionMap{
     { enumCvt(E_THROW_SENTENCE_UNKNOWN_DATA_TYPE),                       "Sentence unknown data type " },
     { enumCvt(E_THROW_SENTENCE_TPYE_IS_UNDETERMINDED),                   "Sentence type is undeterminded " },
 
-    { enumCvt(E_THROW_NO_MATCHED_OPEN_PARENTHESES),                      "Sentence no matched '(' while pushing   ')' " },
+    { enumCvt(E_THROW_NO_MATCHED_OPEN_PARENTHESIS),                      "Sentence no matched '(' while pushing   ')' " },
     { enumCvt(E_THROW_CANNOT_PUSH_TOKEN_KEYWORD),                        "Keyword can't existed after '=' " },
 
 

@@ -30,8 +30,8 @@ enum E_OperatorType
     E_BIT_LEFT_SHIFT,     // <<
     E_BIT_RIGHT_SHIFT,    // >>
 
-    E_OPEN_PARENTHESES,   // (
-    E_CLOSE_PARENTHESES,  // )
+    E_OPEN_PARENTHESIS,   // (
+    E_CLOSE_PARENTHESIS,  // )
                           
     E_ASSIGNMENT,                     // =
     E_ADD_ASSIGNMENT,                 // +=
@@ -58,14 +58,14 @@ enum E_OpAnotherFlag
 {
 	E_OP_FLAG_UNKNOWN = 0,
 
-	E_OP_FLAG_OPEN_PARENTHESES_PRIORITY_PREMOTE,    // a = ( b + c ) * d
+	E_OP_FLAG_OPEN_PARENTHESIS_PRIORITY_PREMOTE,    // a = ( b + c ) * d
 													//     ^
-	E_OP_FLAG_OPEN_PARENTHESES_FUNCTION_START,      // a = sin( angle )
+	E_OP_FLAG_OPEN_PARENTHESIS_FUNCTION_START,      // a = sin( angle )
 													//        ^
 
-	E_OP_FLAG_CLOSE_PARENTHESES_PRIORITY_PREMOTE,   //  a = ( b + c ) * d
+	E_OP_FLAG_CLOSE_PARENTHESIS_PRIORITY_PREMOTE,   //  a = ( b + c ) * d
 													//              ^
-	E_OP_FLAG_CLOSE_PARENTHESES_FUNCTION_END,       //  a = sin( angle ) 
+	E_OP_FLAG_CLOSE_PARENTHESIS_FUNCTION_END,       //  a = sin( angle ) 
 													//                 ^
 
 	E_OP_COMMA_NORMAL,            //  a = 3 , 5
@@ -206,7 +206,7 @@ enum E_ExceptionType
     E_THROW_SENTENCE_UNKNOWN_DATA_TYPE,
     E_THROW_SENTENCE_TPYE_IS_UNDETERMINDED,
 
-    E_THROW_NO_MATCHED_OPEN_PARENTHESES,
+    E_THROW_NO_MATCHED_OPEN_PARENTHESIS,
     E_THROW_CANNOT_PUSH_TOKEN_KEYWORD,
 
     E_THROW_SUFFIXEXPR_BINARY_OP_MISS_TWO_OPERANDS,

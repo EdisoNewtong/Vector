@@ -64,7 +64,7 @@ protected:
     static bool isBlankType(TokenBase* pToken);
     static bool isIgnoredType(TokenBase* pToken);
 
-    bool hasPreviousExistOpenParentheses();
+    bool hasPreviousExistOpenParenthesis();
     std::pair<bool,TokenBase*>        checkAdjacentTokensRelationship_IsValid(TokenBase* toBePushed);
     std::pair<TokenBase*,TokenBase*>  getPreviousToken();
 
@@ -88,7 +88,7 @@ protected:
     void processOperatorStack(TokenBase* previousToken, TokenBase* pToken);
     void popAllOperatorStack();
 
-    void popUntilOpenParentheses();
+    void popUntilOpenParenthesis();
 
 
     TokenBase* doBinaryOp(TokenBase* left, TokenBase* op, TokenBase* right);

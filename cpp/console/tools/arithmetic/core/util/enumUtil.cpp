@@ -53,8 +53,8 @@ string EnumUtil::enumName(E_OperatorType tp)
     INNER_ENUM_2_STRING_MAP(E_BIT_NOT)
     INNER_ENUM_2_STRING_MAP(E_BIT_LEFT_SHIFT)
     INNER_ENUM_2_STRING_MAP(E_BIT_RIGHT_SHIFT)
-    INNER_ENUM_2_STRING_MAP(E_OPEN_PARENTHESES)
-    INNER_ENUM_2_STRING_MAP(E_CLOSE_PARENTHESES)
+    INNER_ENUM_2_STRING_MAP(E_OPEN_PARENTHESIS)
+    INNER_ENUM_2_STRING_MAP(E_CLOSE_PARENTHESIS)
     INNER_ENUM_2_STRING_MAP(E_ASSIGNMENT)
     ///////////////////////////////////////////////////
     INNER_ENUM_2_STRING_MAP(E_ADD_ASSIGNMENT)
@@ -254,7 +254,7 @@ string EnumUtil::enumName(E_ExceptionType tp)
     INNER_ENUM_2_STRING_MAP(E_THROW_SENTENCE_UNKNOWN_DATA_TYPE)
     INNER_ENUM_2_STRING_MAP(E_THROW_SENTENCE_TPYE_IS_UNDETERMINDED)
 
-    INNER_ENUM_2_STRING_MAP(E_THROW_NO_MATCHED_OPEN_PARENTHESES)
+    INNER_ENUM_2_STRING_MAP(E_THROW_NO_MATCHED_OPEN_PARENTHESIS)
     INNER_ENUM_2_STRING_MAP(E_THROW_CANNOT_PUSH_TOKEN_KEYWORD)
     
     INNER_ENUM_2_STRING_MAP(E_THROW_SUFFIXEXPR_BINARY_OP_MISS_TWO_OPERANDS)
@@ -371,10 +371,10 @@ E_OperatorType EnumUtil::getOpType(const string& opSepStr, bool isUnary /* = fal
             retOpTp = E_BIT_NOT;
             break;
         case '(':
-            retOpTp = E_OPEN_PARENTHESES;
+            retOpTp = E_OPEN_PARENTHESIS;
             break;
         case ')':
-            retOpTp = E_CLOSE_PARENTHESES;
+            retOpTp = E_CLOSE_PARENTHESIS;
             break;
         case '=':
             retOpTp = E_ASSIGNMENT;

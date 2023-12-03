@@ -13,8 +13,8 @@ namespace charUtil
     static const std::string SPACE_5 = std::string(5,' ');
     static const std::string DOUBLE_QUOTO = "\"";
     static const std::string SINGLE_QUOTO = "'";
-    static const std::string STR_OPEN_PARENTHESES = "(";
-    static const std::string STR_CLOSE_PARENTHESES = ")";
+    static const std::string STR_OPEN_PARENTHESIS = "(";
+    static const std::string STR_CLOSE_PARENTHESIS = ")";
 
     static const std::string SC_OP_ADD                = " + ";
     static const std::string SC_OP_MINUS              = " - ";
@@ -191,10 +191,10 @@ namespace charUtil
                         retType = E_BIT_NOT;
                         break;
                     case '(':
-                        retType = E_OPEN_PARENTHESES;
+                        retType = E_OPEN_PARENTHESIS;
                         break;
                     case ')':
-                        retType = E_CLOSE_PARENTHESES;
+                        retType = E_CLOSE_PARENTHESIS;
                         break;
                     case '=':
                         retType = E_ASSIGNMENT;
