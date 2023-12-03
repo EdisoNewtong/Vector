@@ -6,4 +6,4 @@ main:main.rs
 
 .PHONY:clean
 clean:
-	-rm   -Rf   main  
+	-rm   -Rf   main  *.pdb
