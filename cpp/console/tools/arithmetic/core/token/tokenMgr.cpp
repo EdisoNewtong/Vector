@@ -16,8 +16,6 @@ using namespace std;
 
 TokenMgr* TokenMgr::s_gInstance = nullptr;
 
-
-
 const TokenMgr::OpPairCfg TokenMgr::s_OpPairCfgTable[OPERATOR_CNT][OPERATOR_CNT] = {
     {   //  E_ADD
          TokenMgr::OpPairCfg( false, true ),      // +  + 
@@ -700,9 +698,6 @@ const TokenMgr::OpPairCfg TokenMgr::s_OpPairCfgTable[OPERATOR_CNT][OPERATOR_CNT]
 
 
 
-
-
-
 // static ,  stand for   "unsigned long long int" : there are 4 keywords for the longest data type defination
 const int TokenMgr::s_MAX_KEYWORDS_CNT = 4;
 
@@ -742,7 +737,6 @@ const unordered_map<string, E_DataType> TokenMgr::s_keywordsDataTypeMap{
 
 // static 
 std::list<TokenBase*> TokenMgr::s_generatedTmpTokenPool{};
-
 
 void TokenMgr::init()
 {
@@ -862,6 +856,13 @@ void TokenMgr::pushToken(TokenBase* pToken)
     // ****************************************************
     auto pr = checkAdjacentTokensRelationship_IsValid(pToken);
 
+    //
+    // Always Push to All-Token-List ( *** Must after *** previous check adjacent two tokens' relationship ) , 
+	//
+	//     Otherwise it will result in memory leak because of neglected token to be pushed into the memory pool
+    //
+    m_allTokenList.push_back(pToken);
+
     auto isValid = pr.first;
     if ( !isValid ) {
         auto previousToken = pr.second;
@@ -911,10 +912,6 @@ void TokenMgr::pushToken(TokenBase* pToken)
         throw e;
     }
 
-    //
-    // Always Push to All-Token-List
-    //
-    m_allTokenList.push_back(pToken);
     tracePushedTokenWarning(pToken);
 
 
@@ -988,7 +985,7 @@ void TokenMgr::executeCode()
 
         1. DataType    varible                   (;)    type-id = 1    |  e.g. :   int index;
         2. DataType    varible = expression      (;)    type=id = 2    |  e.g. :   int index = 1+a;
-        3. Tmp expression                        (;)    such as  a = 3;  / a += 3;  /   a + b * c;
+        3. Normal expression or tmp expression   (;)    such as  a = 3;  / a += 3;  /       a + b * c;  ( the previous statement is a kind of tmp expression)
 
         ///////////////////////////////////////////////////////////////////////
         //
@@ -1213,6 +1210,8 @@ void TokenMgr::buildSuffixExpression(int sentenceType, int varibleIdx)
                     indexCheck = (idx > varibleIdx);
                 }
 
+				(void)indexCheck;
+				/*
                 if ( indexCheck &&  !(pVisitedVaribleInfo->isInitialed) ) {
                     if ( CmdOptions::needTreatUninitializedVaribleAsError()  ) {
                         MyException e(E_THROW_VARIBLE_NOT_INITIALIZED_BEFORE_USED, pToken->getBeginPos() );
@@ -1220,8 +1219,8 @@ void TokenMgr::buildSuffixExpression(int sentenceType, int varibleIdx)
                     } else {
                         traceUnInitializedVarWhenUsed(pToken);
                     }
-
                 }
+				*/
 
                 pToken->setDataType( pVisitedVaribleInfo->dataVal.type );
                 pToken->setRealValue( pVisitedVaribleInfo->dataVal );
@@ -1479,6 +1478,42 @@ void TokenMgr::evaluateSuffixExpression()
                 it = prev(it,1);
                 leftOperand = *it;
 
+				if (   CmdOptions::needTraceUninitializedVaribleWhenEvaluatingExpression() ) {
+					// opType != E_ASSIGNMENT
+					// check Left Operand
+					auto needCheckLeft = (opType != E_ASSIGNMENT);
+					if ( needCheckLeft ) {
+						if ( leftOperand!=nullptr &&  leftOperand->getTokenType() == E_TOKEN_EXPRESSION    &&   leftOperand->isVarible() ) {
+							string varName = leftOperand->getTokenContent();
+							VaribleInfo* pVisitedVaribleInfo = VariblePool::getPool()->getVaribleByName( varName );
+							if ( pVisitedVaribleInfo != nullptr  &&   !pVisitedVaribleInfo->isInitialed ) {
+								if ( CmdOptions::needTreatUninitializedVaribleAsError()  ) {
+									MyException e(E_THROW_VARIBLE_NOT_INITIALIZED_BEFORE_USED, leftOperand->getBeginPos() );
+									throw e;
+								} else {
+									traceUnInitializedVarWhenUsed(leftOperand);
+								}
+							}
+						}
+					}
+
+					//
+					// Not matter whether the operator is '=' or not , always check Right operand 
+					// 
+					if ( rightOperand!=nullptr &&  rightOperand->getTokenType() == E_TOKEN_EXPRESSION    &&   rightOperand->isVarible() ) {
+						string varName = rightOperand->getTokenContent();
+						VaribleInfo* pVisitedVaribleInfo = VariblePool::getPool()->getVaribleByName( varName );
+						if ( pVisitedVaribleInfo != nullptr  &&   !pVisitedVaribleInfo->isInitialed ) {
+							if ( CmdOptions::needTreatUninitializedVaribleAsError()  ) {
+								MyException e(E_THROW_VARIBLE_NOT_INITIALIZED_BEFORE_USED, rightOperand->getBeginPos() );
+								throw e;
+							} else {
+								traceUnInitializedVarWhenUsed(rightOperand);
+							}
+						}
+					}
+				}
+
                 auto genTmpExp = doBinaryOp(leftOperand, currentElement, rightOperand);
                 ++operatorProcessCnt;
 
@@ -1500,6 +1535,22 @@ void TokenMgr::evaluateSuffixExpression()
 
                 it = prev(it,1);
                 rightOperand = *it;
+
+				if ( CmdOptions::needTraceUninitializedVaribleWhenEvaluatingExpression() ) {
+					// check the only right Operand for Unary operator expression
+					if ( rightOperand!=nullptr &&  rightOperand->getTokenType() == E_TOKEN_EXPRESSION    &&   rightOperand->isVarible() ) {
+						string varName = rightOperand->getTokenContent();
+						VaribleInfo* pVisitedVaribleInfo = VariblePool::getPool()->getVaribleByName( varName );
+						if ( pVisitedVaribleInfo != nullptr  &&   !pVisitedVaribleInfo->isInitialed ) {
+							if ( CmdOptions::needTreatUninitializedVaribleAsError()  ) {
+								MyException e(E_THROW_VARIBLE_NOT_INITIALIZED_BEFORE_USED, rightOperand->getBeginPos() );
+								throw e;
+							} else {
+								traceUnInitializedVarWhenUsed(rightOperand);
+							}
+						}
+					}
+				}
 
                 auto genTmpExp = doUnaryOp(currentElement, rightOperand);
                 ++operatorProcessCnt;

@@ -58,6 +58,8 @@ public:
     static bool needTreatUninitializedVaribleAsError();
     static bool needTraceParseTimeStep();
     static bool needPrintSrcCodeLength();
+
+	static bool needTraceUninitializedVaribleWhenEvaluatingExpression();
 protected:
     static bool needPrintDataTypeRange();
 

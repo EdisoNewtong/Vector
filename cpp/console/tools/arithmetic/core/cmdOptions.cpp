@@ -48,6 +48,7 @@ R"([Flag]
     TREAT_UNINITIALIZED_VARIBLE_AS_ERROR = 0
     PRINT_PARSE_FILE_LENGTH = 0
     NEED_CHECK_FIXED_LITERAL_INT_RANGE_WHEN_ASSIGN = 1
+	TRACE_UNINITIALIZED_VARIBLE_WHEN_EVALUATING_EXPRESSIONS = 1
 
     TRACE_PARSE_TIME_STEP = 0
 )"
@@ -72,6 +73,7 @@ const vector< pair<string,unsigned long> > CmdOptions::SC_DEBUG_OPTIONS_MAP{
     { string("TREAT_UNINITIALIZED_VARIBLE_AS_ERROR = "),              13UL },
     { string("PRINT_PARSE_FILE_LENGTH = "),                           14UL },
     { string("NEED_CHECK_FIXED_LITERAL_INT_RANGE_WHEN_ASSIGN = "),    15UL },
+    { string("TRACE_UNINITIALIZED_VARIBLE_WHEN_EVALUATING_EXPRESSIONS = "),    16UL },
 
     { string("TRACE_PARSE_TIME_STEP = "),                             23UL }
 };
@@ -417,6 +419,7 @@ bool CmdOptions::needTreatBlankStatementAsWarning()            { return  ( (s_de
 bool CmdOptions::needTreatUninitializedVaribleAsError()        { return  ( (s_debugOption >> 13UL)     & 0x1UL) != 0;  }
 bool CmdOptions::needPrintSrcCodeLength()                      { return  ( (s_debugOption >> 14UL)     & 0x1UL) != 0;  }
 bool CmdOptions::needCheckFixedLiteralIntRangeWhenAssign()     { return  ( (s_debugOption >> 15UL)     & 0x1UL) != 0;  }
+bool CmdOptions::needTraceUninitializedVaribleWhenEvaluatingExpression()     { return  ( (s_debugOption >> 16UL)     & 0x1UL) != 0;  }
 
 bool CmdOptions::needTraceParseTimeStep()                      { return  ( (s_debugOption >> 23UL)     & 0x1UL) != 0;  }
 
