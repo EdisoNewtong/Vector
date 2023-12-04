@@ -319,6 +319,7 @@ bool   TokenBase::isKeyword()
 
 bool   TokenBase::isVarible()
 {
+	// m_expTypeFlag = 0x30U ??
     return ( ((m_expTypeFlag >> 4) & 0x3U) == 0x3U );
 }
 
@@ -449,3 +450,15 @@ E_OpAnotherFlag  TokenBase::getContextRoleForOp()
 {
 	return m_opFlag;
 }
+
+
+bool	TokenBase::isFunction()
+{
+	return m_expTypeFlag == 0x80;
+}
+
+void    TokenBase::setAsFunction()
+{
+	m_expTypeFlag = 0x80;
+}
+

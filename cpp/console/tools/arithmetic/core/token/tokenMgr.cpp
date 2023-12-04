@@ -800,6 +800,9 @@ TokenMgr::TokenMgr()
     , m_oneSentence()
     , m_opertorStack()
     , m_suffixExpression()
+    , m_callstackFuncList()
+    , m_oneArgumentForACertainFunc()
+    , m_openParenthesisList()
     , m_execodeIdx(0)
 {
     m_allTokenList.clear();
@@ -808,6 +811,10 @@ TokenMgr::TokenMgr()
     m_oneSentence.clear();
     m_opertorStack.clear();
     m_suffixExpression.clear();
+
+    m_callstackFuncList.clear();
+    m_oneArgumentForACertainFunc.clear();
+    m_openParenthesisList.clear();
 }
 
 // virtual
@@ -828,6 +835,19 @@ TokenMgr::~TokenMgr()
     m_oneSentence.clear();
     m_opertorStack.clear();
     m_suffixExpression.clear();
+
+
+    m_callstackFuncList.clear();
+	for( auto it = m_oneArgumentForACertainFunc.begin(); it !=  m_oneArgumentForACertainFunc.end(); ++it ) {
+		if ( *it != nullptr ) {
+			(*it)->clear();
+			delete (*it);
+			*it = nullptr;
+		}
+	}
+	m_oneArgumentForACertainFunc.clear();
+
+    m_openParenthesisList.clear();
 }
 
 
@@ -854,7 +874,11 @@ void TokenMgr::pushToken(TokenBase* pToken)
     // ****************************************************
     // the key logic ( critical )
     // ****************************************************
-    auto pr = checkAdjacentTokensRelationship_IsValid(pToken);
+	int iSpFlag = 0;
+    auto pr = checkAdjacentTokensRelationship_IsValid(pToken, iSpFlag);
+
+	processParenthesisFlag_IfNecessary(pToken,  iSpFlag); // set '('
+	processFunctionRelated_IfNecessary(pr.second , pToken, iSpFlag); // set 'func'   and '('
 
     //
     // Always Push to All-Token-List ( *** Must after *** previous check adjacent two tokens' relationship ) , 
@@ -873,35 +897,14 @@ void TokenMgr::pushToken(TokenBase* pToken)
             detailstr += "First Token ";
             detailstr += (SINGLE_QUOTO + pToken->getTokenContent() + SINGLE_QUOTO);
 
-            // detailstr += SPACE_2;
-            // detailstr += "After '";
-            // detailstr += "nullptr";
         } else {
-            //  previousToken != nullptr
-            // auto preTp = previousToken->getTokenType();
-
-
-            //if ( preTp  == E_TOKEN_OPERATOR ) {
-            //    detailstr += EnumUtil::enumName( previousToken->getOperatorType() );
-            //} else {
-            //    detailstr += EnumUtil::enumName( preTp );
-            //}
-
             auto rightContent = pToken->getTokenContent();
             detailstr += (SINGLE_QUOTO + rightContent + SINGLE_QUOTO);
-            // detailstr += " @";
-            // detailstr += previousToken->getBeginPos().getPos(0);
 
             detailstr += " After ";
 
             auto leftContent = previousToken->getTokenContent();
             detailstr += (SPACE_1 + SINGLE_QUOTO + leftContent + SINGLE_QUOTO);
-
-            //if ( tokenType == E_TOKEN_OPERATOR ) {
-            //    detailstr += EnumUtil::enumName( pToken->getOperatorType() );
-            //} else {
-            //    detailstr += EnumUtil::enumName( tokenType );
-            //}
 
             detailstr += " @";
             detailstr += pToken->getBeginPos().getPos(0);
@@ -980,7 +983,7 @@ void TokenMgr::executeCode()
  
     /*
     --------------------------------------------------
-        Only 4 kinds of format are all allowed
+        Only 3 kinds of format are all allowed
     --------------------------------------------------
 
         1. DataType    varible                   (;)    type-id = 1    |  e.g. :   int index;
@@ -1120,7 +1123,6 @@ void TokenMgr::executeCode()
                 VariblePool::getPool()->randomVaribleValue( varname );
             }
             
-
 
             if ( sentenceVarElement != nullptr ) { 
                 sentenceVarElement->setDataType( pVaribleInfo->dataVal.type );
@@ -1811,7 +1813,7 @@ bool TokenMgr::hasPreviousExistOpenParenthesis()
 //
 //   Key Logic    
 //
-pair<bool,TokenBase*> TokenMgr::checkAdjacentTokensRelationship_IsValid(TokenBase* toBePushed)
+pair<bool,TokenBase*> TokenMgr::checkAdjacentTokensRelationship_IsValid(TokenBase* toBePushed, int &iSpecialFlag)
 {
     auto avaliable = false;
     TokenBase* previousToken = nullptr;
@@ -1843,7 +1845,7 @@ pair<bool,TokenBase*> TokenMgr::checkAdjacentTokensRelationship_IsValid(TokenBas
         break;
     case E_TOKEN_OPERATOR:
         {
-            avaliable = process_OperatorWithPriorToken( toBePushed, previousValidToken, previousClosestToken);
+            avaliable = process_OperatorWithPriorToken( toBePushed, previousValidToken, previousClosestToken, iSpecialFlag);
             previousToken = previousValidToken;
         }
         break;
@@ -2939,7 +2941,7 @@ bool TokenMgr::process_SequenceWithPriorToken(TokenBase* toBePushed, TokenBase* 
     }
 }
 
-bool TokenMgr::process_OperatorWithPriorToken(TokenBase* toBePushed, TokenBase* priorToken, TokenBase* priorClosestToken)
+bool TokenMgr::process_OperatorWithPriorToken(TokenBase* toBePushed, TokenBase* priorToken, TokenBase* priorClosestToken, int &iSpecialFlag)
 {
     auto opType = toBePushed->getOperatorType();
     if ( priorToken == nullptr  ) {
@@ -2972,7 +2974,8 @@ bool TokenMgr::process_OperatorWithPriorToken(TokenBase* toBePushed, TokenBase* 
             } else if ( opType == E_OPEN_PARENTHESIS ) {
                 // TODO for future feature use : function call ?
                 // e.g.   sin( ... ) 
-                return false;
+				iSpecialFlag = 1;  // Core , set function flag
+                return true;
             } else {
                 return true;
             }
@@ -3009,21 +3012,6 @@ bool TokenMgr::process_OperatorWithPriorToken(TokenBase* toBePushed, TokenBase* 
             foundMatched = true;
         }
 
-
-        /*
-        for( int idx = 0; idx < TokenMgr::s_TABLE_SIZE; ++idx )
-        {
-            if(     TokenMgr::s_OpPairCfgTable[idx].left  == priorToken->getOperatorType()  
-                &&  TokenMgr::s_OpPairCfgTable[idx].right == opType ) 
-            {
-                closeFlag = TokenMgr::s_OpPairCfgTable[idx].closeAvaliable;
-                sepFlag   = TokenMgr::s_OpPairCfgTable[idx].seperateAvaliable;
-                foundMatched = true;
-                break;
-            }
-        }
-        */
-
         auto avaliable = false;
         if ( foundMatched ) {
             if ( closeFlag && sepFlag ) {
@@ -3049,4 +3037,68 @@ bool TokenMgr::process_OperatorWithPriorToken(TokenBase* toBePushed, TokenBase* 
     }
 
     return false;
+}
+
+void TokenMgr::processFunctionRelated_IfNecessary(TokenBase* pFuncObj, TokenBase* pBeginOpenParenthesis, int iFlag)
+{
+	if ( iFlag == 1 ) {
+		// Function Setting
+		if ( pFuncObj != nullptr ) {
+			pFuncObj->setAsFunction();
+
+			m_callstackFuncList.push_back( pFuncObj );
+			allocNewArgumentExpr();
+		}
+
+		if ( pBeginOpenParenthesis != nullptr ) {
+			pBeginOpenParenthesis->setContextRoleForOp( E_OP_FLAG_OPEN_PARENTHESIS_FUNCTION_START );
+		}
+	} 
+}
+
+
+void TokenMgr::allocNewArgumentExpr()
+{
+	auto newArgumentsPart = new std::list<TokenBase*>();
+	m_oneArgumentForACertainFunc.push_back( newArgumentsPart );
+}
+
+
+void TokenMgr::processParenthesisFlag_IfNecessary(TokenBase* pToken, int iFlag)
+{
+	if (  pToken!=nullptr &&  pToken->getTokenType() == E_TOKEN_OPERATOR ) {
+		auto opType = pToken->getOperatorType();
+		if ( opType == E_OPEN_PARENTHESIS ) {
+			if ( iFlag == 1 ) {
+				pToken->setContextRoleForOp( E_OP_FLAG_OPEN_PARENTHESIS_FUNCTION_START );
+			} else {
+				pToken->setContextRoleForOp( E_OP_FLAG_OPEN_PARENTHESIS_PRIORITY_PREMOTE );
+			}
+			m_openParenthesisList.push_back( pToken );
+		} else if ( opType == E_CLOSE_PARENTHESIS ) {
+			if ( m_openParenthesisList.empty() ) {
+				MyException e(E_THROW_NO_MATCHED_OPEN_PARENTHESIS, pToken->getBeginPos() );
+				throw e;
+			} else {
+				// "()" list is not empty
+				auto tailopen = m_openParenthesisList.back();
+				auto openParenthesisFlag = tailopen->getContextRoleForOp();
+				if ( openParenthesisFlag == E_OP_FLAG_OPEN_PARENTHESIS_FUNCTION_START ) {
+					// function end ,check call stack , and pop function object and matched '('
+					if ( m_callstackFuncList.empty() ) {
+						// TODO , logic error , throw exception
+					} else {
+						m_callstackFuncList.pop_back();
+						m_openParenthesisList.pop_back();
+						// TODO
+						// function argument is end
+						//  m_oneArgumentForACertainFunc ->   copy to   argument list
+					}
+				} else {
+					//  openParenthesisFlag == E_OP_FLAG_OPEN_PARENTHESIS_PRIORITY_PREMOTE
+					m_openParenthesisList.pop_back();
+				}
+			}
+		}
+	}
 }

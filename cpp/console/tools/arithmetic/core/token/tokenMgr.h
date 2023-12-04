@@ -7,6 +7,7 @@
 #include "variblePool.h"
 #include "dataValue.h"
 #include "dataTypeUtil.h"
+#include "functionBase.h"
 #include <string>
 // #include <stack>
 #include <list>
@@ -30,9 +31,6 @@ protected:
     struct OpPairCfg
     {
         OpPairCfg(bool flag1, bool flag2) : closeAvaliable(flag1), seperateAvaliable(flag2) { };
-
-        // E_OperatorType left;
-        // E_OperatorType right;
 
         bool           closeAvaliable;    //   permission for  the 2 operators are adjacent without any Space or Comment
         bool           seperateAvaliable; //   permission for  the 2 operators are not adjacent but there is at least some Space or Comment token in the middle
@@ -65,12 +63,16 @@ protected:
     static bool isIgnoredType(TokenBase* pToken);
 
     bool hasPreviousExistOpenParenthesis();
-    std::pair<bool,TokenBase*>        checkAdjacentTokensRelationship_IsValid(TokenBase* toBePushed);
+    std::pair<bool,TokenBase*>        checkAdjacentTokensRelationship_IsValid(TokenBase* toBePushed, int &iSpecialFlag);
     std::pair<TokenBase*,TokenBase*>  getPreviousToken();
 
     bool process_SemicolonWithPriorToken(TokenBase* toBePushed, TokenBase* priorToken);
     bool process_SequenceWithPriorToken(TokenBase* toBePushed, TokenBase* priorToken);
-    bool process_OperatorWithPriorToken(TokenBase* toBePushed, TokenBase* priorToken, TokenBase* priorClosestToken);
+    bool process_OperatorWithPriorToken(TokenBase* toBePushed, TokenBase* priorToken, TokenBase* priorClosestToken, int &iSpecialFlag);
+
+	void processParenthesisFlag_IfNecessary(TokenBase* pToken, int iFlag);
+	void processFunctionRelated_IfNecessary(TokenBase* pFunctObj, TokenBase* pBeginOpenParenthesis, int iFlag);
+	void allocNewArgumentExpr();
 
     // for tmp expression check use
     bool is1stTokenTypeKeyWord();
@@ -158,7 +160,6 @@ protected:
 protected:
     static TokenMgr* s_gInstance;
 
-    // static const OpPairCfg s_OpPairCfgTable[OPERATOR_CNT * OPERATOR_CNT];
     static const OpPairCfg s_OpPairCfgTable[OPERATOR_CNT][OPERATOR_CNT];
 
     static const int s_MAX_KEYWORDS_CNT;
@@ -176,6 +177,29 @@ protected:
     // std::stack<TokenBase*>  m_opertorStack;
     std::list<TokenBase*>   m_opertorStack;
     std::list<TokenBase*>   m_suffixExpression;
+
+    //////////////////////////////////////////////////////////////////////
+    //
+    // Function related data members
+    //
+    //////////////////////////////////////////////////////////////////////
+	
+	std::list<TokenBase*>                   m_callstackFuncList;
+	/**************************************************
+
+	  e.g.   
+          expr : sin(  1+ sin(30 + sin(45) ) )
+	
+		  there is a layer conception inside  argument parsing
+
+		  1.     1 +                 ==>   1 +  sin( 30 + sin(45) )
+		    2.     30 +             ==>   30 + sin(45) 
+			   3.      45 <Done>
+
+	***************************************************/
+	std::list< std::list<TokenBase*>* >     m_oneArgumentForACertainFunc;
+
+	std::list<TokenBase*>                   m_openParenthesisList;
 
     int m_execodeIdx;
 

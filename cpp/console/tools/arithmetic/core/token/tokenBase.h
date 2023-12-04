@@ -39,6 +39,9 @@ public:
     bool           isVarible();
     void           setAsVarible();
 
+	bool           isFunction();
+	void           setAsFunction();
+
     void           setBeginPos(const ChInfo& beg);
     ChInfo         getBeginPos();
     void           setEndPos(const ChInfo& end);
@@ -61,9 +64,9 @@ protected:
     ////////////////////////////////////////////////////////////////////////////////////////////////////////
     //
     //-----------------------------------------------------------------------------------------------------
-    //             |      7      6    5      |   4     3   2   1  |
+    //             |    8        7      6    5      |   4     3   2   1  |
     //-----------------------------------------------------------------------------------------------------
-    // 8 bits      | x keywords exp varible  | float  hex oct dec |
+    // 8 bits      | function keywords exp varible  | float  hex oct dec |
     //----------------------------------------------------------------------------------------------------
     //
     //  if token is an intermediate tmp expression : val = 0x20
