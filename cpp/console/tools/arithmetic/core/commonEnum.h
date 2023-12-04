@@ -17,35 +17,36 @@ enum E_OperatorType
 {
     E_OPERATOR_UNKNOWN = -1,
 
-    E_ADD = 0,      // +  , e.g.   a + b
-    E_MINUS,    // -  , e.g.   a - b
-    E_MULTIPLY, // *
-    E_DIVIDE,   // /
-    E_MOD,      // %
+/*0*/     E_ADD = 0,      // +  , e.g.   a + b
+/*1*/     E_MINUS,    // -  , e.g.   a - b
+/*2*/     E_MULTIPLY, // *
+/*3*/     E_DIVIDE,   // /
+/*4*/     E_MOD,      // %
 
-    E_BIT_AND,  // &
-    E_BIT_OR,   // |
-    E_BIT_XOR,  // ^
-    E_BIT_NOT,  // ~
-    E_BIT_LEFT_SHIFT,     // <<
-    E_BIT_RIGHT_SHIFT,    // >>
+/*5*/     E_BIT_AND,  // &
+/*6*/     E_BIT_OR,   // |
+/*7*/     E_BIT_XOR,  // ^
+/*8*/     E_BIT_NOT,  // ~
+/*9*/     E_BIT_LEFT_SHIFT,     // <<
+/*10*/    E_BIT_RIGHT_SHIFT,    // >>
 
-    E_OPEN_PARENTHESIS,   // (
-    E_CLOSE_PARENTHESIS,  // )
+/*11*/    E_OPEN_PARENTHESIS,   // (
+/*12*/    E_CLOSE_PARENTHESIS,  // )
                           
-    E_ASSIGNMENT,                     // =
-    E_ADD_ASSIGNMENT,                 // +=
-    E_MINUS_ASSIGNMENT,               // -=
-    E_MULTIPLY_ASSIGNMENT,            // *=
-    E_DIVIDE_ASSIGNMENT,              // /=
-    E_MOD_ASSIGNMENT,                 // %=
-    E_BIT_AND_ASSIGNMENT,             // &=
-    E_BIT_OR_ASSIGNMENT,              // |=
-    E_BIT_XOR_ASSIGNMENT,             // ^=
-    E_BIT_LEFT_SHIFT_ASSIGNMENT,      // <<=
-    E_BIT_RIGHT_SHIFT_ASSIGNMENT,     // >>=
-	// new feature for function call
-    E_COMMA,                          // ,
+/*13*/    E_ASSIGNMENT,                     // =
+/*14*/    E_ADD_ASSIGNMENT,                 // +=
+/*15*/    E_MINUS_ASSIGNMENT,               // -=
+/*16*/    E_MULTIPLY_ASSIGNMENT,            // *=
+/*17*/    E_DIVIDE_ASSIGNMENT,              // /=
+/*18*/    E_MOD_ASSIGNMENT,                 // %=
+/*19*/    E_BIT_AND_ASSIGNMENT,             // &=
+/*20*/    E_BIT_OR_ASSIGNMENT,              // |=
+/*21*/    E_BIT_XOR_ASSIGNMENT,             // ^=
+/*22*/    E_BIT_LEFT_SHIFT_ASSIGNMENT,      // <<=
+/*23*/    E_BIT_RIGHT_SHIFT_ASSIGNMENT,     // >>=
+
+     // new feature for function call
+/*24*/    E_COMMA,                          // ,
 
         E_POSITIVE, // +  , e.g.   +a
         E_NEGATIVE, // -  , e.g.   -a
@@ -56,24 +57,24 @@ enum E_OperatorType
 
 enum E_OpAnotherFlag
 {
-	E_OP_FLAG_UNKNOWN = 0,
+    E_OP_FLAG_UNKNOWN = 0,
 
-	E_OP_FLAG_OPEN_PARENTHESIS_PRIORITY_PREMOTE,    // a = ( b + c ) * d
-													//     ^
-	E_OP_FLAG_OPEN_PARENTHESIS_FUNCTION_START,      // a = sin( angle )
-													//        ^
+    E_OP_FLAG_OPEN_PARENTHESIS_PRIORITY_PREMOTE,    // a = ( b + c ) * d
+                                                    //     ^
+    E_OP_FLAG_OPEN_PARENTHESIS_FUNCTION_START,      // a = sin( angle )
+                                                    //        ^
 
-	E_OP_FLAG_CLOSE_PARENTHESIS_PRIORITY_PREMOTE,   //  a = ( b + c ) * d
-													//              ^
-	E_OP_FLAG_CLOSE_PARENTHESIS_FUNCTION_END,       //  a = sin( angle ) 
-													//                 ^
+    E_OP_FLAG_CLOSE_PARENTHESIS_PRIORITY_PREMOTE,   //  a = ( b + c ) * d
+                                                    //              ^
+    E_OP_FLAG_CLOSE_PARENTHESIS_FUNCTION_END,       //  a = sin( angle ) 
+                                                    //                 ^
 
-	E_OP_COMMA_NORMAL,            //  a = 3 , 5
+    E_OP_COMMA_NORMAL,            //  a = 3 , 5
                                   //        ^
-	E_OP_COMMA_FUNCTION_ARG_SEP,  // function( a , b )
-								  //             ^
-	E_OP_COMMA_DEFINATION_SEP     //   int a , b , c
-								  //         ^   ^
+    E_OP_COMMA_FUNCTION_ARG_SEP,  // function( a , b )
+                                  //             ^
+    E_OP_COMMA_DEFINATION_SEP     //   int a , b , c
+                                  //         ^   ^
 };
 
 
@@ -243,6 +244,17 @@ enum E_ExceptionType
     E_THROW_ALL_TOKENS_ARE_KEYWORD,
     E_THROW_TOO_MANY_KEYWORDS,
     E_THROW_SENTENCE_DEFINITION_HAS_MISSED_AN_ASSIGNMENT_OPERATOR,
+
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////
+	//
+	// Function Call relative exception
+	//
+	////////////////////////////////////////////////////////////////////////////////////////////////////
+    E_THROW_CALL_FUNCTION_TOO_MANY_ARGUMENTS,
+	E_THROW_CALL_FUNCTION_TOO_LITTLE_ARGUMENTS,
+
+	E_THROW_PARSE_FUNCTION_PUSH_TOO_MANY_ARGUMENTS,
 
 
 };

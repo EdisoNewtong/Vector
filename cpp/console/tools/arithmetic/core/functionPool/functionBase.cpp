@@ -20,7 +20,8 @@ FunctionBase::~FunctionBase()
 
 TokenBase* FunctionBase::executeFunction()
 {
-    preCheckArgCount();
+	auto needThrow = true;
+    preCheckArgCount( needThrow );
     auto retValue = doCall();
 
 	// After call , Delete argument list
@@ -30,18 +31,23 @@ TokenBase* FunctionBase::executeFunction()
 }
 
 
-void FunctionBase::preCheckArgCount()
+bool FunctionBase::preCheckArgCount(bool needThrow)
 {
     int argCnt = static_cast<int>( m_argumentList.size() );
     int requiredCnt = getRequiredArgumentsCount();
-    if ( argCnt >  requiredCnt )  {
-		MyException e(E_THROW_CALL_FUNCTION_TOO_MANY_ARGUMENTS, m_argumentList.back().back()->getBeginPos() );
-        throw e;
-    } else if ( argCnt <  requiredCnt ) {
-		MyException e(E_THROW_CALL_FUNCTION_TOO_LITTLE_ARGUMENTS, m_argumentList.back().back()->getBeginPos() );
-		throw e;
-    }
 
+	auto isMatched =  (argCnt != requiredCnt);
+	if ( needThrow ) {
+		if ( argCnt >  requiredCnt )  {
+			MyException e(E_THROW_CALL_FUNCTION_TOO_MANY_ARGUMENTS, m_argumentList.back().back()->getBeginPos() );
+			throw e;
+		} else if ( argCnt <  requiredCnt ) {
+			MyException e(E_THROW_CALL_FUNCTION_TOO_LITTLE_ARGUMENTS, m_argumentList.back().back()->getBeginPos() );
+			throw e;
+		}
+	} 
+	
+	return isMatched;
 }
 
 
@@ -59,4 +65,3 @@ void FunctionBase::pushOneArgumentExpr( const std::list<TokenBase*>& oneArgument
 
 	m_argumentList.push_back( oneArgumentExpr );
 }
-

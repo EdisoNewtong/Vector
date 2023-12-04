@@ -95,7 +95,11 @@ unordered_map<MyException::ErrorType,string>    MyException::s_exceptionMap{
 
     { enumCvt(E_THROW_ALL_TOKENS_ARE_KEYWORD),                              "All sentence which is full of keywords is syntax error. " },
     { enumCvt(E_THROW_TOO_MANY_KEYWORDS),                                   "The keywords' count is exceeded the limit.  " },
-    { enumCvt(E_THROW_SENTENCE_DEFINITION_HAS_MISSED_AN_ASSIGNMENT_OPERATOR),  "The sentence defination has missed an assignment operator. " }
+    { enumCvt(E_THROW_SENTENCE_DEFINITION_HAS_MISSED_AN_ASSIGNMENT_OPERATOR),  "The sentence defination has missed an assignment operator. " },
+
+    { enumCvt(E_THROW_CALL_FUNCTION_TOO_MANY_ARGUMENTS),                      "No matched function prototype , more arguments is given. "    },
+    { enumCvt(E_THROW_CALL_FUNCTION_TOO_LITTLE_ARGUMENTS),                    "No matched function prototype , more arguments is required. " },
+    { enumCvt(E_THROW_PARSE_FUNCTION_PUSH_TOO_MANY_ARGUMENTS),                "During token parsing , too many arugments will be pushed to arguments. " },
 
 };
 
