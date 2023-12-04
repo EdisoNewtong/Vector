@@ -23,7 +23,7 @@ LINK_OPT := -Wall --std=c++11  -O3
 #
 # build/stringNumber.o
 #
-build/arithMetic:build/arithMetic.o build/buff.o build/enumUtil.o build/keywordList.o  build/dataTypeUtil.o  build/stringNumber.o  build/opUtil.o    build/myException.o build/buff.o build/globalDirector.o   build/tokenBase.o build/tokenMgr.o    build/cmdOptions.o   build/parserBase.o   build/blankParser.o build/singlelineCommentParser.o   build/multilineCommentParser.o  build/operatorParser.o  build/sequenceParser.o build/semicolonParser.o    build/variblePool.o build/dataValue.o   build/functionBase.o   build/functionMgr.o   build/MyAbs.o
+build/arithMetic:build/arithMetic.o build/buff.o build/enumUtil.o build/keywordList.o  build/dataTypeUtil.o  build/stringNumber.o  build/opUtil.o    build/myException.o build/buff.o build/globalDirector.o   build/tokenBase.o build/tokenMgr.o    build/cmdOptions.o   build/parserBase.o   build/blankParser.o build/singlelineCommentParser.o   build/multilineCommentParser.o  build/operatorParser.o  build/sequenceParser.o build/semicolonParser.o    build/variblePool.o build/dataValue.o   build/functionBase.o   build/functionMgr.o   build/MyAbs.o   build/MyFmod.o   build/MyRemainder.o  build/MyFmin.o    build/MyFmax.o   
 	@echo -e "\n----------------------------------------------------------------------------------------------------"
 	g++    $(LINK_OPT)    -o    build/arithMetic    build/*.o
 	cp build/arithMetic .
@@ -113,11 +113,23 @@ build/cmdOptions.o:core/cmdOptions.cpp  core/cmdOptions.h core/util/charUtil.h  
 build/functionBase.o:core/functionPool/functionBase.cpp  core/functionPool/functionBase.h  core/token/tokenBase.h  core/commonEnum.h  core/myException.h
 	g++    $(COMPILE_OPT)  -o  build/functionBase.o    core/functionPool/functionBase.cpp
 
-build/functionMgr.o:core/functionPool/functionMgr.cpp  core/functionPool/functionMgr.h  core/functionPool/functionBase.h  core/functionPool/basic/MyAbs.h
+build/functionMgr.o:core/functionPool/functionMgr.cpp  core/functionPool/functionMgr.h  core/functionPool/functionBase.h  core/functionPool/basic/MyAbs.h  core/functionPool/basic/MyFmod.h  core/functionPool/basic/MyRemainder.h  core/functionPool/basic/MyFmax.h  core/functionPool/basic/MyFmin.h 
 	g++    $(COMPILE_OPT)  -o  build/functionMgr.o    core/functionPool/functionMgr.cpp
 
 build/MyAbs.o:core/functionPool/basic/MyAbs.cpp   core/functionPool/basic/MyAbs.h   core/functionPool/functionBase.h
 	g++    $(COMPILE_OPT)  -o  build/MyAbs.o    core/functionPool/basic/MyAbs.cpp
+
+build/MyFmod.o:core/functionPool/basic/MyFmod.cpp   core/functionPool/basic/MyFmod.h   core/functionPool/functionBase.h 
+	g++    $(COMPILE_OPT)  -o  build/MyFmod.o    core/functionPool/basic/MyFmod.cpp
+
+build/MyRemainder.o:core/functionPool/basic/MyRemainder.cpp   core/functionPool/basic/MyRemainder.h   core/functionPool/functionBase.h 
+	g++    $(COMPILE_OPT)  -o  build/MyRemainder.o    core/functionPool/basic/MyRemainder.cpp
+
+build/MyFmin.o:core/functionPool/basic/MyFmin.cpp   core/functionPool/basic/MyFmin.h   core/functionPool/functionBase.h 
+	g++    $(COMPILE_OPT)  -o  build/MyFmin.o    core/functionPool/basic/MyFmin.cpp
+
+build/MyFmax.o:core/functionPool/basic/MyFmax.cpp   core/functionPool/basic/MyFmax.h   core/functionPool/functionBase.h 
+	g++    $(COMPILE_OPT)  -o  build/MyFmax.o    core/functionPool/basic/MyFmax.cpp
 
 
 

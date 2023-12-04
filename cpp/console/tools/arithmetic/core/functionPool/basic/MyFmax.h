@@ -1,13 +1,13 @@
-#ifndef MY_FMOD_H
-#define MY_FMOD_H
+#ifndef MY_FMAX_H
+#define MY_FMAX_H
 
 #include "functionBase.h"
 
-class My_fmod : public FunctionBase
+class My_fmax : public FunctionBase
 {
 public:
-    My_fmod();
-    virtual ~My_fmod();
+    My_fmax();
+    virtual ~My_fmax();
 
 protected:
     virtual TokenBase* doCall() override;

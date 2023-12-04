@@ -1,5 +1,9 @@
 #include "functionMgr.h"
 #include "MyAbs.h"
+#include "MyFmod.h"
+#include "MyRemainder.h"
+#include "MyFmax.h"
+#include "MyFmin.h"
 
 using namespace std;
 
@@ -21,10 +25,10 @@ unordered_set<string> FunctionMgr::s_functionNameList{
     // remainder( x, y)
     "remainder",
 
-    // fma(x, y, z) ,  max of (x,y,z)
-    "fma",
+    // fma(x, y),  max of (x,y)
+    "fmax",
 
-    // fmin(x, y, z) ,  min of (x,y,z)
+    // fmin(x, y),  min of (x,y)
     "fmin",
 
 //--------------------------------
@@ -138,12 +142,18 @@ bool FunctionMgr::isInsideFunctionList(const string& funcName)
 // static 
 FunctionBase* FunctionMgr::generateFunctionObjectByName(const string& funcName)
 {
+	FunctionBase* fObject = nullptr;
     if ( funcName == "abs" ) {
-        return new My_abs();
+        fObject = new My_abs();
     } else if ( funcName == "fmod" ) {
-        // TODO
-        return nullptr;
+		fObject = new My_fmod();
+    } else if ( funcName == "remainder" ) {
+		fObject = new My_remainder();
+    } else if ( funcName == "fmax" ) {
+		fObject = new My_fmax();
+    } else if ( funcName == "fmin" ) {
+		fObject = new My_fmin();
     }
 
-    return nullptr;
+    return fObject;
 }

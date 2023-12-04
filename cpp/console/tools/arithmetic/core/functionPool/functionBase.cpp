@@ -6,7 +6,7 @@
 #include "myException.h"
 
 FunctionBase::FunctionBase() 
-    : m_funcName()
+    : m_funcName("???")
     , m_argumentList()
 {
 
