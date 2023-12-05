@@ -1,13 +1,13 @@
-#ifndef MY_SIN_H
-#define MY_SIN_H
+#ifndef MY_LOG10_H
+#define MY_LOG10_H
 
 #include "functionBase.h"
 
-class My_sin : public FunctionBase
+class My_log10 : public FunctionBase
 {
 public:
-    My_sin();
-    virtual ~My_sin();
+    My_log10();
+    virtual ~My_log10();
 
 protected:
     virtual TokenBase* doCall() override;
