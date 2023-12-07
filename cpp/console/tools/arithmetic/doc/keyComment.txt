@@ -35,6 +35,45 @@ The evaluated value must be different from each other.
 
 
 
+4 . Let's make a protocol
+     
+	 int a = 0;
+	 a = funcAdd(3,4);
+
+Suffix Expression will be generated as the following :
+					|   a   |   funcAdd   |   =   |
+
+********************************************************************************************************************************************************************************************************
+1.	The argument seperator operator ',' mustn't be appeared inside the final suffix expression
+2.	The function arguments should be pushed to an argument list of a function object named "funcAdd"
+3.  But the operator ',' who play the role of comma expression's seperator  can be existed inside the final suffix expression
+
+( e.g.
+
+    --------------------------------------------------
+	        a = 3,4,5;
+
+			a3=4,5,     // finally a = 3 rather than 5
+		1st.             a=3  => 3
+		2nd.             3,4  => 4
+		3nd.             4,5  => 5
+
+    --------------------------------------------------
+
+	        a = (3,4,5);
+
+			a34,5,=     // finally a = 5 rather than 3
+		1st.             34,  => 4
+		2nd.             4,5  => 5
+		3nd.             a=5  => 5
+
+    --------------------------------------------------
+)
+
+********************************************************************************************************************************************************************************************************
+
+
+
 
 
 
@@ -83,13 +122,13 @@ remainder(...)
     Promoted    remainder ( Arithmetic1 x, Arithmetic2 y );
 
 
-fma(...)  // pick the max value of two/three elements
-    float       fma ( float x, float y, float z );
-    float       fmaf( float x, float y, float z );
-    double      fma ( double x, double y, double z );
-    long double fma ( long double x, long double y, long double z );
-    long double fmal( long double x, long double y, long double z );
-    Promoted    fma ( Arithmetic1 x, Arithmetic2 y, Arithmetic3 z );
+fmax(...)  // pick the max value of two/three elements
+    float       fmax( float x, float y)
+    float       fmaxf( float x, float y)
+    double      fmax( double x, double y)
+    long double fmax( long double x, long double y)
+    long double fmaxl( long double x, long double y)
+    Promoted    fmax( Arithmetic1 x, Arithmetic2 y)
 
 fmin(...)  // pick the min value of two/three elements
     float       fmin ( float x, float y );
@@ -263,4 +302,3 @@ round(...)
     long long llround ( long double arg );
     long long llroundl( long double arg );
     long long llround ( IntegralType arg );
-

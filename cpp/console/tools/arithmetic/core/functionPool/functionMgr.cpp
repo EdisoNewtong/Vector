@@ -51,7 +51,7 @@ unordered_set<string> FunctionMgr::s_functionNameList{
     // remainder( x, y)
     "remainder",
 
-    // fma(x, y),  max of (x,y)
+    // fmax(x, y),  max of (x,y)
     "fmax",
 
     // fmin(x, y),  min of (x,y)

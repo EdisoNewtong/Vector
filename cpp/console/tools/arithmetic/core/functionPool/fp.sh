@@ -2,8 +2,8 @@
 
 mv  basic/my_abs.cpp  basic/MyAbs.cpp
 mv  basic/my_abs.h  basic/MyAbs.h
-mv  basic/my_fma.cpp  basic/MyFma.cpp
-mv  basic/my_fma.h  basic/MyFma.h
+mv  basic/my_fmax.cpp  basic/MyFmax.cpp
+mv  basic/my_fmax.h  basic/MyFmax.h
 mv  basic/my_fmin.cpp  basic/MyFmin.cpp
 mv  basic/my_fmin.h  basic/MyFmin.h
 mv  basic/my_fmod.cpp  basic/MyFmod.cpp
@@ -51,4 +51,3 @@ mv  trigonometric/my_sin.cpp  trigonometric/MySin.cpp
 mv  trigonometric/my_sin.h  trigonometric/MySin.h
 mv  trigonometric/my_tan.cpp  trigonometric/MyTan.cpp
 mv  trigonometric/my_tan.h  trigonometric/MyTan.h
-

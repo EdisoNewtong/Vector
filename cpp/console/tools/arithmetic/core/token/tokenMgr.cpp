@@ -877,15 +877,16 @@ void TokenMgr::pushToken(TokenBase* pToken)
 	int iSpFlag = 0;
     auto pr = checkAdjacentTokensRelationship_IsValid(pToken, iSpFlag);
 
-	processParenthesisFlag_IfNecessary(pToken,  iSpFlag); // set '('
-	processFunctionRelated_IfNecessary(pr.second , pToken, iSpFlag); // set 'func'   and '('
-
     //
     // Always Push to All-Token-List ( *** Must after *** previous check adjacent two tokens' relationship ) , 
 	//
 	//     Otherwise it will result in memory leak because of neglected token to be pushed into the memory pool
     //
     m_allTokenList.push_back(pToken);
+
+	processParenthesisFlag_IfNecessary(pToken,  iSpFlag); // set '('
+	processFunctionRelated_IfNecessary(pr.second , pToken, iSpFlag); // set 'func'   and '('
+
 
     auto isValid = pr.first;
     if ( !isValid ) {

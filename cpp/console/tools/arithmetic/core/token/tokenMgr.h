@@ -170,7 +170,7 @@ protected:
     static void clearTmpGenTokenPool();
 
 protected:
-    std::vector<TokenBase*> m_allTokenList;
+    std::vector<TokenBase*> m_allTokenList;    // for memory pool manager
     std::vector<TokenBase*> m_validTokenList;
     std::vector<TokenBase*> m_oneSentence;
 

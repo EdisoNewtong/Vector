@@ -120,13 +120,13 @@ remainder(...)
     Promoted    remainder ( Arithmetic1 x, Arithmetic2 y );
 
 
-fma(...)  // pick the max value of two/three elements
-    float       fma ( float x, float y, float z );
-    float       fmaf( float x, float y, float z );
-    double      fma ( double x, double y, double z );
-    long double fma ( long double x, long double y, long double z );
-    long double fmal( long double x, long double y, long double z );
-    Promoted    fma ( Arithmetic1 x, Arithmetic2 y, Arithmetic3 z );
+fmax(...)  // pick the max value of two elements
+    float       fmax( float x, float y)
+    float       fmaxf( float x, float y)
+    double      fmax( double x, double y)
+    long double fmax( long double x, long double y)
+    long double fmaxl( long double x, long double y)
+    Promoted    fmax( Arithmetic1 x, Arithmetic2 y)
 
 fmin(...)  // pick the min value of two/three elements
     float       fmin ( float x, float y );
@@ -300,5 +300,4 @@ round(...)
     long long llround ( long double arg );
     long long llroundl( long double arg );
     long long llround ( IntegralType arg );
-
 
