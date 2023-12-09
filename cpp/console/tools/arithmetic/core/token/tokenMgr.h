@@ -70,8 +70,9 @@ protected:
     bool process_SequenceWithPriorToken(TokenBase* toBePushed, TokenBase* priorToken);
     bool process_OperatorWithPriorToken(TokenBase* toBePushed, TokenBase* priorToken, TokenBase* priorClosestToken, int &iSpecialFlag);
 
-	void processParenthesisFlag_IfNecessary(TokenBase* pToken, int iFlag);
-	void processFunctionRelated_IfNecessary(TokenBase* pFunctObj, TokenBase* pBeginOpenParenthesis, int iFlag);
+	void processPreviousFunctionRelated_IfNecessary(TokenBase* pFunctObj, int iFlag);
+	void processParenthesisOrCommaFlag_IfNecessary(TokenBase* pTokenToBePushed, int iFlag);
+
 	void allocNewArgumentExpr();
 
     // for tmp expression check use
@@ -157,6 +158,8 @@ protected:
     void traceAssignOverFlow(TokenBase* leftVar, TokenBase* rightFixedInt);
 
     void traceBlankStatement();
+
+	void clearOneArgumentsPool();
 protected:
     static TokenMgr* s_gInstance;
 
@@ -171,12 +174,12 @@ protected:
 
 protected:
     std::vector<TokenBase*> m_allTokenList;    // for memory pool manager
-    std::vector<TokenBase*> m_validTokenList;
-    std::vector<TokenBase*> m_oneSentence;
+    std::vector<TokenBase*> m_validTokenList;  // a list for all tokens that is neither comment nor blank ( arbitary <Space> or <Tab> ) contains ';'  ,  So the list can analyze the 2 adjacent statements' relationship.
+    std::vector<TokenBase*> m_oneSentence;     // a list for only 1 statement with neither comment nor blank and whose delimiter is ';'
 
     // std::stack<TokenBase*>  m_opertorStack;
     std::list<TokenBase*>   m_opertorStack;
-    std::list<TokenBase*>   m_suffixExpression;
+    std::list<TokenBase*>   m_suffixExpression; // Core : the main suffix expressions only contain a function object's name without  any function arugments , and it can only caotain the comma ',' which plays a role of comma expression seperator ( seperate two token for evaluattion   rather than function arguments seperator ):
 
     //////////////////////////////////////////////////////////////////////
     //

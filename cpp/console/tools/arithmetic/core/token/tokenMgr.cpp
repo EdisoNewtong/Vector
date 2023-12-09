@@ -838,15 +838,7 @@ TokenMgr::~TokenMgr()
 
 
     m_callstackFuncList.clear();
-	for( auto it = m_oneArgumentForACertainFunc.begin(); it !=  m_oneArgumentForACertainFunc.end(); ++it ) {
-		if ( *it != nullptr ) {
-			(*it)->clear();
-			delete (*it);
-			*it = nullptr;
-		}
-	}
-	m_oneArgumentForACertainFunc.clear();
-
+	clearOneArgumentsPool();
     m_openParenthesisList.clear();
 }
 
@@ -869,8 +861,6 @@ void TokenMgr::pushToken(TokenBase* pToken)
         throw e;
     }
 
-    auto tokenType = pToken->getTokenType();
-
     // ****************************************************
     // the key logic ( critical )
     // ****************************************************
@@ -884,8 +874,6 @@ void TokenMgr::pushToken(TokenBase* pToken)
     //
     m_allTokenList.push_back(pToken);
 
-	processParenthesisFlag_IfNecessary(pToken,  iSpFlag); // set '('
-	processFunctionRelated_IfNecessary(pr.second , pToken, iSpFlag); // set 'func'   and '('
 
 
     auto isValid = pr.first;
@@ -916,16 +904,27 @@ void TokenMgr::pushToken(TokenBase* pToken)
         throw e;
     }
 
+	processPreviousFunctionRelated_IfNecessary(pr.second , iSpFlag); // set 'func'   and '('
+	processParenthesisOrCommaFlag_IfNecessary(pToken, iSpFlag); // set '('
+
     tracePushedTokenWarning(pToken);
 
 
+     /******************************************************************************************************
+	 
+	   Key Code Here :
+
+		  Only push passed token into the     "m_oneSentence"       container until meet ';'
+	   Do <Not> process operator-stack and suffix-expression during the pushing step
+	   After all pushing till meet the ';' token   then build suffix expression by the statement's type
+
+    *******************************************************************************************************/
     //      Skip :  Blank / Single-Comment / Multi-Comment   <===   such types can be ignored
     //      Operator or Sequence or    ;
     if ( !( TokenMgr::isIgnoredType(pToken) ) ) {
-        // int pushedIdx = static_cast<int>( m_validTokenList.size() );
         m_validTokenList.push_back( pToken );
 
-        if ( tokenType == E_TOKEN_SEMICOLON ) {
+        if ( pToken->getTokenType() == E_TOKEN_SEMICOLON ) {
             // Core Core Core
             executeCode();
             ++m_execodeIdx;
@@ -965,6 +964,7 @@ void TokenMgr::executeCode()
     printSuffixExpression(1);
     m_suffixExpression.clear();
 
+	//   m_oneSentence is a list without  ';'
     if ( m_oneSentence.empty() ) {
         traceBlankStatement();
         clearTmpGenTokenPool();
@@ -975,13 +975,6 @@ void TokenMgr::executeCode()
     // Sequence / operator   Only
     int vecSz = static_cast<int>( m_oneSentence.size() );
 
-    // if ( vecSz < 2 ) {
-    //     MyException e(E_THROW_SENTENCE_LESS_TOKEN, m_oneSentence.front()->getBeginPos() );
-    //     // e.setDetail( m_oneSentence.front()->getBeginPos().getPos() );
-    //     throw e;
-    // } 
-
- 
     /*
     --------------------------------------------------
         Only 3 kinds of format are all allowed
@@ -1115,15 +1108,13 @@ void TokenMgr::executeCode()
         throw e;
     }
 
+	//   int a;            ||      int a = ... ;
     if ( sentenceType == 1 ||  sentenceType == 2 ) {
         sentenceVarElement = m_oneSentence.at(varibleIdx);
         pVaribleInfo = VariblePool::getPool()->create_a_new_varible(defDt, varname, sentenceVarElement->getBeginPos().line );
         if ( pVaribleInfo != nullptr  ) {
-            // Random the new alloced varible's value
-            if ( sentenceType == 1 ) {
-                VariblePool::getPool()->randomVaribleValue( varname );
-            }
-            
+            // Random a value and assign it to new alloced varible's
+			VariblePool::getPool()->randomVaribleValue( varname );
 
             if ( sentenceVarElement != nullptr ) { 
                 sentenceVarElement->setDataType( pVaribleInfo->dataVal.type );
@@ -1138,6 +1129,11 @@ void TokenMgr::executeCode()
         // e.g.   int a;
     } 
 
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//
+	// Has   = or ?=
+	//
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     bool hasAssignmentOrVariadicAssignment = false;
     for( auto idx = 0; idx < vecSz; ++idx )
     {
@@ -1146,6 +1142,7 @@ void TokenMgr::executeCode()
 
         if ( tokenType == E_TOKEN_OPERATOR  ) {  
             E_OperatorType opType = pToken->getOperatorType();
+			// has  =   or    ?= ( += -=    ...  >>= )
             if ( opType >= E_ASSIGNMENT &&  opType <= E_BIT_RIGHT_SHIFT_ASSIGNMENT ) {
                 hasAssignmentOrVariadicAssignment = true;
                 break;
@@ -1174,6 +1171,9 @@ void TokenMgr::executeCode()
     m_oneSentence.clear();
     clearTmpGenTokenPool();
 
+	m_callstackFuncList.clear();
+	clearOneArgumentsPool();
+	m_openParenthesisList.clear();
 }
 
 
@@ -1329,8 +1329,10 @@ void TokenMgr::processOperatorStack(TokenBase* previousToken, TokenBase* pToken)
     }
 
 
-
+	////////////////////////////////////////////////////////////////////////////////////////////////////
+	//
     // Core Core Core
+	//
     //    Generate Suffix Expression
     if ( opType == E_CLOSE_PARENTHESIS ) {
         if ( !hasPreviousExistOpenParenthesis() ) {
@@ -2342,7 +2344,6 @@ TokenBase* TokenMgr::doPositive(TokenBase* op, TokenBase* right)
 {
     using namespace charUtil;
 
-
     string rightContent = right->getExpressionContent();
     string finalExpr = SC_OP_POSITIVE_BEGIN + rightContent;
 
@@ -2946,8 +2947,8 @@ bool TokenMgr::process_OperatorWithPriorToken(TokenBase* toBePushed, TokenBase* 
 {
     auto opType = toBePushed->getOperatorType();
     if ( priorToken == nullptr  ) {
-        if (   opType == E_ADD   || opType == E_POSITIVE 
-            || opType == E_MINUS || opType == E_NEGATIVE
+        if (   ( opType == E_ADD   || opType == E_POSITIVE )
+            || ( opType == E_MINUS || opType == E_NEGATIVE )
             || opType == E_BIT_NOT
             || opType == E_OPEN_PARENTHESIS ) {
             return true;
@@ -2958,8 +2959,8 @@ bool TokenMgr::process_OperatorWithPriorToken(TokenBase* toBePushed, TokenBase* 
 
     auto preType = priorToken->getTokenType();
     if ( preType == E_TOKEN_SEMICOLON ) {
-        if (   opType == E_ADD   || opType == E_POSITIVE 
-            || opType == E_MINUS || opType == E_NEGATIVE
+        if (   ( opType == E_ADD   || opType == E_POSITIVE )
+            || ( opType == E_MINUS || opType == E_NEGATIVE )
             || opType == E_BIT_NOT
             || opType == E_OPEN_PARENTHESIS ) {
             return true;
@@ -3040,7 +3041,7 @@ bool TokenMgr::process_OperatorWithPriorToken(TokenBase* toBePushed, TokenBase* 
     return false;
 }
 
-void TokenMgr::processFunctionRelated_IfNecessary(TokenBase* pFuncObj, TokenBase* pBeginOpenParenthesis, int iFlag)
+void TokenMgr::processPreviousFunctionRelated_IfNecessary(TokenBase* pFuncObj, int iFlag)
 {
 	if ( iFlag == 1 ) {
 		// Function Setting
@@ -3051,34 +3052,32 @@ void TokenMgr::processFunctionRelated_IfNecessary(TokenBase* pFuncObj, TokenBase
 			allocNewArgumentExpr();
 		}
 
-		if ( pBeginOpenParenthesis != nullptr ) {
-			pBeginOpenParenthesis->setContextRoleForOp( E_OP_FLAG_OPEN_PARENTHESIS_FUNCTION_START );
-		}
 	} 
 }
 
 
 void TokenMgr::allocNewArgumentExpr()
 {
-	auto newArgumentsPart = new std::list<TokenBase*>();
-	m_oneArgumentForACertainFunc.push_back( newArgumentsPart );
+	auto newArguments_OnePart = new std::list<TokenBase*>();
+	m_oneArgumentForACertainFunc.push_back( newArguments_OnePart );
 }
 
 
-void TokenMgr::processParenthesisFlag_IfNecessary(TokenBase* pToken, int iFlag)
+// Core : Key Logic 
+void TokenMgr::processParenthesisOrCommaFlag_IfNecessary(TokenBase* pTokenToBePushed, int iFlag)
 {
-	if (  pToken!=nullptr &&  pToken->getTokenType() == E_TOKEN_OPERATOR ) {
-		auto opType = pToken->getOperatorType();
+	if (  pTokenToBePushed!=nullptr  &&  pTokenToBePushed->getTokenType() == E_TOKEN_OPERATOR ) {
+		auto opType = pTokenToBePushed->getOperatorType();
 		if ( opType == E_OPEN_PARENTHESIS ) {
 			if ( iFlag == 1 ) {
-				pToken->setContextRoleForOp( E_OP_FLAG_OPEN_PARENTHESIS_FUNCTION_START );
+				pTokenToBePushed->setContextRoleForOp( E_OP_FLAG_OPEN_PARENTHESIS_FUNCTION_START );
 			} else {
-				pToken->setContextRoleForOp( E_OP_FLAG_OPEN_PARENTHESIS_PRIORITY_PREMOTE );
+				pTokenToBePushed->setContextRoleForOp( E_OP_FLAG_OPEN_PARENTHESIS_PRIORITY_PREMOTE );
 			}
-			m_openParenthesisList.push_back( pToken );
+			m_openParenthesisList.push_back( pTokenToBePushed );
 		} else if ( opType == E_CLOSE_PARENTHESIS ) {
 			if ( m_openParenthesisList.empty() ) {
-				MyException e(E_THROW_NO_MATCHED_OPEN_PARENTHESIS, pToken->getBeginPos() );
+				MyException e(E_THROW_NO_MATCHED_OPEN_PARENTHESIS, pTokenToBePushed->getBeginPos() );
 				throw e;
 			} else {
 				// "()" list is not empty
@@ -3090,7 +3089,7 @@ void TokenMgr::processParenthesisFlag_IfNecessary(TokenBase* pToken, int iFlag)
 						// TODO , logic error , throw exception
 					} else {
 						m_callstackFuncList.pop_back();
-						m_openParenthesisList.pop_back();
+						m_openParenthesisList.pop_back(); // pop the matched  '('
 						// TODO
 						// function argument is end
 						//  m_oneArgumentForACertainFunc ->   copy to   argument list
@@ -3100,6 +3099,46 @@ void TokenMgr::processParenthesisFlag_IfNecessary(TokenBase* pToken, int iFlag)
 					m_openParenthesisList.pop_back();
 				}
 			}
+		} else if ( opType == E_COMMA ) {
+			if ( m_openParenthesisList.empty() ) {
+				if ( !m_oneSentence.empty() ) {
+					auto firstToken = m_oneSentence.front();
+					if ( firstToken!=nullptr ) {
+						if ( firstToken->isKeyword() ) {
+							pTokenToBePushed->setContextRoleForOp( E_OP_COMMA_DEFINATION_SEP );
+						} else {
+							pTokenToBePushed->setContextRoleForOp( E_OP_COMMA_NORMAL_FOR_COMMA_EXPRESSION );
+						}
+					}
+				} 
+				/* 
+				else {
+					it will throw exception after checkAdjacentTokensRelationship_IsValid() 
+				} 
+				*/
+			} else {
+				auto lastOpenParenthesis = m_openParenthesisList.back();
+				auto theRole = lastOpenParenthesis->getContextRoleForOp();
+				if ( theRole == E_OpAnotherFlag::E_OP_FLAG_OPEN_PARENTHESIS_FUNCTION_START ) {
+					pTokenToBePushed->setContextRoleForOp( E_OP_COMMA_FUNCTION_ARG_SEP );
+				} else {
+					pTokenToBePushed->setContextRoleForOp( E_OP_COMMA_NORMAL_FOR_COMMA_EXPRESSION );
+				}
+			}
+
 		}
 	}
+}
+
+
+void TokenMgr::clearOneArgumentsPool()
+{
+	for ( auto it = m_oneArgumentForACertainFunc.begin(); it !=  m_oneArgumentForACertainFunc.end(); ++it ) {
+		if ( *it != nullptr ) {
+			(*it)->clear();
+			delete (*it);
+			*it = nullptr;
+		}
+	}
+	m_oneArgumentForACertainFunc.clear();
 }

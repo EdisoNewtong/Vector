@@ -1,6 +1,10 @@
 #include "variblePool.h"
 #include "myException.h"
 #include "enumUtil.h"
+
+#include "charUtil.h"
+#include "functionMgr.h" // check the varible name is inside built-in function name list or not
+
 #include <iostream>
 using namespace std;
 
@@ -58,6 +62,8 @@ VariblePool::~VariblePool()
 
 VaribleInfo* VariblePool::getVaribleByName(const std::string& varname)
 {
+	
+
     auto foundIt = m_pool.find(varname);
     if ( foundIt == m_pool.end() ) {
         return nullptr;
@@ -79,11 +85,20 @@ void VariblePool::randomVaribleValue(const std::string& varname)
 
 VaribleInfo* VariblePool::create_a_new_varible(E_DataType dt, const std::string& varname, int defline)
 {
+	//
+	// first , Check it is a built-in function name or not  
+	//
+	if ( FunctionMgr::isInsideFunctionList(varname) ) {
+        MyException e( E_THROW_CANNOT_DEFINE_A_VARIBLE_WITH_THE_SAME_NAME_OF_BUILT_IN_FUNCTION );
+        e.setDetail( charUtil::SINGLE_QUOTO + varname + charUtil::SINGLE_QUOTO  + std::string(" is a built-in function name. ") );
+        throw e;
+	}
+
     auto foundIt = m_pool.find(varname);
     if ( foundIt != m_pool.end() ) {
         // already found it
-        MyException e(E_THROW_VARIBLE_ALREADY_DEFINED);
-        e.setDetail( varname + std::string(" @line : ") + std::to_string(defline) +  std::string(" has already been defined @line : ") + std::to_string( foundIt->second->definedLine) );
+        MyException e( E_THROW_VARIBLE_ALREADY_DEFINED );
+        e.setDetail( charUtil::SINGLE_QUOTO + varname + charUtil::SINGLE_QUOTO +  std::string("It has already been defined @line : ") + std::to_string( foundIt->second->definedLine) );
         throw e;
     }
 
@@ -125,4 +140,3 @@ void VariblePool::printAllVaribles(unsigned int flag)
     }
 
 }
-

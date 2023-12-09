@@ -69,12 +69,12 @@ enum E_OpAnotherFlag
     E_OP_FLAG_CLOSE_PARENTHESIS_FUNCTION_END,       //  a = sin( angle ) 
                                                     //                 ^
 
-    E_OP_COMMA_NORMAL,            //  a = 3 , 5
-                                  //        ^
-    E_OP_COMMA_FUNCTION_ARG_SEP,  // function( a , b )
-                                  //             ^
-    E_OP_COMMA_DEFINATION_SEP     //   int a , b , c
-                                  //         ^   ^
+    E_OP_COMMA_NORMAL_FOR_COMMA_EXPRESSION,         //  a = 3 , 5
+                                                    //        ^
+    E_OP_COMMA_FUNCTION_ARG_SEP,                    // function( a , b )
+                                                    //             ^
+    E_OP_COMMA_DEFINATION_SEP                       //   int a , b , c
+                                                    //         ^   ^
 };
 
 
@@ -255,6 +255,8 @@ enum E_ExceptionType
 	E_THROW_CALL_FUNCTION_TOO_LITTLE_ARGUMENTS,
 
 	E_THROW_PARSE_FUNCTION_PUSH_TOO_MANY_ARGUMENTS,
+
+	E_THROW_CANNOT_DEFINE_A_VARIBLE_WITH_THE_SAME_NAME_OF_BUILT_IN_FUNCTION,
 
 
 };

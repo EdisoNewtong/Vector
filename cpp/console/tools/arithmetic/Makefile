@@ -47,7 +47,7 @@ build/dataValue.o:core/dataValue.cpp   core/dataValue.h   core/commonEnum.h   co
 	g++    $(COMPILE_OPT)  -o  build/dataValue.o   core/dataValue.cpp
 
 
-build/variblePool.o:core/variblePool/variblePool.cpp  core/variblePool/variblePool.h  core/myException.h core/token/tokenBase.h core/dataValue.h  core/util/enumUtil.h
+build/variblePool.o:core/variblePool/variblePool.cpp  core/variblePool/variblePool.h  core/myException.h core/token/tokenBase.h core/dataValue.h  core/util/enumUtil.h  core/util/charUtil.h   core/functionPool/functionMgr.h  
 	g++    $(COMPILE_OPT)  -o  build/variblePool.o   core/variblePool/variblePool.cpp
 
 build/enumUtil.o:core/util/enumUtil.cpp core/util/enumUtil.h core/parser/parserBase.h  core/commonEnum.h  core/myException.h
@@ -232,4 +232,3 @@ build/MyRound.o:core/functionPool/nearest/MyRound.cpp   core/functionPool/neares
 .PHONY:clean
 clean:
 	-rm   -Rf   arithMetic *.exe *.dSYM   build/*.o  build/arithMetic*
-

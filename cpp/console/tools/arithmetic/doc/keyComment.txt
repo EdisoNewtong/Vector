@@ -71,6 +71,31 @@ Suffix Expression will be generated as the following :
 )
 
 ********************************************************************************************************************************************************************************************************
+About the operator ','
+There are 3 kinds of ',' in the c/c++ statement.
+
+1. Play a role of function arguments seperator                                  :  e.g.      funcAdd(3,4);
+
+2. Play a role of a sepeator of comma expression                                :  e.g.        num = 3,4;     // after the code has being executed , the varible num's value is 3 rather than 4 , finally it yield a tmp expresssion whose value is 4 
+                                                                                          or   num = (3,4);   // after the code has being executed , the varible num's value is 4 rather than 3 , because of the ( ... ) promote the operator priority of ',' ( Comma )
+
+3. Play a role of a seperator of alloc more than one varible for a new varible  : e.g.       int a,b;         // declare 2 varibles that ones' name is 'a' and the others' name is 'b' , and both of the values can be any arbirary value .
+                                                                                             int a=3,b;       // declare 2 varibles that ones' name is 'a' and it's init value is 3 and the others' name is 'b' , b's value can be any arbirary value .
+                                                                                             int a=4,b=4;     // declare 2 varibles that ones' name is 'a' and it's init value is 3 and the others' name is 'b' , b's value is 4 .
+
+																							 int a=100;
+																							 int b=a+1,200,c;      // compile error , '200' is not a valid varible name
+
+																							 int b=(a+1,200),c;  // compile ok , b and c are both new alloced varibles , b's value is 100 because the statement ( 101,200 ) will generate tmp value 200 , 
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+Core Core Core :
+    So from the previous example , you may be awared that the '(' play a critical role during the expression evaluation phase . 
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
 
 
 

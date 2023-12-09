@@ -100,7 +100,7 @@ unordered_map<MyException::ErrorType,string>    MyException::s_exceptionMap{
     { enumCvt(E_THROW_CALL_FUNCTION_TOO_MANY_ARGUMENTS),                      "No matched function prototype , more arguments is given. "    },
     { enumCvt(E_THROW_CALL_FUNCTION_TOO_LITTLE_ARGUMENTS),                    "No matched function prototype , more arguments is required. " },
     { enumCvt(E_THROW_PARSE_FUNCTION_PUSH_TOO_MANY_ARGUMENTS),                "During token parsing , too many arugments will be pushed to arguments. " },
-
+    { enumCvt(E_THROW_CANNOT_DEFINE_A_VARIBLE_WITH_THE_SAME_NAME_OF_BUILT_IN_FUNCTION), "Can't define a varible with the same name of built-in function. " }
 };
 
 
