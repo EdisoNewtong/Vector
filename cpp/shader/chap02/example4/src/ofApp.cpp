@@ -12,6 +12,23 @@ void ofApp::setup(){
 	m_triangle.addColor( ofFloatColor(0.0, 1.0f, 0.0f, 1.0f) ); // set vertex #1 color as green
 	m_triangle.addColor( ofFloatColor(0.0, 0.0f, 1.0f, 1.0f) ); // set vertex #2 color as blue
 
+    /******************************************************************************
+     * Or Use the following Code ( position and color alternatively ) :
+
+	// vertex #0
+	m_triangle.addVertex( glm::vec3(-1.0,  1.0, 0.0) );         // set vertex #0 position
+	m_triangle.addColor( ofFloatColor(1.0, 0.0f, 0.0f, 1.0f) ); // set vertex #0 color as red
+
+	// vertex #1
+	m_triangle.addVertex( glm::vec3(-1.0, -1.0f, 0.0) );        // set vertex #1 position
+	m_triangle.addColor( ofFloatColor(0.0, 1.0f, 0.0f, 1.0f) ); // set vertex #1 color as green
+
+	// vertex #2
+	m_triangle.addVertex( glm::vec3( 1.0, -1.0f, 0.0) );        // set vertex #2 position
+	m_triangle.addColor( ofFloatColor(0.0, 0.0f, 1.0f, 1.0f) ); // set vertex #2 color as blue
+
+     ***********************************************************************/
+
 	m_shader.load("first_vertex.vert" , "first_fragment.frag");
 }
 
