@@ -9,21 +9,21 @@ INC_PATH := -Icore -Icore/util -Icore/token -Icore/parser -Icore/parser/blank -I
 
 
 #COMPILE_OPT :=  -Wall --std=c++11 $(DEFINED_MACRO) $(INC_PATH)   -c -g3
-COMPILE_OPT :=  -Wall --std=c++11 $(DEFINED_MACRO) $(INC_PATH) -O3  -c
+COMPILE_OPT :=  -Werror -Wall --std=c++11 $(DEFINED_MACRO) $(INC_PATH) -O3  -c
 
 ####################################################################################################
 ####################################################################################################
 ####################################################################################################
 
 #LINK_OPT := -Wall --std=c++11
-LINK_OPT := -Wall --std=c++11  -O3
+LINK_OPT := -Werror  -Wall --std=c++11  -O3
 
 
 
 #
 # build/stringNumber.o
 #
-build/arithMetic:build/arithMetic.o build/buff.o build/enumUtil.o build/keywordList.o  build/dataTypeUtil.o  build/stringNumber.o  build/opUtil.o    build/myException.o build/buff.o build/globalDirector.o   build/tokenBase.o build/tokenMgr.o    build/cmdOptions.o   build/parserBase.o   build/blankParser.o build/singlelineCommentParser.o   build/multilineCommentParser.o  build/operatorParser.o  build/sequenceParser.o build/semicolonParser.o    build/variblePool.o build/dataValue.o   build/functionBase.o   build/functionMgr.o   build/MyAbs.o   build/MyFmod.o   build/MyRemainder.o  build/MyFmin.o    build/MyFmax.o   build/MyExp.o  build/MyExp2.o   build/MyLog.o  build/MyLog2.o   build/MyLog10.o    build/MyPow.o   build/MySqrt.o  build/MyCbrt.o  build/MyHypot.o  build/MySin.o  build/MyCos.o  build/MyTan.o   build/MyAsin.o   build/MyAcos.o  build/MyAtan.o   build/MyAtan2.o     build/MyCeil.o  build/MyFloor.o   build/MyTrunc.o  build/MyRound.o
+build/arithMetic:build/arithMetic.o build/buff.o build/enumUtil.o build/keywordList.o  build/dataTypeUtil.o  build/stringNumber.o  build/opUtil.o    build/myException.o build/buff.o build/globalDirector.o   build/tokenBase.o build/tokenMgr.o   build/expEvaluation.o    build/cmdOptions.o   build/parserBase.o   build/blankParser.o build/singlelineCommentParser.o   build/multilineCommentParser.o  build/operatorParser.o  build/sequenceParser.o build/semicolonParser.o    build/variblePool.o build/dataValue.o   build/functionBase.o   build/functionMgr.o   build/MyAbs.o   build/MyFmod.o   build/MyRemainder.o  build/MyFmin.o    build/MyFmax.o   build/MyExp.o  build/MyExp2.o   build/MyLog.o  build/MyLog2.o   build/MyLog10.o    build/MyPow.o   build/MySqrt.o  build/MyCbrt.o  build/MyHypot.o  build/MySin.o  build/MyCos.o  build/MyTan.o   build/MyAsin.o   build/MyAcos.o  build/MyAtan.o   build/MyAtan2.o     build/MyCeil.o  build/MyFloor.o   build/MyTrunc.o  build/MyRound.o
 
 	@echo -e "\n----------------------------------------------------------------------------------------------------"
 	g++    $(LINK_OPT)    -o    build/arithMetic    build/*.o
@@ -31,7 +31,7 @@ build/arithMetic:build/arithMetic.o build/buff.o build/enumUtil.o build/keywordL
 	@echo "----------------------------------------------------------------------------------------------------"
 
 
-build/arithMetic.o:arithMetic.cpp core/commonEnum.h core/myException.h core/buff.h core/globalDirector.h core/cmdOptions.h  core/token/tokenMgr.h  core/variblePool/variblePool.h  core/util/dataTypeUtil.h  
+build/arithMetic.o:arithMetic.cpp core/commonEnum.h core/myException.h core/buff.h core/globalDirector.h core/cmdOptions.h  core/token/tokenMgr.h   core/token/expEvaluation.h   core/functionPool/functionMgr.h    core/variblePool/variblePool.h  core/util/dataTypeUtil.h  
 	g++    $(COMPILE_OPT)  -o  build/arithMetic.o   arithMetic.cpp
 
 
@@ -71,12 +71,15 @@ build/globalDirector.o:core/globalDirector.cpp  core/globalDirector.h   core/par
 ####################################################################################################
 ####################################################################################################
 ####################################################################################################
-build/tokenBase.o:core/token/tokenBase.cpp core/token/tokenBase.h core/commonEnum.h core/util/keywordList.h core/myException.h core/buff.h core/dataValue.h  core/util/charUtil.h  core/util/stringNumber.h
+build/tokenBase.o:core/token/tokenBase.cpp core/token/tokenBase.h core/commonEnum.h core/util/keywordList.h core/myException.h core/buff.h core/dataValue.h  core/util/charUtil.h  core/util/stringNumber.h  core/functionPool/functionBase.h 
 	g++    $(COMPILE_OPT)  -o  build/tokenBase.o    core/token/tokenBase.cpp
 
-build/tokenMgr.o:core/token/tokenMgr.cpp  core/token/tokenMgr.h core/token/tokenBase.h core/myException.h   core/variblePool/variblePool.h core/util/opUtil.h core/util/dataTypeUtil.h core/cmdOptions.h   core/util/charUtil.h
+build/tokenMgr.o:core/token/tokenMgr.cpp  core/token/tokenMgr.h core/token/tokenBase.h core/myException.h   core/variblePool/variblePool.h core/util/opUtil.h core/util/dataTypeUtil.h core/cmdOptions.h   core/util/charUtil.h   core/token/expEvaluation.h
 	g++    $(COMPILE_OPT)  -o  build/tokenMgr.o   core/token/tokenMgr.cpp
 
+
+build/expEvaluation.o:core/token/expEvaluation.cpp  core/token/expEvaluation.h   core/token/tokenBase.h  core/commonEnum.h core/variblePool/variblePool.h core/cmdOptions.h core/util/charUtil.h  core/util/opUtil.h  core/myException.h  core/functionPool/functionMgr.h   core/functionPool/functionBase.h   core/util/dataTypeUtil.h   core/util/enumUtil.h
+	g++    $(COMPILE_OPT)  -o  build/expEvaluation.o   core/token/expEvaluation.cpp
 
 
 ####################################################################################################
@@ -123,19 +126,19 @@ build/functionMgr.o:core/functionPool/functionMgr.cpp  core/functionPool/functio
 ##################################################
 #  abs / fmod / remainder / fmin / fmax  
 ##################################################
-build/MyAbs.o:core/functionPool/basic/MyAbs.cpp   core/functionPool/basic/MyAbs.h   core/functionPool/functionBase.h
+build/MyAbs.o:core/functionPool/basic/MyAbs.cpp   core/functionPool/basic/MyAbs.h   core/functionPool/functionBase.h    core/functionPool/functionMgr.h    core/token/expEvaluation.h 
 	g++    $(COMPILE_OPT)  -o  build/MyAbs.o    core/functionPool/basic/MyAbs.cpp
 
-build/MyFmod.o:core/functionPool/basic/MyFmod.cpp   core/functionPool/basic/MyFmod.h   core/functionPool/functionBase.h 
+build/MyFmod.o:core/functionPool/basic/MyFmod.cpp   core/functionPool/basic/MyFmod.h   core/functionPool/functionBase.h    core/functionPool/functionMgr.h    core/token/expEvaluation.h  
 	g++    $(COMPILE_OPT)  -o  build/MyFmod.o    core/functionPool/basic/MyFmod.cpp
 
-build/MyRemainder.o:core/functionPool/basic/MyRemainder.cpp   core/functionPool/basic/MyRemainder.h   core/functionPool/functionBase.h 
+build/MyRemainder.o:core/functionPool/basic/MyRemainder.cpp   core/functionPool/basic/MyRemainder.h   core/functionPool/functionBase.h     core/functionPool/functionMgr.h    core/token/expEvaluation.h 
 	g++    $(COMPILE_OPT)  -o  build/MyRemainder.o    core/functionPool/basic/MyRemainder.cpp
 
-build/MyFmin.o:core/functionPool/basic/MyFmin.cpp   core/functionPool/basic/MyFmin.h   core/functionPool/functionBase.h 
+build/MyFmin.o:core/functionPool/basic/MyFmin.cpp   core/functionPool/basic/MyFmin.h   core/functionPool/functionBase.h     core/functionPool/functionMgr.h    core/token/expEvaluation.h 
 	g++    $(COMPILE_OPT)  -o  build/MyFmin.o    core/functionPool/basic/MyFmin.cpp
 
-build/MyFmax.o:core/functionPool/basic/MyFmax.cpp   core/functionPool/basic/MyFmax.h   core/functionPool/functionBase.h 
+build/MyFmax.o:core/functionPool/basic/MyFmax.cpp   core/functionPool/basic/MyFmax.h   core/functionPool/functionBase.h     core/functionPool/functionMgr.h    core/token/expEvaluation.h 
 	g++    $(COMPILE_OPT)  -o  build/MyFmax.o    core/functionPool/basic/MyFmax.cpp
 
 
@@ -145,19 +148,19 @@ build/MyFmax.o:core/functionPool/basic/MyFmax.cpp   core/functionPool/basic/MyFm
 ##################################################
 #  exp / log 
 ##################################################
-build/MyExp.o:core/functionPool/explog/MyExp.cpp   core/functionPool/explog/MyExp.h   core/functionPool/functionBase.h
+build/MyExp.o:core/functionPool/explog/MyExp.cpp   core/functionPool/explog/MyExp.h   core/functionPool/functionBase.h       core/functionPool/functionMgr.h    core/token/expEvaluation.h 
 	g++    $(COMPILE_OPT)  -o  build/MyExp.o    core/functionPool/explog/MyExp.cpp
 
-build/MyExp2.o:core/functionPool/explog/MyExp2.cpp   core/functionPool/explog/MyExp2.h   core/functionPool/functionBase.h
+build/MyExp2.o:core/functionPool/explog/MyExp2.cpp   core/functionPool/explog/MyExp2.h   core/functionPool/functionBase.h     core/functionPool/functionMgr.h    core/token/expEvaluation.h 
 	g++    $(COMPILE_OPT)  -o  build/MyExp2.o    core/functionPool/explog/MyExp2.cpp
 
-build/MyLog.o:core/functionPool/explog/MyLog.cpp   core/functionPool/explog/MyLog.h   core/functionPool/functionBase.h 
+build/MyLog.o:core/functionPool/explog/MyLog.cpp   core/functionPool/explog/MyLog.h   core/functionPool/functionBase.h        core/functionPool/functionMgr.h    core/token/expEvaluation.h 
 	g++    $(COMPILE_OPT)  -o  build/MyLog.o    core/functionPool/explog/MyLog.cpp
 
-build/MyLog2.o:core/functionPool/explog/MyLog2.cpp   core/functionPool/explog/MyLog2.h   core/functionPool/functionBase.h  
+build/MyLog2.o:core/functionPool/explog/MyLog2.cpp   core/functionPool/explog/MyLog2.h   core/functionPool/functionBase.h      core/functionPool/functionMgr.h    core/token/expEvaluation.h 
 	g++    $(COMPILE_OPT)  -o  build/MyLog2.o    core/functionPool/explog/MyLog2.cpp
 
-build/MyLog10.o:core/functionPool/explog/MyLog10.cpp   core/functionPool/explog/MyLog10.h   core/functionPool/functionBase.h  
+build/MyLog10.o:core/functionPool/explog/MyLog10.cpp   core/functionPool/explog/MyLog10.h   core/functionPool/functionBase.h    core/functionPool/functionMgr.h    core/token/expEvaluation.h 
 	g++    $(COMPILE_OPT)  -o  build/MyLog10.o    core/functionPool/explog/MyLog10.cpp
 
 
@@ -165,16 +168,16 @@ build/MyLog10.o:core/functionPool/explog/MyLog10.cpp   core/functionPool/explog/
 ##################################################
 #  Pow / Sqrt / cbrt 
 ##################################################
-build/MyPow.o:core/functionPool/powSqrt/MyPow.cpp   core/functionPool/powSqrt/MyPow.h   core/functionPool/functionBase.h  
+build/MyPow.o:core/functionPool/powSqrt/MyPow.cpp   core/functionPool/powSqrt/MyPow.h   core/functionPool/functionBase.h        core/functionPool/functionMgr.h    core/token/expEvaluation.h 
 	g++    $(COMPILE_OPT)  -o  build/MyPow.o    core/functionPool/powSqrt/MyPow.cpp
 
-build/MySqrt.o:core/functionPool/powSqrt/MySqrt.cpp   core/functionPool/powSqrt/MySqrt.h   core/functionPool/functionBase.h  
+build/MySqrt.o:core/functionPool/powSqrt/MySqrt.cpp   core/functionPool/powSqrt/MySqrt.h   core/functionPool/functionBase.h      core/functionPool/functionMgr.h    core/token/expEvaluation.h 
 	g++    $(COMPILE_OPT)  -o  build/MySqrt.o    core/functionPool/powSqrt/MySqrt.cpp
 
-build/MyCbrt.o:core/functionPool/powSqrt/MyCbrt.cpp   core/functionPool/powSqrt/MyCbrt.h   core/functionPool/functionBase.h    
+build/MyCbrt.o:core/functionPool/powSqrt/MyCbrt.cpp   core/functionPool/powSqrt/MyCbrt.h   core/functionPool/functionBase.h      core/functionPool/functionMgr.h    core/token/expEvaluation.h 
 	g++    $(COMPILE_OPT)  -o  build/MyCbrt.o    core/functionPool/powSqrt/MyCbrt.cpp
 
-build/MyHypot.o:core/functionPool/powSqrt/MyHypot.cpp   core/functionPool/powSqrt/MyHypot.h   core/functionPool/functionBase.h      
+build/MyHypot.o:core/functionPool/powSqrt/MyHypot.cpp   core/functionPool/powSqrt/MyHypot.h   core/functionPool/functionBase.h   core/functionPool/functionMgr.h    core/token/expEvaluation.h 
 	g++    $(COMPILE_OPT)  -o  build/MyHypot.o    core/functionPool/powSqrt/MyHypot.cpp
 
 
@@ -183,29 +186,29 @@ build/MyHypot.o:core/functionPool/powSqrt/MyHypot.cpp   core/functionPool/powSqr
 ##################################################
 #  sin / cos / tan / asin / acos / atan / atan2 
 ##################################################
-build/MySin.o:core/functionPool/trigonometric/MySin.cpp   core/functionPool/trigonometric/MySin.h   core/functionPool/functionBase.h  
+build/MySin.o:core/functionPool/trigonometric/MySin.cpp   core/functionPool/trigonometric/MySin.h   core/functionPool/functionBase.h    core/functionPool/functionMgr.h    core/token/expEvaluation.h   
 	g++    $(COMPILE_OPT)  -o  build/MySin.o    core/functionPool/trigonometric/MySin.cpp
 
-build/MyCos.o:core/functionPool/trigonometric/MyCos.cpp   core/functionPool/trigonometric/MyCos.h   core/functionPool/functionBase.h  
+build/MyCos.o:core/functionPool/trigonometric/MyCos.cpp   core/functionPool/trigonometric/MyCos.h   core/functionPool/functionBase.h    core/functionPool/functionMgr.h    core/token/expEvaluation.h   
 	g++    $(COMPILE_OPT)  -o  build/MyCos.o    core/functionPool/trigonometric/MyCos.cpp
 
 
-build/MyTan.o:core/functionPool/trigonometric/MyTan.cpp   core/functionPool/trigonometric/MyTan.h   core/functionPool/functionBase.h  
+build/MyTan.o:core/functionPool/trigonometric/MyTan.cpp   core/functionPool/trigonometric/MyTan.h   core/functionPool/functionBase.h    core/functionPool/functionMgr.h    core/token/expEvaluation.h   
 	g++    $(COMPILE_OPT)  -o  build/MyTan.o    core/functionPool/trigonometric/MyTan.cpp
 	
 
-build/MyAsin.o:core/functionPool/trigonometric/MyAsin.cpp   core/functionPool/trigonometric/MyAsin.h   core/functionPool/functionBase.h  
+build/MyAsin.o:core/functionPool/trigonometric/MyAsin.cpp   core/functionPool/trigonometric/MyAsin.h   core/functionPool/functionBase.h    core/functionPool/functionMgr.h    core/token/expEvaluation.h   
 	g++    $(COMPILE_OPT)  -o  build/MyAsin.o    core/functionPool/trigonometric/MyAsin.cpp
 
 
-build/MyAcos.o:core/functionPool/trigonometric/MyAcos.cpp   core/functionPool/trigonometric/MyAcos.h   core/functionPool/functionBase.h  
+build/MyAcos.o:core/functionPool/trigonometric/MyAcos.cpp   core/functionPool/trigonometric/MyAcos.h   core/functionPool/functionBase.h    core/functionPool/functionMgr.h    core/token/expEvaluation.h   
 	g++    $(COMPILE_OPT)  -o  build/MyAcos.o    core/functionPool/trigonometric/MyAcos.cpp
 
 
-build/MyAtan.o:core/functionPool/trigonometric/MyAtan.cpp   core/functionPool/trigonometric/MyAtan.h   core/functionPool/functionBase.h  
+build/MyAtan.o:core/functionPool/trigonometric/MyAtan.cpp   core/functionPool/trigonometric/MyAtan.h   core/functionPool/functionBase.h    core/functionPool/functionMgr.h    core/token/expEvaluation.h   
 	g++    $(COMPILE_OPT)  -o  build/MyAtan.o    core/functionPool/trigonometric/MyAtan.cpp
 
-build/MyAtan2.o:core/functionPool/trigonometric/MyAtan2.cpp   core/functionPool/trigonometric/MyAtan2.h   core/functionPool/functionBase.h  
+build/MyAtan2.o:core/functionPool/trigonometric/MyAtan2.cpp   core/functionPool/trigonometric/MyAtan2.h   core/functionPool/functionBase.h    core/functionPool/functionMgr.h    core/token/expEvaluation.h   
 	g++    $(COMPILE_OPT)  -o  build/MyAtan2.o    core/functionPool/trigonometric/MyAtan2.cpp
 
 
@@ -215,16 +218,16 @@ build/MyAtan2.o:core/functionPool/trigonometric/MyAtan2.cpp   core/functionPool/
 ##################################################
 #  ceil / floor / trunc / round
 ##################################################
-build/MyCeil.o:core/functionPool/nearest/MyCeil.cpp   core/functionPool/nearest/MyCeil.h   core/functionPool/functionBase.h  
+build/MyCeil.o:core/functionPool/nearest/MyCeil.cpp   core/functionPool/nearest/MyCeil.h   core/functionPool/functionBase.h    core/functionPool/functionMgr.h    core/token/expEvaluation.h   
 	g++    $(COMPILE_OPT)  -o  build/MyCeil.o    core/functionPool/nearest/MyCeil.cpp
 
-build/MyFloor.o:core/functionPool/nearest/MyFloor.cpp   core/functionPool/nearest/MyFloor.h   core/functionPool/functionBase.h     
+build/MyFloor.o:core/functionPool/nearest/MyFloor.cpp   core/functionPool/nearest/MyFloor.h   core/functionPool/functionBase.h    core/functionPool/functionMgr.h    core/token/expEvaluation.h      
 	g++    $(COMPILE_OPT)  -o  build/MyFloor.o    core/functionPool/nearest/MyFloor.cpp
 
-build/MyTrunc.o:core/functionPool/nearest/MyTrunc.cpp   core/functionPool/nearest/MyTrunc.h   core/functionPool/functionBase.h    
+build/MyTrunc.o:core/functionPool/nearest/MyTrunc.cpp   core/functionPool/nearest/MyTrunc.h   core/functionPool/functionBase.h    core/functionPool/functionMgr.h    core/token/expEvaluation.h     
 	g++    $(COMPILE_OPT)  -o  build/MyTrunc.o    core/functionPool/nearest/MyTrunc.cpp
 
-build/MyRound.o:core/functionPool/nearest/MyRound.cpp   core/functionPool/nearest/MyRound.h   core/functionPool/functionBase.h  
+build/MyRound.o:core/functionPool/nearest/MyRound.cpp   core/functionPool/nearest/MyRound.h   core/functionPool/functionBase.h    core/functionPool/functionMgr.h    core/token/expEvaluation.h   
 	g++    $(COMPILE_OPT)  -o  build/MyRound.o    core/functionPool/nearest/MyRound.cpp
 
 

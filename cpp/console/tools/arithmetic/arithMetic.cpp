@@ -17,6 +17,8 @@
 #include "cmdOptions.h"
 #include "variblePool.h"
 #include "dataTypeUtil.h"
+#include "functionMgr.h"
+#include "expEvaluation.h"
 
 using namespace std;
 
@@ -224,6 +226,8 @@ int main(int argc, char* argv[], char* env[])
     DataTypeUtil::init();
     VariblePool::init();
     TokenMgr::init();
+    FunctionMgr::init();
+    ExpEvaluation::init();
 
     // if ( !DataTypeUtil::testCase() ) {
     //     cout << "testCase Failed" << endl;
@@ -264,6 +268,8 @@ int main(int argc, char* argv[], char* env[])
         cout << "[ERROR] : Meet an unexpection exception : " << endl;
     }
 
+    ExpEvaluation::release();
+    FunctionMgr::finalize();
     TokenMgr::release();
     VariblePool::finalize();
     DataTypeUtil::finalize();

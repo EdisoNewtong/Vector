@@ -66,11 +66,14 @@ unordered_map<MyException::ErrorType,string>    MyException::s_exceptionMap{
     { enumCvt(E_THROW_SENTENCE_TPYE_IS_UNDETERMINDED),                   "Sentence type is undeterminded " },
 
     { enumCvt(E_THROW_NO_MATCHED_OPEN_PARENTHESIS),                      "Sentence no matched '(' while pushing   ')' " },
+    { enumCvt(E_THROW_NO_MATCHED_CLOSE_PARENTHESIS),                     "Sentence no matched ')' while building suffix expression. " },
     { enumCvt(E_THROW_CANNOT_PUSH_TOKEN_KEYWORD),                        "Keyword can't existed after '=' " },
 
 
     { enumCvt(E_THROW_SUFFIXEXPR_BINARY_OP_MISS_TWO_OPERANDS),           "Suffix-Expression miss 2 operands while processing binary operator " },
     { enumCvt(E_THROW_SUFFIXEXPR_UNARY_OP_MISS_ONE_OPERAND),             "Suffix-Expression miss 1 operand  while processing unary operator " },
+    { enumCvt(E_THROW_SUFFIXEXPR_FINAL_EVALUATE_MUST_LEAVE_ONLY_ONE_ELEMENT),   "Suffix-Expression's final size must be only one. " },
+
     { enumCvt(E_THROW_DIVIDE_ZERO),                                      "Interger operator : divide by Zero " },
     { enumCvt(E_THROW_MODULO_ZERO),                                      "Interger operator : modulo by Zero " },
 
@@ -97,10 +100,17 @@ unordered_map<MyException::ErrorType,string>    MyException::s_exceptionMap{
     { enumCvt(E_THROW_TOO_MANY_KEYWORDS),                                   "The keywords' count is exceeded the limit.  " },
     { enumCvt(E_THROW_SENTENCE_DEFINITION_HAS_MISSED_AN_ASSIGNMENT_OPERATOR),  "The sentence defination has missed an assignment operator. " },
 
-    { enumCvt(E_THROW_CALL_FUNCTION_TOO_MANY_ARGUMENTS),                      "No matched function prototype , more arguments is given. "    },
+    { enumCvt(E_THROW_FUNCTION_OBJECT_IS_NULLPTR),                            "Function object is a nullptr pointer. "    },
+    { enumCvt(E_THROW_CALL_FUNCTION_TOO_MANY_ARGUMENTS),                      "No matched function prototype , too many arguments is given. "    },
     { enumCvt(E_THROW_CALL_FUNCTION_TOO_LITTLE_ARGUMENTS),                    "No matched function prototype , more arguments is required. " },
     { enumCvt(E_THROW_PARSE_FUNCTION_PUSH_TOO_MANY_ARGUMENTS),                "During token parsing , too many arugments will be pushed to arguments. " },
-    { enumCvt(E_THROW_CANNOT_DEFINE_A_VARIBLE_WITH_THE_SAME_NAME_OF_BUILT_IN_FUNCTION), "Can't define a varible with the same name of built-in function. " }
+    { enumCvt(E_THROW_UNKNOWN_BUILT_IN_FUNCTION_NAME),                        "Unknown built-in function name. " },
+    { enumCvt(E_THROW_EMPTY_CONTENT_INSIDE_PARENTHESIS_PAIR_IS_NOT_ALLOWED),  "empty content inside none function version '()' pair is not allowed.  " },
+    { enumCvt(E_THROW_CANNOT_DEFINE_A_VARIBLE_WITH_THE_SAME_NAME_OF_BUILT_IN_FUNCTION), "Can't define a varible with the same name of built-in function. " },
+    { enumCvt(E_THROW_FUNCTION_ARGUMENT_CANNOT_BE_EMPTY_WHEN_MEET_COMMA),               "one function argument expression can't be empty when meet   ',' . " },
+    { enumCvt(E_THROW_FUNCTION_IS_NOT_VALID_BY_MISSING_CLOSE_PARENTHESIS),               "the function is not valid because of missing a ')' . " },
+
+    { enumCvt(E_THROW_CALL_STACK_SHOULD_NEVER_BE_EMPTY) , "Call Stack should never be empty. " }
 };
 
 

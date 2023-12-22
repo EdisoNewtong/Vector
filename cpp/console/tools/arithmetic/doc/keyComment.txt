@@ -28,8 +28,8 @@ The evaluated value must be different from each other.
 
 	     int add(int n1, int n2) { return n1+n2; }
 
-	    C  Calling Conventsion  : add( a, a = 10);  =>   n1 <-  1,  n2 = 10 ,  return  1+10; return 11;
-	      Std-Call Conventsion  : add( a, a = 10);  =>   n1 <- 10,  n2 = 10 ,  return 10+10; return 20;
+	    C  Calling Conventsion  : add( a, a = 10);  =>   n1 <-  1,  n2 = 10 , calling add(1 ,10);  return  1+10; return 11;
+	      Std-Call Conventsion  : add( a, a = 10);  =>   n1 <- 10,  n2 = 10 , calling add(10,10);  return 10+10; return 20;
 
 	****************************************************/
 
@@ -40,13 +40,19 @@ The evaluated value must be different from each other.
 	 int a = 0;
 	 a = funcAdd(3,4);
 
-Suffix Expression will be generated as the following :
+Suffix Expression will be generated as the following ( The final suffix expression must contain neither the function arguments nor the open-close parenthesis pair which promote the operator's precess precedence ) :
+########################################################################################################################################################################################################
+#
+# The final suffix expression must contain neither the function arguments nor the open-close parenthesis pair which promote the operator's precess precedence 
+# ( In the other word, the function arguments should push into the member data of the function object. )
+#
+########################################################################################################################################################################################################
 					|   a   |   funcAdd   |   =   |
 
 ********************************************************************************************************************************************************************************************************
-1.	The argument seperator operator ',' mustn't be appeared inside the final suffix expression
-2.	The function arguments should be pushed to an argument list of a function object named "funcAdd"
-3.  But the operator ',' who play the role of comma expression's seperator  can be existed inside the final suffix expression
+1.	The argument seperator operator ',' mustn't be append inside the final suffix expression
+2.	The function arguments should be pushed to an argument list of a function object whose name is "funcAdd" rather than the final suffix expression
+3.  But the operator ',' who play the role of comma expression's operator can be existed inside the final suffix expression , such as  a=3,b,c; ( it will yield a = 3, 'b' and 'c' keep its original value )
 
 ( e.g.
 
@@ -94,6 +100,27 @@ Core Core Core :
     So from the previous example , you may be awared that the '(' play a critical role during the expression evaluation phase . 
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+
+
+5. The code struct must be refactored because the evaluation part should be used not only in normal expression but also in function's argument .
+   e.g.
+        
+        /*
+            Here . 
+                   1. aSum = ( aShipment + aPrice * aCount )                                           is a tmp expression that need to be evaluate before the function call 
+                   2. bSum = ( bPrice * bCount >= 100 ? (bPrice * bCount - 15) : bPrice * bCount )     is a tmp expression that need to be evaluate before the function call 
+        */
+
+        int sumOf_a_b = add( aShipment + aPrice * aCount , bPrice * bCount >= 100 ? (bPrice * bCount - 15) : bPrice * bCount );
+
+    ************************************************************************************************************************ 
+
+          So evaluation module should be abstracted as a new class to meet the frequency amount of evaluation tasks *****
+          Rather than put all the logic into the token manager ( class tokenMgr )
+
+    ************************************************************************************************************************ 
 
 
 
@@ -327,3 +354,6 @@ round(...)
     long long llround ( long double arg );
     long long llroundl( long double arg );
     long long llround ( IntegralType arg );
+
+
+

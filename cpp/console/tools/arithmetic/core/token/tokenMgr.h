@@ -44,7 +44,8 @@ public:
     static void release();
     static TokenMgr* getInstance();
 
-
+    static void setUnInitializedVaribleAsError(bool flag);
+    static void setNeedTreatBlankStatementAsWarning(bool flag);
 public:
     // Core Core Core : Key Logic
     void pushToken(TokenBase* pToken);
@@ -53,8 +54,6 @@ public:
     // Scan all token inside the whole list, and decide whether it is full of comment(s) or blank(s)
     bool isAllTokensTrivial();
 
-    static void setUnInitializedVaribleAsError(bool flag);
-    static void setNeedTreatBlankStatementAsWarning(bool flag);
 protected:
     TokenMgr();
     virtual ~TokenMgr();
@@ -63,23 +62,25 @@ protected:
     static bool isIgnoredType(TokenBase* pToken);
 
     bool hasPreviousExistOpenParenthesis();
-    std::pair<bool,TokenBase*>        checkAdjacentTokensRelationship_IsValid(TokenBase* toBePushed, int &iSpecialFlag);
+    std::pair<bool,TokenBase*>        checkAdjacentTokensRelationship_IsValid(TokenBase* toBePushed);
     std::pair<TokenBase*,TokenBase*>  getPreviousToken();
 
     bool process_SemicolonWithPriorToken(TokenBase* toBePushed, TokenBase* priorToken);
     bool process_SequenceWithPriorToken(TokenBase* toBePushed, TokenBase* priorToken);
-    bool process_OperatorWithPriorToken(TokenBase* toBePushed, TokenBase* priorToken, TokenBase* priorClosestToken, int &iSpecialFlag);
+    bool process_OperatorWithPriorToken(TokenBase* toBePushed, TokenBase* priorToken, TokenBase* priorClosestToken);
 
-	void processPreviousFunctionRelated_IfNecessary(TokenBase* pFunctObj, int iFlag);
-	void processParenthesisOrCommaFlag_IfNecessary(TokenBase* pTokenToBePushed, int iFlag);
+    // void processPreviousFunctionRelated_IfNecessary(TokenBase* pFunctObj);
+    void processParenthesisOrCommaFlag_IfNecessary(TokenBase* pTokenToBePushed, int tokenIndex, int iFlag);
 
-	void allocNewArgumentExpr();
+    void allocNewArgumentExpr();
 
     // for tmp expression check use
     bool is1stTokenTypeKeyWord();
 
     E_DataType checkPrefixKeyWordsAndGetDataType(int varIdx, std::string& varname, bool hasEqual);
     void executeCode();
+
+    void executeCode_New();
 
     /********************
      * Core Core Core   *
@@ -159,7 +160,7 @@ protected:
 
     void traceBlankStatement();
 
-	void clearOneArgumentsPool();
+    void clearOneArgumentsPool();
 protected:
     static TokenMgr* s_gInstance;
 
@@ -174,35 +175,40 @@ protected:
 
 protected:
     std::vector<TokenBase*> m_allTokenList;    // for memory pool manager
-    std::vector<TokenBase*> m_validTokenList;  // a list for all tokens that is neither comment nor blank ( arbitary <Space> or <Tab> ) contains ';'  ,  So the list can analyze the 2 adjacent statements' relationship.
+    std::vector<TokenBase*> m_validTokenList;  // a list for only 1 statement end up with ';' with all tokens that is neither comment nor blank ( arbitary <Space> or <Tab> )  ,  So the list can analyze the 2 adjacent statements' relationship.
     std::vector<TokenBase*> m_oneSentence;     // a list for only 1 statement with neither comment nor blank and whose delimiter is ';'
 
     // std::stack<TokenBase*>  m_opertorStack;
     std::list<TokenBase*>   m_opertorStack;
     std::list<TokenBase*>   m_suffixExpression; // Core : the main suffix expressions only contain a function object's name without  any function arugments , and it can only caotain the comma ',' which plays a role of comma expression seperator ( seperate two token for evaluattion   rather than function arguments seperator ):
 
+
     //////////////////////////////////////////////////////////////////////
     //
     // Function related data members
     //
     //////////////////////////////////////////////////////////////////////
-	
-	std::list<TokenBase*>                   m_callstackFuncList;
-	/**************************************************
 
-	  e.g.   
-          expr : sin(  1+ sin(30 + sin(45) ) )
-	
-		  there is a layer conception inside  argument parsing
+    std::list<TokenBase*>                   m_callstackFuncList;
+    /**************************************************
 
-		  1.     1 +                 ==>   1 +  sin( 30 + sin(45) )
-		    2.     30 +             ==>   30 + sin(45) 
-			   3.      45 <Done>
+      e.g.   
+          expr : sin(  1 + sin(30 + sin(45) ) )
 
-	***************************************************/
-	std::list< std::list<TokenBase*>* >     m_oneArgumentForACertainFunc;
+          there is a layer conception inside  argument parsing
 
-	std::list<TokenBase*>                   m_openParenthesisList;
+                 1.     1 +                 ==>   1 +  sin( 30 + sin(45) )
+             (sin) 2.     30 +              ==>   30 + sin(45) ( pop | sin(30 + sin(45) |      to  layer-1 )
+               (sin) 3.      45 <Done>      _________| ( pop | sin(45) |      to layer-2 )
+
+    ***************************************************/
+    std::list< std::list<TokenBase*>* >     m_oneArgument4ACertainFunc;
+    std::list< std::pair<TokenBase*,int> >  m_openParenthesisList;
+
+	// the following 2 list will not treat as one part of (m_opertorStack, m_suffixExpression) 
+    std::list<TokenBase*>                   m_opertorStack4OneArgument;
+	std::list<TokenBase*>                   m_suffixExpression4OneArgument;
+
 
     int m_execodeIdx;
 

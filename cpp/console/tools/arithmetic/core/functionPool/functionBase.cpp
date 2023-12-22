@@ -1,4 +1,3 @@
-
 #include "functionBase.h"
 #include "tokenBase.h"
 
@@ -8,6 +7,7 @@
 FunctionBase::FunctionBase() 
     : m_funcName("???")
     , m_argumentList()
+    , m_hasEndCloseParenthesis( false )
 {
 
 }
@@ -65,3 +65,18 @@ void FunctionBase::pushOneArgumentExpr( const std::list<TokenBase*>& oneArgument
 
 	m_argumentList.push_back( oneArgumentExpr );
 }
+
+
+
+void FunctionBase::setCloseParenthesisValidFlag()
+{
+    preCheckArgCount( true );
+	m_hasEndCloseParenthesis = true;
+}
+
+
+bool FunctionBase::isFunctionEndupValid()
+{
+	return m_hasEndCloseParenthesis;
+}
+

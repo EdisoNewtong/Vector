@@ -1,11 +1,11 @@
 #ifndef FUNCTION_BASE_H
 #define FUNCTION_BASE_H
 
+
 class TokenBase;
 
 #include <string>
 #include <list>
-
 
 class FunctionBase
 {
@@ -38,6 +38,8 @@ public:
 
     TokenBase* executeFunction( );
     bool       preCheckArgCount(bool needThrow);
+    void       setCloseParenthesisValidFlag();
+	bool       isFunctionEndupValid();
 
 protected:
     virtual TokenBase* doCall() = 0;
@@ -46,6 +48,8 @@ protected:
 protected:
     std::string m_funcName;
 	std::list< std::list<TokenBase*> > m_argumentList;
+
+    bool m_hasEndCloseParenthesis; // a valid function must contain a pair of ( )
 };
 
 #endif

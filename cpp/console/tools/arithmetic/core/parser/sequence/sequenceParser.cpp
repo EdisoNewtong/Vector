@@ -1503,6 +1503,7 @@ TokenBase* SequenceParser::generateToken() // override;
         {
             pGenToken = new TokenBase( E_TP_UNKNOWN );
             if ( KeyWordList::isKeyWord( m_parsedSeq) ) {
+                // not the compiler only support the 'Type' keyword
                 if ( !KeyWordList::isTypeKeyWord( m_parsedSeq ) ) {  // such as    int / short / char / long / float / double 
                     MyException e(E_THROW_VARIBLE_CANNOT_BE_KEYWORD );
                     e.setDetail( surroundDoubleQuoto(m_parsedSeq) + string(" @") + m_beginChPos.getPos(0) );

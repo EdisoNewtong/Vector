@@ -16,10 +16,12 @@ TokenBase::TokenBase(E_TokenType tp)
     , m_expTypeFlag(0U)
 	, m_opFlag( E_OP_FLAG_UNKNOWN )
     , m_token_content()
+    , m_token_build_exp()
     , m_beginPos()
     , m_endPos()
     , m_dataValue()
     , m_warningContent()
+    , m_funcObject( nullptr )
 {
     m_dataValue.type = E_TP_UNKNOWN;
 }
@@ -32,9 +34,11 @@ TokenBase::TokenBase(E_DataType dt)
     , m_expTypeFlag(0U)
 	, m_opFlag( E_OP_FLAG_UNKNOWN )
     , m_token_content()
+    , m_token_build_exp()
     , m_beginPos()
     , m_endPos()
     , m_dataValue()
+    , m_funcObject( nullptr )
 {
     m_dataValue.type = dt;
 }
@@ -98,6 +102,18 @@ void TokenBase::setTokenContent(const string& content)
 {
     m_token_content = content;
 }
+
+
+void TokenBase::setGeneratedExp(const std::string& exp)
+{
+    m_token_build_exp = exp;
+}
+
+string TokenBase::getGeneratedExp()
+{
+    return m_token_build_exp;
+}
+
 
 
 void TokenBase::setTokenContentWithoutSuffix(const std::string& content, const std::string& noSuffix)
@@ -441,12 +457,12 @@ string    TokenBase::getWarningContent()
 
 
 
-void  TokenBase::setContextRoleForOp(const E_OpAnotherFlag& flag)
+void  TokenBase::setContextRoleForOp(const E_OpAnotherRoleFlag& flag)
 {
 	m_opFlag = flag;
 }
 
-E_OpAnotherFlag  TokenBase::getContextRoleForOp()
+E_OpAnotherRoleFlag  TokenBase::getContextRoleForOp()
 {
 	return m_opFlag;
 }
@@ -457,8 +473,15 @@ bool	TokenBase::isFunction()
 	return m_expTypeFlag == 0x80;
 }
 
-void    TokenBase::setAsFunction()
+void    TokenBase::setAsFunction(FunctionBase* pFunc)
 {
 	m_expTypeFlag = 0x80;
+    m_funcObject = pFunc;
 }
+
+FunctionBase*  TokenBase::getFuncObject()
+{
+    return m_funcObject;
+}
+
 

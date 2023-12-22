@@ -4,6 +4,7 @@
 #include "opUtil.h"
 #include "cmdOptions.h"
 #include "charUtil.h"
+#include "expEvaluation.h"
 #include <iterator>
 #include <iostream>
 using namespace std;
@@ -17,7 +18,7 @@ using namespace std;
 TokenMgr* TokenMgr::s_gInstance = nullptr;
 
 const TokenMgr::OpPairCfg TokenMgr::s_OpPairCfgTable[OPERATOR_CNT][OPERATOR_CNT] = {
-    {   //  E_ADD
+    {   //  E_ADD   closeAdjacent  ,  seperate with <Space> / tab 
          TokenMgr::OpPairCfg( false, true ),      // +  + 
          TokenMgr::OpPairCfg( true, true ),       // +  - 
          TokenMgr::OpPairCfg( false, false ),     // +  * 
@@ -327,7 +328,7 @@ const TokenMgr::OpPairCfg TokenMgr::s_OpPairCfgTable[OPERATOR_CNT][OPERATOR_CNT]
         TokenMgr::OpPairCfg( false, false ),     // (  << 
         TokenMgr::OpPairCfg( false, false ),     // (  >> 
         TokenMgr::OpPairCfg( true, true ),       // (  ( 
-        TokenMgr::OpPairCfg( false, false ),     // (  )   // if function feature is implemented , set false,false  ==>  true, true
+        TokenMgr::OpPairCfg( true, true ),       // (  )   // if function feature is implemented , set false,false  ==>  true, true
         TokenMgr::OpPairCfg( false, false ),     // (  = 
         TokenMgr::OpPairCfg( false, false ),     // (  += 
         TokenMgr::OpPairCfg( false, false ),     // (  -= 
@@ -339,7 +340,7 @@ const TokenMgr::OpPairCfg TokenMgr::s_OpPairCfgTable[OPERATOR_CNT][OPERATOR_CNT]
         TokenMgr::OpPairCfg( false, false ),     // (  ^= 
         TokenMgr::OpPairCfg( false, false ),     // (  <<= 
         TokenMgr::OpPairCfg( false, false ),     // (  >>= 
-        TokenMgr::OpPairCfg( false, false )      //  (  ,
+        TokenMgr::OpPairCfg( false, false )      // (  ,
     },
     {   //  E_CLOSE_PARENTHESIS
         TokenMgr::OpPairCfg( true, true ),     // )  + 
@@ -667,7 +668,7 @@ const TokenMgr::OpPairCfg TokenMgr::s_OpPairCfgTable[OPERATOR_CNT][OPERATOR_CNT]
         TokenMgr::OpPairCfg( false, false ),   // >>=  >>= 
         TokenMgr::OpPairCfg( false, false )    // >>= ,
     },
-	{   //  E_COMMA
+    {   //  E_COMMA
         TokenMgr::OpPairCfg( true, true ),     // ,  + 
         TokenMgr::OpPairCfg( true, true ),     // ,  - 
         TokenMgr::OpPairCfg( false, false ),   // ,  * 
@@ -801,8 +802,10 @@ TokenMgr::TokenMgr()
     , m_opertorStack()
     , m_suffixExpression()
     , m_callstackFuncList()
-    , m_oneArgumentForACertainFunc()
+    , m_oneArgument4ACertainFunc()
     , m_openParenthesisList()
+	, m_opertorStack4OneArgument()
+	, m_suffixExpression4OneArgument()
     , m_execodeIdx(0)
 {
     m_allTokenList.clear();
@@ -813,8 +816,10 @@ TokenMgr::TokenMgr()
     m_suffixExpression.clear();
 
     m_callstackFuncList.clear();
-    m_oneArgumentForACertainFunc.clear();
+    m_oneArgument4ACertainFunc.clear();
     m_openParenthesisList.clear();
+	m_opertorStack4OneArgument.clear();
+	m_suffixExpression4OneArgument.clear();
 }
 
 // virtual
@@ -838,8 +843,7 @@ TokenMgr::~TokenMgr()
 
 
     m_callstackFuncList.clear();
-	clearOneArgumentsPool();
-    m_openParenthesisList.clear();
+    clearOneArgumentsPool();
 }
 
 
@@ -851,8 +855,9 @@ void TokenMgr::pushToken(TokenBase* pToken)
 {
     using namespace charUtil;
 
+    /*
     if ( pToken == nullptr ) {
-        MyException e(E_THROW_NULL_PTR);
+        MyException e( E_THROW_NULL_PTR );
 
         string detail( __FILE__ );
         detail += (string(" TokenMgr::pushToken( nullptr ) @line : ") + to_string(__LINE__));
@@ -860,21 +865,19 @@ void TokenMgr::pushToken(TokenBase* pToken)
         e.setDetail(detail);
         throw e;
     }
+    */
 
     // ****************************************************
     // the key logic ( critical )
     // ****************************************************
-	int iSpFlag = 0;
-    auto pr = checkAdjacentTokensRelationship_IsValid(pToken, iSpFlag);
+    auto pr = checkAdjacentTokensRelationship_IsValid( pToken );
 
     //
-    // Always Push to All-Token-List ( *** Must after *** previous check adjacent two tokens' relationship ) , 
-	//
-	//     Otherwise it will result in memory leak because of neglected token to be pushed into the memory pool
+    // Always Push to All-Token-List,  No matter the relationship is valid or not  
+    //    ( *** Must after *** previous check adjacent two tokens' relationship )
+    //     Otherwise it will result in memory leak because of neglected token to be pushed into the memory pool
     //
     m_allTokenList.push_back(pToken);
-
-
 
     auto isValid = pr.first;
     if ( !isValid ) {
@@ -904,19 +907,20 @@ void TokenMgr::pushToken(TokenBase* pToken)
         throw e;
     }
 
-	processPreviousFunctionRelated_IfNecessary(pr.second , iSpFlag); // set 'func'   and '('
-	processParenthesisOrCommaFlag_IfNecessary(pToken, iSpFlag); // set '('
+    // processPreviousFunctionRelated_IfNecessary(pr.second , iSpFlag); // set 'func'   and '('
+    // treat  '('   ')'     ','
+    // processParenthesisOrCommaFlag_IfNecessary(pToken); // set '('
 
     tracePushedTokenWarning(pToken);
 
 
      /******************************************************************************************************
-	 
-	   Key Code Here :
 
-		  Only push passed token into the     "m_oneSentence"       container until meet ';'
-	   Do <Not> process operator-stack and suffix-expression during the pushing step
-	   After all pushing till meet the ';' token   then build suffix expression by the statement's type
+    Key Code Here :
+
+      Only push passed token into the     "m_oneSentence"       container until meet ';'
+    Do <Not> process operator-stack and suffix-expression during the pushing step
+    After all pushing till meet the ';' token   then build suffix expression by the statement's type
 
     *******************************************************************************************************/
     //      Skip :  Blank / Single-Comment / Multi-Comment   <===   such types can be ignored
@@ -952,19 +956,175 @@ TokenMgr::isLastValidTokenSemicolonOrEmpty()
 
 
 
+void TokenMgr::executeCode_New()
+{
+    if ( m_oneSentence.empty() ) {
+        // traceBlankStatement();
+        // clearTmpGenTokenPool();
+        return;
+    }
+
+    bool isFirstKeyWord = is1stTokenTypeKeyWord();
+    if ( isFirstKeyWord ) {
+        int sentenceLen = static_cast<int>( m_oneSentence.size() );
+        int restIdx = -1;
+        string strTypeKeyWords = m_oneSentence.front()->getTokenContent(); // set the type as the 1st token's content
+        for( auto idx = 1; idx < sentenceLen; ++idx ) {
+            auto token = m_oneSentence.at(idx);
+            if (  token!=nullptr &&  token->isKeyword()  ) {
+                strTypeKeyWords += " ";
+                strTypeKeyWords += token->getTokenContent();
+
+                if( (idx+1) > TokenMgr::s_MAX_KEYWORDS_CNT ) {
+                    MyException e(E_THROW_TOO_MANY_KEYWORDS, m_oneSentence.at(idx)->getBeginPos() );
+                    e.setDetail( strTypeKeyWords );
+                    throw e;
+                }
+            } else {
+                restIdx = idx;
+                break;
+            }
+        }
+
+
+        if ( restIdx == -1 ) {
+            MyException e(E_THROW_ALL_TOKENS_ARE_KEYWORD, m_oneSentence.back()->getBeginPos() );
+            throw e;
+        }
+
+        // get the corresponding data type
+        auto mapedDtIt = s_keywordsDataTypeMap.find(strTypeKeyWords);
+        if ( mapedDtIt == s_keywordsDataTypeMap.end() ) {
+            MyException e(E_THROW_SENTENCE_UNKNOWN_DATA_TYPE , m_oneSentence.at(restIdx-1)->getBeginPos() );
+            e.setDetail( string("\"") +  strTypeKeyWords + string("\"") );
+            throw e;
+        }
+
+
+        int openParenthesisCnt = 0;
+        std::list< pair<int,int> > varbileDefGrp;
+        varbileDefGrp.push_back( make_pair(-1, -1)  );
+
+        TokenBase* previousToken = nullptr;
+        auto meetError = false;
+        for( auto idx = restIdx; idx < sentenceLen; ++idx ) {
+            auto token = m_oneSentence.at(idx);
+            auto needAdd = true;
+            if ( token != nullptr ) {
+                if ( token->getTokenType() == E_TOKEN_OPERATOR ) {
+                    auto opType = token->getOperatorType();
+
+                    if ( opType == E_OPEN_PARENTHESIS ) {
+                        if ( previousToken!=nullptr  ) {
+                            if ( previousToken->isVarible() ) {
+                                // TODO : check is function name existed ?
+                                // token->setContextRoleForOp( E_OP_FLAG_OPEN_PARENTHESIS_FUNCTION_START );
+                                ++openParenthesisCnt;
+                            } else if ( previousToken->isFixedLiteral() ) {
+                                //   3(...  or   07(...    or   0x4(     or   3.14(...    or  3.14f(
+                                meetError = true;
+                                break;
+                            } else {
+                                // token->setContextRoleForOp( E_OP_FLAG_OPEN_PARENTHESIS_PRIORITY_PREMOTE );
+                                ++openParenthesisCnt;
+                            }
+                        } else {
+                            //  previousToken == nullptr
+                            // token->setContextRoleForOp( E_OP_FLAG_OPEN_PARENTHESIS_PRIORITY_PREMOTE );
+                            ++openParenthesisCnt;
+                        }
+
+                    } else if ( opType == E_CLOSE_PARENTHESIS ) {
+                        if ( openParenthesisCnt == 0  ) {
+                            // no matched '('
+                            meetError = true;
+                            break;
+                        }
+
+                        --openParenthesisCnt;
+                    } else if ( opType == E_COMMA ) {
+                        if ( openParenthesisCnt == 0  ) {
+                            // token->setContextRoleForOp( E_OP_COMMA_DEFINATION_SEP );
+                            // start a new group to push new token expressions
+                            needAdd = false;
+                            varbileDefGrp.push_back( make_pair(-1,-1) ); // create a new pair 
+                            // Do not push it into  varbileDefGrp.back() 
+                        } 
+                    }
+                } 
+            } else {
+                // token == nullptr;
+                needAdd = false;
+            }
+
+            if ( needAdd ) {
+                if ( varbileDefGrp.back().first == -1 && varbileDefGrp.back().second == -1 ) {
+                    varbileDefGrp.back() = make_pair(idx,idx);
+                } else {
+                    varbileDefGrp.back().second = idx;
+                }
+            }
+
+            previousToken = token;
+        }
+
+
+        if ( meetError ) {
+            varbileDefGrp.clear();
+            // TODO throw a certain exception
+        }
+
+        
+
+        // valid logic , 
+        for( const auto& idxPr : varbileDefGrp ) {
+            if (     (idxPr.first>=0  &&  idxPr.first  < sentenceLen)   
+                  && (idxPr.second>=0 &&  idxPr.second < sentenceLen) ) {
+                std::vector< TokenBase* > grpTokens;
+                for( auto idx = idxPr.first; idx <= idxPr.second; ++idx ) {
+                     grpTokens.push_back( m_oneSentence.at(idx) );
+                }
+
+                // TODO : 
+                // define a new varible : mapedDtIt.second;
+                auto evaluator = ExpEvaluation::createANewEvaluator();
+                if ( evaluator != nullptr ) {
+                    evaluator->doNewVaribleDefEvaluation(mapedDtIt->second,  grpTokens, 0);
+                }
+            }
+        }
+    } else {
+        // sentence's  first token is not <Keyword>
+        // TODO :
+        auto evaluator = ExpEvaluation::createANewEvaluator();
+        if ( evaluator != nullptr ) {
+            evaluator->doNormalExpEvaluation( m_oneSentence, 0 );
+        }
+    }
+
+}
+
+
+//////////////////////////////////////////////////////////////////////
+//
+// Core Core Core
+//
+//////////////////////////////////////////////////////////////////////
 void TokenMgr::executeCode()
 {
-    //////////////////////////////////////////////////////////////////////
-    //
-    // Core Core Core
-    //
-    //////////////////////////////////////////////////////////////////////
     printOperatorStack();
     m_opertorStack.clear();
     printSuffixExpression(1);
     m_suffixExpression.clear();
 
-	//   m_oneSentence is a list without  ';'
+
+    m_callstackFuncList.clear();
+    clearOneArgumentsPool();
+    m_openParenthesisList.clear();
+	m_opertorStack4OneArgument.clear();
+	m_suffixExpression4OneArgument.clear();
+
+    //   m_oneSentence is a list without  ';'
     if ( m_oneSentence.empty() ) {
         traceBlankStatement();
         clearTmpGenTokenPool();
@@ -1024,7 +1184,7 @@ void TokenMgr::executeCode()
                 } else if ( pToken->isVarible() ) {
                     varibleIdx = idx;
                     firstNotKeyWordIdx = idx;
-                    firstNotKeyWordType = 0; // 0 :  first Un-Keyword token is Varible Type
+                    firstNotKeyWordType = 0; // 0 :  first Un-Keyword token is a name of varible 
                     break;
                 } else {
                     firstNotKeyWordIdx = idx;
@@ -1107,14 +1267,14 @@ void TokenMgr::executeCode()
         MyException e(E_THROW_SENTENCE_DEFINITION_PREFIX_IS_NOT_VARIBLE, m_oneSentence.at( varibleIdx )->getBeginPos()  );
         throw e;
     }
-
-	//   int a;            ||      int a = ... ;
+    
+    //   int a;            ||      int a = ... ;
     if ( sentenceType == 1 ||  sentenceType == 2 ) {
         sentenceVarElement = m_oneSentence.at(varibleIdx);
         pVaribleInfo = VariblePool::getPool()->create_a_new_varible(defDt, varname, sentenceVarElement->getBeginPos().line );
         if ( pVaribleInfo != nullptr  ) {
             // Random a value and assign it to new alloced varible's
-			VariblePool::getPool()->randomVaribleValue( varname );
+            VariblePool::getPool()->randomVaribleValue( varname );
 
             if ( sentenceVarElement != nullptr ) { 
                 sentenceVarElement->setDataType( pVaribleInfo->dataVal.type );
@@ -1129,11 +1289,11 @@ void TokenMgr::executeCode()
         // e.g.   int a;
     } 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//
-	// Has   = or ?=
-	//
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Has   = or ?=
+    //
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     bool hasAssignmentOrVariadicAssignment = false;
     for( auto idx = 0; idx < vecSz; ++idx )
     {
@@ -1142,7 +1302,7 @@ void TokenMgr::executeCode()
 
         if ( tokenType == E_TOKEN_OPERATOR  ) {  
             E_OperatorType opType = pToken->getOperatorType();
-			// has  =   or    ?= ( += -=    ...  >>= )
+            // has  =   or    ?= ( += -=    ...  >>= )
             if ( opType >= E_ASSIGNMENT &&  opType <= E_BIT_RIGHT_SHIFT_ASSIGNMENT ) {
                 hasAssignmentOrVariadicAssignment = true;
                 break;
@@ -1171,9 +1331,14 @@ void TokenMgr::executeCode()
     m_oneSentence.clear();
     clearTmpGenTokenPool();
 
-	m_callstackFuncList.clear();
-	clearOneArgumentsPool();
-	m_openParenthesisList.clear();
+
+
+    m_callstackFuncList.clear();
+    clearOneArgumentsPool();
+    m_openParenthesisList.clear();
+	m_opertorStack4OneArgument.clear();
+	m_suffixExpression4OneArgument.clear();
+
 }
 
 
@@ -1213,8 +1378,8 @@ void TokenMgr::buildSuffixExpression(int sentenceType, int varibleIdx)
                     indexCheck = (idx > varibleIdx);
                 }
 
-				(void)indexCheck;
-				/*
+                (void)indexCheck;
+                /*
                 if ( indexCheck &&  !(pVisitedVaribleInfo->isInitialed) ) {
                     if ( CmdOptions::needTreatUninitializedVaribleAsError()  ) {
                         MyException e(E_THROW_VARIBLE_NOT_INITIALIZED_BEFORE_USED, pToken->getBeginPos() );
@@ -1223,7 +1388,7 @@ void TokenMgr::buildSuffixExpression(int sentenceType, int varibleIdx)
                         traceUnInitializedVarWhenUsed(pToken);
                     }
                 }
-				*/
+                */
 
                 pToken->setDataType( pVisitedVaribleInfo->dataVal.type );
                 pToken->setRealValue( pVisitedVaribleInfo->dataVal );
@@ -1285,7 +1450,7 @@ bool TokenMgr::is1stTokenTypeKeyWord()
 {
     auto headtoken = m_oneSentence.front();
     //                                                           here  : keyWord must be  type-key-word : int/long/ ... 
-    return headtoken!=nullptr && headtoken->getTokenType() == E_TOKEN_EXPRESSION  &&   headtoken->isKeyword();
+    return headtoken!=nullptr && headtoken->getTokenType() == E_TOKEN_EXPRESSION  &&  headtoken->isKeyword();
 }
 
 
@@ -1329,10 +1494,10 @@ void TokenMgr::processOperatorStack(TokenBase* previousToken, TokenBase* pToken)
     }
 
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////
-	//
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    //
     // Core Core Core
-	//
+    //
     //    Generate Suffix Expression
     if ( opType == E_CLOSE_PARENTHESIS ) {
         if ( !hasPreviousExistOpenParenthesis() ) {
@@ -1483,41 +1648,41 @@ void TokenMgr::evaluateSuffixExpression()
                 it = prev(it,1);
                 leftOperand = *it;
 
-				if (   CmdOptions::needTraceUninitializedVaribleWhenEvaluatingExpression() ) {
-					// opType != E_ASSIGNMENT
-					// check Left Operand
-					auto needCheckLeft = (opType != E_ASSIGNMENT);
-					if ( needCheckLeft ) {
-						if ( leftOperand!=nullptr &&  leftOperand->getTokenType() == E_TOKEN_EXPRESSION    &&   leftOperand->isVarible() ) {
-							string varName = leftOperand->getTokenContent();
-							VaribleInfo* pVisitedVaribleInfo = VariblePool::getPool()->getVaribleByName( varName );
-							if ( pVisitedVaribleInfo != nullptr  &&   !pVisitedVaribleInfo->isInitialed ) {
-								if ( CmdOptions::needTreatUninitializedVaribleAsError()  ) {
-									MyException e(E_THROW_VARIBLE_NOT_INITIALIZED_BEFORE_USED, leftOperand->getBeginPos() );
-									throw e;
-								} else {
-									traceUnInitializedVarWhenUsed(leftOperand);
-								}
-							}
-						}
-					}
+                if (   CmdOptions::needTraceUninitializedVaribleWhenEvaluatingExpression() ) {
+                    // opType != E_ASSIGNMENT
+                    // check Left Operand
+                    auto needCheckLeft = (opType != E_ASSIGNMENT);
+                    if ( needCheckLeft ) {
+                        if ( leftOperand!=nullptr &&  leftOperand->getTokenType() == E_TOKEN_EXPRESSION    &&   leftOperand->isVarible() ) {
+                            string varName = leftOperand->getTokenContent();
+                            VaribleInfo* pVisitedVaribleInfo = VariblePool::getPool()->getVaribleByName( varName );
+                            if ( pVisitedVaribleInfo != nullptr  &&   !pVisitedVaribleInfo->isInitialed ) {
+                                if ( CmdOptions::needTreatUninitializedVaribleAsError()  ) {
+                                    MyException e(E_THROW_VARIBLE_NOT_INITIALIZED_BEFORE_USED, leftOperand->getBeginPos() );
+                                    throw e;
+                                } else {
+                                    traceUnInitializedVarWhenUsed(leftOperand);
+                                }
+                            }
+                        }
+                    }
 
-					//
-					// Not matter whether the operator is '=' or not , always check Right operand 
-					// 
-					if ( rightOperand!=nullptr &&  rightOperand->getTokenType() == E_TOKEN_EXPRESSION    &&   rightOperand->isVarible() ) {
-						string varName = rightOperand->getTokenContent();
-						VaribleInfo* pVisitedVaribleInfo = VariblePool::getPool()->getVaribleByName( varName );
-						if ( pVisitedVaribleInfo != nullptr  &&   !pVisitedVaribleInfo->isInitialed ) {
-							if ( CmdOptions::needTreatUninitializedVaribleAsError()  ) {
-								MyException e(E_THROW_VARIBLE_NOT_INITIALIZED_BEFORE_USED, rightOperand->getBeginPos() );
-								throw e;
-							} else {
-								traceUnInitializedVarWhenUsed(rightOperand);
-							}
-						}
-					}
-				}
+                    //
+                    // Not matter whether the operator is '=' or not , always check Right operand 
+                    // 
+                    if ( rightOperand!=nullptr &&  rightOperand->getTokenType() == E_TOKEN_EXPRESSION    &&   rightOperand->isVarible() ) {
+                        string varName = rightOperand->getTokenContent();
+                        VaribleInfo* pVisitedVaribleInfo = VariblePool::getPool()->getVaribleByName( varName );
+                        if ( pVisitedVaribleInfo != nullptr  &&   !pVisitedVaribleInfo->isInitialed ) {
+                            if ( CmdOptions::needTreatUninitializedVaribleAsError()  ) {
+                                MyException e(E_THROW_VARIBLE_NOT_INITIALIZED_BEFORE_USED, rightOperand->getBeginPos() );
+                                throw e;
+                            } else {
+                                traceUnInitializedVarWhenUsed(rightOperand);
+                            }
+                        }
+                    }
+                }
 
                 auto genTmpExp = doBinaryOp(leftOperand, currentElement, rightOperand);
                 ++operatorProcessCnt;
@@ -1541,21 +1706,21 @@ void TokenMgr::evaluateSuffixExpression()
                 it = prev(it,1);
                 rightOperand = *it;
 
-				if ( CmdOptions::needTraceUninitializedVaribleWhenEvaluatingExpression() ) {
-					// check the only right Operand for Unary operator expression
-					if ( rightOperand!=nullptr &&  rightOperand->getTokenType() == E_TOKEN_EXPRESSION    &&   rightOperand->isVarible() ) {
-						string varName = rightOperand->getTokenContent();
-						VaribleInfo* pVisitedVaribleInfo = VariblePool::getPool()->getVaribleByName( varName );
-						if ( pVisitedVaribleInfo != nullptr  &&   !pVisitedVaribleInfo->isInitialed ) {
-							if ( CmdOptions::needTreatUninitializedVaribleAsError()  ) {
-								MyException e(E_THROW_VARIBLE_NOT_INITIALIZED_BEFORE_USED, rightOperand->getBeginPos() );
-								throw e;
-							} else {
-								traceUnInitializedVarWhenUsed(rightOperand);
-							}
-						}
-					}
-				}
+                if ( CmdOptions::needTraceUninitializedVaribleWhenEvaluatingExpression() ) {
+                    // check the only right Operand for Unary operator expression
+                    if ( rightOperand!=nullptr &&  rightOperand->getTokenType() == E_TOKEN_EXPRESSION    &&   rightOperand->isVarible() ) {
+                        string varName = rightOperand->getTokenContent();
+                        VaribleInfo* pVisitedVaribleInfo = VariblePool::getPool()->getVaribleByName( varName );
+                        if ( pVisitedVaribleInfo != nullptr  &&   !pVisitedVaribleInfo->isInitialed ) {
+                            if ( CmdOptions::needTreatUninitializedVaribleAsError()  ) {
+                                MyException e(E_THROW_VARIBLE_NOT_INITIALIZED_BEFORE_USED, rightOperand->getBeginPos() );
+                                throw e;
+                            } else {
+                                traceUnInitializedVarWhenUsed(rightOperand);
+                            }
+                        }
+                    }
+                }
 
                 auto genTmpExp = doUnaryOp(currentElement, rightOperand);
                 ++operatorProcessCnt;
@@ -1816,7 +1981,7 @@ bool TokenMgr::hasPreviousExistOpenParenthesis()
 //
 //   Key Logic    
 //
-pair<bool,TokenBase*> TokenMgr::checkAdjacentTokensRelationship_IsValid(TokenBase* toBePushed, int &iSpecialFlag)
+pair<bool,TokenBase*> TokenMgr::checkAdjacentTokensRelationship_IsValid(TokenBase* toBePushed)
 {
     auto avaliable = false;
     TokenBase* previousToken = nullptr;
@@ -1848,7 +2013,7 @@ pair<bool,TokenBase*> TokenMgr::checkAdjacentTokensRelationship_IsValid(TokenBas
         break;
     case E_TOKEN_OPERATOR:
         {
-            avaliable = process_OperatorWithPriorToken( toBePushed, previousValidToken, previousClosestToken, iSpecialFlag);
+            avaliable = process_OperatorWithPriorToken( toBePushed, previousValidToken, previousClosestToken);
             previousToken = previousValidToken;
         }
         break;
@@ -2934,7 +3099,13 @@ bool TokenMgr::process_SequenceWithPriorToken(TokenBase* toBePushed, TokenBase* 
     } else {
         // preType == E_TOKEN_OPERATOR
         if ( toBePushed->isKeyword() ) {
-            return false;
+			if ( priorToken->getOperatorType() == E_OPEN_PARENTHESIS ) {
+				// TODO , if support type force convertion ?
+				// e.g.      (int)3.14f;
+				return false;
+			} else {
+				return false;
+			}
         } else if ( priorToken->getOperatorType() == E_CLOSE_PARENTHESIS ) {
             return false;
         } else {
@@ -2943,10 +3114,10 @@ bool TokenMgr::process_SequenceWithPriorToken(TokenBase* toBePushed, TokenBase* 
     }
 }
 
-bool TokenMgr::process_OperatorWithPriorToken(TokenBase* toBePushed, TokenBase* priorToken, TokenBase* priorClosestToken, int &iSpecialFlag)
+bool TokenMgr::process_OperatorWithPriorToken(TokenBase* toBePushed, TokenBase* priorToken, TokenBase* priorClosestToken)
 {
     auto opType = toBePushed->getOperatorType();
-    if ( priorToken == nullptr  ) {
+    if ( priorToken == nullptr ||  (priorToken->getTokenType() == E_TOKEN_SEMICOLON) ) {
         if (   ( opType == E_ADD   || opType == E_POSITIVE )
             || ( opType == E_MINUS || opType == E_NEGATIVE )
             || opType == E_BIT_NOT
@@ -2958,25 +3129,12 @@ bool TokenMgr::process_OperatorWithPriorToken(TokenBase* toBePushed, TokenBase* 
     }
 
     auto preType = priorToken->getTokenType();
-    if ( preType == E_TOKEN_SEMICOLON ) {
-        if (   ( opType == E_ADD   || opType == E_POSITIVE )
-            || ( opType == E_MINUS || opType == E_NEGATIVE )
-            || opType == E_BIT_NOT
-            || opType == E_OPEN_PARENTHESIS ) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
     if ( preType == E_TOKEN_EXPRESSION ) {
         if ( priorToken->isVarible() ) {
             if (  opType == E_BIT_NOT ) {
                 return false;
             } else if ( opType == E_OPEN_PARENTHESIS ) {
-                // TODO for future feature use : function call ?
-                // e.g.   sin( ... ) 
-				iSpecialFlag = 1;  // Core , set function flag
+                // e.g.   sin( ... )  for function call syntax support
                 return true;
             } else {
                 return true;
@@ -3005,8 +3163,8 @@ bool TokenMgr::process_OperatorWithPriorToken(TokenBase* toBePushed, TokenBase* 
         int leftOpType  = static_cast<int>( priorToken->getOperatorType() );
         int rightOpType = static_cast<int>( opType );
 
-        if (   (leftOpType  >= static_cast<int>(E_ADD) &&  leftOpType  <= static_cast<int>( E_BIT_RIGHT_SHIFT_ASSIGNMENT) ) 
-            && (rightOpType >= static_cast<int>(E_ADD) &&  rightOpType <= static_cast<int>(E_BIT_RIGHT_SHIFT_ASSIGNMENT)  )  ) 
+        if (   (leftOpType  >= static_cast<int>(E_ADD) &&  leftOpType  <= static_cast<int>(E_COMMA) ) 
+            && (rightOpType >= static_cast<int>(E_ADD) &&  rightOpType <= static_cast<int>(E_COMMA)  )  ) 
         {
 
             closeFlag = TokenMgr::s_OpPairCfgTable[leftOpType][rightOpType].closeAvaliable;
@@ -3022,7 +3180,7 @@ bool TokenMgr::process_OperatorWithPriorToken(TokenBase* toBePushed, TokenBase* 
                 avaliable = false;
             } else {
                 if ( !closeFlag && sepFlag ) {
-                    if ( priorToken == priorClosestToken   ) {
+                    if ( priorToken == priorClosestToken ) {
                         avaliable = false;
                     } else {
                         avaliable = true;
@@ -3041,104 +3199,106 @@ bool TokenMgr::process_OperatorWithPriorToken(TokenBase* toBePushed, TokenBase* 
     return false;
 }
 
-void TokenMgr::processPreviousFunctionRelated_IfNecessary(TokenBase* pFuncObj, int iFlag)
+
+/*
+void TokenMgr::processPreviousFunctionRelated_IfNecessary(TokenBase* pFuncObj)
 {
-	if ( iFlag == 1 ) {
-		// Function Setting
-		if ( pFuncObj != nullptr ) {
-			pFuncObj->setAsFunction();
+    if ( iFlag == 1 ) {
+        // Function Setting
+        if ( pFuncObj != nullptr ) {
+            pFuncObj->setAsFunction();
 
-			m_callstackFuncList.push_back( pFuncObj );
-			allocNewArgumentExpr();
-		}
-
-	} 
+            // m_callstackFuncList.push_back( pFuncObj );
+            // allocNewArgumentExpr();
+        }
+    } 
 }
-
+*/
 
 void TokenMgr::allocNewArgumentExpr()
 {
-	auto newArguments_OnePart = new std::list<TokenBase*>();
-	m_oneArgumentForACertainFunc.push_back( newArguments_OnePart );
+    auto newArguments_OnePart = new std::list<TokenBase*>();
+    m_oneArgument4ACertainFunc.push_back( newArguments_OnePart );
 }
 
 
 // Core : Key Logic 
-void TokenMgr::processParenthesisOrCommaFlag_IfNecessary(TokenBase* pTokenToBePushed, int iFlag)
+void TokenMgr::processParenthesisOrCommaFlag_IfNecessary(TokenBase* pTokenToBePushed, int tokenIndex,int iFlag)
 {
-	if (  pTokenToBePushed!=nullptr  &&  pTokenToBePushed->getTokenType() == E_TOKEN_OPERATOR ) {
-		auto opType = pTokenToBePushed->getOperatorType();
-		if ( opType == E_OPEN_PARENTHESIS ) {
-			if ( iFlag == 1 ) {
-				pTokenToBePushed->setContextRoleForOp( E_OP_FLAG_OPEN_PARENTHESIS_FUNCTION_START );
-			} else {
-				pTokenToBePushed->setContextRoleForOp( E_OP_FLAG_OPEN_PARENTHESIS_PRIORITY_PREMOTE );
-			}
-			m_openParenthesisList.push_back( pTokenToBePushed );
-		} else if ( opType == E_CLOSE_PARENTHESIS ) {
-			if ( m_openParenthesisList.empty() ) {
-				MyException e(E_THROW_NO_MATCHED_OPEN_PARENTHESIS, pTokenToBePushed->getBeginPos() );
-				throw e;
-			} else {
-				// "()" list is not empty
-				auto tailopen = m_openParenthesisList.back();
-				auto openParenthesisFlag = tailopen->getContextRoleForOp();
-				if ( openParenthesisFlag == E_OP_FLAG_OPEN_PARENTHESIS_FUNCTION_START ) {
-					// function end ,check call stack , and pop function object and matched '('
-					if ( m_callstackFuncList.empty() ) {
-						// TODO , logic error , throw exception
-					} else {
-						m_callstackFuncList.pop_back();
-						m_openParenthesisList.pop_back(); // pop the matched  '('
-						// TODO
-						// function argument is end
-						//  m_oneArgumentForACertainFunc ->   copy to   argument list
-					}
-				} else {
-					//  openParenthesisFlag == E_OP_FLAG_OPEN_PARENTHESIS_PRIORITY_PREMOTE
-					m_openParenthesisList.pop_back();
-				}
-			}
-		} else if ( opType == E_COMMA ) {
-			if ( m_openParenthesisList.empty() ) {
-				if ( !m_oneSentence.empty() ) {
-					auto firstToken = m_oneSentence.front();
-					if ( firstToken!=nullptr ) {
-						if ( firstToken->isKeyword() ) {
-							pTokenToBePushed->setContextRoleForOp( E_OP_COMMA_DEFINATION_SEP );
-						} else {
-							pTokenToBePushed->setContextRoleForOp( E_OP_COMMA_NORMAL_FOR_COMMA_EXPRESSION );
-						}
-					}
-				} 
-				/* 
-				else {
-					it will throw exception after checkAdjacentTokensRelationship_IsValid() 
-				} 
-				*/
-			} else {
-				auto lastOpenParenthesis = m_openParenthesisList.back();
-				auto theRole = lastOpenParenthesis->getContextRoleForOp();
-				if ( theRole == E_OpAnotherFlag::E_OP_FLAG_OPEN_PARENTHESIS_FUNCTION_START ) {
-					pTokenToBePushed->setContextRoleForOp( E_OP_COMMA_FUNCTION_ARG_SEP );
-				} else {
-					pTokenToBePushed->setContextRoleForOp( E_OP_COMMA_NORMAL_FOR_COMMA_EXPRESSION );
-				}
-			}
+    if ( pTokenToBePushed!=nullptr  &&  pTokenToBePushed->getTokenType() == E_TOKEN_OPERATOR ) {
+        auto opType = pTokenToBePushed->getOperatorType();
+        if ( opType == E_OPEN_PARENTHESIS ) {
+            if ( iFlag == 1 ) {
+                pTokenToBePushed->setContextRoleForOp( E_OP_FLAG_OPEN_PARENTHESIS_FUNCTION_START );
+            } else {
+                pTokenToBePushed->setContextRoleForOp( E_OP_FLAG_OPEN_PARENTHESIS_PRIORITY_PREMOTE );
+            }
+            m_openParenthesisList.push_back( make_pair(pTokenToBePushed,tokenIndex) );
+        } else if ( opType == E_CLOSE_PARENTHESIS ) {
+            if ( m_openParenthesisList.empty() ) {
+                MyException e(E_THROW_NO_MATCHED_OPEN_PARENTHESIS, pTokenToBePushed->getBeginPos() );
+                throw e;
+            } else {
+                // "()" list is not empty
+                auto tailopen = m_openParenthesisList.back().first;
+                auto openParenthesisFlag = tailopen->getContextRoleForOp();
+                if ( openParenthesisFlag == E_OP_FLAG_OPEN_PARENTHESIS_FUNCTION_START ) {
+                    // function end ,check call stack , and pop function object and matched '('
+                    if ( m_callstackFuncList.empty() ) {
+                        // TODO , logic error , throw exception
+                    } else {
+                        m_callstackFuncList.pop_back();
+                        m_openParenthesisList.pop_back(); // pop the matched  '('
+                        // TODO
+                        // function argument is end
+                        //  m_oneArgument4ACertainFunc ->   copy to   argument list
+                    }
+                } else {
+                    //  openParenthesisFlag == E_OP_FLAG_OPEN_PARENTHESIS_PRIORITY_PREMOTE
+                    m_openParenthesisList.pop_back();
+                }
+            }
+        } else if ( opType == E_COMMA ) {
+            if ( m_openParenthesisList.empty() ) {
+                if ( !m_oneSentence.empty() ) {
+                    auto firstToken = m_oneSentence.front();
+                    if ( firstToken!=nullptr ) {
+                        if ( firstToken->isKeyword() ) {
+                            pTokenToBePushed->setContextRoleForOp( E_OP_COMMA_DEFINATION_SEP );
+                        } else {
+                            pTokenToBePushed->setContextRoleForOp( E_OP_COMMA_NORMAL_FOR_COMMA_EXPRESSION );
+                        }
+                    }
+                } 
+                /* 
+                else {
+                    it will throw exception after checkAdjacentTokensRelationship_IsValid() 
+                } 
+                */
+            } else {
+                auto lastOpenParenthesis = m_openParenthesisList.back().first;
+                auto theRole = lastOpenParenthesis->getContextRoleForOp();
+                if ( theRole == E_OpAnotherRoleFlag::E_OP_FLAG_OPEN_PARENTHESIS_FUNCTION_START ) {
+                    pTokenToBePushed->setContextRoleForOp( E_OP_COMMA_FUNCTION_ARG_SEP );
+                } else {
+                    pTokenToBePushed->setContextRoleForOp( E_OP_COMMA_NORMAL_FOR_COMMA_EXPRESSION );
+                }
+            }
 
-		}
-	}
+        }
+    }
 }
 
 
 void TokenMgr::clearOneArgumentsPool()
 {
-	for ( auto it = m_oneArgumentForACertainFunc.begin(); it !=  m_oneArgumentForACertainFunc.end(); ++it ) {
-		if ( *it != nullptr ) {
-			(*it)->clear();
-			delete (*it);
-			*it = nullptr;
-		}
-	}
-	m_oneArgumentForACertainFunc.clear();
-}
+    for ( auto it = m_oneArgument4ACertainFunc.begin(); it !=  m_oneArgument4ACertainFunc.end(); ++it ) {
+        if ( *it != nullptr ) {
+            (*it)->clear();
+            delete (*it);
+            *it = nullptr;
+        }
+    }
+    m_oneArgument4ACertainFunc.clear();
+}  
+

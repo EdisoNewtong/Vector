@@ -35,6 +35,7 @@ using namespace std;
 
 // staitc  , set std-call call convention  as default
 bool    FunctionMgr::s_callingConvention_StdCall { true };
+bool    FunctionMgr::isUseStdCallConvension() { return FunctionMgr::s_callingConvention_StdCall; }
 
 
 // static     
@@ -244,6 +245,8 @@ FunctionBase* FunctionMgr::generateFunctionObjectByName(const string& funcName)
 	} else if ( funcName == "round" ) {
 		fObject = new My_round();
 	}
+
+    s_allocedFunctionTokenList.push_back( fObject );
 
     return fObject;
 }
