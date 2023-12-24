@@ -62,7 +62,11 @@ struct DataValue
     } value;
 
     void doIntergerPromotion(E_DataType promotionTp);
+    // only the type that higher than int/unsigned int   has the permission of   doConvertion(...)
     void doConvertion(E_DataType destinationTp);
+
+    void forceCast(E_DataType destinationTp);
+
     bool isIntZero() const;
     bool isFloatZero() const;
     bool isNegative();

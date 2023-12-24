@@ -17,6 +17,7 @@ public:
 
     static FunctionBase* generateFunctionObjectByName(const std::string& funcName);
     static bool          isUseStdCallConvension();
+
 protected:
     static std::unordered_set<std::string> s_functionNameList;
 

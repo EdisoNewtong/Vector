@@ -930,8 +930,11 @@ void TokenMgr::pushToken(TokenBase* pToken)
 
         if ( pToken->getTokenType() == E_TOKEN_SEMICOLON ) {
             // Core Core Core
-            executeCode();
+            //
             ++m_execodeIdx;
+            executeCode_New();
+
+            // executeCode();
         } else {
             m_oneSentence.push_back( pToken );
         }
@@ -1085,8 +1088,6 @@ void TokenMgr::executeCode_New()
                      grpTokens.push_back( m_oneSentence.at(idx) );
                 }
 
-                // TODO : 
-                // define a new varible : mapedDtIt.second;
                 auto evaluator = ExpEvaluation::createANewEvaluator();
                 if ( evaluator != nullptr ) {
                     evaluator->doNewVaribleDefEvaluation(mapedDtIt->second,  grpTokens, 0);
@@ -1098,10 +1099,13 @@ void TokenMgr::executeCode_New()
         // TODO :
         auto evaluator = ExpEvaluation::createANewEvaluator();
         if ( evaluator != nullptr ) {
-            evaluator->doNormalExpEvaluation( m_oneSentence, 0 );
+            auto needCheckVaribleIsExisted = true;
+            evaluator->doNormalExpEvaluation( m_oneSentence, 0, needCheckVaribleIsExisted );
         }
     }
 
+
+    m_oneSentence.clear();
 }
 
 

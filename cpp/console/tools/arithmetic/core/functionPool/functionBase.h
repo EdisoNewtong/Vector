@@ -38,9 +38,14 @@ public:
 
     TokenBase* executeFunction( );
     bool       preCheckArgCount(bool needThrow);
-    void       setCloseParenthesisValidFlag();
+
+    void       setBeginParenthesis(TokenBase* funcName, TokenBase* pOpenParenthesis);
+    void       setCloseParenthesisValidFlag(TokenBase* pEndParenthesis);
+
 	bool       isFunctionEndupValid();
 
+    static std::string   getSuffixExpString( const std::list<TokenBase*>& oneArgumentExpr);
+    std::string   buildFuncitonDetailString(const std::list<std::string>& strExpList);
 protected:
     virtual TokenBase* doCall() = 0;
     virtual int getRequiredArgumentsCount() = 0;
@@ -48,8 +53,14 @@ protected:
 protected:
     std::string m_funcName;
 	std::list< std::list<TokenBase*> > m_argumentList;
+	std::list<TokenBase*>              m_argResultList;
+	std::list<std::string>             m_argStrSuffixExprList;
 
-    bool m_hasEndCloseParenthesis; // a valid function must contain a pair of ( )
+    TokenBase* m_pFuncToken;
+    TokenBase* m_pOpenParenthesis;
+    TokenBase* m_pCloseParenthesis;
+
+
 };
 
 #endif

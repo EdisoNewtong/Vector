@@ -210,7 +210,7 @@ exp2(...)        2^(arg)
     long double exp2l( long double n );
     double      exp2 ( IntegralType n );
 
-log(...)        log  (arg)
+log10(...)        log  (arg)
                    10
 
     float       log ( float arg );
@@ -231,6 +231,16 @@ log(...)        log  (arg)
     long double log2l( long double arg );
     double      log2( IntegralType arg );
 
+
+log(...)        log  (arg)    --> ln(arg)
+                    e 
+
+    float       log ( float arg );
+    float       log( float arg );
+    double      log( double arg );
+    long double log( long double arg );
+    long double log( long double arg );
+    double      log( IntegralType arg );
 
 //--------------------------------
 // Power functions

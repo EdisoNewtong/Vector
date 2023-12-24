@@ -14,10 +14,12 @@ public:
     static ExpEvaluation* createANewEvaluator();
 
 public:
-    TokenBase* doNormalExpEvaluation(const std::vector<TokenBase*>& expList, int begIdx);
-    TokenBase* doNewVaribleDefEvaluation(E_DataType definedDataType, const std::vector<TokenBase*>& expList, int begIdx);
+    TokenBase* doNormalExpEvaluation(const std::vector<TokenBase*>& expList, int begIdx, bool checkVaibleIsValid);
+    void doNewVaribleDefEvaluation(E_DataType definedDataType, const std::vector<TokenBase*>& expList, int begIdx);
 
     TokenBase* evaluateSuffixExpression(std::list<TokenBase*>& suffixExpression);
+
+    static TokenBase* generateTmpExpression(E_DataType dt, const std::string& expression, TokenBase* begtoken, TokenBase* endtoken);
 protected:
     struct suffixExpEnv {
         suffixExpEnv() 
@@ -44,7 +46,6 @@ protected:
     static void clearEnvList();
     static suffixExpEnv* allocEnvObject();
 
-    static TokenBase* generateTmpExpression(E_DataType dt, const std::string& expression, TokenBase* begtoken, TokenBase* endtoken);
 protected:
     ExpEvaluation();
     virtual ~ExpEvaluation();
@@ -52,7 +53,7 @@ protected:
 
     int preCheckOperator(TokenBase* previousToken, const std::pair<TokenBase*,int>& tokenPair,  ExpEvaluation::suffixExpEnv* pEnv);
 
-    void buildSuffixExpression(const std::vector<TokenBase*>& expList, int begIdx, ExpEvaluation::suffixExpEnv* pEnv);
+    void buildSuffixExpression(const std::vector<TokenBase*>& expList, int begIdx, ExpEvaluation::suffixExpEnv* pEnv, bool checkVaibleIsValid);
 
     std::pair<TokenBase*,int>  findClosestOpenParenthesis(const std::list< std::pair<TokenBase*,int> >& operatorStack);
     void popUntilOpenParenthesis(ExpEvaluation::suffixExpEnv* pEnv);
@@ -91,8 +92,11 @@ protected:
     TokenBase* doBitXor(TokenBase* left, TokenBase* right);
     TokenBase* doBitLeftShift(TokenBase* left, TokenBase* right);
     TokenBase* doBitRightShift(TokenBase* left, TokenBase* right);
-    TokenBase* doAssignment(TokenBase* left, TokenBase* right);
+    TokenBase* doCommaExpression(TokenBase* left, TokenBase* right);
 
+    // a = b;
+    TokenBase* doAssignment(TokenBase* left, TokenBase* right);
+    // a ?= b;
     TokenBase* do_Add_Assignment(TokenBase* left, TokenBase* right);
     TokenBase* do_Minus_Assignment(TokenBase* left, TokenBase* right);
     TokenBase* do_Multiply_Assignment(TokenBase* left, TokenBase* right);

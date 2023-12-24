@@ -100,7 +100,7 @@ ExpEvaluation::~ExpEvaluation()
 
 
     
-TokenBase* ExpEvaluation::doNormalExpEvaluation(const vector<TokenBase*>& expList, int begIdx)
+TokenBase* ExpEvaluation::doNormalExpEvaluation(const vector<TokenBase*>& expList, int begIdx, bool checkVaibleIsValid)
 {
     // ExpEvaluation::clearEnvList();
     auto veryBeginningEnv = ExpEvaluation::allocEnvObject();
@@ -109,13 +109,13 @@ TokenBase* ExpEvaluation::doNormalExpEvaluation(const vector<TokenBase*>& expLis
     m_callStack.push_back( veryBeginningEnv );
     auto currentEnv = veryBeginningEnv;
 
-    buildSuffixExpression(expList, begIdx, currentEnv);
+    buildSuffixExpression(expList, begIdx, currentEnv, checkVaibleIsValid);
     return evaluateSuffixExpression( currentEnv->suffixExpression );
 }
 
 
 
-void ExpEvaluation::buildSuffixExpression(const vector<TokenBase*>& expList, int begIdx, ExpEvaluation::suffixExpEnv* currentEnv)
+void ExpEvaluation::buildSuffixExpression(const vector<TokenBase*>& expList, int begIdx, ExpEvaluation::suffixExpEnv* currentEnv, bool checkVaibleIsValid)
 {
     int sz = static_cast<int>( expList.size() );
     TokenBase* previousToken = nullptr;
@@ -137,26 +137,31 @@ void ExpEvaluation::buildSuffixExpression(const vector<TokenBase*>& expList, int
                 MyException e(E_THROW_CANNOT_PUSH_TOKEN_KEYWORD, token->getBeginPos() );
                 throw e;
             } else if ( token->isVarible() ) {
-                string varName = token->getTokenContent();
 
-                VaribleInfo* pVisitedVaribleInfo = VariblePool::getPool()->getVaribleByName( varName );
-                if ( pVisitedVaribleInfo == nullptr ) {
-                    if ( !FunctionMgr::isInsideFunctionList(varName) ) {
-                        MyException e(E_THROW_VARIBLE_NOT_DEFINED , token->getBeginPos());
-                        e.setDetail( varName  );
-                        throw e;
+                if ( checkVaibleIsValid ) {
+                    string varName = token->getTokenContent();
+
+                    VaribleInfo* pVisitedVaribleInfo = VariblePool::getPool()->getVaribleByName( varName );
+                    if ( pVisitedVaribleInfo == nullptr ) {
+                        if ( !FunctionMgr::isInsideFunctionList(varName) ) {
+                            MyException e(E_THROW_VARIBLE_NOT_DEFINED , token->getBeginPos());
+                            e.setDetail( varName  );
+                            throw e;
+                        }
+                        // else   
+                        //      maybe it is a pending function-call
+                    } else {
+                        // it is a varible
+                        token->setDataType( pVisitedVaribleInfo->dataVal.type );
+                        token->setRealValue( pVisitedVaribleInfo->dataVal );
                     }
-                    // maybe it is a pending function-call
-                } else {
-                    // it is a varible
-                    token->setDataType( pVisitedVaribleInfo->dataVal.type );
-                    token->setRealValue( pVisitedVaribleInfo->dataVal );
                 }
             }
 
             if ( currentEnv!=nullptr ) {
                 currentEnv->suffixExpression.push_back( token );
             }
+
             traceSuffixExpression(token, true);
         } else  {
             // tokenType == E_TOKEN_OPERATOR
@@ -201,18 +206,73 @@ void ExpEvaluation::buildSuffixExpression(const vector<TokenBase*>& expList, int
     }
     currentEnv->operatorStack.clear();
 
-
-
 }
 
 
 
-TokenBase* ExpEvaluation::doNewVaribleDefEvaluation(E_DataType definedDataType, const vector<TokenBase*>& expList, int begIdx)
+void ExpEvaluation::doNewVaribleDefEvaluation(E_DataType definedDataType, const vector<TokenBase*>& expList, int begIdx)
 {
-    (void)definedDataType;
-    (void)expList;
-    (void)begIdx;
-    return nullptr;
+    vector<TokenBase*> prefixDefineTokeList;
+    int sz = static_cast<int>( expList.size() );
+    auto hasAssignment = false;
+    for ( auto idx = begIdx; idx < sz; ++idx ) {
+        auto token = expList.at(idx);
+        if (   token != nullptr ) {
+            if (    token->getTokenType() == E_TOKEN_OPERATOR
+                 && token->getOperatorType() == E_ASSIGNMENT )
+            {
+                // break if meet the 1st   '='
+                hasAssignment = true;
+                break;
+            } else {
+                prefixDefineTokeList.push_back( token );
+            }
+        }
+    }
+
+    auto evaluator = ExpEvaluation::createANewEvaluator();
+    TokenBase* varibleToken = nullptr;
+    if ( evaluator != nullptr ) {
+        //
+        // Step 1 : Create a new varible
+        //
+        auto needCheckVaribleIsExisted = false;
+        varibleToken = evaluator->doNormalExpEvaluation(prefixDefineTokeList, 0, needCheckVaribleIsExisted);
+        if ( varibleToken!=nullptr  ) {
+            if( !varibleToken->isVarible() ) {
+                MyException e(E_THROW_SENTENCE_DEFINITION_PREFIX_IS_NOT_VARIBLE, varibleToken->getBeginPos() );
+                throw e;
+            } else {
+                auto varname = varibleToken->getTokenContent();
+                VaribleInfo* pVaribleInfo = VariblePool::getPool()->create_a_new_varible(definedDataType, varname , varibleToken->getBeginPos().line );
+                if ( pVaribleInfo != nullptr  ) {
+                    // Random a value and assign it to new alloced varible's
+                    VariblePool::getPool()->randomVaribleValue( varname );
+
+                    if ( varibleToken != nullptr ) { 
+                        varibleToken->setDataType( definedDataType );
+                        varibleToken->setRealValue( pVaribleInfo->dataVal );
+                    } else {
+                        MyException e(E_THROW_VARIBLE_IS_MISSING);
+                        e.setDetail( varibleToken->getTokenContent() + string(" is not a varible") );
+                        throw e;
+                    }
+                }
+            }
+        }
+
+        //
+        // Step 2 : do assignment if necessary
+        //
+        if ( hasAssignment ) {
+            auto evaluatorAssignment = ExpEvaluation::createANewEvaluator();
+            if ( evaluatorAssignment != nullptr ) {
+                auto needCheckVaribleIsExisted2 = true;
+                evaluatorAssignment->doNormalExpEvaluation(expList, begIdx, needCheckVaribleIsExisted2);
+            }
+        }
+    }
+
 }
 
 
@@ -389,7 +449,7 @@ void ExpEvaluation::popUntilOpenParenthesis(ExpEvaluation::suffixExpEnv* pEnv)
     for( auto rit = pEnv->operatorStack.rbegin(); rit != pEnv->operatorStack.rend(); )
     {
         TokenBase* pElement = rit->first;
-        auto isopenParenthesis = (pElement!=nullptr && pElement->getOperatorType() == E_OPEN_PARENTHESIS && pElement->getContextRoleForOp() == E_OP_FLAG_CLOSE_PARENTHESIS_PRIORITY_PREMOTE  );
+        auto isopenParenthesis = (pElement!=nullptr && pElement->getOperatorType() == E_OPEN_PARENTHESIS && pElement->getContextRoleForOp() == E_OP_FLAG_OPEN_PARENTHESIS_PRIORITY_PREMOTE  );
 
         movedTokenList.push_back( pElement );
         // traceOperatorStack( pElement, false );
@@ -491,6 +551,7 @@ ExpEvaluation::suffixExpEnv* ExpEvaluation::processOperatorStack(TokenBase* prev
     case 1: // '(' for function begin
         {
             auto genFuncObject = FunctionMgr::generateFunctionObjectByName( previousToken->getTokenContent() );
+            genFuncObject->setBeginParenthesis( previousToken , tokenPair.first ); 
             previousToken->setAsFunction( genFuncObject );
 
             auto newAllocedEnv = allocEnvObject();
@@ -524,8 +585,7 @@ ExpEvaluation::suffixExpEnv* ExpEvaluation::processOperatorStack(TokenBase* prev
             }
 
             if ( currentEnv->funcObj != nullptr ) {
-                currentEnv->funcObj->preCheckArgCount( true );
-                currentEnv->funcObj->setCloseParenthesisValidFlag();
+                currentEnv->funcObj->setCloseParenthesisValidFlag( tokenPair.first );
             }
             
             if ( !m_callStack.empty() ) {
@@ -995,6 +1055,9 @@ TokenBase* ExpEvaluation::doBinaryOp(TokenBase* left, TokenBase* op, TokenBase* 
     case E_BIT_RIGHT_SHIFT_ASSIGNMENT:     // >>=
         genTmpExp = do_Bit_RightShift_Assignment(left, right);
         break;
+    case E_COMMA:     // >>=
+        genTmpExp = doCommaExpression(left, right);
+        break;
     default:
         break;
     }
@@ -1359,6 +1422,20 @@ TokenBase* ExpEvaluation::doBitRightShift(TokenBase* left, TokenBase* right)
     return ret;
 }
 
+
+
+TokenBase* ExpEvaluation::doCommaExpression(TokenBase* left, TokenBase* right)
+{
+    // using namespace charUtil;
+    // string leftContent  = left->getExpressionContent();
+    // string rightContent = right->getExpressionContent();
+    // string finalExpr = leftContent + SC_OP_COMMA  + rightContent;
+
+    (void)left;
+    return right;
+}
+
+
 TokenBase* ExpEvaluation::doAssignment(TokenBase* left, TokenBase* right)
 {
     using namespace charUtil;
@@ -1413,7 +1490,9 @@ TokenBase* ExpEvaluation::doAssignment(TokenBase* left, TokenBase* right)
 }
 
 
-
+/***************************************************
+ *    ?=
+****************************************************/
 TokenBase*      ExpEvaluation::do_Add_Assignment(TokenBase* left, TokenBase* right)
 {  return doAssignment( left,  doAdd(left, right) ); }
 
@@ -1746,4 +1825,5 @@ TokenBase* ExpEvaluation::generateTmpExpression(E_DataType dt, const std::string
     s_generatedTmpTokenPool.push_back( pTmpExpression );
     return pTmpExpression;
 }
+
 

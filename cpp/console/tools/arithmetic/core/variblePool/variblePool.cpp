@@ -98,7 +98,7 @@ VaribleInfo* VariblePool::create_a_new_varible(E_DataType dt, const std::string&
     if ( foundIt != m_pool.end() ) {
         // already found it
         MyException e( E_THROW_VARIBLE_ALREADY_DEFINED );
-        e.setDetail( charUtil::SINGLE_QUOTO + varname + charUtil::SINGLE_QUOTO +  std::string("It has already been defined @line : ") + std::to_string( foundIt->second->definedLine) );
+        e.setDetail( charUtil::SINGLE_QUOTO + varname + charUtil::SINGLE_QUOTO +  std::string(". It has already been defined @line : ") + std::to_string( foundIt->second->definedLine) );
         throw e;
     }
 
