@@ -23,7 +23,7 @@ LINK_OPT := -Werror  -Wall --std=c++11  -O3
 #
 # build/stringNumber.o
 #
-build/arithMetic:build/arithMetic.o build/buff.o build/enumUtil.o build/keywordList.o  build/dataTypeUtil.o  build/stringNumber.o  build/opUtil.o    build/myException.o build/buff.o build/globalDirector.o   build/tokenBase.o build/tokenMgr.o   build/expEvaluation.o    build/cmdOptions.o   build/parserBase.o   build/blankParser.o build/singlelineCommentParser.o   build/multilineCommentParser.o  build/operatorParser.o  build/sequenceParser.o build/semicolonParser.o    build/variblePool.o build/dataValue.o   build/functionBase.o   build/functionMgr.o   build/MyAbs.o   build/MyFmod.o   build/MyRemainder.o  build/MyFmin.o    build/MyFmax.o   build/MyExp.o  build/MyExp2.o   build/MyLog.o  build/MyLog2.o   build/MyLog10.o    build/MyPow.o   build/MySqrt.o  build/MyCbrt.o  build/MyHypot.o  build/MySin.o  build/MyCos.o  build/MyTan.o   build/MyAsin.o   build/MyAcos.o  build/MyAtan.o   build/MyAtan2.o     build/MyCeil.o  build/MyFloor.o   build/MyTrunc.o  build/MyRound.o
+build/arithMetic:build/arithMetic.o build/buff.o build/enumUtil.o build/keywordList.o  build/dataTypeUtil.o  build/stringNumber.o  build/opUtil.o    build/myException.o build/buff.o build/globalDirector.o   build/tokenBase.o build/tokenMgr.o   build/expEvaluation.o    build/cmdOptions.o   build/parserBase.o   build/blankParser.o build/singlelineCommentParser.o   build/multilineCommentParser.o  build/operatorParser.o  build/sequenceParser.o build/semicolonParser.o    build/variblePool.o build/dataValue.o   build/functionBase.o   build/functionMgr.o   build/MyAbs.o   build/MyFmod.o   build/MyFmin.o    build/MyFmax.o   build/MyExp.o  build/MyExp2.o   build/MyLog.o  build/MyLog2.o   build/MyLog10.o    build/MyPow.o   build/MySqrt.o  build/MyCbrt.o  build/MyHypot.o  build/MySin.o  build/MyCos.o  build/MyTan.o   build/MyAsin.o   build/MyAcos.o  build/MyAtan.o   build/MyAtan2.o     build/MyCeil.o  build/MyFloor.o   build/MyTrunc.o  build/MyRound.o
 
 	@echo -e "\n----------------------------------------------------------------------------------------------------"
 	g++    $(LINK_OPT)    -o    build/arithMetic    build/*.o
@@ -117,14 +117,14 @@ build/cmdOptions.o:core/cmdOptions.cpp  core/cmdOptions.h core/util/charUtil.h  
 build/functionBase.o:core/functionPool/functionBase.cpp  core/functionPool/functionBase.h  core/token/tokenBase.h  core/commonEnum.h  core/myException.h
 	g++    $(COMPILE_OPT)  -o  build/functionBase.o    core/functionPool/functionBase.cpp
 
-build/functionMgr.o:core/functionPool/functionMgr.cpp  core/functionPool/functionMgr.h  core/functionPool/functionBase.h  core/functionPool/basic/MyAbs.h  core/functionPool/basic/MyFmod.h  core/functionPool/basic/MyRemainder.h  core/functionPool/basic/MyFmax.h  core/functionPool/basic/MyFmin.h  core/functionPool/explog/MyExp.h core/functionPool/explog/MyExp2.h core/functionPool/explog/MyLog.h   core/functionPool/explog/MyLog2.h  core/functionPool/explog/MyLog10.h  core/functionPool/powSqrt/MyPow.h  core/functionPool/powSqrt/MySqrt.h   core/functionPool/powSqrt/MyCbrt.h   core/functionPool/powSqrt/MyHypot.h   core/functionPool/trigonometric/MySin.h    core/functionPool/trigonometric/MyCos.h    core/functionPool/trigonometric/MyTan.h    core/functionPool/trigonometric/MyAsin.h     core/functionPool/trigonometric/MyAcos.h   core/functionPool/trigonometric/MyAtan.cpp   core/functionPool/trigonometric/MyAtan2.h     core/functionPool/nearest/MyCeil.h      core/functionPool/nearest/MyFloor.h     core/functionPool/nearest/MyTrunc.h     core/functionPool/nearest/MyRound.h   
+build/functionMgr.o:core/functionPool/functionMgr.cpp  core/functionPool/functionMgr.h  core/functionPool/functionBase.h  core/functionPool/basic/MyAbs.h  core/functionPool/basic/MyFmod.h  core/functionPool/basic/MyFmax.h  core/functionPool/basic/MyFmin.h  core/functionPool/explog/MyExp.h core/functionPool/explog/MyExp2.h core/functionPool/explog/MyLog.h   core/functionPool/explog/MyLog2.h  core/functionPool/explog/MyLog10.h  core/functionPool/powSqrt/MyPow.h  core/functionPool/powSqrt/MySqrt.h   core/functionPool/powSqrt/MyCbrt.h   core/functionPool/powSqrt/MyHypot.h   core/functionPool/trigonometric/MySin.h    core/functionPool/trigonometric/MyCos.h    core/functionPool/trigonometric/MyTan.h    core/functionPool/trigonometric/MyAsin.h     core/functionPool/trigonometric/MyAcos.h   core/functionPool/trigonometric/MyAtan.cpp   core/functionPool/trigonometric/MyAtan2.h     core/functionPool/nearest/MyCeil.h      core/functionPool/nearest/MyFloor.h     core/functionPool/nearest/MyTrunc.h     core/functionPool/nearest/MyRound.h   
 	g++    $(COMPILE_OPT)  -o  build/functionMgr.o    core/functionPool/functionMgr.cpp
 
 
 
 
 ##################################################
-#  abs / fmod / remainder / fmin / fmax  
+#  abs / fmod /  fmin / fmax  
 ##################################################
 build/MyAbs.o:core/functionPool/basic/MyAbs.cpp   core/functionPool/basic/MyAbs.h   core/functionPool/functionBase.h    core/functionPool/functionMgr.h    core/token/expEvaluation.h 
 	g++    $(COMPILE_OPT)  -o  build/MyAbs.o    core/functionPool/basic/MyAbs.cpp
@@ -132,8 +132,6 @@ build/MyAbs.o:core/functionPool/basic/MyAbs.cpp   core/functionPool/basic/MyAbs.
 build/MyFmod.o:core/functionPool/basic/MyFmod.cpp   core/functionPool/basic/MyFmod.h   core/functionPool/functionBase.h    core/functionPool/functionMgr.h    core/token/expEvaluation.h  
 	g++    $(COMPILE_OPT)  -o  build/MyFmod.o    core/functionPool/basic/MyFmod.cpp
 
-build/MyRemainder.o:core/functionPool/basic/MyRemainder.cpp   core/functionPool/basic/MyRemainder.h   core/functionPool/functionBase.h     core/functionPool/functionMgr.h    core/token/expEvaluation.h 
-	g++    $(COMPILE_OPT)  -o  build/MyRemainder.o    core/functionPool/basic/MyRemainder.cpp
 
 build/MyFmin.o:core/functionPool/basic/MyFmin.cpp   core/functionPool/basic/MyFmin.h   core/functionPool/functionBase.h     core/functionPool/functionMgr.h    core/token/expEvaluation.h 
 	g++    $(COMPILE_OPT)  -o  build/MyFmin.o    core/functionPool/basic/MyFmin.cpp
@@ -235,3 +233,5 @@ build/MyRound.o:core/functionPool/nearest/MyRound.cpp   core/functionPool/neares
 .PHONY:clean
 clean:
 	-rm   -Rf   arithMetic *.exe *.dSYM   build/*.o  build/arithMetic*
+
+

@@ -23,7 +23,7 @@ FunctionBase::FunctionBase()
 
 FunctionBase::~FunctionBase()
 {
-	m_argumentList.clear();
+    m_argumentList.clear();
 
     m_argResultList.clear();
     m_argStrSuffixExprList.clear();
@@ -43,37 +43,38 @@ TokenBase* FunctionBase::executeFunction()
         throw e;
     }
 
-	auto needThrow = true;
+    auto needThrow = true;
     preCheckArgCount( needThrow );
 
     // prepare argument expression evaluation and a certain argument list's  string suffix
     m_argResultList.clear();
     m_argStrSuffixExprList.clear();
-	if ( FunctionMgr::isUseStdCallConvension() ) {
-		for ( auto rit = m_argumentList.rbegin(); rit != m_argumentList.rend(); ++rit ) {
+    auto needCheckVarible = true;
+    if ( FunctionMgr::isUseStdCallConvension() ) {
+        for ( auto rit = m_argumentList.rbegin(); rit != m_argumentList.rend(); ++rit ) {
             m_argStrSuffixExprList.push_front( FunctionBase::getSuffixExpString( *rit ) );
 
-			auto expEvaObject = ExpEvaluation::createANewEvaluator();
-			auto oneArgValue = expEvaObject->evaluateSuffixExpression( *rit );
+            auto expEvaObject = ExpEvaluation::createANewEvaluator();
+            auto oneArgValue = expEvaObject->evaluateSuffixExpression( *rit, needCheckVarible );
             m_argResultList.push_front( oneArgValue );
-		}
-	} else {
-		for( auto fit = m_argumentList.begin(); fit != m_argumentList.end(); ++fit ) {
+        }
+    } else {
+        for( auto fit = m_argumentList.begin(); fit != m_argumentList.end(); ++fit ) {
             m_argStrSuffixExprList.push_back( FunctionBase::getSuffixExpString( *fit ) );
 
-			auto expEvaObject = ExpEvaluation::createANewEvaluator();
-			auto oneArgValue = expEvaObject->evaluateSuffixExpression( *fit );
-			m_argResultList.push_back( oneArgValue );
-		}
-	}
+            auto expEvaObject = ExpEvaluation::createANewEvaluator();
+            auto oneArgValue = expEvaObject->evaluateSuffixExpression( *fit, needCheckVarible );
+            m_argResultList.push_back( oneArgValue );
+        }
+    }
 
 
     auto retValue = doCall();
 
-	// After call , Delete argument list
-	m_argumentList.clear();
+    // After call , Delete argument list
+    m_argumentList.clear();
 
-	return retValue;
+    return retValue;
 }
 
 
@@ -82,13 +83,13 @@ bool FunctionBase::preCheckArgCount(bool needThrow)
     int argCnt = static_cast<int>( m_argumentList.size() );
     int requiredCnt = getRequiredArgumentsCount();
 
-	auto isMatched =  (argCnt != requiredCnt);
-	if ( needThrow ) {
-		if ( argCnt >  requiredCnt )  {
-			MyException e(E_THROW_CALL_FUNCTION_TOO_MANY_ARGUMENTS, m_argumentList.back().back()->getBeginPos() );
+    auto isMatched =  (argCnt != requiredCnt);
+    if ( needThrow ) {
+        if ( argCnt >  requiredCnt )  {
+            MyException e(E_THROW_CALL_FUNCTION_TOO_MANY_ARGUMENTS, m_argumentList.back().back()->getBeginPos() );
             e.setDetail( string("function.name = ") + m_funcName );
-			throw e;
-		} else if ( argCnt <  requiredCnt ) {
+            throw e;
+        } else if ( argCnt <  requiredCnt ) {
             if ( argCnt != 0 ) {
                 MyException e(E_THROW_CALL_FUNCTION_TOO_LITTLE_ARGUMENTS, m_argumentList.back().back()->getBeginPos() );
                 e.setDetail( string("function.name = ") + m_funcName );
@@ -98,26 +99,26 @@ bool FunctionBase::preCheckArgCount(bool needThrow)
                 e.setDetail( string("function.name = ") + m_funcName + string(" . it has 0 argument   "));
                 throw e;
             }
-		}
-	} 
-	
-	return isMatched;
+        }
+    } 
+
+    return isMatched;
 }
 
 
 void FunctionBase::pushOneArgumentExpr( const std::list<TokenBase*>& oneArgumentExpr )
 {
-	using namespace std;
+    using namespace std;
 
     int requiredCnt = getRequiredArgumentsCount();
-	int existedSz = static_cast<int>( m_argumentList.size() );
-	if ( (existedSz + 1) > requiredCnt ) {
-		MyException e(E_THROW_PARSE_FUNCTION_PUSH_TOO_MANY_ARGUMENTS, oneArgumentExpr.back()->getBeginPos() );
-		e.setDetail( m_funcName + string(" , it required argument count = ") + to_string(requiredCnt) + string(", a new argument #") + to_string(existedSz + 1) + string(" to be pushed. ") );
+    int existedSz = static_cast<int>( m_argumentList.size() );
+    if ( (existedSz + 1) > requiredCnt ) {
+        MyException e(E_THROW_PARSE_FUNCTION_PUSH_TOO_MANY_ARGUMENTS, oneArgumentExpr.back()->getBeginPos() );
+        e.setDetail( m_funcName + string(" , it required argument count = ") + to_string(requiredCnt) + string(", a new argument #") + to_string(existedSz + 1) + string(" to be pushed. ") );
         throw e;
-	}
+    }
 
-	m_argumentList.push_back( oneArgumentExpr );
+    m_argumentList.push_back( oneArgumentExpr );
 }
 
 
@@ -131,7 +132,7 @@ void FunctionBase::setCloseParenthesisValidFlag(TokenBase* pEndParenthesis)
 
 bool FunctionBase::isFunctionEndupValid()
 {
-	return m_pCloseParenthesis != nullptr;
+    return m_pCloseParenthesis != nullptr;
 }
 
 

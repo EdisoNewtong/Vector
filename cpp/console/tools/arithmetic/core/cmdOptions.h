@@ -11,6 +11,8 @@ public:
     static std::pair<bool,std::string>   parseCmdArgs(const std::vector<std::string>& args);
     static std::pair<bool,std::string>   parseCfgFile(bool hasCmdArgs, const std::string& cfgfile, const std::string& binPath);
 
+
+    static std::string getFunctionsList();
     static std::string getUserManual();
     static std::string getDefaultCfgFileName();
     static std::string sampleCfgFile();

@@ -11,15 +11,16 @@ public:
     static void init();
     static void release();
 
-    static ExpEvaluation* createANewEvaluator();
 
 public:
     TokenBase* doNormalExpEvaluation(const std::vector<TokenBase*>& expList, int begIdx, bool checkVaibleIsValid);
     void doNewVaribleDefEvaluation(E_DataType definedDataType, const std::vector<TokenBase*>& expList, int begIdx);
 
-    TokenBase* evaluateSuffixExpression(std::list<TokenBase*>& suffixExpression);
+    TokenBase* evaluateSuffixExpression(std::list<TokenBase*>& suffixExpression, bool needCheckVarible);
 
     static TokenBase* generateTmpExpression(E_DataType dt, const std::string& expression, TokenBase* begtoken, TokenBase* endtoken);
+    static ExpEvaluation* createANewEvaluator();
+
 protected:
     struct suffixExpEnv {
         suffixExpEnv() 
@@ -44,6 +45,7 @@ protected:
     static void clearTmpTokenList();
     static void clearAllocedEvaluator();
     static void clearEnvList();
+
     static suffixExpEnv* allocEnvObject();
 
 protected:
@@ -61,18 +63,18 @@ protected:
 
 
 
-    void traceOperatorStack(TokenBase* pToken, bool push);
-    void traceSuffixExpression(TokenBase* pToken, bool push);
-    void tracePositiveNegativeFlag(TokenBase* pPreviousToken, E_OperatorType op);
-    void traceSomeTokensFromOpMove2SuffixExpression(const std::list<TokenBase*>& lst, bool specialFlag);
-    void traceOpMove2SuffixExpression(TokenBase* pToken);
-    void traceUnInitializedVarWhenUsed(TokenBase* pToken);
-    void traceTmpOpResult(const std::string& expr, DataValue& retValue);
+    void traceOperatorStack(TokenBase* pToken, bool push);//D
+    void traceSuffixExpression(TokenBase* pToken, bool push);//D
+    void tracePositiveNegativeFlag(TokenBase* pPreviousToken, E_OperatorType op);//D
+    void traceSomeTokensFromOpMove2SuffixExpression(const std::list<TokenBase*>& lst, bool specialFlag);//D
+    void traceOpMove2SuffixExpression(TokenBase* pToken);//D
+    void traceUnInitializedVarWhenUsed(TokenBase* pToken);//D
+    void traceTmpOpResult(const std::string& expr, DataValue& retValue);//D
 
 
-    void traceNegativeOperation(TokenBase* right);
+    void traceNegativeOperation(TokenBase* right);//D
     void traceBitShiftWarning(bool isLeftBitShift, TokenBase* left,  TokenBase* right);
-    void traceAssignOverFlow(TokenBase* leftVar, TokenBase* rightFixedInt);
+    void traceAssignOverFlow(TokenBase* leftVar, TokenBase* rightFixedInt);//D
 
 
 
@@ -115,8 +117,11 @@ protected:
     TokenBase* doNegative(TokenBase* op, TokenBase* right);
     TokenBase* doBitNot(TokenBase* op, TokenBase* right);
 
+    // for only one operand ,  dataType conversion ( such as : + , - , ~ )
     E_DataType operatorPrepairDataTypeConversion1(DataValue* pRightVal);
+    // for two operands , dataType conversion
     E_DataType operatorPrepairDataTypeConversion2(DataValue* pLeftVal, DataValue* pRightVal);
+
 
 protected:
     static std::list<TokenBase*>                      s_generatedTmpTokenPool;

@@ -110,7 +110,7 @@ TokenBase* ExpEvaluation::doNormalExpEvaluation(const vector<TokenBase*>& expLis
     auto currentEnv = veryBeginningEnv;
 
     buildSuffixExpression(expList, begIdx, currentEnv, checkVaibleIsValid);
-    return evaluateSuffixExpression( currentEnv->suffixExpression );
+    return evaluateSuffixExpression( currentEnv->suffixExpression, checkVaibleIsValid );
 }
 
 
@@ -790,10 +790,9 @@ void ExpEvaluation::traceOpMove2SuffixExpression(TokenBase* pToken)
 }
 
 
-TokenBase* ExpEvaluation::evaluateSuffixExpression(list<TokenBase*>& suffixExpression)
+TokenBase* ExpEvaluation::evaluateSuffixExpression(list<TokenBase*>& suffixExpression, bool needCheckVarible)
 {
     list<TokenBase*> backupSuffixExpression(suffixExpression);
-
 
     int operatorProcessCnt = 0; // count for do binaryOp/UnaryOp Cnt
     int previousExpCnt = 0;
@@ -815,6 +814,20 @@ TokenBase* ExpEvaluation::evaluateSuffixExpression(list<TokenBase*>& suffixExpre
                 ++previousExpCnt;
             } else {
                 // varible or fixed literal number 
+                if ( needCheckVarible && currentElement->isVarible() ) {
+                    string pVisitVarName = currentElement->getTokenContent();
+
+                    VaribleInfo* pVisitedVaribleInfo = VariblePool::getPool()->getVaribleByName( pVisitVarName );
+                    if ( pVisitedVaribleInfo == nullptr ) {
+                        MyException e(E_THROW_VARIBLE_NOT_DEFINED , currentElement->getBeginPos());
+                        e.setDetail( pVisitVarName );
+                        throw e;
+                    }
+
+                    currentElement->setDataType( pVisitedVaribleInfo->dataVal.type );
+                    currentElement->setRealValue( pVisitedVaribleInfo->dataVal );
+                }
+
                 ++it;
                 ++previousExpCnt;
             }
@@ -1055,7 +1068,7 @@ TokenBase* ExpEvaluation::doBinaryOp(TokenBase* left, TokenBase* op, TokenBase* 
     case E_BIT_RIGHT_SHIFT_ASSIGNMENT:     // >>=
         genTmpExp = do_Bit_RightShift_Assignment(left, right);
         break;
-    case E_COMMA:     // >>=
+    case E_COMMA:     // , 
         genTmpExp = doCommaExpression(left, right);
         break;
     default:
@@ -1473,20 +1486,10 @@ TokenBase* ExpEvaluation::doAssignment(TokenBase* left, TokenBase* right)
     toBeAssignmentVar->dataVal.doAssignment( leftVal );
     toBeAssignmentVar->isInitialed = true; // set as initialed
 
-
-    /*
-     * TODO  ??? 
-    traceTmpOpResult(finalExpr, leftVal);
-
-    TokenBase* ret = generateTmpExpression( leftVal.type , finalExpr, left, right);
-    ret->setRealValue( leftVal );
-
-    return ret;
-    */
-
     traceTmpOpResult(finalExpr, leftVal);
     left->setGeneratedExp( finalExpr );
     return left;
+
 }
 
 

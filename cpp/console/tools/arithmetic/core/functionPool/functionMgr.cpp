@@ -3,7 +3,6 @@
 
 #include "MyAbs.h"
 #include "MyFmod.h"
-#include "MyRemainder.h"
 #include "MyFmax.h"
 #include "MyFmin.h"
 
@@ -36,6 +35,7 @@ using namespace std;
 // staitc  , set std-call call convention  as default
 bool    FunctionMgr::s_callingConvention_StdCall { true };
 bool    FunctionMgr::isUseStdCallConvension() { return FunctionMgr::s_callingConvention_StdCall; }
+void    FunctionMgr::setStdCallConvension(bool bIsStdCallConvension) { FunctionMgr::s_callingConvention_StdCall = bIsStdCallConvension; }
 
 
 // static     
@@ -182,8 +182,6 @@ FunctionBase* FunctionMgr::generateFunctionObjectByName(const string& funcName)
         fObject = new My_abs();
     } else if ( funcName == "fmod" ) {
 		fObject = new My_fmod();
-    } else if ( funcName == "remainder" ) {
-		fObject = new My_remainder();
     } else if ( funcName == "fmax" ) {
 		fObject = new My_fmax();
     } else if ( funcName == "fmin" ) {
