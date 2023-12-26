@@ -48,6 +48,7 @@ R"([Flag]
     TREAT_UNINITIALIZED_VARIBLE_AS_ERROR = 0
     PRINT_PARSE_FILE_LENGTH = 0
     NEED_CHECK_FIXED_LITERAL_INT_RANGE_WHEN_ASSIGN = 1
+	TRACE_UNINITIALIZED_VARIBLE_WHEN_EVALUATING_EXPRESSIONS = 1
 
     TRACE_PARSE_TIME_STEP = 0
 )"
@@ -72,6 +73,7 @@ const vector< pair<string,unsigned long> > CmdOptions::SC_DEBUG_OPTIONS_MAP{
     { string("TREAT_UNINITIALIZED_VARIBLE_AS_ERROR = "),              13UL },
     { string("PRINT_PARSE_FILE_LENGTH = "),                           14UL },
     { string("NEED_CHECK_FIXED_LITERAL_INT_RANGE_WHEN_ASSIGN = "),    15UL },
+    { string("TRACE_UNINITIALIZED_VARIBLE_WHEN_EVALUATING_EXPRESSIONS = "),    16UL },
 
     { string("TRACE_PARSE_TIME_STEP = "),                             23UL }
 };
@@ -344,6 +346,53 @@ void CmdOptions::printDataTypeRangeIfNecessary()
 }
 
 
+// static
+string CmdOptions::getFunctionsList()
+{
+    return R"(
+--------------------------
+| Built-in Function List |
+--------------------------
+// Basic
+double abs(double arg);    // return   | arg |;
+double fmod(double n1, double n2);    // return the remainder  :   n1 - ( static_cast<int>( n1/n2 ) * n2 );
+double fmin(double n1, double n2);    // return the min one of (n1,n2)
+double fmax(double n1, double n2);    // return the max one of (n1,n2)
+
+// explog 
+double exp(double exp);  // return e^(exp);  e.g. exp(3) => e*e*e;
+double exp2(double exp);  // return 2^(exp);  e.g. exp2(4) => 2*2*2*2 = 16;
+double log(double arg);  // return ln(arg);  e.g. log(e*e*e) = 3;
+double log2(double arg);  // return log_2(arg);  e.g. log(2*2*2*2) = 4;
+double log10(double arg);  // return log_10(arg);  e.g. log(1000) = 3;
+
+
+// powSqrt
+double pow(double base,double exp);  // return base^(exp);  e.g. exp(3,4) => 3*3*3*3 = 81
+double sqrt(double arg);  // return arg^(1/2); e.g. sqrt(121) => 11
+double cbrt(double arg);  // return arg^(1/3); e.g. cbrt(125) => 5
+double hypot(double a,double b);  // return sqrt(  a*a + b*b );
+
+// trigonometric
+double sin(double radNum);  // return sin(rad);  sin(PI/6) => 0.5 
+double cos(double radNum);  // return cos(rad);  sin(PI/3) => 0.5 
+double tan(double radNum);  // return tan(rad);  sin(PI/4) => 1.0
+double asin(double num); // return asin(num);  asin(0.5) => PI/6;
+double acos(double num); // return acos(num);  acos(0.5) => PI/3;
+double atan(double num); // return atan(num);  atan(1.0) => PI/4;
+double atan2(double a,double b); // return atan(a/b);  atan2(3.0,3.0) => PI/4;
+
+// nearest
+double ceil(double n);  // return the min int number no less than n
+double floor(double n); // return the max int number no greater than n
+double trunc(double n); // return the int part of the float number
+double round(double n); // return halfway case away from zero. round(2.3) => 2.0, round(2.5) => 3.0, round(2.7) => 3.0
+
+)";
+
+}
+
+
 // static 
 string CmdOptions::getUserManual()
 {
@@ -359,6 +408,8 @@ string CmdOptions::getUserManual()
 
     strUserManul += SPACE_2;
     strUserManul += "<sourceCode>\n";
+    strUserManul += "====================================================================================================\n";
+    strUserManul += CmdOptions::getFunctionsList();
     strUserManul += "====================================================================================================\n";
 
     return strUserManul;
@@ -417,11 +468,16 @@ bool CmdOptions::needTreatBlankStatementAsWarning()            { return  ( (s_de
 bool CmdOptions::needTreatUninitializedVaribleAsError()        { return  ( (s_debugOption >> 13UL)     & 0x1UL) != 0;  }
 bool CmdOptions::needPrintSrcCodeLength()                      { return  ( (s_debugOption >> 14UL)     & 0x1UL) != 0;  }
 bool CmdOptions::needCheckFixedLiteralIntRangeWhenAssign()     { return  ( (s_debugOption >> 15UL)     & 0x1UL) != 0;  }
+bool CmdOptions::needTraceUninitializedVaribleWhenEvaluatingExpression()     { return  ( (s_debugOption >> 16UL)     & 0x1UL) != 0;  }
 
 bool CmdOptions::needTraceParseTimeStep()                      { return  ( (s_debugOption >> 23UL)     & 0x1UL) != 0;  }
+
+
+
 
 
 string CmdOptions::sampleCfgFile()
 {
     return SC_CFG_CONTENT;
 }
+

@@ -17,8 +17,29 @@
 #include "cmdOptions.h"
 #include "variblePool.h"
 #include "dataTypeUtil.h"
+#include "functionMgr.h"
+#include "expEvaluation.h"
 
 using namespace std;
+
+
+
+constexpr static const int G_MAJOR = 1;
+constexpr static const int G_MINOR = 4;
+constexpr static const int G_PATCH = 0;
+
+
+
+std::string getProgram_Version()
+{
+    const std::string S_FEATURE_DESCRIPTION("( Support Function-Call )");
+
+    return    string("  Arith V ")
+            + to_string(G_MAJOR) + string(".") 
+            + to_string(G_MINOR) + string(".")
+            + to_string(G_PATCH)
+            + string(" is Running.  ") + S_FEATURE_DESCRIPTION;
+}
 
 
 //
@@ -118,6 +139,7 @@ string getBinaryPath(const string& strProgName, char* env[])
 int main(int argc, char* argv[], char* env[])
 {
     string runningPath = getBinaryPath(string(argv[0]), env);
+    cout << getProgram_Version() << endl;
 
     if ( argc < 2 ) {
         cout << "[ERROR] : Missing a given file to parse !!" << endl;
@@ -224,6 +246,8 @@ int main(int argc, char* argv[], char* env[])
     DataTypeUtil::init();
     VariblePool::init();
     TokenMgr::init();
+    FunctionMgr::init();
+    ExpEvaluation::init();
 
     // if ( !DataTypeUtil::testCase() ) {
     //     cout << "testCase Failed" << endl;
@@ -264,6 +288,8 @@ int main(int argc, char* argv[], char* env[])
         cout << "[ERROR] : Meet an unexpection exception : " << endl;
     }
 
+    ExpEvaluation::release();
+    FunctionMgr::finalize();
     TokenMgr::release();
     VariblePool::finalize();
     DataTypeUtil::finalize();

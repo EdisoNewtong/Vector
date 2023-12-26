@@ -17,11 +17,11 @@ unordered_set<string> KeyWordList::s_keywordList{
     "compl",  // same as '~'
 
     "auto",
-    "bool",
+    "bool", // Try    bool    support ?
     "break",
     "case",
     "catch",
-    "char",
+    "char",  // picked 
     "class",
     "const",
     "const_cast",
@@ -30,21 +30,21 @@ unordered_set<string> KeyWordList::s_keywordList{
     "default",
     "delete",
     "do",
-    "double",
+    "double",  // picked   
     "dynamic_cast",
     "else",
     "enum",
     "explicit",
     "extern",
-    "false",
-    "float",
+    "false",  // Try    bool    support ?
+    "float",  // picked   
     "for",
     "friend",
     "goto",
     "if",
     "inline",
-    "int",
-    "long",
+    "int",  // picked   
+    "long",  // picked   
     "mutable",
     "namespace",
     "new",
@@ -57,8 +57,8 @@ unordered_set<string> KeyWordList::s_keywordList{
     "register",
     "reinterpret_cast",
     "return",
-    "short",
-    "signed",
+    "short",  // picked   
+    "signed",  // picked   
     "sizeof",
     "static",
     "static_cast",
@@ -67,13 +67,13 @@ unordered_set<string> KeyWordList::s_keywordList{
     "template",
     "this",
     "throw",
-    "true",
+    "true",  // Try    bool    support ?
     "try",
     "typedef",
     "typeid",
     "typename",
     "union",
-    "unsigned",
+    "unsigned",  // picked   
     "using",
     "virtual",
     "void",
@@ -126,4 +126,3 @@ bool KeyWordList::isTypeKeyWord(const std::string& name)
 {
     return s_typeKeyword.find(name) != s_typeKeyword.end();
 }
-

@@ -4,7 +4,9 @@
 #include "commonEnum.h"
 #include "buff.h"
 #include "dataValue.h"
+#include "functionBase.h"
 #include <string>
+
 
 class TokenBase
 {
@@ -30,6 +32,11 @@ public:
 
     std::string    getTokenContent();
     void           setTokenContent(const std::string& content);
+
+    void           setGeneratedExp(const std::string& exp);
+    std::string    getGeneratedExp();
+
+
     void           setTokenContentWithoutSuffix(const std::string& content, const std::string& noSuffix);
     std::string    getExpressionContent();
 
@@ -38,6 +45,10 @@ public:
 
     bool           isVarible();
     void           setAsVarible();
+
+	bool           isFunction();
+	void           setAsFunction(FunctionBase* pFunc);
+    FunctionBase*  getFuncObject();
 
     void           setBeginPos(const ChInfo& beg);
     ChInfo         getBeginPos();
@@ -49,6 +60,9 @@ public:
 
     void           setWarningContent( const std::string& content);
     std::string    getWarningContent();
+
+	void            setContextRoleForOp(const E_OpAnotherRoleFlag& flag);
+	E_OpAnotherRoleFlag getContextRoleForOp();
 protected:
     E_TokenType    m_tokenType;
 
@@ -58,9 +72,9 @@ protected:
     ////////////////////////////////////////////////////////////////////////////////////////////////////////
     //
     //-----------------------------------------------------------------------------------------------------
-    //             |      7      6    5      |   4     3   2   1  |
+    //             |    8        7      6    5      |   4     3   2   1  |
     //-----------------------------------------------------------------------------------------------------
-    // 8 bits      | x keywords exp varible  | float  hex oct dec |
+    // 8 bits      | function keywords exp varible  | float  hex oct dec |
     //----------------------------------------------------------------------------------------------------
     //
     //  if token is an intermediate tmp expression : val = 0x20
@@ -69,7 +83,15 @@ protected:
     ////////////////////////////////////////////////////////////////////////////////////////////////////////
     unsigned char  m_expTypeFlag;
 
+	// function call is under develop ,    
+	// 
+	//      ','( Comma )  ,    
+	//      '(' ( Open Parenthese )    
+	//       play role flag
+	E_OpAnotherRoleFlag m_opFlag;
+
     std::string    m_token_content;
+    std::string    m_token_build_exp;
 
     ChInfo         m_beginPos;
     ChInfo         m_endPos;
@@ -77,6 +99,9 @@ protected:
     DataValue      m_dataValue;
 
     std::string    m_warningContent;
+
+    FunctionBase*  m_funcObject;
+
 };
 
 #endif
