@@ -11,6 +11,8 @@ public:
     static std::pair<bool,std::string>   parseCmdArgs(const std::vector<std::string>& args);
     static std::pair<bool,std::string>   parseCfgFile(bool hasCmdArgs, const std::string& cfgfile, const std::string& binPath);
 
+
+    static std::string getFunctionsList();
     static std::string getUserManual();
     static std::string getDefaultCfgFileName();
     static std::string sampleCfgFile();
@@ -26,7 +28,8 @@ public:
     static bool needPrintVarible_8();
     static bool isOctalDefaultStyle();
 
-	static bool needDoBitwiseShift_Mod_Algorithm();
+    static bool needDoBitwiseShift_Mod_Algorithm();
+    static bool isFunctionUseStdCallConvension();
 
     static bool isPrintVaribleFormatValid();
 
@@ -58,6 +61,8 @@ public:
     static bool needTreatUninitializedVaribleAsError();
     static bool needTraceParseTimeStep();
     static bool needPrintSrcCodeLength();
+
+    static bool needTraceUninitializedVaribleWhenEvaluatingExpression();
 protected:
     static bool needPrintDataTypeRange();
 

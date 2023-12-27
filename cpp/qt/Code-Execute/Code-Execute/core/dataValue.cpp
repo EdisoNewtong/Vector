@@ -18,9 +18,9 @@ using namespace std;
 //       error C4146:  Can't apply unary minus operator to an unsigned type
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-//#ifdef _WIN32
-//#pragma warning( disable : 4146 )
-//#endif
+#ifdef _WIN32
+#pragma warning( disable : 4146 )
+#endif
 
 namespace intTypeRange
 {
@@ -398,6 +398,648 @@ void DataValue::doConvertion(E_DataType destinationTp)
         break;
     }
 
+
+    type = destinationTp;
+}
+
+
+
+void DataValue::forceCast(E_DataType destinationTp)
+{
+    if ( type == destinationTp ) { 
+        return; 
+    }
+    
+    switch ( destinationTp )
+    {
+    case E_TP_CHAR:
+        {
+            switch( type )
+            {
+            // case E_TP_CHAR:
+            //     value.char_val = static_cast<unsigned char>( value.char_val );
+            //     break;
+            case E_TP_U_CHAR:
+                value.char_val = static_cast<char>( value.uchar_val );
+                break;
+            case E_TP_S_CHAR:
+                value.char_val = static_cast<char>( value.schar_val );
+                break;
+            case E_TP_U_SHORT:
+                value.char_val = static_cast<char>( value.ushort_val );
+                break;
+            case E_TP_S_SHORT:
+                value.char_val = static_cast<char>( value.sshort_val );
+                break;
+            case E_TP_U_INT:
+                value.char_val = static_cast<char>( value.uint_val );
+                break;
+            case E_TP_S_INT:
+                value.char_val = static_cast<char>( value.sint_val );
+                break;
+            case E_TP_U_LONG:
+                value.char_val = static_cast<char>( value.ulong_val );
+                break;
+            case E_TP_S_LONG:
+                value.char_val = static_cast<char>( value.slong_val );
+                break;
+            case E_TP_U_LONG_LONG:
+                value.char_val = static_cast<char>( value.ulonglong_val );
+                break;
+            case E_TP_S_LONG_LONG:
+                value.char_val = static_cast<char>( value.slonglong_val );
+                break;
+            case E_TP_FLOAT:
+                value.char_val = static_cast<char>( value.float_val );
+                break;
+            case E_TP_DOUBLE:
+                value.char_val = static_cast<char>( value.double_val );
+                break;
+            default:
+                break;
+            }
+        }
+        break;
+    case E_TP_U_CHAR:  // unsigned char
+        {
+            switch( type )
+            {
+            case E_TP_CHAR:
+                value.uchar_val = static_cast<unsigned char>( value.char_val );
+                break;
+            //case E_TP_U_CHAR:
+            //    value.uchar_val = static_cast<unsigned char>( value.uchar_val );
+            //    break;
+            case E_TP_S_CHAR:
+                value.uchar_val = static_cast<unsigned char>( value.schar_val );
+                break;
+            case E_TP_U_SHORT:
+                value.uchar_val = static_cast<unsigned char>( value.ushort_val );
+                break;
+            case E_TP_S_SHORT:
+                value.uchar_val = static_cast<unsigned char>( value.sshort_val );
+                break;
+            case E_TP_U_INT:
+                value.uchar_val = static_cast<unsigned char>( value.uint_val );
+                break;
+            case E_TP_S_INT:
+                value.uchar_val = static_cast<unsigned char>( value.sint_val );
+                break;
+            case E_TP_U_LONG:
+                value.uchar_val = static_cast<unsigned char>( value.ulong_val );
+                break;
+            case E_TP_S_LONG:
+                value.uchar_val = static_cast<unsigned char>( value.slong_val );
+                break;
+            case E_TP_U_LONG_LONG:
+                value.uchar_val = static_cast<unsigned char>( value.ulonglong_val );
+                break;
+            case E_TP_S_LONG_LONG:
+                value.uchar_val = static_cast<unsigned char>( value.slonglong_val );
+                break;
+            case E_TP_FLOAT:
+                value.uchar_val = static_cast<unsigned char>( value.float_val );
+                break;
+            case E_TP_DOUBLE:
+                value.uchar_val = static_cast<unsigned char>( value.double_val );
+                break;
+            default:
+                break;
+            }
+        }
+        break;
+    case E_TP_S_CHAR:  //   signed char
+        {
+            switch( type )
+            {
+            case E_TP_CHAR:
+                value.schar_val = static_cast<signed char>( value.char_val );
+                break;
+            case E_TP_U_CHAR:
+                value.schar_val = static_cast<signed char>( value.uchar_val );
+                break;
+            // case E_TP_S_CHAR:
+            //     value.uchar_val = static_cast<unsigned char>( value.schar_val );
+            //     break;
+            case E_TP_U_SHORT:
+                value.schar_val = static_cast<signed char>( value.ushort_val );
+                break;
+            case E_TP_S_SHORT:
+                value.schar_val = static_cast<signed char>( value.sshort_val );
+                break;
+            case E_TP_U_INT:
+                value.schar_val = static_cast<signed char>( value.uint_val );
+                break;
+            case E_TP_S_INT:
+                value.schar_val = static_cast<signed char>( value.sint_val );
+                break;
+            case E_TP_U_LONG:
+                value.schar_val = static_cast<signed char>( value.ulong_val );
+                break;
+            case E_TP_S_LONG:
+                value.schar_val = static_cast<signed char>( value.slong_val );
+                break;
+            case E_TP_U_LONG_LONG:
+                value.schar_val = static_cast<signed char>( value.ulonglong_val );
+                break;
+            case E_TP_S_LONG_LONG:
+                value.schar_val = static_cast<signed char>( value.slonglong_val );
+                break;
+            case E_TP_FLOAT:
+                value.schar_val = static_cast<signed char>( value.float_val );
+                break;
+            case E_TP_DOUBLE:
+                value.schar_val = static_cast<signed char>( value.double_val );
+                break;
+            default:
+                break;
+            }
+        }
+        break;
+    case E_TP_U_SHORT: // unsigned short
+        {
+            switch( type )
+            {
+            case E_TP_CHAR:
+                value.ushort_val = static_cast<unsigned short>( value.char_val );
+                break;
+            case E_TP_U_CHAR:
+                value.ushort_val = static_cast<unsigned short>( value.uchar_val );
+                break;
+            case E_TP_S_CHAR:
+                value.ushort_val = static_cast<unsigned short>( value.schar_val );
+                break;
+            // case E_TP_U_SHORT:
+            //     value.schar_val = static_cast<signed char>( value.ushort_val );
+            //     break;
+            case E_TP_S_SHORT:
+                value.ushort_val = static_cast<unsigned short>( value.sshort_val );
+                break;
+            case E_TP_U_INT:
+                value.ushort_val = static_cast<unsigned short>( value.uint_val );
+                break;
+            case E_TP_S_INT:
+                value.ushort_val = static_cast<unsigned short>( value.sint_val );
+                break;
+            case E_TP_U_LONG:
+                value.ushort_val = static_cast<unsigned short>( value.ulong_val );
+                break;
+            case E_TP_S_LONG:
+                value.ushort_val = static_cast<unsigned short>( value.slong_val );
+                break;
+            case E_TP_U_LONG_LONG:
+                value.ushort_val = static_cast<unsigned short>( value.ulonglong_val );
+                break;
+            case E_TP_S_LONG_LONG:
+                value.ushort_val = static_cast<unsigned short>( value.slonglong_val );
+                break;
+            case E_TP_FLOAT:
+                value.ushort_val = static_cast<unsigned short>( value.float_val );
+                break;
+            case E_TP_DOUBLE:
+                value.ushort_val = static_cast<unsigned short>( value.double_val );
+                break;
+            default:
+                break;
+            }
+        }
+        break;
+    case E_TP_S_SHORT: //   signed short
+        {
+            switch( type )
+            {
+            case E_TP_CHAR:
+                value.sshort_val = static_cast<signed short>( value.char_val );
+                break;
+            case E_TP_U_CHAR:
+                value.sshort_val = static_cast<signed short>( value.uchar_val );
+                break;
+            case E_TP_S_CHAR:
+                value.sshort_val = static_cast<signed short>( value.schar_val );
+                break;
+            case E_TP_U_SHORT:
+                value.sshort_val = static_cast<signed short>( value.ushort_val );
+                break;
+            // case E_TP_S_SHORT:
+            //     value.ushort_val = static_cast<unsigned short>( value.sshort_val );
+            //     break;
+            case E_TP_U_INT:
+                value.sshort_val = static_cast<signed short>( value.uint_val );
+                break;
+            case E_TP_S_INT:
+                value.sshort_val = static_cast<signed short>( value.sint_val );
+                break;
+            case E_TP_U_LONG:
+                value.sshort_val = static_cast<signed short>( value.ulong_val );
+                break;
+            case E_TP_S_LONG:
+                value.sshort_val = static_cast<signed short>( value.slong_val );
+                break;
+            case E_TP_U_LONG_LONG:
+                value.sshort_val = static_cast<signed short>( value.ulonglong_val );
+                break;
+            case E_TP_S_LONG_LONG:
+                value.sshort_val = static_cast<signed short>( value.slonglong_val );
+                break;
+            case E_TP_FLOAT:
+                value.sshort_val = static_cast<signed short>( value.float_val );
+                break;
+            case E_TP_DOUBLE:
+                value.sshort_val = static_cast<signed short>( value.double_val );
+                break;
+            default:
+                break;
+            }
+        }
+        break;
+    case E_TP_U_INT:   // unsigned int
+        {
+            switch( type )
+            {
+            case E_TP_CHAR:
+                value.uint_val = static_cast<unsigned int>( value.char_val );
+                break;
+            case E_TP_U_CHAR:
+                value.uint_val = static_cast<unsigned int>( value.uchar_val );
+                break;
+            case E_TP_S_CHAR:
+                value.uint_val = static_cast<unsigned int>( value.schar_val );
+                break;
+            case E_TP_U_SHORT:
+                value.uint_val = static_cast<unsigned int>( value.ushort_val );
+                break;
+            case E_TP_S_SHORT:
+                value.uint_val = static_cast<unsigned int>( value.sshort_val );
+                break;
+            // case E_TP_U_INT:
+            //     value.sshort_val = static_cast<signed short>( value.uint_val );
+            //     break;
+            case E_TP_S_INT:
+                value.uint_val = static_cast<unsigned int>( value.sint_val );
+                break;
+            case E_TP_U_LONG:
+                value.uint_val = static_cast<unsigned int>( value.ulong_val );
+                break;
+            case E_TP_S_LONG:
+                value.uint_val = static_cast<unsigned int>( value.slong_val );
+                break;
+            case E_TP_U_LONG_LONG:
+                value.uint_val = static_cast<unsigned int>( value.ulonglong_val );
+                break;
+            case E_TP_S_LONG_LONG:
+                value.uint_val = static_cast<unsigned int>( value.slonglong_val );
+                break;
+            case E_TP_FLOAT:
+                value.uint_val = static_cast<unsigned int>( value.float_val );
+                break;
+            case E_TP_DOUBLE:
+                value.uint_val = static_cast<unsigned int>( value.double_val );
+                break;
+            default:
+                break;
+            }
+        }
+        break;
+    case E_TP_S_INT:   //   signed int
+        {
+            switch( type )
+            {
+            case E_TP_CHAR:
+                value.sint_val = static_cast<signed int>( value.char_val );
+                break;
+            case E_TP_U_CHAR:
+                value.sint_val = static_cast<signed int>( value.uchar_val );
+                break;
+            case E_TP_S_CHAR:
+                value.sint_val = static_cast<signed int>( value.schar_val );
+                break;
+            case E_TP_U_SHORT:
+                value.sint_val = static_cast<signed int>( value.ushort_val );
+                break;
+            case E_TP_S_SHORT:
+                value.sint_val = static_cast<signed int>( value.sshort_val );
+                break;
+            case E_TP_U_INT:
+                value.sint_val = static_cast<signed int>( value.uint_val );
+                break;
+            // case E_TP_S_INT:
+            //     value.uint_val = static_cast<unsigned int>( value.sint_val );
+            //     break;
+            case E_TP_U_LONG:
+                value.sint_val = static_cast<signed int>( value.ulong_val );
+                break;
+            case E_TP_S_LONG:
+                value.sint_val = static_cast<signed int>( value.slong_val );
+                break;
+            case E_TP_U_LONG_LONG:
+                value.sint_val = static_cast<signed int>( value.ulonglong_val );
+                break;
+            case E_TP_S_LONG_LONG:
+                value.sint_val = static_cast<signed int>( value.slonglong_val );
+                break;
+            case E_TP_FLOAT:
+                value.sint_val = static_cast<signed int>( value.float_val );
+                break;
+            case E_TP_DOUBLE:
+                value.sint_val = static_cast<signed int>( value.double_val );
+                break;
+            default:
+                break;
+            }
+        }
+        break;
+    case E_TP_U_LONG:  // unsigned long
+        {
+            switch( type )
+            {
+            case E_TP_CHAR:
+                value.ulong_val = static_cast<unsigned long>( value.char_val );
+                break;
+            case E_TP_U_CHAR:
+                value.ulong_val = static_cast<unsigned long>( value.uchar_val );
+                break;
+            case E_TP_S_CHAR:
+                value.ulong_val = static_cast<unsigned long>( value.schar_val );
+                break;
+            case E_TP_U_SHORT:
+                value.ulong_val = static_cast<unsigned long>( value.ushort_val );
+                break;
+            case E_TP_S_SHORT:
+                value.ulong_val = static_cast<unsigned long>( value.sshort_val );
+                break;
+            case E_TP_U_INT:
+                value.ulong_val = static_cast<unsigned long>( value.uint_val );
+                break;
+            case E_TP_S_INT:
+                value.ulong_val = static_cast<unsigned long>( value.sint_val );
+                break;
+            // case E_TP_U_LONG:
+            //     value.sint_val = static_cast<signed int>( value.ulong_val );
+            //     break;
+            case E_TP_S_LONG:
+                value.ulong_val = static_cast<unsigned long>( value.slong_val );
+                break;
+            case E_TP_U_LONG_LONG:
+                value.ulong_val = static_cast<unsigned long>( value.ulonglong_val );
+                break;
+            case E_TP_S_LONG_LONG:
+                value.ulong_val = static_cast<unsigned long>( value.slonglong_val );
+                break;
+            case E_TP_FLOAT:
+                value.ulong_val = static_cast<unsigned long>( value.float_val );
+                break;
+            case E_TP_DOUBLE:
+                value.ulong_val = static_cast<unsigned long>( value.double_val );
+                break;
+            default:
+                break;
+            }
+        }
+        break;
+    case E_TP_S_LONG:  //   signed long
+        {
+            switch( type )
+            {
+            case E_TP_CHAR:
+                value.slong_val = static_cast<signed long>( value.char_val );
+                break;
+            case E_TP_U_CHAR:
+                value.slong_val = static_cast<signed long>( value.uchar_val );
+                break;
+            case E_TP_S_CHAR:
+                value.slong_val = static_cast<signed long>( value.schar_val );
+                break;
+            case E_TP_U_SHORT:
+                value.slong_val = static_cast<signed long>( value.ushort_val );
+                break;
+            case E_TP_S_SHORT:
+                value.slong_val = static_cast<signed long>( value.sshort_val );
+                break;
+            case E_TP_U_INT:
+                value.slong_val = static_cast<signed long>( value.uint_val );
+                break;
+            case E_TP_S_INT:
+                value.slong_val = static_cast<signed long>( value.sint_val );
+                break;
+            case E_TP_U_LONG:
+                value.slong_val = static_cast<signed long>( value.ulong_val );
+                break;
+            // case E_TP_S_LONG:
+            //     value.ulong_val = static_cast<unsigned long>( value.slong_val );
+            //     break;
+            case E_TP_U_LONG_LONG:
+                value.slong_val = static_cast<signed long>( value.ulonglong_val );
+                break;
+            case E_TP_S_LONG_LONG:
+                value.slong_val = static_cast<signed long>( value.slonglong_val );
+                break;
+            case E_TP_FLOAT:
+                value.slong_val = static_cast<signed long>( value.float_val );
+                break;
+            case E_TP_DOUBLE:
+                value.slong_val = static_cast<signed long>( value.double_val );
+                break;
+            default:
+                break;
+            }
+        }
+        break;
+    case E_TP_U_LONG_LONG: // unsigned long long
+        {
+            switch( type )
+            {
+            case E_TP_CHAR:
+                value.ulonglong_val = static_cast<unsigned long long>( value.char_val );
+                break;
+            case E_TP_U_CHAR:
+                value.ulonglong_val = static_cast<unsigned long long>( value.uchar_val );
+                break;
+            case E_TP_S_CHAR:
+                value.ulonglong_val = static_cast<unsigned long long>( value.schar_val );
+                break;
+            case E_TP_U_SHORT:
+                value.ulonglong_val = static_cast<unsigned long long>( value.ushort_val );
+                break;
+            case E_TP_S_SHORT:
+                value.ulonglong_val = static_cast<unsigned long long>( value.sshort_val );
+                break;
+            case E_TP_U_INT:
+                value.ulonglong_val = static_cast<unsigned long long>( value.uint_val );
+                break;
+            case E_TP_S_INT:
+                value.ulonglong_val = static_cast<unsigned long long>( value.sint_val );
+                break;
+            case E_TP_U_LONG:
+                value.ulonglong_val = static_cast<unsigned long long>( value.ulong_val );
+                break;
+            case E_TP_S_LONG:
+                value.ulonglong_val = static_cast<unsigned long long>( value.slong_val );
+                break;
+            // case E_TP_U_LONG_LONG:
+            //     value.slong_val = static_cast<signed long>( value.ulonglong_val );
+            //     break;
+            case E_TP_S_LONG_LONG:
+                value.ulonglong_val = static_cast<unsigned long long>( value.slonglong_val );
+                break;
+            case E_TP_FLOAT:
+                value.ulonglong_val = static_cast<unsigned long long>( value.float_val );
+                break;
+            case E_TP_DOUBLE:
+                value.ulonglong_val = static_cast<unsigned long long>( value.double_val );
+                break;
+            default:
+                break;
+            }
+        }
+        break;
+    case E_TP_S_LONG_LONG: //   signed long long
+        {
+            switch( type )
+            {
+            case E_TP_CHAR:
+                value.slonglong_val = static_cast<signed long long>( value.char_val );
+                break;
+            case E_TP_U_CHAR:
+                value.slonglong_val = static_cast<signed long long>( value.uchar_val );
+                break;
+            case E_TP_S_CHAR:
+                value.slonglong_val = static_cast<signed long long>( value.schar_val );
+                break;
+            case E_TP_U_SHORT:
+                value.slonglong_val = static_cast<signed long long>( value.ushort_val );
+                break;
+            case E_TP_S_SHORT:
+                value.slonglong_val = static_cast<signed long long>( value.sshort_val );
+                break;
+            case E_TP_U_INT:
+                value.slonglong_val = static_cast<signed long long>( value.uint_val );
+                break;
+            case E_TP_S_INT:
+                value.slonglong_val = static_cast<signed long long>( value.sint_val );
+                break;
+            case E_TP_U_LONG:
+                value.slonglong_val = static_cast<signed long long>( value.ulong_val );
+                break;
+            case E_TP_S_LONG:
+                value.slonglong_val = static_cast<signed long long>( value.slong_val );
+                break;
+            case E_TP_U_LONG_LONG:
+                value.slonglong_val = static_cast<signed long long>( value.ulonglong_val );
+                break;
+            // case E_TP_S_LONG_LONG:
+            //     value.slonglong_val = static_cast<signed long long>( value.slonglong_val );
+            //     break;
+            case E_TP_FLOAT:
+                value.slonglong_val = static_cast<signed long long>( value.float_val );
+                break;
+            case E_TP_DOUBLE:
+                value.slonglong_val = static_cast<signed long long>( value.double_val );
+                break;
+            default:
+                break;
+            }
+        }
+        break;
+    //////////////////////////////////////////////////
+    case E_TP_FLOAT:       // float
+        {
+            switch( type )
+            {
+            case E_TP_CHAR:
+                value.float_val = static_cast<float>( value.char_val );
+                break;
+            case E_TP_U_CHAR:
+                value.float_val = static_cast<float>( value.uchar_val );
+                break;
+            case E_TP_S_CHAR:
+                value.float_val = static_cast<float>( value.schar_val );
+                break;
+            case E_TP_U_SHORT:
+                value.float_val = static_cast<float>( value.ushort_val );
+                break;
+            case E_TP_S_SHORT:
+                value.float_val = static_cast<float>( value.sshort_val );
+                break;
+            case E_TP_U_INT:
+                value.float_val = static_cast<float>( value.uint_val );
+                break;
+            case E_TP_S_INT:
+                value.float_val = static_cast<float>( value.sint_val );
+                break;
+            case E_TP_U_LONG:
+                value.float_val = static_cast<float>( value.ulong_val );
+                break;
+            case E_TP_S_LONG:
+                value.float_val = static_cast<float>( value.slong_val );
+                break;
+            case E_TP_U_LONG_LONG:
+                value.float_val = static_cast<float>( value.ulonglong_val );
+                break;
+            case E_TP_S_LONG_LONG:
+                value.float_val = static_cast<float>( value.slonglong_val );
+                break;
+            // case E_TP_FLOAT:
+            //     value.slonglong_val = static_cast<signed long long>( value.float_val );
+            //     break;
+            case E_TP_DOUBLE:
+                value.float_val = static_cast<float>( value.double_val );
+                break;
+            default:
+                break;
+            }
+        }
+        break;
+    case E_TP_DOUBLE:      // double
+        {
+            switch( type )
+            {
+            case E_TP_CHAR:
+                value.double_val = static_cast<double>( value.char_val );
+                break;
+            case E_TP_U_CHAR:
+                value.double_val = static_cast<double>( value.uchar_val );
+                break;
+            case E_TP_S_CHAR:
+                value.double_val = static_cast<double>( value.schar_val );
+                break;
+            case E_TP_U_SHORT:
+                value.double_val = static_cast<double>( value.ushort_val );
+                break;
+            case E_TP_S_SHORT:
+                value.double_val = static_cast<double>( value.sshort_val );
+                break;
+            case E_TP_U_INT:
+                value.double_val = static_cast<double>( value.uint_val );
+                break;
+            case E_TP_S_INT:
+                value.double_val = static_cast<double>( value.sint_val );
+                break;
+            case E_TP_U_LONG:
+                value.double_val = static_cast<double>( value.ulong_val );
+                break;
+            case E_TP_S_LONG:
+                value.double_val = static_cast<double>( value.slong_val );
+                break;
+            case E_TP_U_LONG_LONG:
+                value.double_val = static_cast<double>( value.ulonglong_val );
+                break;
+            case E_TP_S_LONG_LONG:
+                value.double_val = static_cast<double>( value.slonglong_val );
+                break;
+            case E_TP_FLOAT:
+                value.double_val = static_cast<double>( value.float_val );
+                break;
+            // case E_TP_DOUBLE:
+            //     value.float_val = static_cast<float>( value.double_val );
+            //     break;
+            default:
+                break;
+            }
+        }
+        break;
+    default:
+        break;
+    }
 
     type = destinationTp;
 }
@@ -2868,3 +3510,4 @@ bool DataValue::isIntOutOfRange(E_DataType leftDt, string& strMinVal, string& st
 
     return !isInRange;
 }
+

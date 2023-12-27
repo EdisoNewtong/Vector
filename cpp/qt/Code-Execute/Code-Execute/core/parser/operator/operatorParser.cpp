@@ -40,7 +40,7 @@ ParserBase::E_PARSER_TYPE OperatorParser::appendChar(const ChInfo& rChInfo,  E_P
     if ( isCurOp ) {
         // 2nd or next character is an operator type
         if ( previousSz == 1 ) {
-			// Now parse the 2nd operator character
+            // Now parse the 2nd operator character
             switch ( firstCh )
             {
             case '+':
@@ -54,7 +54,6 @@ ParserBase::E_PARSER_TYPE OperatorParser::appendChar(const ChInfo& rChInfo,  E_P
             case '|':
             case '^':
                 {
-
                     if ( curCh == '=' ) {
                         //  such as : +=   -=   *=   %=         &=   |=   ^=
                         setEndPosFlag = true;
@@ -85,8 +84,8 @@ ParserBase::E_PARSER_TYPE OperatorParser::appendChar(const ChInfo& rChInfo,  E_P
                                 //    "||"
                                 MyException e(E_THROW_UNSUPPORTED_FEATURE_LOGIC_OR,  rChInfo );
                                 throw e;
-							}
-						}
+                            }
+                        }
 
                         setEndPosFlag = true;
 
@@ -120,7 +119,6 @@ ParserBase::E_PARSER_TYPE OperatorParser::appendChar(const ChInfo& rChInfo,  E_P
                 break;
             case '<':
                 {
-
                     // check the 2nd character is '<' or not
                     if ( curCh != '<' ) {
                         if ( curCh == '=' ) {
@@ -261,7 +259,6 @@ bool OperatorParser::isParsedSeqValid(std::string& errorMsg) // override
     auto sz = static_cast<int>( m_parsedSeq.size() );
     if ( sz == 1 ) {
         const auto& ch = m_parsedSeq.front();
-
         if ( ch == '<'  ) {
             bret = false;
             errorMsg = "Operator \"Less than\" '<'  is unsupported feature. ";
@@ -291,3 +288,4 @@ bool OperatorParser::isParsedSeqValid(std::string& errorMsg) // override
 
     return bret;
 }
+

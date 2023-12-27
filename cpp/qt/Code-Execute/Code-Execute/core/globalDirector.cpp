@@ -4,6 +4,7 @@
 #include "enumUtil.h"
 #include "myException.h"
 #include "tokenMgr.h"
+#include "expEvaluation.h"
 #include "variblePool.h"
 
 
@@ -102,7 +103,8 @@ void GlobalDirector::doParse()
         return;
     }
 
-    TokenMgr::getInstance()->setTextEdit( m_pTextEdit );
+    TokenMgr::getInstance()->setTextEditor( m_pTextEdit );
+    ExpEvaluation::setTextEditor( m_pTextEdit );
 
     auto needMove2Next = true;
     ChInfo& rChInfo = m_buff->getCursor();

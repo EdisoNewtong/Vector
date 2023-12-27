@@ -15,4 +15,4 @@ main:main.c
 
 .PHONY:clean
 clean:
-	-rm  -Rf  *.i *.s *.o main
+	-rm  -Rf  *.i *.s *.o *.exe   main

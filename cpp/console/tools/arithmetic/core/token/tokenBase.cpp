@@ -14,11 +14,14 @@ TokenBase::TokenBase(E_TokenType tp)
     , m_opType(E_OPERATOR_UNKNOWN)
     , m_dataType(E_TP_UNKNOWN)
     , m_expTypeFlag(0U)
+	, m_opFlag( E_OP_FLAG_UNKNOWN )
     , m_token_content()
+    , m_token_build_exp()
     , m_beginPos()
     , m_endPos()
     , m_dataValue()
     , m_warningContent()
+    , m_funcObject( nullptr )
 {
     m_dataValue.type = E_TP_UNKNOWN;
 }
@@ -29,10 +32,13 @@ TokenBase::TokenBase(E_DataType dt)
     , m_opType(E_OPERATOR_UNKNOWN)
     , m_dataType(dt)
     , m_expTypeFlag(0U)
+	, m_opFlag( E_OP_FLAG_UNKNOWN )
     , m_token_content()
+    , m_token_build_exp()
     , m_beginPos()
     , m_endPos()
     , m_dataValue()
+    , m_funcObject( nullptr )
 {
     m_dataValue.type = dt;
 }
@@ -96,6 +102,18 @@ void TokenBase::setTokenContent(const string& content)
 {
     m_token_content = content;
 }
+
+
+void TokenBase::setGeneratedExp(const std::string& exp)
+{
+    m_token_build_exp = exp;
+}
+
+string TokenBase::getGeneratedExp()
+{
+    return m_token_build_exp;
+}
+
 
 
 void TokenBase::setTokenContentWithoutSuffix(const std::string& content, const std::string& noSuffix)
@@ -317,6 +335,7 @@ bool   TokenBase::isKeyword()
 
 bool   TokenBase::isVarible()
 {
+	// m_expTypeFlag = 0x30U ??
     return ( ((m_expTypeFlag >> 4) & 0x3U) == 0x3U );
 }
 
@@ -409,12 +428,12 @@ string    TokenBase::getExpressionContent()
     if ( isTmpExpression() ) {
         int sz = static_cast<int>( retExpr.size() );
         if ( sz >= 2 ) {
-            if (    !(   retExpr.front() == STR_OPEN_PARENTHESES.at(0)
-                      && retExpr.back()  == STR_CLOSE_PARENTHESES.at(0) ) )
+            if (    !(   retExpr.front() == STR_OPEN_PARENTHESIS.at(0)
+                      && retExpr.back()  == STR_CLOSE_PARENTHESIS.at(0) ) )
             {
-                retExpr = (STR_OPEN_PARENTHESES + SPACE_1
+                retExpr = (STR_OPEN_PARENTHESIS + SPACE_1
                            + retExpr 
-                           + SPACE_1 + STR_CLOSE_PARENTHESES);
+                           + SPACE_1 + STR_CLOSE_PARENTHESIS);
             }
         } 
     } 
@@ -435,3 +454,34 @@ string    TokenBase::getWarningContent()
 {
     return m_warningContent;
 }
+
+
+
+void  TokenBase::setContextRoleForOp(const E_OpAnotherRoleFlag& flag)
+{
+	m_opFlag = flag;
+}
+
+E_OpAnotherRoleFlag  TokenBase::getContextRoleForOp()
+{
+	return m_opFlag;
+}
+
+
+bool	TokenBase::isFunction()
+{
+	return m_expTypeFlag == 0x80;
+}
+
+void    TokenBase::setAsFunction(FunctionBase* pFunc)
+{
+	m_expTypeFlag = 0x80;
+    m_funcObject = pFunc;
+}
+
+FunctionBase*  TokenBase::getFuncObject()
+{
+    return m_funcObject;
+}
+
+

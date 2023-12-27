@@ -9,6 +9,9 @@
 #include "cmdOptions.h"
 #include "variblePool.h"
 #include "dataTypeUtil.h"
+#include "functionMgr.h"
+#include "expEvaluation.h"
+
 
 #include <QDebug>
 #include <QDataStream>
@@ -28,6 +31,8 @@ MainWindow::MainWindow(QWidget *parent)
     , m_pCfgFile( nullptr ) 
 {
     ui->setupUi(this);
+
+    this->setWindowTitle( getVersionDetail() );
 
     setupLayout();
 
@@ -74,7 +79,7 @@ void MainWindow::initMenuBar()
 
 void MainWindow::initMenuBar0()
 {
-    constexpr size_t cMenuCnt = 7;
+    constexpr size_t cMenuCnt = 8;
     size_t cIndex = 0;
     QAction* pActionAry[cMenuCnt];
     for( cIndex = 0; cIndex < cMenuCnt; ++cIndex ) {
@@ -101,6 +106,7 @@ void MainWindow::initMenuBar0()
     //
     menu0->addSeparator();
 	act = menu0->addAction("Use [Mod Algorithm]  when execute  << or >> ");  pActionAry[cIndex++] = act; act->setCheckable( true ); act->setChecked( CmdOptions::needDoBitwiseShift_Mod_Algorithm() ); act->setData( QVariant(6) );
+	act = menu0->addAction("Use Std-Call Convension ");  pActionAry[cIndex++] = act; act->setCheckable( true ); act->setChecked( CmdOptions::isFunctionUseStdCallConvension()  ); act->setData( QVariant(7) );
     menu0->addSeparator();
 
     for( cIndex = 0; cIndex < cMenuCnt; ++cIndex ) {
@@ -209,6 +215,8 @@ void MainWindow::on_pushButton_clicked()
     DataTypeUtil::init();
     VariblePool::init();
     TokenMgr::init();
+    FunctionMgr::init();
+    ExpEvaluation::init();
 
     // TODO :
     ui->outputEdit->setPlainText( QString("") );
@@ -217,9 +225,12 @@ void MainWindow::on_pushButton_clicked()
     QString codestr = ui->codeEdit->toPlainText();
     QString trimmedstr = codestr.trimmed();
     if ( trimmedstr.isNull() || trimmedstr.isEmpty() ) {
+        ExpEvaluation::release();
+        FunctionMgr::finalize();
         TokenMgr::release();
         VariblePool::finalize();
         DataTypeUtil::finalize();
+
 
         return;
     }
@@ -266,6 +277,8 @@ void MainWindow::on_pushButton_clicked()
     oldstr = (outstr + oldstr);
     ui->outputEdit->setPlainText( oldstr );
 
+    ExpEvaluation::release();
+    FunctionMgr::finalize();
     TokenMgr::release();
     VariblePool::finalize();
     DataTypeUtil::finalize();
@@ -364,3 +377,16 @@ void MainWindow::onSaveToCfg(bool checked)
     ui->statusbar->showMessage( QString("Save to \"%1\" Done").arg( QString(CmdOptions::getDefaultCfgFileName().c_str()) ),  2000 );
 
 }
+
+
+
+QString MainWindow::getVersionDetail()
+{
+    constexpr const int V_G_MAJOR = 1;
+    constexpr const int V_G_MINOR = 4;
+    constexpr const int V_G_PATCH = 1;
+    const QString V_S_FEATURE_DESCRIPTION(" Support Function-Call ");
+    return QString("Arith Ver %1.%2.%3 [%4]").arg(V_G_MAJOR).arg(V_G_MINOR).arg(V_G_PATCH).arg(V_S_FEATURE_DESCRIPTION);
+}
+
+

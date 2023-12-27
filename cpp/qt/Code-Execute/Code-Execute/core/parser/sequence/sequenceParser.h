@@ -30,7 +30,7 @@ protected:
 
 public:
     SequenceParser();
-    virtual ~SequenceParser() override;
+    virtual ~SequenceParser();
 
     virtual ParserBase::E_PARSER_TYPE appendChar(const ChInfo& rChInfo, E_ParserAction& afterAction) override;
 

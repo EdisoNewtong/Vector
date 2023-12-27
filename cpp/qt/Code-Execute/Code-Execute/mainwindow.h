@@ -36,6 +36,8 @@ private:
     void saveToFile(bool needDelete);
     void highLightCatchedPosition(int startCursorPos);
     void de_highlight();
+
+    QString getVersionDetail();
 private:
     Ui::MainWindow *ui;
     QMenu*         m_pPrintSubMenu;

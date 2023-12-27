@@ -17,40 +17,66 @@ enum E_OperatorType
 {
     E_OPERATOR_UNKNOWN = -1,
 
-    E_ADD = 0,      // +  , e.g.   a + b
-    E_MINUS,    // -  , e.g.   a - b
-    E_MULTIPLY, // *
-    E_DIVIDE,   // /
-    E_MOD,      // %
+/*0*/     E_ADD = 0,            // +  , e.g.   a + b
+/*1*/     E_MINUS,              // -  , e.g.   a - b
+/*2*/     E_MULTIPLY,           // *
+/*3*/     E_DIVIDE,             // /
+/*4*/     E_MOD,                // %
 
-    E_BIT_AND,  // &
-    E_BIT_OR,   // |
-    E_BIT_XOR,  // ^
-    E_BIT_NOT,  // ~
-    E_BIT_LEFT_SHIFT,     // <<
-    E_BIT_RIGHT_SHIFT,    // >>
+/*5*/     E_BIT_AND,            // &
+/*6*/     E_BIT_OR,             // |
+/*7*/     E_BIT_XOR,            // ^
+/*8*/     E_BIT_NOT,            // ~
+/*9*/     E_BIT_LEFT_SHIFT,     // <<
+/*10*/    E_BIT_RIGHT_SHIFT,    // >>
 
-    E_OPEN_PARENTHESES,   // (
-    E_CLOSE_PARENTHESES,  // )
+/*11*/    E_OPEN_PARENTHESIS,   // (
+/*12*/    E_CLOSE_PARENTHESIS,  // )
                           
-    E_ASSIGNMENT,                     // =
-    E_ADD_ASSIGNMENT,                 // +=
-    E_MINUS_ASSIGNMENT,               // -=
-    E_MULTIPLY_ASSIGNMENT,            // *=
-    E_DIVIDE_ASSIGNMENT,              // /=
-    E_MOD_ASSIGNMENT,                 // %=
-    E_BIT_AND_ASSIGNMENT,             // &=
-    E_BIT_OR_ASSIGNMENT,              // |=
-    E_BIT_XOR_ASSIGNMENT,             // ^=
-    E_BIT_LEFT_SHIFT_ASSIGNMENT,      // <<=
-    E_BIT_RIGHT_SHIFT_ASSIGNMENT,     // >>=
-                                      //
+/*13*/    E_ASSIGNMENT,                     // =
+/*14*/    E_ADD_ASSIGNMENT,                 // +=
+/*15*/    E_MINUS_ASSIGNMENT,               // -=
+/*16*/    E_MULTIPLY_ASSIGNMENT,            // *=
+/*17*/    E_DIVIDE_ASSIGNMENT,              // /=
+/*18*/    E_MOD_ASSIGNMENT,                 // %=
+/*19*/    E_BIT_AND_ASSIGNMENT,             // &=
+/*20*/    E_BIT_OR_ASSIGNMENT,              // |=
+/*21*/    E_BIT_XOR_ASSIGNMENT,             // ^=
+/*22*/    E_BIT_LEFT_SHIFT_ASSIGNMENT,      // <<=
+/*23*/    E_BIT_RIGHT_SHIFT_ASSIGNMENT,     // >>=
+
+     // new feature for function call
+/*24*/    E_COMMA,                          // ,
+
         E_POSITIVE, // +  , e.g.   +a
         E_NEGATIVE, // -  , e.g.   -a
 
     // E_OPERATOR_UNKNOWN 
 
 };
+
+enum E_OpAnotherRoleFlag
+{
+    E_OP_FLAG_UNKNOWN = 0,
+
+    E_OP_FLAG_OPEN_PARENTHESIS_PRIORITY_PREMOTE,    // a = ( b + c ) * d
+                                                    //     ^
+    E_OP_FLAG_OPEN_PARENTHESIS_FUNCTION_START,      // a = sin( angle )
+                                                    //        ^
+
+    E_OP_FLAG_CLOSE_PARENTHESIS_PRIORITY_PREMOTE,   //  a = ( b + c ) * d
+                                                    //              ^
+    E_OP_FLAG_CLOSE_PARENTHESIS_FUNCTION_END,       //  a = sin( angle ) 
+                                                    //                 ^
+
+    E_OP_COMMA_NORMAL_FOR_COMMA_EXPRESSION,         //  a = 3 , 5
+                                                    //        ^
+    E_OP_COMMA_FUNCTION_ARG_SEP,                    // function( a , b )
+                                                    //             ^
+    E_OP_COMMA_DEFINATION_SEP                       //   int a , b , c
+                                                    //         ^   ^
+};
+
 
 enum E_TokenType
 {
@@ -181,11 +207,14 @@ enum E_ExceptionType
     E_THROW_SENTENCE_UNKNOWN_DATA_TYPE,
     E_THROW_SENTENCE_TPYE_IS_UNDETERMINDED,
 
-    E_THROW_NO_MATCHED_OPEN_PARENTHESES,
+    E_THROW_NO_MATCHED_OPEN_PARENTHESIS,
+    E_THROW_NO_MATCHED_CLOSE_PARENTHESIS,
     E_THROW_CANNOT_PUSH_TOKEN_KEYWORD,
 
     E_THROW_SUFFIXEXPR_BINARY_OP_MISS_TWO_OPERANDS,
     E_THROW_SUFFIXEXPR_UNARY_OP_MISS_ONE_OPERAND,
+    E_THROW_SUFFIXEXPR_FINAL_EVALUATE_MUST_LEAVE_ONLY_ONE_ELEMENT,
+
 
     E_THROW_DIVIDE_ZERO,
     E_THROW_MODULO_ZERO,
@@ -218,6 +247,26 @@ enum E_ExceptionType
     E_THROW_ALL_TOKENS_ARE_KEYWORD,
     E_THROW_TOO_MANY_KEYWORDS,
     E_THROW_SENTENCE_DEFINITION_HAS_MISSED_AN_ASSIGNMENT_OPERATOR,
+
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////
+	//
+	// Function Call relative exception
+	//
+	////////////////////////////////////////////////////////////////////////////////////////////////////
+    E_THROW_FUNCTION_OBJECT_IS_NULLPTR,
+    E_THROW_CALL_FUNCTION_TOO_MANY_ARGUMENTS,
+	E_THROW_CALL_FUNCTION_TOO_LITTLE_ARGUMENTS,
+
+	E_THROW_PARSE_FUNCTION_PUSH_TOO_MANY_ARGUMENTS,
+    E_THROW_UNKNOWN_BUILT_IN_FUNCTION_NAME,
+    E_THROW_EMPTY_CONTENT_INSIDE_PARENTHESIS_PAIR_IS_NOT_ALLOWED, // none function  ()   is not allowed
+
+	E_THROW_CANNOT_DEFINE_A_VARIBLE_WITH_THE_SAME_NAME_OF_BUILT_IN_FUNCTION,
+    E_THROW_FUNCTION_ARGUMENT_CANNOT_BE_EMPTY_WHEN_MEET_COMMA,
+    E_THROW_FUNCTION_IS_NOT_VALID_BY_MISSING_CLOSE_PARENTHESIS,
+
+    E_THROW_CALL_STACK_SHOULD_NEVER_BE_EMPTY,
 
 
 };
