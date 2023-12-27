@@ -114,7 +114,7 @@ build/cmdOptions.o:core/cmdOptions.cpp  core/cmdOptions.h core/util/charUtil.h  
 	g++    $(COMPILE_OPT)  -o  build/cmdOptions.o    core/cmdOptions.cpp
 
 
-build/functionBase.o:core/functionPool/functionBase.cpp  core/functionPool/functionBase.h  core/token/tokenBase.h  core/commonEnum.h  core/myException.h
+build/functionBase.o:core/functionPool/functionBase.cpp  core/functionPool/functionBase.h  core/token/tokenBase.h  core/commonEnum.h  core/myException.h  core/cmdOptions.h
 	g++    $(COMPILE_OPT)  -o  build/functionBase.o    core/functionPool/functionBase.cpp
 
 build/functionMgr.o:core/functionPool/functionMgr.cpp  core/functionPool/functionMgr.h  core/functionPool/functionBase.h  core/functionPool/basic/MyAbs.h  core/functionPool/basic/MyFmod.h  core/functionPool/basic/MyFmax.h  core/functionPool/basic/MyFmin.h  core/functionPool/explog/MyExp.h core/functionPool/explog/MyExp2.h core/functionPool/explog/MyLog.h   core/functionPool/explog/MyLog2.h  core/functionPool/explog/MyLog10.h  core/functionPool/powSqrt/MyPow.h  core/functionPool/powSqrt/MySqrt.h   core/functionPool/powSqrt/MyCbrt.h   core/functionPool/powSqrt/MyHypot.h   core/functionPool/trigonometric/MySin.h    core/functionPool/trigonometric/MyCos.h    core/functionPool/trigonometric/MyTan.h    core/functionPool/trigonometric/MyAsin.h     core/functionPool/trigonometric/MyAcos.h   core/functionPool/trigonometric/MyAtan.cpp   core/functionPool/trigonometric/MyAtan2.h     core/functionPool/nearest/MyCeil.h      core/functionPool/nearest/MyFloor.h     core/functionPool/nearest/MyTrunc.h     core/functionPool/nearest/MyRound.h   
@@ -233,5 +233,4 @@ build/MyRound.o:core/functionPool/nearest/MyRound.cpp   core/functionPool/neares
 .PHONY:clean
 clean:
 	-rm   -Rf   arithMetic *.exe *.dSYM   build/*.o  build/arithMetic*
-
 

@@ -2,6 +2,7 @@
 #include "functionMgr.h"
 #include "expEvaluation.h"
 #include "tokenBase.h"
+#include "cmdOptions.h"
 
 #include "commonEnum.h"
 #include "myException.h"
@@ -50,7 +51,7 @@ TokenBase* FunctionBase::executeFunction()
     m_argResultList.clear();
     m_argStrSuffixExprList.clear();
     auto needCheckVarible = true;
-    if ( FunctionMgr::isUseStdCallConvension() ) {
+    if ( CmdOptions::isFunctionUseStdCallConvension() ) {
         for ( auto rit = m_argumentList.rbegin(); rit != m_argumentList.rend(); ++rit ) {
             m_argStrSuffixExprList.push_front( FunctionBase::getSuffixExpString( *rit ) );
 
@@ -178,5 +179,4 @@ string  FunctionBase::buildFuncitonDetailString(const list<string>& strExpList)
     retStrExp += string(" )");
     return retStrExp;
 }
-
 

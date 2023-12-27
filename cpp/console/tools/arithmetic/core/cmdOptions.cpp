@@ -27,8 +27,9 @@ R"([Flag]
     // OctStyle : 0   =>     0xxxx    
     // OctStyle : 1   =>   (0)xxxx
     OctStyle = 0
-	//
-	BitwiseShift_Mod_Algorithm = 0
+    //
+    BitwiseShift_Mod_Algorithm = 0
+    FunctionUseStdCallConvension = 1
 
 [DebugOption]
     PRINT_RUNTIME_WARNING = 1
@@ -48,7 +49,7 @@ R"([Flag]
     TREAT_UNINITIALIZED_VARIBLE_AS_ERROR = 0
     PRINT_PARSE_FILE_LENGTH = 0
     NEED_CHECK_FIXED_LITERAL_INT_RANGE_WHEN_ASSIGN = 1
-	TRACE_UNINITIALIZED_VARIBLE_WHEN_EVALUATING_EXPRESSIONS = 1
+    TRACE_UNINITIALIZED_VARIBLE_WHEN_EVALUATING_EXPRESSIONS = 1
 
     TRACE_PARSE_TIME_STEP = 0
 )"
@@ -88,7 +89,8 @@ const vector< pair<string,unsigned long> > CmdOptions::SC_FLAG_MAP{
     { string("Oct = "),      4UL   },
     { string("OctStyle = "), 5UL   },
 	//////////////////////////////////////////////////
-    { string("BitwiseShift_Mod_Algorithm = "), 6UL   }
+    { string("BitwiseShift_Mod_Algorithm = "), 6UL   },
+    { string("FunctionUseStdCallConvension = "), 7UL   }
 
     // OctStyle = 0
 };
@@ -431,7 +433,9 @@ bool CmdOptions::needPrintVarible_8()      { return ( (s_flag >> 4UL) & 0x1UL) !
 // 0 : default  0xxxxx    1: special format (0)xxxx
 bool CmdOptions::isOctalDefaultStyle()     { return ( (s_flag >> 5UL) & 0x1UL) == 0; }
 
-bool CmdOptions::needDoBitwiseShift_Mod_Algorithm() { return ( (s_flag >> 6UL) & 0x1UL) == 0; }
+bool CmdOptions::needDoBitwiseShift_Mod_Algorithm() { return ( (s_flag >> 6UL) & 0x1UL) != 0; }
+// new feature for function call
+bool CmdOptions::isFunctionUseStdCallConvension() { return ( (s_flag >> 7UL) & 0x1UL) != 0; }
 
 
 unsigned int CmdOptions::getFlag()        { return s_flag; }
@@ -480,4 +484,3 @@ string CmdOptions::sampleCfgFile()
 {
     return SC_CFG_CONTENT;
 }
-

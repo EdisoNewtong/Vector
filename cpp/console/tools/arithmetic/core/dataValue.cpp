@@ -18,9 +18,9 @@ using namespace std;
 //       error C4146:  Can't apply unary minus operator to an unsigned type
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-#ifdef _WIN32
-#pragma warning( disable : 4146 )
-#endif
+// #ifdef _WIN32
+// #pragma warning( disable : 4146 )
+// #endif
 
 namespace intTypeRange
 {
@@ -3510,4 +3510,3 @@ bool DataValue::isIntOutOfRange(E_DataType leftDt, string& strMinVal, string& st
 
     return !isInRange;
 }
-
