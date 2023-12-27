@@ -28,7 +28,8 @@ public:
     static bool needPrintVarible_8();
     static bool isOctalDefaultStyle();
 
-	static bool needDoBitwiseShift_Mod_Algorithm();
+    static bool needDoBitwiseShift_Mod_Algorithm();
+    static bool isFunctionUseStdCallConvension();
 
     static bool isPrintVaribleFormatValid();
 
@@ -61,7 +62,7 @@ public:
     static bool needTraceParseTimeStep();
     static bool needPrintSrcCodeLength();
 
-	static bool needTraceUninitializedVaribleWhenEvaluatingExpression();
+    static bool needTraceUninitializedVaribleWhenEvaluatingExpression();
 protected:
     static bool needPrintDataTypeRange();
 
