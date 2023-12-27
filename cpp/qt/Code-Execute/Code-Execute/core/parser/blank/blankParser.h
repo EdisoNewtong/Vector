@@ -7,7 +7,7 @@ class BlankParser : public ParserBase
 {
 public:
     BlankParser();
-    virtual ~BlankParser() override;
+    virtual ~BlankParser();
 
     virtual ParserBase::E_PARSER_TYPE appendChar(const ChInfo& rChInfo,  E_ParserAction& afterAction) override;
 

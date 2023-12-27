@@ -76,7 +76,6 @@ The following table lists the precedence and associativity of C++ operators. Ope
 
 
 
-
 #define BINARY_OP_MASK      (0U << 15)
 #define UNARY_OP_MASK       (1U << 15)
 
@@ -155,8 +154,8 @@ unordered_map<OpUtil::OpType, OpInfo> OpUtil::s_operatorMap{
     make_pair(enumCvt(E_BIT_LEFT_SHIFT),    OpInfo( BINARY_OP_MASK | ASS_LEFT_2_RIGHT | PRIORITY_MASK(7U)  | static_cast<unsigned int>(E_BIT_LEFT_SHIFT)    ) ),
     make_pair(enumCvt(E_BIT_RIGHT_SHIFT),   OpInfo( BINARY_OP_MASK | ASS_LEFT_2_RIGHT | PRIORITY_MASK(7U)  | static_cast<unsigned int>(E_BIT_RIGHT_SHIFT)   ) ),
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    make_pair(enumCvt(E_OPEN_PARENTHESES),  OpInfo( BINARY_OP_MASK | ASS_RIGHT_2_LEFT | PRIORITY_MASK(2U)  | static_cast<unsigned int>(E_OPEN_PARENTHESES)  ) ),
-    make_pair(enumCvt(E_CLOSE_PARENTHESES), OpInfo( BINARY_OP_MASK | ASS_RIGHT_2_LEFT | PRIORITY_MASK(2U)  | static_cast<unsigned int>(E_CLOSE_PARENTHESES) ) ),
+    make_pair(enumCvt(E_OPEN_PARENTHESIS),  OpInfo( BINARY_OP_MASK | ASS_RIGHT_2_LEFT | PRIORITY_MASK(2U)  | static_cast<unsigned int>(E_OPEN_PARENTHESIS)  ) ),
+    make_pair(enumCvt(E_CLOSE_PARENTHESIS), OpInfo( BINARY_OP_MASK | ASS_RIGHT_2_LEFT | PRIORITY_MASK(2U)  | static_cast<unsigned int>(E_CLOSE_PARENTHESIS) ) ),
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     make_pair(enumCvt(E_ASSIGNMENT),        OpInfo( BINARY_OP_MASK | ASS_RIGHT_2_LEFT | PRIORITY_MASK(16U) | static_cast<unsigned int>(E_ASSIGNMENT)        ) ),
@@ -170,7 +169,9 @@ unordered_map<OpUtil::OpType, OpInfo> OpUtil::s_operatorMap{
     make_pair(enumCvt(E_BIT_OR_ASSIGNMENT),          OpInfo( BINARY_OP_MASK | ASS_RIGHT_2_LEFT | PRIORITY_MASK(16U) | static_cast<unsigned int>(E_BIT_OR_ASSIGNMENT)    ) ),
     make_pair(enumCvt(E_BIT_XOR_ASSIGNMENT),         OpInfo( BINARY_OP_MASK | ASS_RIGHT_2_LEFT | PRIORITY_MASK(16U) | static_cast<unsigned int>(E_BIT_XOR_ASSIGNMENT)    ) ),
     make_pair(enumCvt(E_BIT_LEFT_SHIFT_ASSIGNMENT),  OpInfo( BINARY_OP_MASK | ASS_RIGHT_2_LEFT | PRIORITY_MASK(16U) | static_cast<unsigned int>(E_BIT_LEFT_SHIFT_ASSIGNMENT)    ) ),
-    make_pair(enumCvt(E_BIT_RIGHT_SHIFT_ASSIGNMENT), OpInfo( BINARY_OP_MASK | ASS_RIGHT_2_LEFT | PRIORITY_MASK(16U) | static_cast<unsigned int>(E_BIT_RIGHT_SHIFT_ASSIGNMENT)    ) )
+    make_pair(enumCvt(E_BIT_RIGHT_SHIFT_ASSIGNMENT), OpInfo( BINARY_OP_MASK | ASS_RIGHT_2_LEFT | PRIORITY_MASK(16U) | static_cast<unsigned int>(E_BIT_RIGHT_SHIFT_ASSIGNMENT)    ) ),
+    // new feature for function call
+    make_pair(enumCvt(E_COMMA), OpInfo( BINARY_OP_MASK | ASS_LEFT_2_RIGHT | PRIORITY_MASK(17U) | static_cast<unsigned int>(E_COMMA)    ) )
 };
 
 

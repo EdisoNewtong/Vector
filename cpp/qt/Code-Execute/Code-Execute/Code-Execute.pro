@@ -36,6 +36,7 @@ SOURCES += \
     ##################################################
     core/token/tokenBase.cpp \
     core/token/tokenMgr.cpp \
+    core/token/expEvaluation.cpp \
     ##################################################
     core/util/dataTypeUtil.cpp \
     core/util/enumUtil.cpp \
@@ -43,7 +44,34 @@ SOURCES += \
     core/util/opUtil.cpp \
     core/util/stringNumber.cpp \
     ##################################################
-    core/variblePool/variblePool.cpp
+    core/variblePool/variblePool.cpp \
+    ##################################################
+    core/functionPool/functionBase.cpp \
+    core/functionPool/functionMgr.cpp \
+    core/functionPool/basic/MyAbs.cpp \
+    core/functionPool/basic/MyFmod.cpp \
+    core/functionPool/basic/MyFmax.cpp \
+    core/functionPool/basic/MyFmin.cpp \
+    core/functionPool/explog/MyExp.cpp \
+    core/functionPool/explog/MyExp2.cpp \
+    core/functionPool/explog/MyLog.cpp \
+    core/functionPool/explog/MyLog2.cpp \
+    core/functionPool/explog/MyLog10.cpp \
+    core/functionPool/powSqrt/MyPow.cpp \
+    core/functionPool/powSqrt/MySqrt.cpp \
+    core/functionPool/powSqrt/MyCbrt.cpp \
+    core/functionPool/powSqrt/MyHypot.cpp \
+    core/functionPool/trigonometric/MyCos.cpp \
+    core/functionPool/trigonometric/MySin.cpp \
+    core/functionPool/trigonometric/MyTan.cpp \
+    core/functionPool/trigonometric/MyAsin.cpp \
+    core/functionPool/trigonometric/MyAcos.cpp \
+    core/functionPool/trigonometric/MyAtan.cpp \
+    core/functionPool/trigonometric/MyAtan2.cpp \
+    core/functionPool/nearest/MyCeil.cpp \
+    core/functionPool/nearest/MyFloor.cpp \
+    core/functionPool/nearest/MyTrunc.cpp \
+    core/functionPool/nearest/MyRound.cpp
 
 
 HEADERS += \
@@ -67,6 +95,7 @@ HEADERS += \
     ##################################################
     core/token/tokenBase.h \
     core/token/tokenMgr.h \
+    core/token/expEvaluation.h \
     ##################################################
     core/util/charUtil.h \
     core/util/dataTypeUtil.h \
@@ -75,7 +104,34 @@ HEADERS += \
     core/util/opUtil.h \
     core/util/stringNumber.h \
     ##################################################
-    core/variblePool/variblePool.h
+    core/variblePool/variblePool.h \
+    ##################################################
+    core/functionPool/functionBase.h \
+    core/functionPool/functionMgr.h \
+    core/functionPool/basic/MyAbs.h \
+    core/functionPool/basic/MyFmod.h \
+    core/functionPool/basic/MyFmax.h \
+    core/functionPool/basic/MyFmin.h \
+    core/functionPool/explog/MyExp.h \
+    core/functionPool/explog/MyExp2.h \
+    core/functionPool/explog/MyLog.h \
+    core/functionPool/explog/MyLog2.h \
+    core/functionPool/explog/MyLog10.h \
+    core/functionPool/powSqrt/MyPow.h \
+    core/functionPool/powSqrt/MySqrt.h \
+    core/functionPool/powSqrt/MyCbrt.h \
+    core/functionPool/powSqrt/MyHypot.h \
+    core/functionPool/trigonometric/MyCos.h \
+    core/functionPool/trigonometric/MySin.h \
+    core/functionPool/trigonometric/MyTan.h \
+    core/functionPool/trigonometric/MyAsin.h \
+    core/functionPool/trigonometric/MyAcos.h \
+    core/functionPool/trigonometric/MyAtan.h \
+    core/functionPool/trigonometric/MyAtan2.h \
+    core/functionPool/nearest/MyCeil.h \
+    core/functionPool/nearest/MyFloor.h \
+    core/functionPool/nearest/MyTrunc.h \
+    core/functionPool/nearest/MyRound.h
 
 INCLUDEPATH += \
     core \
@@ -91,7 +147,14 @@ INCLUDEPATH += \
     ##################################################
     core/util \
     ##################################################
-    core/variblePool
+    core/variblePool \
+    ##################################################
+    core/functionPool \
+    core/functionPool/basic \
+    core/functionPool/explog \
+    core/functionPool/powSqrt \
+    core/functionPool/trigonometric \
+    core/functionPool/nearest
 
 FORMS += \
     mainwindow.ui
