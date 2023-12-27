@@ -33,9 +33,6 @@
 using namespace std;
 
 // staitc  , set std-call call convention  as default
-bool    FunctionMgr::s_callingConvention_StdCall { true };
-bool    FunctionMgr::isUseStdCallConvension() { return FunctionMgr::s_callingConvention_StdCall; }
-void    FunctionMgr::setStdCallConvension(bool bIsStdCallConvension) { FunctionMgr::s_callingConvention_StdCall = bIsStdCallConvension; }
 
 
 // static     
