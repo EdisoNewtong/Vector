@@ -6,8 +6,21 @@ cmake_minimum_required(VERSION 3.1.0)
 # Notes : You should *** Never *** add the double quotes surround the workd  Tutorial
 # and the final built output program will be named as Tutorial with the capital letter 'L'
 # rather than the lower case source file's ( tutorial.cxx )   base name  'tutorial'
-project(Tutorial)
+#           ***** HERE *****   set the version of the project
+project(Tutorial VERSION 1.0)
+
+# Copy "TutorialConfig.h.in" into the build dir 
+# replace the file content of given VERSION number
+#          and then rename it to "TutorialConfig.h"
+configure_file(TutorialConfig.h.in TutorialConfig.h)
+
+
 
 # add the source code "tutorial.cxx" to the project named "Tutorial" 's build file list 
 add_executable(Tutorial tutorial.cxx)
+
+
+target_include_directories(Tutorial PUBLIC
+                           "${PROJECT_BINARY_DIR}"
+                           )
 

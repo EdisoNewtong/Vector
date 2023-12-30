@@ -1,0 +1,24 @@
+//
+// TutorialConfig.h.in
+//
+// the configured options and settings for Tutorial 
+//   ( the value is given in the root  file : "CMakeLists.txt" )
+// Notes : the config content of the version must following this format : 
+//
+//          <ProjectName>_VERSION_MAJOR
+//          <ProjectName>_VERSION_MINOR
+//
+// the final header file "TutorialConfig.h"   
+//       will be configed well and generated  by CMake Program
+//
+//  ********************************************************************
+//       and output to the working diretory which runs 'cmake' command
+//  ** Rather than ** in the same diretory of the    tutorial.cxx
+//  ********************************************************************
+//
+//  so you must indicate the correct include path of the header file "TutorialConfig.h"
+//
+//      "${PROJECT_BINARY_DIR}" is the right path pointer to the build output path
+//
+#define Tutorial_VERSION_MAJOR @Tutorial_VERSION_MAJOR@
+#define Tutorial_VERSION_MINOR @Tutorial_VERSION_MINOR@
