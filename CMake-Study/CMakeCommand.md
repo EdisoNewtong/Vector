@@ -1,4 +1,4 @@
-# Generate a Project Build-System  
+# Generate a Project Build-System  ( generate your MakeFile )
 ```bash  
 # <path-to-source> must contain a "CMakeLists.txt" and must not contain a "CMakeCache.txt" because the latter identifies an existing build tree
 $ cmake [<options>]  <path-to-source>
@@ -8,7 +8,7 @@ $ cmake [<options>]  <path-to-existing-build>
 $ cmake [<options>]  -S <path-to-source>  -B <path-to-build>
 ```
 
-# Build a Project
+# Build a Project ( compile & link your source code )
 ```bash  
 $ cmake --build <dir> [<options>] [-- <build-too-options>]
 ```

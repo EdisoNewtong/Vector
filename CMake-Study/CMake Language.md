@@ -26,8 +26,10 @@ Furthermore, CMake 3.0 and above allow a leading UTF-8 Byte-Order Mark in source
 ## Commands
 In Cmake , Built-in Command names are case-**==in==**sensitive. 
 ```CMake
+# no matter  SET(...) or set(...) or seT(...)  all of previous commands refers to the same built-in command
 SET(a "123")
 set(a "123")
+seT(a "123")
 ```
 
 ## Comment
@@ -160,11 +162,14 @@ endwhile()
 ```
 
 ## Varibles
-Variables are the basic unit of storage in the CMake Language. 
+Variables are the basic unit of storage in the CMake Language. They are case-sensitive 
 Their values are always of **==String==** type, 
 though some commands may interpret the strings as values of other types. 
 The set() and unset() commands explicitly set or unset a variable, 
 but other commands have semantics that modify variables as well.
+
+** Different from other common programming language , The new varible name can be made up with  the symbol minus =='-'== ** 
+We recommend sticking to names consisting only of alphanumeric characters plus **'_'** and **=='-'==** 
 
 Variables have dynamic scope. 
 Each variable "set" or "unset" creates a binding in the current scope:
@@ -176,6 +181,61 @@ CMake reserves identifiers that:
 - begin with _ followed by the name of any CMake Command.
 
 
+```CMake
+# Notes the the minus
+set(aaa-bbb "Hello World")
+#               Use expr : ${aaa-bbb} to get the value of a given varible
+message(STATUS "aaa-bbb  = ${aaa-bbb}"  # this sentence will output :    aaa-bbb = Hello World
 
+# Multiple value arguments are packed into a semicolon-separated list and stored in the variable as a string. 
+set(aaa-bbb Hello World)
+message(STATUS "aaa-bbb  = ${aaa-bbb}"  # this sentence will output :    aaa-bbb = Hello;World
+
+# If the named variable is not defined, the reference is replaced with an empty string; 
+# here xxx has the value "" ( an empty string )
+message(STATUS "xxx  = ${xxx}"  # this sentence will output :    xxx = 
+```
+
+Replacement is performed prior to the expansion of unquoted arguments, 
+so variable values containing semicolons are split into zero-or-more arguments in place of the original unquoted argument.  
+For example: 
+
+```CMake
+set(Foo a b c)    # 3 unquoted args -> value is "a;b;c"
+# unquoted arg replaced by a;b;c
+# and expands to 3 arguments
+command(${Foo})   
+                  
+# quoted arg value is the only 1 arg :  "a;b;c"
+command("${Foo}") # quoted arg value is "a;b;c"
+
+set(Foo "")       # 1 quoted arg -> value is empty string
+
+# unquoted arg replaced by empty string
+# and expands to 0 arguments
+command(${Foo})   
+
+# quoted arg value is empty string
+command("${Foo}")
+
+```
+
+## Varibles scope 
+Variables in CMake have a scope that is a little different from most languages. 
+When you set a variable, it is visible to the ==current CMakeLists== file or function and any subdirectory’s CMakeLists files, any functions or macros that are invoked, 
+and any files that are included using the include command. 
+
+
+
+# Commands 
+CMake is no longer case sensitive to command names, so where you see command, you could use COMMAND or Command instead. 
+It is considered best practice to use lowercase commands
+```CMake
+# 3 unquoted arguments
+command(a b c)       
+
+# 1 unquoted argument expands to 3
+command(a;b;c)
+```
 
 
