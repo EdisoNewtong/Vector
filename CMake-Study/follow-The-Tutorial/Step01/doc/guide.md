@@ -9,4 +9,4 @@
 Please see the following image to understand the detail :
 
 
-![Command line screenshot](/detail.png)
+![Command line screenshot](detail.png)
