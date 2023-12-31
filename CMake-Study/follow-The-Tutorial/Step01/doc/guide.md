@@ -16,7 +16,9 @@ Please see the following image to understand the detail :
 
 Step-1. Prepare a header file named "TutorialConfig.h.in" 
 
-```cpp
+
+
+```c++
 //
 // TutorialConfig.h.in
 //
@@ -47,7 +49,8 @@ Step-1. Prepare a header file named "TutorialConfig.h.in"
 
 Step-2. add the config command into CMakeLists.txt 
 
-```CMake
+
+```cmake
 
 project(Tutorial VERSION 1.0)
 
@@ -75,4 +78,16 @@ Please see the following image to get deep knowledge of the config file :
 
 ![Config Version](ConfigVersion.png)
 
+# Add C++ 11 Support
 
+```cmake
+# specify the C++ standard 
+# Make sure to add the CMAKE_CXX_STANDARD declarations above the call to add_executable.
+set(CMAKE_CXX_STANDARD 11)                     # compile with c++11 standard
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+
+```
+
+
+
+![C++ 11 Support](cpp11-support.png)
