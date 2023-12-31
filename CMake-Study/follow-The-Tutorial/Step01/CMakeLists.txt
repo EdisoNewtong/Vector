@@ -9,6 +9,11 @@ cmake_minimum_required(VERSION 3.1.0)
 #           ***** HERE *****   set the version of the project
 project(Tutorial VERSION 1.0)
 
+# specify the C++ standard 
+# Make sure to add the CMAKE_CXX_STANDARD declarations above the call to add_executable.
+set(CMAKE_CXX_STANDARD 11)                     # compile with c++11 standard
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+
 # Copy "TutorialConfig.h.in" into the build dir 
 # replace the file content of given VERSION number
 #          and then rename it to "TutorialConfig.h"
