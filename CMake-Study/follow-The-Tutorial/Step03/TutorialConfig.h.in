@@ -1,0 +1,15 @@
+// the configured options and settings for Tutorial
+#define Tutorial_VERSION_MAJOR @Tutorial_VERSION_MAJOR@
+#define Tutorial_VERSION_MINOR @Tutorial_VERSION_MINOR@
+
+// 
+// Notes this sentence : #cmakedefine USE_MYMATH
+// 
+// if                              SET   "USE_MYMATH"   ON
+// it will be replaced as  :       #define USE_MYMATH
+// 
+// else if                        SET   "USE_MYMATH"   OFF
+// it will be replaced as  :     /* #undef USE_MYMATH */
+// 
+
+#cmakedefine USE_MYMATH
