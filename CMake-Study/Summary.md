@@ -14,6 +14,12 @@ $ cmake <some_source_path>  -DCMAKE_CXX_COMPILER=cl
 
 
 # Specify the build mode Debug / Release
+- Debug
+- Release
+- RelWithDebInfo
+- MinSizeRel
+
+
 ```bash
 # With source code in the directory MyProject
 # to build MyProject-debug create that directory, cd into it and

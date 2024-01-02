@@ -18,6 +18,12 @@ $ cmake --build <dir> [<options>] [-- <build-too-options>]
 ```bash  
 # execute to generate a Xcode project
 $ cmake -G Xcode .
+
+$ cmake -G "Visual Studio 17 2022" -A Win32
+$ cmake -G "Visual Studio 17 2022" -A x64
+$ cmake -G "Visual Studio 17 2022" -A ARM
+$ cmake -G "Visual Studio 17 2022" -A ARM64
+
 ```
 
 
