@@ -79,4 +79,61 @@ CMake Error at util/CMakeLists.txt:4 (target_sources):
 
 ```
 
+# How to collect the source code files by cmake command ( use api aux_source_directory(...) )
+$ tree -C -L 1 core
+core/
+├── buff.cpp
+├── buff.h
+├── cmdOptions.cpp
+├── cmdOptions.h
+├── commonEnum.h
+├── dataValue.cpp
+├── dataValue.h
+├── functionPool
+├── globalDirector.cpp
+├── globalDirector.h
+├── myException.cpp
+├── myException.h
+├── parser              // directory
+├── token               // directory
+├── util                // directory
+└── variblePool         // directory
+
+
+```cmake
+#[==[
+
+Output : 
+
+-- ##################################################
+-- core/buff.cpp
+-- core/cmdOptions.cpp
+-- core/dataValue.cpp
+-- core/globalDirector.cpp
+-- core/myException.cpp
+-- ##################################################
+
+
+
+
+Notes : aux_source_directory(...) traversal the directory with  ***None*** recursive
+
+]==]
+
+#
+# create a new varible named "all_src" to collect the source code files into a list
+#
+aux_source_directory(core all_src)
+
+message(STATUS "##################################################")
+foreach(ele ${all_src})
+    message(STATUS ${ele})
+endforeach()
+
+message(STATUS "##################################################")
+
+```
+
+
+
 
