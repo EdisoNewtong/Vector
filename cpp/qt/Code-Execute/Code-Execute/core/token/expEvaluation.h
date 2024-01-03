@@ -18,7 +18,7 @@ public:
 
 public:
     TokenBase* doNormalExpEvaluation(const std::vector<TokenBase*>& expList, int begIdx, bool checkVaibleIsValid);
-    void doNewVaribleDefEvaluation(E_DataType definedDataType, const std::vector<TokenBase*>& expList, int begIdx);
+    void       doNewVaribleDefEvaluation(E_DataType definedDataType, const std::vector<TokenBase*>& expList, int begIdx);
 
     TokenBase* evaluateSuffixExpression(std::list<TokenBase*>& suffixExpression, bool needCheckVarible);
 
