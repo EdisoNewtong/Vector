@@ -122,8 +122,7 @@ void MainWindow::initMenuBar0()
 
 void MainWindow::initMenuBar1()
 {
-    // 17
-    constexpr size_t cMenuCnt = 17;
+    constexpr size_t cMenuCnt = 18;
     size_t cIndex = 0;
     QAction* pActionAry[cMenuCnt];
     for( cIndex = 0; cIndex < cMenuCnt; ++cIndex ) {
@@ -152,6 +151,8 @@ void MainWindow::initMenuBar1()
     act = menu1->addAction( "treat blank statement as warning");               pActionAry[cIndex++] = act; act->setCheckable(true); act->setChecked( CmdOptions::needTreatBlankStatementAsWarning() ); act->setData( QVariant(12) );
     act = menu1->addAction( "treat uninitialized varible as error");           pActionAry[cIndex++] = act; act->setCheckable(true); act->setChecked( CmdOptions::needTreatUninitializedVaribleAsError() ); act->setData( QVariant(13) );
     act = menu1->addAction( "check fixed literal int range when assign");      pActionAry[cIndex++] = act; act->setCheckable(true); act->setChecked( CmdOptions::needCheckFixedLiteralIntRangeWhenAssign() ); act->setData( QVariant(15) );
+    act = menu1->addAction( "trace uninitialized varible when evaluating expressions");      pActionAry[cIndex++] = act; act->setCheckable(true); act->setChecked( CmdOptions::needTraceUninitializedVaribleWhenEvaluatingExpression() ); act->setData( QVariant(16) );
+
 
     menu1->addSeparator();
     act = menu1->addAction( "print basic data range");                         pActionAry[cIndex++] = act; act->setCheckable(true); act->setChecked( CmdOptions::needPrintDataTypeRange() ); act->setData( QVariant(8) );
