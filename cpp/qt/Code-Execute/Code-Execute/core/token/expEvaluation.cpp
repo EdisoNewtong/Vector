@@ -1070,7 +1070,6 @@ TokenBase* ExpEvaluation::evaluateSuffixExpression(list<TokenBase*>& suffixExpre
                 }
             }
 
-
             if ( currentTokenType == E_TOKEN_EXPRESSION  ) {
                 auto content = currentElement->getTokenContent();
                 auto dataVal = currentElement->getRealValue();
