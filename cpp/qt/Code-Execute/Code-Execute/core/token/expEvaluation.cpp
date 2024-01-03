@@ -938,7 +938,7 @@ TokenBase* ExpEvaluation::evaluateSuffixExpression(list<TokenBase*>& suffixExpre
                     // check Left Operand
                     auto needCheckLeft = (opType != E_ASSIGNMENT);
                     if ( needCheckLeft ) {
-                        if ( leftOperand!=nullptr &&  leftOperand->getTokenType() == E_TOKEN_EXPRESSION    &&   leftOperand->isVarible() ) {
+                        if (  needCheckVarible  &&  leftOperand!=nullptr    &&   leftOperand->isVarible() ) {
                             string varName = leftOperand->getTokenContent();
                             VaribleInfo* pVisitedVaribleInfo = VariblePool::getPool()->getVaribleByName( varName );
                             if ( pVisitedVaribleInfo != nullptr  &&   !pVisitedVaribleInfo->isInitialed ) {
@@ -955,7 +955,7 @@ TokenBase* ExpEvaluation::evaluateSuffixExpression(list<TokenBase*>& suffixExpre
                     //
                     // Not matter whether the operator is '=' or not , always check Right operand 
                     // 
-                    if ( rightOperand!=nullptr &&  rightOperand->getTokenType() == E_TOKEN_EXPRESSION    &&   rightOperand->isVarible() ) {
+                    if (  needCheckVarible  &&   rightOperand!=nullptr &&  rightOperand->isVarible() ) {
                         string varName = rightOperand->getTokenContent();
                         VaribleInfo* pVisitedVaribleInfo = VariblePool::getPool()->getVaribleByName( varName );
                         if ( pVisitedVaribleInfo != nullptr  &&   !pVisitedVaribleInfo->isInitialed ) {
@@ -1003,7 +1003,7 @@ TokenBase* ExpEvaluation::evaluateSuffixExpression(list<TokenBase*>& suffixExpre
 
                 if ( CmdOptions::needTraceUninitializedVaribleWhenEvaluatingExpression() ) {
                     // check the only right Operand for Unary operator expression
-                    if ( rightOperand!=nullptr &&  rightOperand->getTokenType() == E_TOKEN_EXPRESSION    &&   rightOperand->isVarible() ) {
+                    if (  needCheckVarible  &&  rightOperand!=nullptr   &&   rightOperand->isVarible() ) {
                         string varName = rightOperand->getTokenContent();
                         VaribleInfo* pVisitedVaribleInfo = VariblePool::getPool()->getVaribleByName( varName );
                         if ( pVisitedVaribleInfo != nullptr  &&   !pVisitedVaribleInfo->isInitialed ) {
@@ -1054,6 +1054,23 @@ TokenBase* ExpEvaluation::evaluateSuffixExpression(list<TokenBase*>& suffixExpre
         {
             auto currentElement = *it;
             auto currentTokenType = currentElement->getTokenType();
+
+            if ( CmdOptions::needTraceUninitializedVaribleWhenEvaluatingExpression() ) {
+                if ( needCheckVarible && currentElement!=nullptr   &&   currentElement->isVarible() ) {
+                    string varName = currentElement->getTokenContent();
+                    VaribleInfo* pVisitedVaribleInfo = VariblePool::getPool()->getVaribleByName( varName );
+                    if ( pVisitedVaribleInfo != nullptr  &&   !pVisitedVaribleInfo->isInitialed ) {
+                        if ( CmdOptions::needTreatUninitializedVaribleAsError()  ) {
+                            MyException e(E_THROW_VARIBLE_NOT_INITIALIZED_BEFORE_USED, currentElement->getBeginPos() );
+                            throw e;
+                        } else {
+                            traceUnInitializedVarWhenUsed(currentElement);
+                        }
+                    }
+                }
+            }
+
+
             if ( currentTokenType == E_TOKEN_EXPRESSION  ) {
                 auto content = currentElement->getTokenContent();
                 auto dataVal = currentElement->getRealValue();
