@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.1.0)
 
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
+
 project(arith CXX)
 
 
@@ -196,7 +199,9 @@ add_executable(arith
     ${core_fd}
 )
 
-
+# if compiler doesn't support enum as a key of unordered_map
+# please uncomment this flag
+# target_compile_definitions(arith PUBLIC  USE_INT_INSTEAD_OF_ENUM)
 
 target_include_directories(arith PRIVATE 
     core 
@@ -218,5 +223,4 @@ target_include_directories(arith PRIVATE
     core/util
     core/variblePool
 )
-
 
