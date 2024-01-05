@@ -5,6 +5,7 @@
 #include <unordered_map>
 using namespace std;
 
+static const auto sG_needPrintLog = 0;
 
 #ifndef _WIN32 
  #include <unistd.h>
@@ -805,8 +806,7 @@ int main(int argc, char* argv[], char* env[])
 		cout << "[ERROR] : " << errorMsg << endl;
 		return -1;
 	} else {
-		auto printLog = 0; 
-		if ( printLog ) {
+		if ( sG_needPrintLog  ) {
 			int layer = 0;
 #ifdef USE_POINTER_VERSION_DATA_STRUCT
 			printSpecialDataStruct(*pCfgList, layer);
