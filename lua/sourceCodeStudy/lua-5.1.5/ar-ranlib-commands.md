@@ -20,14 +20,14 @@ $(LUA_A): $(CORE_O) $(LIB_O)
 
 ### option `r` 
        Insert the files member... into archive (with replacement). This operation differs from q in that any previously existing members are deleted if their names match those being added.
-	   If one of the files named in member... does not exist, ar displays an error message, and leaves undisturbed any existing members of the archive matching that name.
-	   By default, new members are added at the end of the file; but you may use one of the modifiers a, b, or i to request placement relative to some existing member.
-	   The modifier v used with this operation elicits a line of output for each file inserted, along with one of the letters a or r to indicate whether  the  file	 was  appended	(no  old  member  deleted)  or
-	   replaced.
+       If one of the files named in member... does not exist, ar displays an error message, and leaves undisturbed any existing members of the archive matching that name.
+       By default, new members are added at the end of the file; but you may use one of the modifiers a, b, or i to request placement relative to some existing member.
+       The modifier v used with this operation elicits a line of output for each file inserted, along with one of the letters a or r to indicate whether  the  file	 was  appended	(no  old  member  deleted)  or
+       replaced.
 
 ### option `c`
        Create the archive.	The specified archive is always created if it did not exist, when you request an update.  But a warning is issued unless you specify in advance that you expect to create it, by using
-	   this modifier.
+       this modifier.
 
 ### option `u`
        Normally,  ar r... inserts all files listed into the archive.  If you would like to insert only those of the files you list that are newer than existing members of the same names, use this modifier.  
@@ -51,7 +51,7 @@ $ ranlib liblua.a
 ```
 
 
-## detail infomation about   `randlib`
+## detail infomation about   `ranlib` from command `man ranlib`
 ranlib - generate an index to an archive
 
 **ranlib** generates an index to the contents of an archive and
