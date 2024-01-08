@@ -5,7 +5,7 @@ $ ./replaceChinesePunctuation   --input   backup/testCase/t1.txt   --output   ou
 ```
 
 
-# About the data struct in this program whose purpose is to replace some chinese punctuation into english version 
+# About the data struct in this program whose purpose is to replace some chinese punctuation into english version  
 The data structure is a little bit like the ***==blacklist==*** words to ban. ( 屏蔽字列表 算法 )
 
 
@@ -203,4 +203,3 @@ struct nextCandidateMap {
 };
 
 ```
-
