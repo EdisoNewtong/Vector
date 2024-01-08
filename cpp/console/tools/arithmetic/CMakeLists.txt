@@ -1,5 +1,4 @@
-cmake_minimum_required(VERSION 3.1.0)
-
+cmake_minimum_required(VERSION 3.8.0)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
@@ -22,6 +21,7 @@ $ cmake -G  "Visual Studio 16 2019"    ../
 # set(CMAKE_SUPPRESS_REGENERATION  true)
 
 # set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
 
 set(root_src arithMetic.cpp)
 
@@ -139,42 +139,9 @@ set(variblepool_fd
 )
 
 
-# core/functionPool
-source_group(arithMetic/core/functionPool               FILES ${funcpool_root})
-
-source_group(arithMetic/core/functionPool/basic         FILES ${funcpool_basic})
-source_group(arithMetic/core/functionPool/explog        FILES ${funcpool_explog})
-source_group(arithMetic/core/functionPool/powSqrt       FILES ${funcpool_powsqrt})
-source_group(arithMetic/core/functionPool/trigonometric FILES ${funcpool_trigonometric})
-source_group(arithMetic/core/functionPool/nearest       FILES ${funcpool_nearest})
-
-# core/parser
-source_group(arithMetic/core/parser           FILES ${parser_root})
-source_group(arithMetic/core/parser/blank     FILES ${parser_blank})
-source_group(arithMetic/core/parser/comment   FILES ${parser_comment})
-source_group(arithMetic/core/parser/operator  FILES ${parser_operator})
-source_group(arithMetic/core/parser/semicolon FILES ${parser_semicolon})
-source_group(arithMetic/core/parser/sequence  FILES ${parser_sequence})
-
-
-# core/util
-source_group(arithMetic/core/util  FILES ${util_fd})
-
-# core/token
-source_group(arithMetic/core/token  FILES ${token_fd})
-
-# core/variblePool
-source_group(arithMetic/core/variblePool  FILES ${variblepool_fd})
-
-# core
-source_group(arithMetic/core              FILES ${core_fd})
-
-# root
-source_group(arithMetic                  FILES  ${root_src})
-
-
-add_executable(arith 
+set(all_src_hds 
     ${root_src}
+
     # functionPool
     ${funcpool_root}
     ${funcpool_basic}
@@ -189,19 +156,30 @@ add_executable(arith
     ${parser_operator}
     ${parser_semicolon}
     ${parser_sequence}
+
     # token
     ${token_fd}
+
     # util
     ${util_fd}
+
     # variblePool
     ${variblepool_fd}
+
     # root
     ${core_fd}
 )
 
-# if compiler doesn't support enum as a key of unordered_map
-# please uncomment this flag
-# target_compile_definitions(arith PUBLIC  USE_INT_INSTEAD_OF_ENUM)
+#
+# source_group(...) can placed either before or after      `add_executable(...)`
+# Both works well
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${all_src_hds})
+
+
+add_executable(arith ${all_src_hds})
+
+
+
 
 target_include_directories(arith PRIVATE 
     core 
@@ -224,3 +202,34 @@ target_include_directories(arith PRIVATE
     core/variblePool
 )
 
+
+#[====[
+
+
+######################################################################################################
+#
+# The following script is copied from stackoverflow.com
+#   https://stackoverflow.com/questions/31422680/how-to-set-visual-studio-filters-for-nested-sub-directory-using-cmake
+#
+######################################################################################################
+
+
+
+
+# This code sorts the project files as they appear in the root directory
+
+# Generate a list of all .c & .h files in the current directory and sub directores.
+file(
+     GLOB_RECURSE source_list RELATIVE
+     "${CMAKE_CURRENT_SOURCE_DIR}"
+     *.c *.cpp *.cppm *.cxx    *.h *.hpp  *.hpp *.cxx
+    )
+foreach(source IN LISTS source_list)
+    get_filename_component(source_path "${source}" PATH)
+    string(REPLACE "/" "\\" source_path_msvc "${source_path}")
+    source_group("${source_path_msvc}" FILES "${source}")
+endforeach()  
+message(STATUS "Tree reorganized")
+
+
+]====]
