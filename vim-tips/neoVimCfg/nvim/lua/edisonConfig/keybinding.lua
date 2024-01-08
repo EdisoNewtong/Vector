@@ -1,10 +1,5 @@
 
-
-
-
 local VimKeyMap = vim.keymap
-
-
 
 --  normal mode : press   <leader>pf    =>   :Explore<CR> 
 VimKeyMap.set("n", "<leader>pf", vim.cmd.Ex)
