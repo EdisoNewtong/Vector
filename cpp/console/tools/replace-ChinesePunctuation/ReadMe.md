@@ -5,50 +5,49 @@ $ ./replaceChinesePunctuation   --input   backup/testCase/t1.txt   --output   ou
 ```
 
 
+# About the data struct in this program whose purpose is to replace some chinese punctuation into english version 
+The data structure is a little bit like the ***==blacklist==*** words to ban. ( 屏蔽字列表 算法 )
 
-
-
-# About the data struct in this program whose purpose is to replace some chinese punctuation into english version
 
 suppose you want to replace some chinese punctuation with   english version punctuation
 
 The following is a **==table==** list all kinds of replacement :
 
-| number | original |              Utf8 Codec          | replace as  |              Comment            |
-|:------:|:--------:|:--------------------------------:|:-----------:|:-------------------------------:|
-| 01 | ｀or ·       | EF BD 80   C2 B7                 |  `          |                                 |
-| 02 | ～           | EF BD 9E                         |  ~          |                                 |
-| 03 |  '　'        | E3 80 80                         | ' '         |   This line is the <Space> key  |
-| 04 | ！           | EF BC 81                         |  !          |                                 |
-| 05 | ＠           | EF BC A0                         |  @          |                                 |
-| 06 | ＃           | EF BC 83                         |  #          |                                 |
-| 07 | ＄ or ￥     | EF BC 84   EF BF A5              |  $          |                                 |
-| 08 | ％           | EF BC 85                         |  %          |                                 |
-| 09 | ＾ or ……     | EF BC BE   E2 80 A6              |  ^          |                                 |
-| 10 | ＆           | EF BC 86                         |  &          |                                 |
-| 11 | ＊ or ×      | EF BC 8A   C3 97 0A              |  *          |                                 |
-| 12 | （           | EF BC 88                         |  (          |                                 |
-| 13 | ）           | EF BC 89                         |  )          |                                 |
-| 14 | －           | EF BC 8D                         |  -          |                                 |
-| 15 | ＿ or ——     | EF BC BF   E2 80 94 + E2 80 94   |  _          |                                 |
-| 16 | ＝           | EF BC 9D                         |  =          |                                 |
-| 17 | ＋           | EF BC 8B                         |  +          |                                 |
-| 18 | ［ or 【     | EF BC BB   E3 80 90              |  [          |                                 |
-| 19 | ｛           | EF BD 9B                         |  {          |                                 |
-| 20 | ］ or 】     | EF BC BD   E3 80 91              |  ]          |                                 |
-| 21 | ｝           | EF BD 9D                         |  }          |                                 |
-| 22 | ＼ or 、     | EF BC BC   E3 80 81              |  \          |                                 |
-| 23 | ｜           | EF BD 9C                         |  \|          |                                 |
-| 24 | ；           | EF BC 9B                         |  ;          |                                 |
-| 25 | ：           | EF BC 9A                         |  :          |                                 |
-| 26 | ＇ or ‘ or ’ | EF BC 87   E2 80 98    E2 80 99  |  '          |                                 |
-| 27 | ＂ or “ or ” | EF BC 82   E2 80 9C    E2 80 9D  |  "          |                                 |
-| 28 | ，           | EF BC 8C                         |  ,          |                                 |
-| 29 | ＜ or 《     | EF BC 9C   E3 80 8A              |  <          |                                 |
-| 30 | ． or 。     | EF BC 8E   E3 80 82              |  .          |                                 |
-| 31 | ＞ or 》     | EF BC 9E   E3 80 8B              |  >          |                                 |
-| 32 | ／           | EF BC 8F                         |  /          |                                 |
-| 33 | ？           | EF BC 9F                         |  ?          |                                 |
+| number | original |                 Utf8 Codec               | replace as  |              Comment            |
+|:------:|:--------:|:----------------------------------------:|:-----------:|:-------------------------------:|
+| 01 | ｀or ·       | ==EF== BD 80   C2 B7                     |  `          |                                 |
+| 02 | ～           | ==EF== BD 9E                             |  ~          |                                 |
+| 03 |  '　'        | E3 80 80                                 | ' '         |   This line is the <Space> key  |
+| 04 | ！           | ==EF== ==BC== 81                         |  !          |                                 |
+| 05 | ＠           | ==EF== ==BC== A0                         |  @          |                                 |
+| 06 | ＃           | ==EF== ==BC== 83                         |  #          |                                 |
+| 07 | ＄ or ￥     | ==EF== ==BC== 84   ==EF== BF A5          |  $          |                                 |
+| 08 | ％           | ==EF== ==BC== 85                         |  %          |                                 |
+| 09 | ＾ or ……     | ==EF== ==BC== BE   E2 80 A6              |  ^          |                                 |
+| 10 | ＆           | ==EF== ==BC== 86                         |  &          |                                 |
+| 11 | ＊ or ×      | ==EF== ==BC== 8A   C3 97 0A              |  *          |                                 |
+| 12 | （           | ==EF== ==BC== 88                         |  (          |                                 |
+| 13 | ）           | ==EF== ==BC== 89                         |  )          |                                 |
+| 14 | －           | ==EF== ==BC== 8D                         |  -          |                                 |
+| 15 | ＿ or ——     | ==EF== ==BC== BF   E2 80 94 + E2 80 94   |  _          |                                 |
+| 16 | ＝           | ==EF== ==BC== 9D                         |  =          |                                 |
+| 17 | ＋           | ==EF== ==BC== 8B                         |  +          |                                 |
+| 18 | ［ or 【     | ==EF== ==BC== BB   E3 80 90              |  [          |                                 |
+| 19 | ｛           | ==EF== BD 9B                             |  {          |                                 |
+| 20 | ］ or 】     | ==EF== ==BC== BD   E3 80 91              |  ]          |                                 |
+| 21 | ｝           | ==EF== BD 9D                             |  }          |                                 |
+| 22 | ＼ or 、     | ==EF== ==BC== BC   E3 80 81              |  \          |                                 |
+| 23 | ｜           | ==EF== BD 9C                             |  \|         |                                 |
+| 24 | ；           | ==EF== ==BC== 9B                         |  ;          |                                 |
+| 25 | ：           | ==EF== ==BC== 9A                         |  :          |                                 |
+| 26 | ＇ or ‘ or ’ | ==EF== ==BC== 87   E2 80 98    E2 80 99  |  '          |                                 |
+| 27 | ＂ or “ or ” | ==EF== ==BC== 82   E2 80 9C    E2 80 9D  |  "          |                                 |
+| 28 | ，           | ==EF== ==BC== 8C                         |  ,          |                                 |
+| 29 | ＜ or 《     | ==EF== ==BC== 9C   E3 80 8A              |  <          |                                 |
+| 30 | ． or 。     | ==EF== ==BC== 8E   E3 80 82              |  .          |                                 |
+| 31 | ＞ or 》     | ==EF== ==BC== 9E   E3 80 8B              |  >          |                                 |
+| 32 | ／           | ==EF== ==BC== 8F                         |  /          |                                 |
+| 33 | ？           | ==EF== ==BC== 9F                         |  ?          |                                 |
 |    |              |                                  |             |                                 |
 
 
@@ -204,5 +203,4 @@ struct nextCandidateMap {
 };
 
 ```
-
 
