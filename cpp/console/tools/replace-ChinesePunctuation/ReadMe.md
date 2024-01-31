@@ -203,3 +203,90 @@ struct nextCandidateMap {
 };
 
 ```
+
+# Compile Issue 
+
+$ gcc --version
+***==g++ (GCC) 4.8.5 20150623 (Red Hat 4.8.5-44)==***
+Copyright © 2015 Free Software Foundation, Inc.
+本程序是自由软件；请参看源代码的版权声明。本软件没有任何担保；
+包括没有适销性和某一专用目的下的适用性担保。
+
+
+ 
+ 
+***==Because for some old compiler , like link-table , the data type of a member can't be the struct itself==*** 
+
+
+$ g++   -Wall   -std=c++11    -O3   -o   replaceChinesePunctuation    replaceChinesePunctuation.cpp
+> g++   -Wall   -std=c++11    -O3   -o   replaceChinesePunctuation    replaceChinesePunctuation.cpp
+> In file included from /usr/include/c++/4.8.2/bits/stl_algobase.h:64:0,
+>                  from /usr/include/c++/4.8.2/bits/char_traits.h:39,
+>                  from /usr/include/c++/4.8.2/ios:40,
+>                  from /usr/include/c++/4.8.2/ostream:38,
+>                  from /usr/include/c++/4.8.2/iostream:39,
+>                  from replaceChinesePunctuation.cpp:1:
+> /usr/include/c++/4.8.2/bits/stl_pair.h: In instantiation of ‘struct std::pair<const char, nextCandidateMap>’:
+> /usr/include/c++/4.8.2/type_traits:615:28:   required from ‘struct std::__is_destructible_impl<std::pair<const char, nextCandidateMap> >’
+> /usr/include/c++/4.8.2/type_traits:637:12:   required from ‘struct std::__is_destructible_safe<std::pair<const char, nextCandidateMap>, false, false>’
+> /usr/include/c++/4.8.2/type_traits:652:12:   required from ‘struct std::is_destructible<std::pair<const char, nextCandidateMap> >’
+> /usr/include/c++/4.8.2/type_traits:116:12:   required from ‘struct std::__and_<std::is_destructible<std::pair<const char, nextCandidateMap> >, std::__is_direct_constructible_impl<std::pair<const char, nextCandidateMap>, const std::pair<const char, nextCandidateMap>&> >’
+> /usr/include/c++/4.8.2/type_traits:817:12:   required from ‘struct std::__is_direct_constructible_new_safe<std::pair<const char, nextCandidateMap>, const std::pair<const char, nextCandidateMap>&>’
+> /usr/include/c++/4.8.2/type_traits:895:12:   [ skipping 4 instantiation contexts, use -ftemplate-backtrace-limit=0 to disable ]
+> /usr/include/c++/4.8.2/type_traits:968:12:   required from ‘struct std::__is_copy_constructible_impl<std::pair<const char, nextCandidateMap>, false>’
+> /usr/include/c++/4.8.2/type_traits:974:12:   required from ‘struct std::is_copy_constructible<std::pair<const char, nextCandidateMap> >’
+> /usr/include/c++/4.8.2/bits/alloc_traits.h:540:12:   required from ‘struct std::__is_copy_insertable<std::allocator<std::pair<const char, nextCandidateMap> > >’
+> /usr/include/c++/4.8.2/bits/alloc_traits.h:560:63:   required by substitution of ‘template<class _Alloc> using __check_copy_constructible = std::__allow_copy_cons<std::__is_copy_insertable<_Alloc>::value> [with _Alloc = std::allocator<std::pair<const char, nextCandidateMap> >]’
+> /usr/include/c++/4.8.2/bits/unordered_map.h:97:11:   required from ‘class std::unordered_map<char, nextCandidateMap>’
+> replaceChinesePunctuation.cpp:43:40:   required from here
+> /usr/include/c++/4.8.2/bits/stl_pair.h:102:11: 错误：‘std::pair<_T1, _T2>::second’类型不完全
+>        _T2 second;                /// @c second is a copy of the second object
+>            ^
+> replaceChinesePunctuation.cpp:37:8: 错误：‘struct nextCandidateMap’的前向声明
+>  struct nextCandidateMap {
+>         ^
+> In file included from /usr/include/c++/4.8.2/bits/stl_algobase.h:64:0,
+>                  from /usr/include/c++/4.8.2/bits/char_traits.h:39,
+>                  from /usr/include/c++/4.8.2/ios:40,
+>                  from /usr/include/c++/4.8.2/ostream:38,
+>                  from /usr/include/c++/4.8.2/iostream:39,
+>                  from replaceChinesePunctuation.cpp:1:
+> /usr/include/c++/4.8.2/bits/stl_pair.h: In instantiation of ‘constexpr std::pair<_T1, _T2>::pair(std::pair<_U1, _U2>&&) [with _U1 = char; _U2 = nextCandidateMap; <模板形参-2-3> = void; _T1 = const char; _T2 = nextCandidateMap]’:
+> /usr/include/c++/4.8.2/type_traits:801:43:   required from ‘struct std::__is_direct_constructible_impl<std::pair<const char, nextCandidateMap>, std::pair<char, nextCandidateMap>&&>’
+> /usr/include/c++/4.8.2/type_traits:116:12:   required from ‘struct std::__and_<std::is_destructible<std::pair<const char, nextCandidateMap> >, std::__is_direct_constructible_impl<std::pair<const char, nextCandidateMap>, std::pair<char, nextCandidateMap>&&> >’
+> /usr/include/c++/4.8.2/type_traits:817:12:   required from ‘struct std::__is_direct_constructible_new_safe<std::pair<const char, nextCandidateMap>, std::pair<char, nextCandidateMap>&&>’
+> /usr/include/c++/4.8.2/type_traits:895:12:   required from ‘struct std::__is_direct_constructible_new<std::pair<const char, nextCandidateMap>, std::pair<char, nextCandidateMap>&&>’
+> /usr/include/c++/4.8.2/type_traits:903:12:   required from ‘struct std::__is_direct_constructible<std::pair<const char, nextCandidateMap>, std::pair<char, nextCandidateMap>&&>’
+> /usr/include/c++/4.8.2/type_traits:944:12:   required from ‘struct std::__is_constructible_impl<std::pair<const char, nextCandidateMap>, std::pair<char, nextCandidateMap>&&>’
+> /usr/include/c++/4.8.2/type_traits:955:12:   required from ‘struct std::is_constructible<std::pair<const char, nextCandidateMap>, std::pair<char, nextCandidateMap>&&>’
+> /usr/include/c++/4.8.2/bits/unordered_map.h:365:32:   required from here
+> /usr/include/c++/4.8.2/bits/stl_pair.h:152:40: 错误：使用无效字段‘std::pair<_T1, _T2>::second’
+>     second(std::forward<_U2>(__p.second)) { }
+>                                         ^
+> replaceChinesePunctuation.cpp: 在函数‘void insertInfoMap(const string&, NextMap*, char)’中:
+> replaceChinesePunctuation.cpp:88:51: 错误：‘struct std::pair<const char, nextCandidateMap>’没有名为‘second’的成员
+>       pWhichList = &( (pWhichList->find(singleCh)->second).nextMap );
+>                                                    ^
+> replaceChinesePunctuation.cpp:98:34: 错误：‘struct std::pair<const char, nextCandidateMap>’没有名为‘second’的成员
+>       pWhichList->find(singleCh)->second.replaceWith = toReplaceWith;
+>                                   ^
+> replaceChinesePunctuation.cpp:106:29: 错误：‘struct std::pair<const char, nextCandidateMap>’没有名为‘second’的成员
+>      pWhichList = &(foundIt->second).nextMap;
+>                              ^
+> replaceChinesePunctuation.cpp: 在函数‘void printSpecialDataStruct(const NextMap&, int)’中:
+> replaceChinesePunctuation.cpp:219:27: 错误：‘const struct std::pair<const char, nextCandidateMap>’没有名为‘second’的成员
+>    NextMap nextLayer = it->second.nextMap;
+>                            ^
+> replaceChinesePunctuation.cpp:229:39: 错误：‘const struct std::pair<const char, nextCandidateMap>’没有名为‘second’的成员
+>     cout << "   replace  ==> '" << it->second.replaceWith << "\' " << endl;
+>                                        ^
+> replaceChinesePunctuation.cpp: 在函数‘void tryReplaceChinesePuncPunctuation(const processArg&, const NextMap&, fileCharInfo*&, size_t&, std::vector<fileCharInfo>&)’中:
+> replaceChinesePunctuation.cpp:608:30: 错误：‘struct std::pair<const char, nextCandidateMap>’没有名为‘second’的成员
+>      char repacedWithCh = it->second.replaceWith;
+>                               ^
+> replaceChinesePunctuation.cpp:609:18: 错误：‘struct std::pair<const char, nextCandidateMap>’没有名为‘second’的成员
+>      pMap = &(it->second.nextMap);
+>                   ^
+> make: *** [replaceChinesePunctuation] 错误 1
+
+
