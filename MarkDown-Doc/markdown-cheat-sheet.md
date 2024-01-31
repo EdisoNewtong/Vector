@@ -138,7 +138,7 @@ X^2^
 
 \*\*Not All MarkDown Editor support the following syntax\*\*&#x20;
 
-<font color="blue">Blue Text</font> <font color="#FF00FF">Pink Text</font>
+<font  face="Cascadia Code" size="7" color="blue">中文MarkDown</font><font face="华文彩云"  size="4" color="#FF00FF" >中文MarkDown</font>
 
 ### ==Characters You Can Escape==
 

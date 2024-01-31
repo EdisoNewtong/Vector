@@ -8,7 +8,7 @@
 
 # Start your program with arguments
 
-(gdb) sta(rt) \[program arguments]    // it set a temporary breakpoint at the beginning of the main procedure\
+(gdb) sta(rt) \[program arguments]    // it set a temporary breakpoint at the beginning of the **==main==** entrypoint 
 (gdb) r(un)   \[program arguments]
 
 (gdb) set args \[program arguments]\
