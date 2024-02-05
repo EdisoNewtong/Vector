@@ -1,6 +1,6 @@
 [引用 -Wl 选项说明](https://www.cnblogs.com/yongdaimi/p/16619264.html)
 
-# GCC-GCC中的-Wl选项说明 
+# GCC-G++中的-Wl选项说明 
   在GCC编译程序时，由于GCC命令不仅能够编译，也能够链接程序，GCC链接程序是通过ld命令实现的， 
 如何将GCC的命令行参数传递给ld命令呢，这就是通过**==-Wl==**,来实现的。 
 
