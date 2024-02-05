@@ -17,6 +17,7 @@ Apparently, on a x86 environment, -fpic and -fPIC are equivalent. On other archi
 ### Preprocessor macros
   When compiling with -fpic, the compiler defines the macro \_\_pic\_\_ and \_\_PIC\_\_ to 1. When copmiling with -fPIC, these macros are defined to 2.
 
+## Other detail
 -fpic
 > Generate position-independent code (PIC) suitable for use in a shared library, if supported for the target
 > machine. Such code accesses all constant addresses through a global offset table (GOT). The dynamic
@@ -38,3 +39,28 @@ position-independent.
 
   Position-independent code requires special support, and therefore works only on certain machines.
 
+
+
+# In GCC (GNU Compiler Collection), both `-fpic` and `-fPIC` are options used to generate position-independent code (PIC), which is a type of code that can be executed at any memory address and can be shared among multiple processes. However, there is a subtle difference between the two options:
+
+1. **-fpic (lowercase):**
+   - Stands for "position-independent code."
+   - Generates position-independent code, but it may place certain constants in registers, which limits the range of addresses that can be used for the code.
+   - Generally suitable for code that is smaller in size and is not expected to be placed far apart in memory.
+
+   Example:
+   ```bash
+   gcc -fpic -o output_file source_file.c
+   ```
+
+2. **-fPIC (uppercase):**
+   - Stands for "position-independent code."
+   - Similar to `-fpic`, but it avoids placing constants in registers, allowing for a larger range of possible addresses.
+   - Generally used when generating code that may be part of a shared library or when the code might be loaded at a large virtual memory address.
+
+   Example:
+   ```bash
+   gcc -fPIC -o output_file source_file.c
+   ```
+
+In most cases, if you're building shared libraries, it's recommended to use `-fPIC` for better compatibility and flexibility. If you're working with smaller programs or in an environment where the benefits of `-fPIC` are not critical, you might opt for `-fpic` for potentially smaller code size.
