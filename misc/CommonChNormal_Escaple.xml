@@ -1,0 +1,550 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Common-Characters>
+  <Alphabet>
+    <Group-1>&#x1D400; &#x1D401; &#x1D402; &#x1D403; &#x1D404; &#x1D405; &#x1D406; &#x1D407; &#x1D408; &#x1D409; &#x1D40A; &#x1D40B; &#x1D40C; &#x1D40D; &#x1D40E; &#x1D40F; &#x1D410; &#x1D411; &#x1D412; &#x1D413; &#x1D414; &#x1D415; &#x1D416; &#x1D417; &#x1D418; &#x1D419; </Group-1>
+    <Group-2>&#x1D41A; &#x1D41B; &#x1D41C; &#x1D41D; &#x1D41E; &#x1D41F; &#x1D420; &#x1D421; &#x1D422; &#x1D423; &#x1D424; &#x1D425; &#x1D426; &#x1D427; &#x1D428; &#x1D429; &#x1D42A; &#x1D42B; &#x1D42C; &#x1D42D; &#x1D42E; &#x1D42F; &#x1D430; &#x1D431; &#x1D432; &#x1D433; </Group-2>
+    <Group-3>&#x1D434; &#x1D435; &#x1D436; &#x1D437; &#x1D438; &#x1D439; &#x1D43A; &#x1D43B; &#x1D43C; &#x1D43D; &#x1D43E; &#x1D43F; &#x1D440; &#x1D441; &#x1D442; &#x1D443; &#x1D444; &#x1D445; &#x1D446; &#x1D447; &#x1D448; &#x1D449; &#x1D44A; &#x1D44B; &#x1D44C; &#x1D44D; </Group-3>
+    <Group-4>&#x1D44E; &#x1D44F; &#x1D450; &#x1D451; &#x1D452; &#x1D453; &#x1D454; &#x1D456; &#x1D457; &#x1D458; &#x1D459; &#x1D45A; &#x1D45B; &#x1D45C; &#x1D45D; &#x1D45E; &#x1D45F; &#x1D460; &#x1D461; &#x1D462; &#x1D463; &#x1D465; &#x1D466; &#x1D467; </Group-4>
+    <Group-5>&#x1D468; &#x1D469; &#x1D46A; &#x1D46B; &#x1D46C; &#x1D46D; &#x1D46E; &#x1D46F; &#x1D470; &#x1D471; &#x1D472; &#x1D473; &#x1D474; &#x1D475; &#x1D476; &#x1D477; &#x1D478; &#x1D479; &#x1D47A; &#x1D47B; &#x1D47C; &#x1D47D; &#x1D47E; &#x1D47F; &#x1D480; &#x1D481; </Group-5>
+    <Group-6>&#x1D482; &#x1D483; &#x1D484; &#x1D485; &#x1D486; &#x1D487; &#x1D488; &#x1D489; &#x1D48A; &#x1D48B; &#x1D48C; &#x1D48D; &#x1D48E; &#x1D48F; &#x1D490; &#x1D491; &#x1D492; &#x1D493; &#x1D494; &#x1D495; &#x1D496; &#x1D497; &#x1D498; &#x1D499; &#x1D49A; &#x1D49B; </Group-6>
+    <Group-7>&#x1D49C; &#x1D49E; &#x1D49F; &#x1D4A2; &#x1D4A5; &#x1D4A6; &#x1D4A9; &#x1D4AA; &#x1D4AB; &#x1D4AC; &#x1D4AE; &#x1D4AF; &#x1D4B0; &#x1D4B1; &#x1D4B2; &#x1D4B3; &#x1D4B4; &#x1D4B5; </Group-7>
+    <Group-8>&#x1D4B6; &#x1D4B7; &#x1D4B8; &#x1D4B9; &#x1D4BB; &#x1D4BD; &#x1D4BE; &#x1D4BF; &#x1D4C0; &#x1D4C1; &#x1D4C2; &#x1D4C3; &#x1D4C5; &#x1D4C6; &#x1D4C7; &#x1D4C8; &#x1D4C9; &#x1D4CA; &#x1D4CB; &#x1D4CC; &#x1D4CD; &#x1D4CE; &#x1D4CF; </Group-8>
+    <Group-9>&#x1D4D0; &#x1D4D1; &#x1D4D2; &#x1D4D3; &#x1D4D4; &#x1D4D5; &#x1D4D6; &#x1D4D7; &#x1D4D8; &#x1D4D9; &#x1D4DA; &#x1D4DB; &#x1D4DC; &#x1D4DD; &#x1D4DE; &#x1D4DF; &#x1D4E0; &#x1D4E1; &#x1D4E2; &#x1D4E3; &#x1D4E4; &#x1D4E5; &#x1D4E6; &#x1D4E7; &#x1D4E8; &#x1D4E9; </Group-9>
+    <Group-10>&#x1D4EA; &#x1D4EB; &#x1D4EC; &#x1D4ED; &#x1D4EE; &#x1D4EF; &#x1D4F0; &#x1D4F1; &#x1D4F2; &#x1D4F3; &#x1D4F4; &#x1D4F5; &#x1D4F6; &#x1D4F7; &#x1D4F8; &#x1D4F9; &#x1D4FA; &#x1D4FB; &#x1D4FC; &#x1D4FD; &#x1D4FE; &#x1D4FF; &#x1D500; &#x1D501; &#x1D502; &#x1D503; </Group-10>
+    <Group-11>&#x1D504; &#x1D505; &#x1D507; &#x1D508; &#x1D509; &#x1D50A; &#x1D50D; &#x1D50E; &#x1D50F; &#x1D510; &#x1D511; &#x1D512; &#x1D513; &#x1D514; &#x1D516; &#x1D517; &#x1D518; &#x1D519; &#x1D51A; &#x1D51B; &#x1D51C; </Group-11>
+    <Group-12>&#x1D51E; &#x1D51F; &#x1D520; &#x1D521; &#x1D522; &#x1D523; &#x1D524; &#x1D525; &#x1D526; &#x1D527; &#x1D528; &#x1D529; &#x1D52A; &#x1D52B; &#x1D52C; &#x1D52D; &#x1D52E; &#x1D52F; &#x1D530; &#x1D531; &#x1D532; &#x1D533; &#x1D534; &#x1D535; &#x1D536; &#x1D537; </Group-12>
+    <Group-13>&#x1D538; &#x1D539; &#x1D53B; &#x1D53C; &#x1D53D; &#x1D53E; &#x1D540; &#x1D541; &#x1D542; &#x1D543; &#x1D544; &#x1D546; &#x1D54A; &#x1D54B; &#x1D54C; &#x1D54D; &#x1D54E; &#x1D54F; &#x1D550; </Group-13>
+    <Group-14>&#x1D552; &#x1D553; &#x1D554; &#x1D555; &#x1D556; &#x1D557; &#x1D558; &#x1D559; &#x1D55A; &#x1D55B; &#x1D55C; &#x1D55D; &#x1D55E; &#x1D55F; &#x1D560; &#x1D561; &#x1D562; &#x1D563; &#x1D564; &#x1D565; &#x1D566; &#x1D567; &#x1D568; &#x1D569; &#x1D56A; &#x1D56B; </Group-14>
+    <Group-15>&#x1D56C; &#x1D56D; &#x1D56E; &#x1D56F; &#x1D570; &#x1D571; &#x1D572; &#x1D573; &#x1D574; &#x1D575; &#x1D576; &#x1D577; &#x1D578; &#x1D579; &#x1D57A; &#x1D57B; &#x1D57C; &#x1D57D; &#x1D57E; &#x1D57F; &#x1D580; &#x1D581; &#x1D582; &#x1D583; &#x1D584; &#x1D585; </Group-15>
+    <Group-16>&#x1D586; &#x1D587; &#x1D588; &#x1D589; &#x1D58A; &#x1D58B; &#x1D58C; &#x1D58D; &#x1D58E; &#x1D58F; &#x1D590; &#x1D591; &#x1D592; &#x1D593; &#x1D594; &#x1D595; &#x1D596; &#x1D597; &#x1D598; &#x1D599; &#x1D59A; &#x1D59B; &#x1D59C; &#x1D59D; &#x1D59E; &#x1D59F; </Group-16>
+    <Group-17>&#x1D5A0; &#x1D5A1; &#x1D5A2; &#x1D5A3; &#x1D5A4; &#x1D5A5; &#x1D5A6; &#x1D5A7; &#x1D5A8; &#x1D5A9; &#x1D5AA; &#x1D5AB; &#x1D5AC; &#x1D5AD; &#x1D5AE; &#x1D5AF; &#x1D5B0; &#x1D5B1; &#x1D5B2; &#x1D5B3; &#x1D5B4; &#x1D5B5; &#x1D5B6; &#x1D5B7; &#x1D5B8; &#x1D5B9; </Group-17>
+    <Group-18>&#x1D5BA; &#x1D5BB; &#x1D5BC; &#x1D5BD; &#x1D5BE; &#x1D5BF; &#x1D5C0; &#x1D5C1; &#x1D5C2; &#x1D5C3; &#x1D5C4; &#x1D5C5; &#x1D5C6; &#x1D5C7; &#x1D5C8; &#x1D5C9; &#x1D5CA; &#x1D5CB; &#x1D5CC; &#x1D5CD; &#x1D5CE; &#x1D5CF; &#x1D5D0; &#x1D5D1; &#x1D5D2; &#x1D5D3; </Group-18>
+    <Group-19>&#x1D5D4; &#x1D5D5; &#x1D5D6; &#x1D5D7; &#x1D5D8; &#x1D5D9; &#x1D5DA; &#x1D5DB; &#x1D5DC; &#x1D5DD; &#x1D5DE; &#x1D5DF; &#x1D5E0; &#x1D5E1; &#x1D5E2; &#x1D5E3; &#x1D5E4; &#x1D5E5; &#x1D5E6; &#x1D5E7; &#x1D5E8; &#x1D5E9; &#x1D5EA; &#x1D5EB; &#x1D5EC; &#x1D5ED; </Group-19>
+    <Group-20>&#x1D5EE; &#x1D5EF; &#x1D5F0; &#x1D5F1; &#x1D5F2; &#x1D5F3; &#x1D5F4; &#x1D5F5; &#x1D5F6; &#x1D5F7; &#x1D5F8; &#x1D5F9; &#x1D5FA; &#x1D5FB; &#x1D5FC; &#x1D5FD; &#x1D5FE; &#x1D5FF; &#x1D600; &#x1D601; &#x1D602; &#x1D603; &#x1D604; &#x1D605; &#x1D606; &#x1D607; </Group-20>
+    <Group-21>&#x1D608; &#x1D609; &#x1D60A; &#x1D60B; &#x1D60C; &#x1D60D; &#x1D60E; &#x1D60F; &#x1D610; &#x1D611; &#x1D612; &#x1D613; &#x1D614; &#x1D615; &#x1D616; &#x1D617; &#x1D618; &#x1D619; &#x1D61A; &#x1D61B; &#x1D61C; &#x1D61D; &#x1D61E; &#x1D61F; &#x1D620; &#x1D621; </Group-21>
+    <Group-22>&#x1D622; &#x1D623; &#x1D624; &#x1D625; &#x1D626; &#x1D627; &#x1D628; &#x1D629; &#x1D62A; &#x1D62B; &#x1D62C; &#x1D62D; &#x1D62E; &#x1D62F; &#x1D630; &#x1D631; &#x1D632; &#x1D633; &#x1D634; &#x1D635; &#x1D636; &#x1D637; &#x1D638; &#x1D639; &#x1D63A; &#x1D63B; </Group-22>
+    <Group-23>&#x1D63C; &#x1D63D; &#x1D63E; &#x1D63F; &#x1D640; &#x1D641; &#x1D642; &#x1D643; &#x1D644; &#x1D645; &#x1D646; &#x1D647; &#x1D648; &#x1D649; &#x1D64A; &#x1D64B; &#x1D64C; &#x1D64D; &#x1D64E; &#x1D64F; &#x1D650; &#x1D651; &#x1D652; &#x1D653; &#x1D654; &#x1D655; </Group-23>
+    <Group-24>&#x1D656; &#x1D657; &#x1D658; &#x1D659; &#x1D65A; &#x1D65B; &#x1D65C; &#x1D65D; &#x1D65E; &#x1D65F; &#x1D660; &#x1D661; &#x1D662; &#x1D663; &#x1D664; &#x1D665; &#x1D666; &#x1D667; &#x1D668; &#x1D669; &#x1D66A; &#x1D66B; &#x1D66C; &#x1D66D; &#x1D66E; &#x1D66F; </Group-24>
+    <Group-25>&#x1D670; &#x1D671; &#x1D672; &#x1D673; &#x1D674; &#x1D675; &#x1D676; &#x1D677; &#x1D678; &#x1D679; &#x1D67A; &#x1D67B; &#x1D67C; &#x1D67D; &#x1D67E; &#x1D67F; &#x1D680; &#x1D681; &#x1D682; &#x1D683; &#x1D684; &#x1D685; &#x1D686; &#x1D687; &#x1D688; &#x1D689; </Group-25>
+    <Group-26>&#x1D68A; &#x1D68B; &#x1D68C; &#x1D68D; &#x1D68E; &#x1D68F; &#x1D690; &#x1D691; &#x1D692; &#x1D693; &#x1D694; &#x1D695; &#x1D696; &#x1D697; &#x1D698; &#x1D699; &#x1D69A; &#x1D69B; &#x1D69C; &#x1D69D; &#x1D69E; &#x1D69F; &#x1D6A0; &#x1D6A1; &#x1D6A2; &#x1D6A3; </Group-26>
+    <Group-27>&#x1F130; &#x1F131; &#x1F132; &#x1F133; &#x1F134; &#x1F135; &#x1F136; &#x1F137; &#x1F138; &#x1F139; &#x1F13A; &#x1F13B; &#x1F13C; &#x1F13D; &#x1F13E; &#x1F13F; &#x1F140; &#x1F141; &#x1F142; &#x1F143; &#x1F144; &#x1F145; &#x1F146; &#x1F147; &#x1F148; &#x1F149; </Group-27>
+    <Group-28>&#x1F150; &#x1F151; &#x1F152; &#x1F153; &#x1F154; &#x1F155; &#x1F156; &#x1F157; &#x1F158; &#x1F159; &#x1F15A; &#x1F15B; &#x1F15C; &#x1F15D; &#x1F15E; &#x1F15F; &#x1F160; &#x1F161; &#x1F162; &#x1F163; &#x1F164; &#x1F165; &#x1F166; &#x1F167; &#x1F168; &#x1F169; </Group-28>
+    <Group-29>&#x1F170; &#x1F171; &#x1F172; &#x1F173; &#x1F174; &#x1F175; &#x1F176; &#x1F177; &#x1F178; &#x1F179; &#x1F17A; &#x1F17B; &#x1F17C; &#x1F17D; &#x1F17E; &#x1F17F; &#x1F180; &#x1F181; &#x1F182; &#x1F183; &#x1F184; &#x1F185; &#x1F186; &#x1F187; &#x1F188; &#x1F189; </Group-29>
+    <Group-30>&#x249C; &#x249D; &#x249E; &#x249F; &#x24A0; &#x24A1; &#x24A2; &#x24A3; &#x24A4; &#x24A5; &#x24A6; &#x24A7; &#x24A8; &#x24A9; &#x24AA; &#x24AB; &#x24AC; &#x24AD; &#x24AE; &#x24AF; &#x24B0; &#x24B1; &#x24B2; &#x24B3; &#x24B4; &#x24B5; </Group-30>
+    <Group-31>&#x24B6; &#x24B7; &#x24B8; &#x24B9; &#x24BA; &#x24BB; &#x24BC; &#x24BD; &#x24BE; &#x24BF; &#x24C0; &#x24C1; &#x24C2; &#x24C3; &#x24C4; &#x24C5; &#x24C6; &#x24C7; &#x24C8; &#x24C9; &#x24CA; &#x24CB; &#x24CC; &#x24CD; &#x24CE; &#x24CF; </Group-31>
+    <Group-32>&#x24D0; &#x24D1; &#x24D2; &#x24D3; &#x24D4; &#x24D5; &#x24D6; &#x24D7; &#x24D8; &#x24D9; &#x24DA; &#x24DB; &#x24DC; &#x24DD; &#x24DE; &#x24DF; &#x24E0; &#x24E1; &#x24E2; &#x24E3; &#x24E4; &#x24E5; &#x24E6; &#x24E7; &#x24E8; &#x24E9; </Group-32>
+    <Group-33>&#x1F110; &#x1F111; &#x1F112; &#x1F113; &#x1F114; &#x1F115; &#x1F116; &#x1F117; &#x1F118; &#x1F119; &#x1F11A; &#x1F11B; &#x1F11C; &#x1F11D; &#x1F11E; &#x1F11F; &#x1F120; &#x1F121; &#x1F122; &#x1F123; &#x1F124; &#x1F125; &#x1F126; &#x1F127; &#x1F128; &#x1F129; </Group-33>
+  </Alphabet>
+  <Greek-Alphabet>
+    <Group-1>&#x1D6A8; &#x1D6A9; &#x1D6AA; &#x1D6AB; &#x1D6AC; &#x1D6AD; &#x1D6AE; &#x1D6AF; &#x1D6B0; &#x1D6B1; &#x1D6B2; &#x1D6B3; &#x1D6B4; &#x1D6B5; &#x1D6B6; &#x1D6B7; &#x1D6B8; &#x1D6B9; &#x1D6BA; &#x1D6BB; &#x1D6BC; &#x1D6BD; &#x1D6BE; &#x1D6BF; &#x1D6C0; &#x1D6C1; </Group-1>
+    <Group-2>&#x1D6C2; &#x1D6C3; &#x1D6C4; &#x1D6C5; &#x1D6C6; &#x1D6C7; &#x1D6C8; &#x1D6C9; &#x1D6CA; &#x1D6CB; &#x1D6CC; &#x1D6CD; &#x1D6CE; &#x1D6CF; &#x1D6D0; &#x1D6D1; &#x1D6D2; &#x1D6D3; &#x1D6D4; &#x1D6D5; &#x1D6D6; &#x1D6D7; &#x1D6D8; &#x1D6D9; &#x1D6DA; &#x1D6DB; &#x1D6DC; &#x1D6DD; &#x1D6DE; &#x1D6DF; &#x1D6E0; &#x1D6E1; </Group-2>
+    <Group-3>&#x1D6E2; &#x1D6E3; &#x1D6E4; &#x1D6E5; &#x1D6E6; &#x1D6E7; &#x1D6E8; &#x1D6E9; &#x1D6EA; &#x1D6EB; &#x1D6EC; &#x1D6ED; &#x1D6EE; &#x1D6EF; &#x1D6F0; &#x1D6F1; &#x1D6F2; &#x1D6F3; &#x1D6F4; &#x1D6F5; &#x1D6F6; &#x1D6F7; &#x1D6F8; &#x1D6F9; &#x1D6FA; &#x1D6FB; </Group-3>
+    <Group-4>&#x1D6FC; &#x1D6FD; &#x1D6FE; &#x1D6FF; &#x1D700; &#x1D701; &#x1D702; &#x1D703; &#x1D704; &#x1D705; &#x1D706; &#x1D707; &#x1D708; &#x1D709; &#x1D70A; &#x1D70B; &#x1D70C; &#x1D70D; &#x1D70E; &#x1D70F; &#x1D710; &#x1D711; &#x1D712; &#x1D713; &#x1D714; &#x1D715; &#x1D716; &#x1D717; &#x1D718; &#x1D719; &#x1D71A; &#x1D71B; </Group-4>
+    <Group-5>&#x1D71C; &#x1D71D; &#x1D71E; &#x1D71F; &#x1D720; &#x1D721; &#x1D722; &#x1D723; &#x1D724; &#x1D725; &#x1D726; &#x1D727; &#x1D728; &#x1D729; &#x1D72A; &#x1D72B; &#x1D72C; &#x1D72D; &#x1D72E; &#x1D72F; &#x1D730; &#x1D731; &#x1D732; &#x1D733; &#x1D734; &#x1D735; </Group-5>
+    <Group-6>&#x1D736; &#x1D737; &#x1D738; &#x1D739; &#x1D73A; &#x1D73B; &#x1D73C; &#x1D73D; &#x1D73E; &#x1D73F; &#x1D740; &#x1D741; &#x1D742; &#x1D743; &#x1D744; &#x1D745; &#x1D746; &#x1D747; &#x1D748; &#x1D749; &#x1D74A; &#x1D74B; &#x1D74C; &#x1D74D; &#x1D74E; &#x1D74F; &#x1D750; &#x1D751; &#x1D752; &#x1D753; &#x1D754; &#x1D755; </Group-6>
+    <Group-7>&#x1D756; &#x1D757; &#x1D758; &#x1D759; &#x1D75A; &#x1D75B; &#x1D75C; &#x1D75D; &#x1D75E; &#x1D75F; &#x1D760; &#x1D761; &#x1D762; &#x1D763; &#x1D764; &#x1D765; &#x1D766; &#x1D767; &#x1D768; &#x1D769; &#x1D76A; &#x1D76B; &#x1D76C; &#x1D76D; &#x1D76E; &#x1D76F; </Group-7>
+    <Group-8>&#x1D770; &#x1D771; &#x1D772; &#x1D773; &#x1D774; &#x1D775; &#x1D776; &#x1D777; &#x1D778; &#x1D779; &#x1D77A; &#x1D77B; &#x1D77C; &#x1D77D; &#x1D77E; &#x1D77F; &#x1D780; &#x1D781; &#x1D782; &#x1D783; &#x1D784; &#x1D785; &#x1D786; &#x1D787; &#x1D788; &#x1D789; &#x1D78A; &#x1D78B; &#x1D78C; &#x1D78D; &#x1D78E; &#x1D78F; </Group-8>
+    <Group-9>&#x1D790; &#x1D791; &#x1D792; &#x1D793; &#x1D794; &#x1D795; &#x1D796; &#x1D797; &#x1D798; &#x1D799; &#x1D79A; &#x1D79B; &#x1D79C; &#x1D79D; &#x1D79E; &#x1D79F; &#x1D7A0; &#x1D7A1; &#x1D7A2; &#x1D7A3; &#x1D7A4; &#x1D7A5; &#x1D7A6; &#x1D7A7; &#x1D7A8; &#x1D7A9; </Group-9>
+    <Group-10>&#x1D7AA; &#x1D7AB; &#x1D7AC; &#x1D7AD; &#x1D7AE; &#x1D7AF; &#x1D7B0; &#x1D7B1; &#x1D7B2; &#x1D7B3; &#x1D7B4; &#x1D7B5; &#x1D7B6; &#x1D7B7; &#x1D7B8; &#x1D7B9; &#x1D7BA; &#x1D7BB; &#x1D7BC; &#x1D7BD; &#x1D7BE; &#x1D7BF; &#x1D7C0; &#x1D7C1; &#x1D7C2; &#x1D7C3; &#x1D7C4; &#x1D7C5; &#x1D7C6; &#x1D7C7; &#x1D7C8; &#x1D7C9; </Group-10>
+    <Group-11>&#x1D7CA; &#x1D7CB; </Group-11>
+    <Group-12>&#x1D6A4; &#x1D6A5; </Group-12>
+  </Greek-Alphabet>
+  <Digit>
+    <Group-1>&#x24EA; </Group-1>
+    <Group-2>&#x2460; &#x2461; &#x2462; &#x2463; &#x2464; &#x2465; &#x2466; &#x2467; &#x2468; &#x2469; &#x246A; &#x246B; &#x246C; &#x246D; &#x246E; &#x246F; </Group-2>
+    <Group-3>&#x2470; &#x2471; &#x2472; &#x2473; &#x3251; &#x3252; &#x3253; &#x3254; &#x3255; &#x3256; &#x3257; &#x3258; &#x3259; &#x325A; &#x325B; &#x325C; </Group-3>
+    <Group-4>&#x325D; &#x325E; &#x325F; &#x32B1; &#x32B2; &#x32B3; &#x32B4; &#x32B5; &#x32B6; &#x32B7; &#x32B8; &#x32B9; &#x32BA; &#x32BB; &#x32BC; &#x32BD; </Group-4>
+    <Group-5>&#x32BE; &#x32BF; </Group-5>
+    <Group-6>&#x2474; &#x2475; &#x2476; &#x2477; &#x2478; &#x2479; &#x247A; &#x247B; &#x247C; &#x247D; &#x247E; &#x247F; &#x2480; &#x2481; &#x2482; &#x2483; &#x2484; &#x2485; &#x2486; &#x2487; </Group-6>
+    <Group-7>&#x2488; &#x2489; &#x248A; &#x248B; &#x248C; &#x248D; &#x248E; &#x248F; &#x2490; &#x2491; &#x2492; &#x2493; &#x2494; &#x2495; &#x2496; &#x2497; &#x2498; &#x2499; &#x249A; &#x249B; </Group-7>
+    <Group-8>&#x24EB; &#x24EC; &#x24ED; &#x24EE; &#x24EF; &#x24F0; &#x24F1; &#x24F2; &#x24F3; &#x24F4; </Group-8>
+    <Group-9>&#x24F5; &#x24F6; &#x24F7; &#x24F8; &#x24F9; &#x24FA; &#x24FB; &#x24FC; &#x24FD; &#x24FE; </Group-9>
+    <Group-10>&#x24FF; &#x278A; &#x278B; &#x278C; &#x278D; &#x278E; &#x278F; &#x2790; &#x2791; &#x2792; &#x2793; </Group-10>
+    <Group-11>&#x1F10C; &#x2776; &#x278B; &#x278C; &#x278D; &#x278E; &#x278F; &#x2790; &#x2791; &#x2792; &#x2793; </Group-11>
+    <Group-12>&#x2780; &#x2781; &#x2782; &#x2783; &#x2784; &#x2785; &#x2786; &#x2787; &#x2788; &#x2789; </Group-12>
+    <Group-13>&#xFF10; &#xFF11; &#xFF12; &#xFF13; &#xFF14; &#xFF15; &#xFF16; &#xFF17; &#xFF18; &#xFF19; </Group-13>
+    <Group-14>&#x1D7CE; &#x1D7CF; &#x1D7D0; &#x1D7D1; &#x1D7D2; &#x1D7D3; &#x1D7D4; &#x1D7D5; &#x1D7D6; &#x1D7D7; </Group-14>
+    <Group-15>&#x1D7D8; &#x1D7D9; &#x1D7DA; &#x1D7DB; &#x1D7DC; &#x1D7DD; &#x1D7DE; &#x1D7DF; &#x1D7E0; &#x1D7E1; </Group-15>
+    <Group-16>&#x1D7E2; &#x1D7E3; &#x1D7E4; &#x1D7E5; &#x1D7E6; &#x1D7E7; &#x1D7E8; &#x1D7E9; &#x1D7EA; &#x1D7EB; </Group-16>
+    <Group-17>&#x1D7EC; &#x1D7ED; &#x1D7EE; &#x1D7EF; &#x1D7F0; &#x1D7F1; &#x1D7F2; &#x1D7F3; &#x1D7F4; &#x1D7F5; </Group-17>
+    <Group-18>&#x1D7F6; &#x1D7F7; &#x1D7F8; &#x1D7F9; &#x1D7FA; &#x1D7FB; &#x1D7FC; &#x1D7FD; &#x1D7FE; &#x1D7FF; </Group-18>
+    <Group-19>&#x1FBF0; &#x1FBF1; &#x1FBF2; &#x1FBF3; &#x1FBF4; &#x1FBF5; &#x1FBF6; &#x1FBF7; &#x1FBF8; &#x1FBF9; </Group-19>
+    <Group-20>&#x1F100; </Group-20>
+    <Group-21>&#x1F101; &#x1F102; &#x1F103; &#x1F104; &#x1F105; &#x1F106; &#x1F107; &#x1F108; &#x1F109; &#x1F10A; </Group-21>
+    <Group-22>&#xBC; &#xBD; &#xBE; &#x2156; &#x2157; &#x2158; &#x2159; &#x215A; &#x215B; &#x215C; &#x215D; &#x215E; &#x215F; &#x2189; &#x2150; &#x2151; &#x2152; &#x2153; &#x2154; &#x2155; </Group-22>
+    <Group-23>&#x2070; &#xB9; &#xB2; &#xB3; &#x2074; &#x2075; &#x2076; &#x2077; &#x2078; &#x2079; &#x207A; &#x207B; &#x207C; &#x207D; &#x207E; </Group-23>
+    <Group-24>&#x2080; &#x2081; &#x2082; &#x2083; &#x2084; &#x2085; &#x2086; &#x2087; &#x2088; &#x2089; &#x208A; &#x208B; &#x208C; &#x208D; &#x208E; </Group-24>
+    <Group-25>&#x3220; &#x3221; &#x3222; &#x3223; &#x3224; &#x3225; &#x3226; &#x3227; &#x3228; &#x3229; </Group-25>
+    <Group-26>&#x3280; &#x3281; &#x3282; &#x3283; &#x3284; &#x3285; &#x3286; &#x3287; &#x3288; &#x3289; </Group-26>
+  </Digit>
+  <Arrows>
+    <Group-1>&#x1F780; &#x1F781; &#x1F782; &#x1F783; </Group-1>
+    <Group-2>&#x23F4; &#x23F5; &#x23F6; &#x23F7; </Group-2>
+    <Group-3>&#x2347; &#x2348; &#x2350; &#x2357; </Group-3>
+    <Group-4>&#x2345; &#x2346; &#x234F; &#x2356; </Group-4>
+    <Group-5>&#x2190; &#x2191; &#x2192; &#x2193; &#x2194; &#x2195; &#x2196; &#x2197; &#x2198; &#x2199; </Group-5>
+    <Group-6>&#x219A; &#x219B; &#x219C; &#x219D; </Group-6>
+    <Group-7>&#x219E; &#x219F; &#x21A0; &#x21A1; </Group-7>
+    <Group-8>&#x21A2; &#x21A3; </Group-8>
+    <Group-9>&#x21A4; &#x21A5; &#x21A6; &#x21A7; </Group-9>
+    <Group-10>&#x21A8; &#x21A9; &#x21AA; &#x21AB; &#x21AC; &#x21AD; &#x21AE; &#x21AF; </Group-10>
+    <Group-11>&#x21B0; &#x21B1; &#x21B2; &#x21B3; &#x21B4; </Group-11>
+    <Group-12>&#x21B5; &#x21B6; &#x21B7; &#x21B8; &#x21B9; &#x21BA; &#x21BB; </Group-12>
+    <Group-13>&#x21BC; &#x21BD; &#x21BE; &#x21BF; &#x21C0; &#x21C1; &#x21C2; &#x21C3; </Group-13>
+    <Group-14>&#x21C4; &#x21C5; &#x21C6; </Group-14>
+    <Group-15>&#x21C7; &#x21C8; &#x21C9; &#x21CA; </Group-15>
+    <Group-16>&#x21CB; &#x21CC; &#x21CD; &#x21CE; &#x21CF; </Group-16>
+    <Group-17>&#x21D0; &#x21D1; &#x21D2; &#x21D3; &#x21D4; &#x21D5; </Group-17>
+    <Group-18>&#x21D6; &#x21D7; &#x21D8; &#x21D9; &#x21DA; &#x21DB; &#x21DC; &#x21DD; &#x21DE; &#x21DF; </Group-18>
+    <Group-19>&#x21E0; &#x21E1; &#x21E2; &#x21E3; &#x21E4; &#x21E5; </Group-19>
+    <Group-20>&#x21E6; &#x21E7; &#x21E8; &#x21E9; &#x21EA; &#x21EB; &#x21EC; &#x21ED; &#x21EE; &#x21EF; &#x21F0; &#x21F1; &#x21F2; </Group-20>
+    <Group-21>&#x21F3; &#x21F4; &#x21F5; &#x21F6; &#x21F7; &#x21F8; &#x21F9; &#x21FA; &#x21FB; &#x21FC; &#x21FD; &#x21FE; &#x21FF; </Group-21>
+    <Group-22>&#x2794; &#x2798; &#x2799; &#x279A; &#x279B; &#x279C; &#x279D; &#x279E; &#x279F; &#x27A0; </Group-22>
+    <Group-23>&#x27A1; &#x27A2; &#x27A3; &#x27A4; &#x27A5; &#x27A6; &#x27A7; &#x27A8; &#x27A9; &#x27AA; &#x27AB; &#x27AC; &#x27AD; &#x27AE; &#x27AF; </Group-23>
+    <Group-24>&#x27B1; &#x27B2; &#x27B3; &#x27B4; &#x27B5; &#x27B6; &#x27B7; &#x27B8; &#x27B9; &#x27BA; &#x27BB; &#x27BC; &#x27BD; &#x27BE; &#x27C0; </Group-24>
+    <Group-25>&#x27F0; &#x27F1; &#x27F2; &#x27F3; &#x27F4; &#x27F5; &#x27F6; &#x27F7; &#x27F8; &#x27F9; &#x27FA; &#x27FB; &#x27FC; &#x27FD; &#x27FE; &#x27FF; &#x2900; &#x2901; </Group-25>
+    <Group-26>&#x2902; &#x2903; &#x2904; &#x2905; &#x2906; &#x2907; &#x2908; &#x2909; &#x290A; &#x290B; &#x290C; &#x290D; &#x290E; &#x290F; &#x2910; </Group-26>
+    <Group-27>&#x2911; &#x2912; &#x2913; &#x2914; &#x2915; &#x2916; &#x2917; &#x2918; &#x2919; &#x291A; &#x291B; &#x291C; &#x291D; &#x291E; &#x291F; &#x2920; </Group-27>
+    <Group-28>&#x2921; &#x2922; &#x2923; &#x2924; &#x2925; &#x2926; </Group-28>
+    <Group-29>&#x2927; &#x2928; &#x2929; &#x292A; &#x292B; &#x292C; &#x292D; &#x292E; &#x292F; &#x2930; &#x2931; &#x2932; </Group-29>
+    <Group-30>&#x2933; &#x2934; &#x2935; &#x2936; &#x2937; &#x2938; &#x2939; &#x293A; &#x293B; &#x293C; &#x293D; &#x293E; &#x293F; </Group-30>
+    <Group-31>&#x2940; &#x2941; </Group-31>
+    <Group-32>&#x2942; &#x2943; &#x2944; &#x2945; &#x2946; &#x2947; &#x2948; &#x2949; </Group-32>
+    <Group-33>&#x294A; &#x294B; &#x294C; &#x294D; </Group-33>
+    <Group-34>&#x294E; &#x294F; &#x2950; &#x2951; </Group-34>
+    <Group-35>&#x2952; &#x2953; &#x2954; &#x2955; &#x2956; &#x2957; &#x2958; &#x2959; </Group-35>
+    <Group-36>&#x295A; &#x295B; &#x295C; &#x295D; &#x295E; &#x295F; &#x2960; &#x2961; </Group-36>
+    <Group-37>&#x2962; &#x2963; &#x2964; &#x2965; </Group-37>
+    <Group-38>&#x2966; &#x2967; &#x2968; &#x2969; &#x296A; &#x296B; &#x296C; &#x296D; &#x296E; &#x296F; </Group-38>
+    <Group-39>&#x2970; </Group-39>
+    <Group-40>&#x2971; &#x2972; &#x2973; &#x2974; &#x2975; &#x2976; &#x2977; &#x2978; &#x2979; &#x297A; &#x297B; &#x297C; &#x297D; &#x297E; &#x297F; </Group-40>
+    <Group-41>&#x2B00; &#x2B01; &#x2B02; &#x2B03; &#x2B04; </Group-41>
+    <Group-42>&#x2B05; &#x2B06; &#x2B08; &#x2B09; &#x2B0A; &#x2B0B; &#x2B0C; &#x2B0D; </Group-42>
+    <Group-43>&#x2B0E; &#x2B0F; &#x2B10; &#x2B11; </Group-43>
+    <Group-44>&#x2B31; &#x2B32; &#x2B33; &#x2B34; &#x2B35; &#x2B36; &#x2B37; &#x2B38; &#x2B39; &#x2B3A; &#x2B3B; &#x2B3C; &#x2B3D; &#x2B3E; &#x2B3F; &#x2B40; </Group-44>
+    <Group-45>&#x2B41; &#x2B42; &#x2B43; &#x2B44; &#x2B45; &#x2B46; &#x2B47; &#x2B48; &#x2B49; &#x2B4A; &#x2B4B; &#x2B4C; &#x2B4D; &#x2B4E; &#x2B4F; </Group-45>
+    <Group-46>&#x2B5A; &#x2B5B; &#x2B5C; &#x2B5D; &#x2B5E; &#x2B5F; </Group-46>
+    <Group-47>&#x2B60; &#x2B61; &#x2B62; &#x2B63; &#x2B64; &#x2B65; &#x2B66; &#x2B67; &#x2B68; &#x2B69; </Group-47>
+    <Group-48>&#x2B6A; &#x2B6B; &#x2B6C; &#x2B6D; &#x2B6E; &#x2B6F; </Group-48>
+    <Group-49>&#x2B70; &#x2B71; &#x2B72; &#x2B73; &#x2B76; &#x2B77; &#x2B78; &#x2B79; </Group-49>
+    <Group-50>&#x2B7A; &#x2B7B; &#x2B7C; &#x2B7D; &#x2B7E; &#x2B7F; </Group-50>
+    <Group-51>&#x2B80; &#x2B81; &#x2B82; &#x2B83; &#x2B84; &#x2B85; &#x2B86; &#x2B87; </Group-51>
+    <Group-52>&#x2B88; &#x2B89; &#x2B8A; &#x2B8B; &#x2B8C; &#x2B8D; &#x2B8E; &#x2B8F; &#x2B90; &#x2B91; &#x2B92; &#x2B93; </Group-52>
+    <Group-53>&#x2B94; &#x2B95; &#x2B97; </Group-53>
+    <Group-54>&#x2B98; &#x2B99; &#x2B9A; &#x2B9B; </Group-54>
+    <Group-55>&#x2B9C; &#x2B9D; &#x2B9E; &#x2B9F; </Group-55>
+    <Group-56>&#x2BA0; &#x2BA1; &#x2BA2; &#x2BA3; &#x2BA4; &#x2BA5; &#x2BA6; &#x2BA7; </Group-56>
+    <Group-57>&#x2BA8; &#x2BA9; &#x2BAA; &#x2BAB; &#x2BAC; &#x2BAD; &#x2BAE; &#x2BAF; </Group-57>
+    <Group-58>&#x2BB0; &#x2BB1; &#x2BB2; &#x2BB3; &#x2BB4; &#x2BB5; &#x2BB6; &#x2BB7; &#x2BB8; </Group-58>
+    <Group-59>&#x1F800; &#x1F801; &#x1F802; &#x1F803; &#x1F804; &#x1F805; &#x1F806; &#x1F807; &#x1F808; &#x1F809; &#x1F80A; &#x1F80B; </Group-59>
+    <Group-60>&#x1F810; &#x1F811; &#x1F812; &#x1F813; &#x1F814; &#x1F815; &#x1F816; &#x1F817; &#x1F818; &#x1F819; &#x1F81A; &#x1F81B; &#x1F81C; &#x1F81D; &#x1F81E; &#x1F81F; </Group-60>
+    <Group-61>&#x1F820; &#x1F821; &#x1F822; &#x1F823; &#x1F824; &#x1F825; &#x1F826; &#x1F827; &#x1F828; &#x1F829; &#x1F82A; &#x1F82B; &#x1F82C; &#x1F82D; &#x1F82E; &#x1F82F; </Group-61>
+    <Group-62>&#x1F830; &#x1F831; &#x1F832; &#x1F833; </Group-62>
+    <Group-63>&#x1F834; &#x1F835; &#x1F836; &#x1F837; </Group-63>
+    <Group-64>&#x1F838; &#x1F839; &#x1F83A; &#x1F83B; &#x1F83C; &#x1F83D; &#x1F83E; &#x1F83F; </Group-64>
+    <Group-65>&#x1F840; &#x1F841; &#x1F842; &#x1F843; </Group-65>
+    <Group-66>&#x1F844; &#x1F845; &#x1F846; &#x1F847; </Group-66>
+    <Group-67>&#x1F850; &#x1F851; &#x1F852; &#x1F853; &#x1F854; &#x1F855; &#x1F856; &#x1F857; &#x1F858; &#x1F859; </Group-67>
+    <Group-68>&#x1F860; &#x1F861; &#x1F862; &#x1F863; &#x1F864; &#x1F865; &#x1F866; &#x1F867; </Group-68>
+    <Group-69>&#x1F868; &#x1F869; &#x1F86A; &#x1F86B; &#x1F86C; &#x1F86D; &#x1F86E; &#x1F86F; </Group-69>
+    <Group-70>&#x1F870; &#x1F871; &#x1F872; &#x1F873; &#x1F874; &#x1F875; &#x1F876; &#x1F877; </Group-70>
+    <Group-71>&#x1F878; &#x1F879; &#x1F87A; &#x1F87B; &#x1F87C; &#x1F87D; &#x1F87E; &#x1F87F; </Group-71>
+    <Group-72>&#x1F880; &#x1F881; &#x1F882; &#x1F883; &#x1F884; &#x1F885; &#x1F886; &#x1F887; </Group-72>
+    <Group-73>&#x1F890; &#x1F891; &#x1F892; &#x1F893; </Group-73>
+    <Group-74>&#x1F894; &#x1F895; &#x1F896; &#x1F897; </Group-74>
+    <Group-75>&#x1F898; &#x1F899; &#x1F89A; &#x1F89B; </Group-75>
+    <Group-76>&#x1F89C; &#x1F89D; &#x1F89E; &#x1F89F; </Group-76>
+    <Group-77>&#x1F8A0; &#x1F8A1; &#x1F8A2; &#x1F8A3; &#x1F8A4; &#x1F8A5; &#x1F8A6; &#x1F8A7; </Group-77>
+    <Group-78>&#x1F8A8; &#x1F8A9; &#x1F8AA; &#x1F8AB; &#x1F8AC; &#x1F8AD; &#x1F8B0; &#x1F8B1; </Group-78>
+    <Group-79>&#x2BC5; &#x2BC6; &#x2BC7; &#x2BC8; </Group-79>
+    <Group-80>&#x1FBB5; &#x1FBB6; &#x1FBB7; &#x1FBB8; </Group-80>
+  </Arrows>
+  <Time>
+    <Group-1>&#x231A; &#x23F0; &#x23F1; &#x23F2; &#x1F570; </Group-1>
+    <Group-2>&#x1F550; &#x1F551; &#x1F552; &#x1F553; &#x1F554; &#x1F555; &#x1F556; &#x1F557; &#x1F558; &#x1F559; &#x1F55A; &#x1F55B; &#x1F55C; &#x1F55D; &#x1F55E; &#x1F55F; &#x1F560; &#x1F561; &#x1F562; &#x1F563; &#x1F564; &#x1F565; &#x1F566; &#x1F567; </Group-2>
+    <Group-3>&#x3358; &#x3359; &#x335A; &#x335B; &#x335C; &#x335D; &#x335E; &#x335F; &#x3360; &#x3361; &#x3362; &#x3363; &#x3364; &#x3365; &#x3366; &#x3367; &#x3368; &#x3369; &#x336A; &#x336B; &#x336C; &#x336D; &#x336E; &#x336F; &#x3370; </Group-3>
+    <Group-4>&#x32C0; &#x32C1; &#x32C2; &#x32C3; &#x32C4; &#x32C5; &#x32C6; &#x32C7; &#x32C8; &#x32C9; &#x32CA; &#x32CB; </Group-4>
+    <Group-5>&#x33E0; &#x33E1; &#x33E2; &#x33E3; &#x33E4; &#x33E5; &#x33E6; &#x33E7; &#x33E8; &#x33E9; &#x33EA; &#x33EB; &#x33EC; &#x33ED; &#x33EE; &#x33EF; </Group-5>
+    <Group-6>&#x33F0; &#x33F1; &#x33F2; &#x33F3; &#x33F4; &#x33F5; &#x33F6; &#x33F7; &#x33F8; &#x33F9; &#x33FA; &#x33FB; &#x33FC; &#x33FD; &#x33FE; </Group-6>
+  </Time>
+  <Dice>
+    <Group-1>&#x2680; &#x2681; &#x2682; &#x2683; &#x2684; &#x2685; </Group-1>
+    <Group-2>&#x1F02B; &#x1F030; </Group-2>
+    <Group-3>&#x1F031; &#x1F032; &#x1F033; &#x1F034; &#x1F035; &#x1F036; &#x1F037; </Group-3>
+    <Group-4>&#x1F038; &#x1F039; &#x1F03A; &#x1F03B; &#x1F03C; &#x1F03D; &#x1F03E; </Group-4>
+    <Group-5>&#x1F03F; &#x1F040; &#x1F041; &#x1F042; &#x1F043; &#x1F044; &#x1F045; </Group-5>
+    <Group-6>&#x1F046; &#x1F047; &#x1F048; &#x1F049; &#x1F04A; &#x1F04B; &#x1F04C; </Group-6>
+    <Group-7>&#x1F04D; &#x1F04E; &#x1F04F; &#x1F050; &#x1F051; &#x1F052; &#x1F053; </Group-7>
+    <Group-8>&#x1F054; &#x1F055; &#x1F056; &#x1F057; &#x1F058; &#x1F059; &#x1F05A; </Group-8>
+    <Group-9>&#x1F05B; &#x1F05C; &#x1F05D; &#x1F05E; &#x1F05F; &#x1F060; &#x1F061; </Group-9>
+    <Group-10>&#x1F062; &#x1F063; &#x1F064; &#x1F065; &#x1F066; &#x1F067; &#x1F068; &#x1F069; </Group-10>
+    <Group-11>&#x1F06A; &#x1F06B; &#x1F06C; &#x1F06D; &#x1F06E; &#x1F06F; &#x1F070; </Group-11>
+    <Group-12>&#x1F071; &#x1F072; &#x1F073; &#x1F074; &#x1F075; &#x1F076; &#x1F077; </Group-12>
+    <Group-13>&#x1F078; &#x1F079; &#x1F07A; &#x1F07B; &#x1F07C; &#x1F07D; &#x1F07E; </Group-13>
+    <Group-14>&#x1F07F; &#x1F080; &#x1F081; &#x1F082; &#x1F083; &#x1F084; &#x1F085; </Group-14>
+    <Group-15>&#x1F086; &#x1F087; &#x1F088; &#x1F089; &#x1F08A; &#x1F08B; &#x1F08C; </Group-15>
+    <Group-16>&#x1F08D; &#x1F08E; &#x1F08F; &#x1F090; &#x1F091; &#x1F092; &#x1F093; </Group-16>
+  </Dice>
+  <Chinese-Mahjong>
+    <Group-1>&#x1F000; &#x1F001; &#x1F002; &#x1F003; &#x1F004; &#x1F005; &#x1F006; &#x1F007; &#x1F008; &#x1F009; &#x1F00A; &#x1F00B; &#x1F00C; &#x1F00D; &#x1F00E; &#x1F00F; &#x1F010; </Group-1>
+    <Group-2>&#x1F011; &#x1F012; &#x1F013; &#x1F014; &#x1F015; &#x1F016; &#x1F017; &#x1F018; &#x1F019; &#x1F01A; &#x1F01B; &#x1F01C; &#x1F01D; &#x1F01E; &#x1F01F; &#x1F020; &#x1F021; </Group-2>
+    <Group-3>&#x1F022; &#x1F023; &#x1F024; &#x1F025; &#x1F026; &#x1F027; &#x1F028; &#x1F029; &#x1F02A; </Group-3>
+  </Chinese-Mahjong>
+  <Poker-Card>
+    <Group-1>&#x1F0A0; &#x1F0DF; &#x1F0CF; &#x1F0E1; &#x1F0E2; &#x1F0E3; &#x1F0E4; &#x1F0E5; &#x1F0E6; &#x1F0E7; &#x1F0E8; &#x1F0E9; &#x1F0EA; </Group-1>
+    <Group-2>&#x1F0EB; &#x1F0EC; &#x1F0ED; &#x1F0EE; &#x1F0EF; &#x1F0F0; &#x1F0F1; &#x1F0F2; &#x1F0F3; &#x1F0F4; &#x1F0F5; </Group-2>
+    <Group-3>&#x1F0E0; &#x1F0BF; &#x2660; &#x2665; &#x2663; &#x2666; &#x2664; &#x2661; &#x2667; &#x2662; </Group-3>
+    <Group-4>&#x1F0A1; &#x1F0A2; &#x1F0A3; &#x1F0A4; &#x1F0A5; &#x1F0A6; &#x1F0A7; &#x1F0A8; &#x1F0A9; &#x1F0AA; &#x1F0AB; &#x1F0AC; &#x1F0AD; &#x1F0AE; </Group-4>
+    <Group-5>&#x1F0B1; &#x1F0B2; &#x1F0B3; &#x1F0B4; &#x1F0B5; &#x1F0B6; &#x1F0B7; &#x1F0B8; &#x1F0B9; &#x1F0BA; &#x1F0BB; &#x1F0BC; &#x1F0BD; &#x1F0BE; </Group-5>
+    <Group-6>&#x1F0D1; &#x1F0D2; &#x1F0D3; &#x1F0D4; &#x1F0D5; &#x1F0D6; &#x1F0D7; &#x1F0D8; &#x1F0D9; &#x1F0DA; &#x1F0DB; &#x1F0DC; &#x1F0DD; &#x1F0DE; </Group-6>
+    <Group-7>&#x1F0C1; &#x1F0C2; &#x1F0C3; &#x1F0C4; &#x1F0C5; &#x1F0C6; &#x1F0C7; &#x1F0C8; &#x1F0C9; &#x1F0CA; &#x1F0CB; &#x1F0CC; &#x1F0CD; &#x1F0CE; </Group-7>
+  </Poker-Card>
+  <Male-Female>
+    <Group-1>&#x2641; &#x2642; </Group-1>
+    <Group-2>&#x329A; &#x329B; </Group-2>
+    <Group-3>&#x2648; &#x2649; &#x264A; &#x264B; &#x264C; &#x264D; &#x264E; &#x264F; &#x2650; &#x2651; &#x2652; &#x2653; </Group-3>
+  </Male-Female>
+  <Chess>
+    <Group-1>&#x2654; &#x2655; &#x2656; &#x2657; &#x2658; &#x2659; &#x265A; &#x265B; &#x265C; &#x265D; &#x265E; &#x265F; </Group-1>
+    <Group-2>&#x1FA00; &#x1FA01; &#x1FA02; &#x1FA03; &#x1FA04; &#x1FA05; &#x1FA06; &#x1FA07; &#x1FA08; </Group-2>
+    <Group-3>&#x1FA09; &#x1FA0A; &#x1FA0B; &#x1FA0C; &#x1FA0D; &#x1FA0E; &#x1FA0F; &#x1FA10; &#x1FA11; &#x1FA12; &#x1FA13; &#x1FA14; &#x1FA15; &#x1FA16; &#x1FA17; &#x1FA18; </Group-3>
+    <Group-4>&#x1FA19; &#x1FA1A; &#x1FA1B; &#x1FA1C; &#x1FA1D; &#x1FA1E; &#x1FA1F; &#x1FA20; &#x1FA21; &#x1FA22; &#x1FA23; &#x1FA24; &#x1FA25; &#x1FA26; &#x1FA27; &#x1FA28; </Group-4>
+    <Group-5>&#x1FA29; &#x1FA2A; &#x1FA2B; &#x1FA2C; &#x1FA2D; &#x1FA2E; &#x1FA2F; &#x1FA30; &#x1FA31; &#x1FA32; &#x1FA33; &#x1FA34; &#x1FA35; &#x1FA36; &#x1FA37; &#x1FA38; </Group-5>
+    <Group-6>&#x1FA39; &#x1FA3A; &#x1FA3B; &#x1FA3C; &#x1FA3D; &#x1FA3E; &#x1FA3F; &#x1FA40; &#x1FA41; &#x1FA42; &#x1FA43; &#x1FA44; &#x1FA45; &#x1FA46; &#x1FA47; &#x1FA48; </Group-6>
+    <Group-7>&#x1FA49; &#x1FA4A; &#x1FA4B; &#x1FA4C; &#x1FA4D; &#x1FA4E; &#x1FA4F; &#x1FA50; &#x1FA51; &#x1FA52; &#x1FA53; </Group-7>
+    <Group-8>&#x1FA60; &#x1FA61; &#x1FA62; &#x1FA63; &#x1FA64; &#x1FA65; &#x1FA66; </Group-8>
+    <Group-9>&#x1FA67; &#x1FA68; &#x1FA69; &#x1FA6A; &#x1FA6B; &#x1FA6C; &#x1FA6D; </Group-9>
+  </Chess>
+  <Five-Phases>
+    <Group-1>&#x3230; &#x322A; &#x322E; &#x322D; &#x322C; &#x322B; &#x322F; </Group-1>
+    <Group-2>&#x3290; &#x328A; &#x328E; &#x328D; &#x328C; &#x328B; &#x328F; </Group-2>
+  </Five-Phases>
+  <Emoji>
+    <Group-1>&#x2639; &#x263A; &#x263B; </Group-1>
+    <Group-2>&#x1F600; &#x1F601; &#x1F602; &#x1F603; &#x1F604; &#x1F605; &#x1F606; &#x1F607; </Group-2>
+    <Group-3>&#x1F608; &#x1F609; &#x1F60A; &#x1F60B; &#x1F60C; &#x1F60D; &#x1F60E; &#x1F60F; &#x1F610; &#x1F611; &#x1F612; &#x1F613; &#x1F614; &#x1F615; &#x1F616; &#x1F617; </Group-3>
+    <Group-4>&#x1F618; &#x1F619; &#x1F61A; &#x1F61B; &#x1F61C; &#x1F61D; &#x1F61E; &#x1F61F; &#x1F620; &#x1F621; &#x1F622; &#x1F623; &#x1F624; &#x1F625; &#x1F626; &#x1F627; </Group-4>
+    <Group-5>&#x1F628; &#x1F629; &#x1F62A; &#x1F62B; &#x1F62C; &#x1F62D; &#x1F62E; &#x1F62F; &#x1F630; &#x1F631; &#x1F632; &#x1F633; &#x1F634; &#x1F635; &#x1F636; &#x1F637; </Group-5>
+    <Group-6>&#x1F638; &#x1F639; &#x1F63A; &#x1F63B; &#x1F63C; &#x1F63D; &#x1F63E; &#x1F63F; &#x1F640; &#x1F641; &#x1F642; &#x1F643; </Group-6>
+  </Emoji>
+  <Musical-Symbols>
+    <Group-1>&#x2669; &#x266A; &#x266B; &#x266C; &#x266D; &#x266E; &#x266F; </Group-1>
+    <Group-2>&#x1F39C; &#x1F39D; </Group-2>
+    <Group-3>&#x1D100; &#x1D101; &#x1D102; &#x1D103; &#x1D104; &#x1D105; &#x1D106; &#x1D107; &#x1D108; &#x1D109; &#x1D10A; </Group-3>
+    <Group-4>&#x1D10B; &#x1D10C; &#x1D10D; &#x1D10E; &#x1D10F; &#x1D110; &#x1D111; &#x1D112; &#x1D113; &#x1D114; &#x1D115; &#x1D116; &#x1D117; &#x1D118; &#x1D119; &#x1D11A; </Group-4>
+    <Group-5>&#x1D11B; &#x1D11C; &#x1D11D; &#x1D11E; &#x1D11F; &#x1D120; &#x1D121; &#x1D122; &#x1D123; &#x1D124; &#x1D125; &#x1D126; &#x1D129; &#x1D12A; &#x1D12B; &#x1D12C; </Group-5>
+    <Group-6>&#x1D12D; &#x1D12E; &#x1D12F; &#x1D130; &#x1D131; &#x1D132; &#x1D133; &#x1D134; &#x1D135; &#x1D136; &#x1D137; &#x1D138; &#x1D139; &#x1D13A; &#x1D13B; &#x1D13C; </Group-6>
+    <Group-7>&#x1D13D; &#x1D13E; &#x1D13F; &#x1D140; &#x1D141; &#x1D142; &#x1D143; &#x1D144; &#x1D145; &#x1D146; &#x1D147; &#x1D148; &#x1D149; &#x1D14B; &#x1D14C; &#x1D14A; </Group-7>
+    <Group-8>&#x1D14D; &#x1D14E; &#x1D14F; &#x1D150; &#x1D151; &#x1D152; &#x1D153; &#x1D154; &#x1D155; &#x1D156; &#x1D157; &#x1D158; &#x1D15A; &#x1D15B; &#x1D15C; </Group-8>
+    <Group-9>&#x1D15D; &#x1D15E; &#x1D15F; &#x1D160; &#x1D161; &#x1D162; &#x1D163; &#x1D164; &#x1D165; &#x1D166; &#x1D16A; &#x1D16B; &#x1D16C; &#x1D16D; &#x1D16E; &#x1D16F; </Group-9>
+    <Group-10>&#x1D170; &#x1D171; &#x1D172; &#x1D183; &#x1D184; &#x1D18C; &#x1D18D; &#x1D18E; </Group-10>
+    <Group-11>&#x1D18F; &#x1D190; &#x1D191; &#x1D192; &#x1D193; &#x1D194; &#x1D195; &#x1D196; &#x1D197; &#x1D198; &#x1D199; &#x1D19A; &#x1D19B; &#x1D19C; &#x1D19D; &#x1D19E; </Group-11>
+    <Group-12>&#x1D19F; &#x1D1A0; &#x1D1A1; &#x1D1A2; &#x1D1A3; &#x1D1A4; &#x1D1A5; &#x1D1A6; &#x1D1A7; &#x1D1A8; &#x1D1A9; &#x1D1AE; &#x1D1AF; &#x1D1B0; &#x1D1B1; &#x1D1B2; </Group-12>
+    <Group-13>&#x1D1B3; &#x1D1B4; &#x1D1B5; &#x1D1B6; &#x1D1B7; &#x1D1B8; &#x1D1B9; &#x1D1BA; &#x1D1BB; &#x1D1BC; &#x1D1BD; &#x1D1BE; &#x1D1BF; &#x1D1C0; &#x1D1C1; &#x1D1C2; </Group-13>
+    <Group-14>&#x1D1C3; &#x1D1C4; &#x1D1C5; &#x1D1C6; &#x1D1C7; &#x1D1C8; &#x1D1C9; &#x1D1CA; &#x1D1CB; &#x1D1CC; &#x1D1CD; &#x1D1CE; &#x1D1CF; &#x1D1D0; &#x1D1D1; &#x1D1D2; </Group-14>
+    <Group-15>&#x1D1D3; &#x1D1D4; &#x1D1D5; &#x1D1D6; &#x1D1D7; &#x1D1D8; &#x1D1D9; &#x1D1DA; &#x1D1DB; &#x1D1DC; &#x1D1DD; &#x1D1DE; &#x1D1DF; &#x1D1E0; &#x1D1E1; &#x1D1E2; </Group-15>
+    <Group-16>&#x1D1E3; &#x1D1E4; &#x1D1E5; &#x1D1E6; &#x1D1E7; &#x1D1E8; </Group-16>
+  </Musical-Symbols>
+  <Check-Cross>
+    <Group-1>&#x2611; &#x2612; &#x2613; &#x2705; &#x274E; &#x1FBC0; &#x2713; &#x2714; &#x2715; &#x2716; &#x2717; &#x2718; &#x274C; &#x2A2F; &#x10102; &#x1F5D9; &#x1F5F4; &#x1F5F5; &#x1F5F6; &#x1F5F7; &#x1F5F8; &#x1F5F9; &#x1F7A8; &#x1F7A9; &#x1F7AA; &#x1F7AB; &#x1F7AC; &#x1F7AD; &#x1F7AE; &#x1FBB1; &#x1FBBD; &#x2BBD; &#x2BBE; &#x2BBF; </Group-1>
+  </Check-Cross>
+  <Fingers>
+    <Group-1>&#x261A; &#x261B; &#x261C; &#x261D; &#x261E; &#x261F; &#x270D; </Group-1>
+    <Group-2>&#x1F446; &#x1F447; &#x1F448; &#x1F449; &#x1F44A; &#x1F44C; &#x1F44D; &#x1F44E; </Group-2>
+    <Group-3>&#x1F58E; &#x1F58F; &#x1F590; &#x1F591; &#x1F592; &#x1F593; &#x1F594; &#x1F597; </Group-3>
+    <Group-4>&#x1F598; &#x1F599; &#x1F59E; &#x1F59F; </Group-4>
+    <Group-5>&#x1F59A; &#x1F59B; &#x1F59C; &#x1F59D; &#x1F5A0; &#x1F5A1; &#x1F5A2; &#x1F5A3; </Group-5>
+    <Group-6>&#x270A; &#x270B; &#x270C; </Group-6>
+    <Group-7>&#x1FBC1; &#x1FBC2; &#x1FBC3; </Group-7>
+  </Fingers>
+  <Miscs>
+    <Group-1>&#xA1; &#xA2; &#xA3; </Group-1>
+    <Group-2>&#xA4; &#xA5; &#xA6; &#xA7; &#xA8; &#xA9; &#xAB; &#xAC; &#xAE; &#xAF; &#xB0; &#xB1; &#xB4; </Group-2>
+    <Group-3>&#xB5; &#xB6; &#xB7; &#xB8; &#xBB; &#xBF; &#xD7; &#xF7; &#x2B9; &#x2BA; &#x2BB; &#x2BC; </Group-3>
+    <Group-4>&#x2BD; &#x2BE; &#x2BF; &#x2C0; &#x2C1; &#x2C2; &#x2C3; &#x2C4; &#x2C5; &#x2C6; &#x2C7; &#x2C8; &#x2C9; &#x2CA; &#x2CB; &#x2CC; </Group-4>
+    <Group-5>&#x2CD; &#x2CE; &#x2CF; &#x2D0; &#x2D1; &#x2D2; &#x2D3; &#x2D4; &#x2D5; &#x2D6; &#x2D7; &#x2D8; &#x2D9; &#x2DA; &#x2DB; &#x2DC; </Group-5>
+    <Group-6>&#x2DD; &#x2DE; &#x2DF; &#x2E5; &#x2E6; &#x2E7; &#x2E8; &#x2E9; &#x2EC; &#x2ED; &#x2EE; &#x2EF; &#x2F0; &#x2F1; &#x2F2; &#x2F3; </Group-6>
+    <Group-7>&#x2F4; &#x2F5; &#x2F6; &#x2F7; &#x2F8; &#x2F9; &#x2FA; &#x2FB; &#x2FC; &#x2FD; &#x2FE; &#x2FF; &#x374; &#x37E; &#x385; &#x387; </Group-7>
+    <Group-8>&#x60C; &#x61B; &#x61F; &#x640; </Group-8>
+    <Group-9>&#x964; &#x965; &#xE3F; &#xFD5; &#xFD6; &#xFD7; &#xFD8; &#x10FB; &#x16EB; </Group-9>
+    <Group-10>&#x16EC; &#x16ED; &#x1735; &#x1736; &#x1802; &#x1803; &#x1805; &#x1CD3; &#x1CE1; &#x1CE9; &#x1CEA; &#x1CEB; &#x1CEC; &#x1CEE; &#x1CEF; &#x1CF0; </Group-10>
+    <Group-11>&#x1CF1; &#x1CF2; </Group-11>
+    <Group-12>&#x1CF3; &#x1CF5; &#x1CF6; &#x1CF7; </Group-12>
+    <Group-13>&#x2010; &#x2011; &#x2012; &#x2013; &#x2014; &#x2015; &#x2016; &#x2017; &#x2018; &#x2019; &#x201A; </Group-13>
+    <Group-14>&#x201B; &#x201C; &#x201D; &#x201E; &#x201F; &#x2020; &#x2021; &#x2022; &#x2023; &#x2024; &#x2025; &#x2026; &#x2027; </Group-14>
+    <Group-15>&#x2030; &#x2031; &#x2032; &#x2033; &#x2034; &#x2035; &#x2036; &#x2037; &#x2038; &#x2039; &#x203A; </Group-15>
+    <Group-16>&#x203B; &#x203C; &#x203D; &#x203E; &#x203F; &#x2040; &#x2041; &#x2042; &#x2043; &#x2044; &#x2045; &#x2046; &#x2047; &#x2048; &#x2049; &#x204A; </Group-16>
+    <Group-17>&#x204B; &#x204C; &#x204D; &#x204E; &#x204F; &#x2050; &#x2051; &#x2052; &#x2053; &#x2054; &#x2055; &#x2056; &#x2057; &#x2058; &#x2059; &#x205A; </Group-17>
+    <Group-18>&#x205B; &#x205C; &#x205D; &#x205E; </Group-18>
+    <Group-19>&#x20A0; &#x20A1; &#x20A2; &#x20A3; &#x20A4; &#x20A5; &#x20A6; &#x20A7; &#x20A8; &#x20A9; &#x20AA; &#x20AB; &#x20AC; &#x20AD; &#x20AE; &#x20AF; &#x20B0; </Group-19>
+    <Group-20>&#x20B1; &#x20B2; &#x20B3; &#x20B4; &#x20B5; &#x20B6; &#x20B7; &#x20B8; &#x20B9; &#x20BA; &#x20BB; &#x20BC; &#x20BD; &#x20BE; &#x20BF; &#x2100; </Group-20>
+    <Group-21>&#x2101; &#x2102; &#x2103; &#x2104; &#x2105; &#x2106; &#x2107; &#x2108; &#x2109; &#x210A; &#x210B; &#x210C; &#x210D; &#x210E; &#x210F; &#x2110; </Group-21>
+    <Group-22>&#x2111; &#x2112; &#x2113; &#x2114; &#x2115; &#x2116; &#x2117; &#x2118; &#x2119; &#x211A; &#x211B; &#x211C; &#x211D; &#x211E; &#x211F; &#x2120; </Group-22>
+    <Group-23>&#x2121; &#x2122; &#x2123; &#x2124; &#x2125; &#x2127; &#x2128; &#x2129; &#x212C; &#x212D; &#x212E; &#x212F; &#x2130; &#x2131; &#x2133; &#x2134; </Group-23>
+    <Group-24>&#x2135; &#x2136; &#x2137; &#x2138; &#x2139; &#x213A; &#x213B; &#x213C; &#x213D; &#x213E; &#x213F; &#x2140; &#x2141; &#x2142; &#x2143; &#x2144; </Group-24>
+    <Group-25>&#x2145; &#x2146; &#x2147; &#x2148; &#x2149; &#x214A; &#x214B; &#x214C; &#x214D; &#x214F; &#x218A; &#x218B; </Group-25>
+    <Group-26>&#x2200; &#x2201; &#x2202; &#x2203; &#x2204; &#x2205; &#x2206; &#x2207; &#x2208; &#x2209; &#x220A; &#x220B; &#x220C; &#x220D; &#x220E; &#x220F; &#x2210; &#x2211; &#x2212; </Group-26>
+    <Group-27>&#x2213; &#x2214; &#x2215; &#x2216; &#x2217; &#x2218; &#x2219; &#x221A; &#x221B; &#x221C; &#x221D; &#x221E; &#x221F; &#x2220; &#x2221; &#x2222; </Group-27>
+    <Group-28>&#x2223; &#x2224; &#x2225; &#x2226; &#x2227; &#x2228; &#x2229; &#x222A; &#x222B; &#x222C; &#x222D; &#x222E; &#x222F; &#x2230; &#x2231; &#x2232; </Group-28>
+    <Group-29>&#x2233; &#x2234; &#x2235; &#x2236; &#x2237; &#x2238; &#x2239; &#x223A; &#x223B; &#x223C; &#x223D; &#x223E; &#x223F; &#x2240; &#x2241; &#x2242; </Group-29>
+    <Group-30>&#x2243; &#x2244; &#x2245; &#x2246; &#x2247; &#x2248; &#x2249; &#x224A; &#x224B; &#x224C; &#x224D; &#x224E; &#x224F; &#x2250; &#x2251; &#x2252; </Group-30>
+    <Group-31>&#x2253; &#x2254; &#x2255; &#x2256; &#x2257; &#x2258; &#x2259; &#x225A; &#x225B; &#x225C; &#x225D; &#x225E; &#x225F; &#x2260; &#x2261; &#x2262; </Group-31>
+    <Group-32>&#x2263; &#x2264; &#x2265; &#x2266; &#x2267; &#x2268; &#x2269; &#x226A; &#x226B; &#x226C; &#x226D; &#x226E; &#x226F; &#x2270; &#x2271; &#x2272; </Group-32>
+    <Group-33>&#x2273; &#x2274; &#x2275; &#x2276; &#x2277; &#x2278; &#x2279; &#x227A; &#x227B; &#x227C; &#x227D; &#x227E; &#x227F; &#x2280; &#x2281; &#x2282; </Group-33>
+    <Group-34>&#x2283; &#x2284; &#x2285; &#x2286; &#x2287; &#x2288; &#x2289; &#x228A; &#x228B; &#x228C; &#x228D; &#x228E; &#x228F; &#x2290; &#x2291; &#x2292; </Group-34>
+    <Group-35>&#x2293; &#x2294; &#x2295; &#x2296; &#x2297; &#x2298; &#x2299; &#x229A; &#x229B; &#x229C; &#x229D; &#x229E; &#x229F; &#x22A0; &#x22A1; &#x22A2; </Group-35>
+    <Group-36>&#x22A3; &#x22A4; &#x22A5; &#x22A6; &#x22A7; &#x22A8; &#x22A9; &#x22AA; &#x22AB; &#x22AC; &#x22AD; &#x22AE; &#x22AF; &#x22B0; &#x22B1; &#x22B2; </Group-36>
+    <Group-37>&#x22B3; &#x22B4; &#x22B5; &#x22B6; &#x22B7; &#x22B8; &#x22B9; &#x22BA; &#x22BB; &#x22BC; &#x22BD; &#x22BE; &#x22BF; &#x22C0; &#x22C1; &#x22C2; </Group-37>
+    <Group-38>&#x22C3; &#x22C4; &#x22C5; &#x22C6; &#x22C7; &#x22C8; &#x22C9; &#x22CA; &#x22CB; &#x22CC; &#x22CD; &#x22CE; &#x22CF; &#x22D0; &#x22D1; &#x22D2; </Group-38>
+    <Group-39>&#x22D3; &#x22D4; &#x22D5; &#x22D6; &#x22D7; &#x22D8; &#x22D9; &#x22DA; &#x22DB; &#x22DC; &#x22DD; &#x22DE; &#x22DF; &#x22E0; &#x22E1; &#x22E2; </Group-39>
+    <Group-40>&#x22E3; &#x22E4; &#x22E5; &#x22E6; &#x22E7; &#x22E8; &#x22E9; &#x22EA; &#x22EB; &#x22EC; &#x22ED; &#x22EE; &#x22EF; &#x22F0; &#x22F1; &#x22F2; </Group-40>
+    <Group-41>&#x22F3; &#x22F4; &#x22F5; &#x22F6; &#x22F7; &#x22F8; &#x22F9; &#x22FA; &#x22FB; &#x22FC; &#x22FD; &#x22FE; &#x22FF; &#x2300; &#x2301; &#x2302; </Group-41>
+    <Group-42>&#x2303; &#x2304; &#x2305; &#x2306; &#x2307; &#x2308; &#x2309; &#x230A; &#x230B; &#x230C; &#x230D; &#x230E; &#x230F; &#x2310; &#x2311; &#x2312; </Group-42>
+    <Group-43>&#x2313; &#x2314; &#x2315; &#x2316; &#x2317; &#x2318; &#x2319; &#x231B; &#x231C; &#x231D; &#x231E; &#x231F; &#x2320; &#x2321; &#x2322; </Group-43>
+    <Group-44>&#x2323; &#x2324; &#x2325; &#x2326; &#x2327; &#x2328; &#x2329; &#x232A; &#x232B; &#x232C; &#x232D; &#x232E; &#x232F; &#x2330; &#x2331; &#x2332; </Group-44>
+    <Group-45>&#x2333; &#x2334; &#x2335; &#x2336; &#x2337; &#x2338; &#x2339; &#x233A; &#x233B; &#x233C; &#x233D; &#x233E; &#x233F; &#x2340; &#x2341; &#x2342; </Group-45>
+    <Group-46>&#x2343; &#x2344; &#x2349; &#x234A; &#x234B; &#x234C; &#x234D; &#x234E; &#x2351; &#x2352; </Group-46>
+    <Group-47>&#x2353; &#x2354; &#x2355; &#x2358; &#x2359; &#x235A; &#x235B; &#x235C; &#x235D; &#x235E; &#x235F; &#x2360; &#x2361; &#x2362; </Group-47>
+    <Group-48>&#x2363; &#x2364; &#x2365; &#x2366; &#x2367; &#x2368; &#x2369; &#x236A; &#x236B; &#x236C; &#x236D; &#x236E; &#x236F; &#x2370; &#x2371; &#x2372; </Group-48>
+    <Group-49>&#x2373; &#x2374; &#x2375; &#x2376; &#x2377; &#x2378; &#x2379; &#x237A; &#x237B; &#x237C; &#x237D; &#x237E; &#x237F; &#x2380; &#x2381; &#x2382; </Group-49>
+    <Group-50>&#x2383; &#x2384; &#x2385; &#x2386; &#x2387; &#x2388; &#x2389; &#x238A; &#x238B; &#x238C; &#x238D; &#x238E; &#x238F; &#x2390; &#x2391; &#x2392; </Group-50>
+    <Group-51>&#x2393; &#x2394; &#x2395; &#x2396; &#x2397; &#x2398; &#x2399; &#x239A; &#x239B; &#x239C; &#x239D; &#x239E; &#x239F; &#x23A0; &#x23A1; &#x23A2; </Group-51>
+    <Group-52>&#x23A3; &#x23A4; &#x23A5; &#x23A6; &#x23A7; &#x23A8; &#x23A9; &#x23AA; &#x23AB; &#x23AC; &#x23AD; &#x23AE; &#x23AF; &#x23B0; &#x23B1; &#x23B2; </Group-52>
+    <Group-53>&#x23B3; &#x23B4; &#x23B5; &#x23B6; &#x23B7; &#x23B8; &#x23B9; &#x23BA; &#x23BB; &#x23BC; &#x23BD; &#x23BE; &#x23BF; &#x23C0; &#x23C1; &#x23C2; </Group-53>
+    <Group-54>&#x23C3; &#x23C4; &#x23C5; &#x23C6; &#x23C7; &#x23C8; &#x23C9; &#x23CA; &#x23CB; &#x23CC; &#x23CD; &#x23CE; &#x23CF; &#x23D0; &#x23D1; &#x23D2; </Group-54>
+    <Group-55>&#x23D3; &#x23D4; &#x23D5; &#x23D6; &#x23D7; &#x23D8; &#x23D9; &#x23DA; &#x23DB; &#x23DC; &#x23DD; &#x23DE; &#x23DF; &#x23E0; &#x23E1; &#x23E2; </Group-55>
+    <Group-56>&#x23E3; &#x23E4; &#x23E5; &#x23E6; &#x23E7; &#x23E8; &#x23E9; &#x23EA; &#x23EB; &#x23EC; &#x23ED; &#x23EE; &#x23EF; </Group-56>
+    <Group-57>&#x23F3; &#x23F8; &#x23F9; &#x23FA; &#x23FB; &#x23FC; &#x23FD; &#x23FE; &#x23FF; </Group-57>
+    <Group-58>&#x2400; &#x2401; &#x2402; &#x2403; &#x2404; &#x2405; &#x2406; &#x2407; &#x2408; &#x2409; &#x240A; &#x240B; &#x240C; &#x240D; &#x240E; &#x240F; &#x2410; &#x2411; &#x2412; &#x2413; &#x2414; &#x2415; &#x2416; &#x2417; &#x2418; &#x2419; &#x241A; &#x241B; &#x241C; &#x241D; &#x241E; &#x241F; &#x2420; &#x2421; &#x2424; </Group-58>
+    <Group-59>&#x2422; &#x2423; &#x2425; &#x2426; &#x2440; &#x2441; &#x2442; &#x2443; &#x2444; &#x2445; &#x2446; &#x2447; &#x2448; &#x2449; &#x244A; </Group-59>
+    <Group-60>&#x2500; &#x2501; &#x2502; &#x2503; &#x2504; &#x2505; &#x2506; &#x2507; &#x2508; &#x2509; &#x250A; &#x250B; &#x250C; &#x250D; &#x250E; &#x250F; &#x2510; </Group-60>
+    <Group-61>&#x2511; &#x2512; &#x2513; &#x2514; &#x2515; &#x2516; &#x2517; &#x2518; &#x2519; &#x251A; &#x251B; &#x251C; &#x251D; &#x251E; &#x251F; &#x2520; </Group-61>
+    <Group-62>&#x2521; &#x2522; &#x2523; &#x2524; &#x2525; &#x2526; &#x2527; &#x2528; &#x2529; &#x252A; &#x252B; &#x252C; &#x252D; &#x252E; &#x252F; &#x2530; </Group-62>
+    <Group-63>&#x2531; &#x2532; &#x2533; &#x2534; &#x2535; &#x2536; &#x2537; &#x2538; &#x2539; &#x253A; &#x253B; &#x253C; &#x253D; &#x253E; &#x253F; &#x2540; </Group-63>
+    <Group-64>&#x2541; &#x2542; &#x2543; &#x2544; &#x2545; &#x2546; &#x2547; &#x2548; &#x2549; &#x254A; &#x254B; &#x254C; &#x254D; &#x254E; &#x254F; &#x2550; </Group-64>
+    <Group-65>&#x2551; &#x2552; &#x2553; &#x2554; &#x2555; &#x2556; &#x2557; &#x2558; &#x2559; &#x255A; &#x255B; &#x255C; &#x255D; &#x255E; &#x255F; &#x2560; </Group-65>
+    <Group-66>&#x2561; &#x2562; &#x2563; &#x2564; &#x2565; &#x2566; &#x2567; &#x2568; &#x2569; &#x256A; &#x256B; &#x256C; &#x256D; &#x256E; &#x256F; &#x2570; </Group-66>
+    <Group-67>&#x2571; &#x2572; &#x2573; &#x2574; &#x2575; &#x2576; &#x2577; &#x2578; &#x2579; &#x257A; &#x257B; &#x257C; &#x257D; &#x257E; &#x257F; &#x2580; </Group-67>
+    <Group-68>&#x2581; &#x2582; &#x2583; &#x2584; &#x2585; &#x2586; &#x2587; &#x2588; &#x2589; &#x258A; &#x258B; &#x258C; &#x258D; &#x258E; &#x258F; &#x2590; </Group-68>
+    <Group-69>&#x2591; &#x2592; &#x2593; &#x2594; &#x2595; &#x2596; &#x2597; &#x2598; &#x2599; &#x259A; &#x259B; &#x259C; &#x259D; &#x259E; &#x259F; &#x25A0; </Group-69>
+    <Group-70>&#x25A1; &#x25A2; &#x25A3; &#x25A4; &#x25A5; &#x25A6; &#x25A7; &#x25A8; &#x25A9; &#x25AA; &#x25AB; &#x25AC; &#x25AD; &#x25AE; &#x25AF; &#x25B0; </Group-70>
+    <Group-71>&#x25B1; &#x25B2; &#x25B3; &#x25B4; &#x25B5; &#x25B6; &#x25B7; &#x25B8; &#x25B9; &#x25BA; &#x25BB; &#x25BC; &#x25BD; &#x25BE; &#x25BF; &#x25C0; </Group-71>
+    <Group-72>&#x25C1; &#x25C2; &#x25C3; &#x25C4; &#x25C5; &#x25C6; &#x25C7; &#x25C8; &#x25C9; &#x25CA; &#x25CB; &#x25CC; &#x25CD; &#x25CE; &#x25CF; &#x25D0; </Group-72>
+    <Group-73>&#x25D1; &#x25D2; &#x25D3; &#x25D4; &#x25D5; &#x25D6; &#x25D7; &#x25D8; &#x25D9; &#x25DA; &#x25DB; &#x25DC; &#x25DD; &#x25DE; &#x25DF; &#x25E0; </Group-73>
+    <Group-74>&#x25E1; &#x25E2; &#x25E3; &#x25E4; &#x25E5; &#x25E6; &#x25E7; &#x25E8; &#x25E9; &#x25EA; &#x25EB; &#x25EC; &#x25ED; &#x25EE; &#x25EF; </Group-74>
+    <Group-75>&#x25F0; &#x25F1; &#x25F2; &#x25F3; &#x25F4; &#x25F5; &#x25F6; &#x25F7; &#x25F8; &#x25F9; &#x25FA; &#x25FB; &#x25FC; &#x25FD; &#x25FE; &#x25FF; &#x2600; </Group-75>
+    <Group-76>&#x2601; &#x2602; &#x2603; &#x2604; &#x2605; &#x2606; &#x2607; &#x2608; &#x2609; &#x260A; &#x260B; &#x260C; &#x260D; &#x260E; &#x260F; &#x2610; </Group-76>
+    <Group-77>&#x2614; &#x2615; &#x2616; &#x2617; &#x2618; &#x2619; &#x2620; </Group-77>
+    <Group-78>&#x2621; &#x2622; &#x2623; &#x2624; &#x2625; &#x2626; &#x2627; &#x2628; &#x2629; &#x262A; &#x262B; &#x262C; &#x262D; &#x262E; &#x262F; </Group-78>
+    <Group-79>&#x2630; &#x2631; &#x2632; &#x2633; &#x2634; &#x2635; &#x2636; &#x2637; </Group-79>
+    <Group-80>&#x2638; &#x263C; &#x263D; &#x263E; </Group-80>
+    <Group-81>&#x263F; &#x2640; &#x2643; &#x2644; &#x2645; &#x2646; &#x2647; </Group-81>
+    <Group-82>&#x2668; &#x267F; </Group-82>
+    <Group-83>&#x2670; &#x2671; </Group-83>
+    <Group-84>&#x2672; &#x267A; &#x267B; &#x267C; &#x267D; &#x267E; </Group-84>
+    <Group-85>&#x2673; &#x2674; &#x2675; &#x2676; &#x2677; &#x2678; &#x2679; </Group-85>
+    <Group-86>&#x2686; &#x2687; &#x2688; &#x2689; &#x268A; &#x268B; &#x268C; &#x268D; &#x268E; &#x268F; &#x2690; &#x2691; </Group-86>
+    <Group-87>&#x2692; &#x2693; &#x2694; &#x2695; &#x2696; &#x2697; &#x2698; &#x2699; &#x269A; &#x269B; &#x269C; &#x269D; &#x269E; &#x269F; &#x26A0; </Group-87>
+    <Group-88>&#x26A1; &#x26A2; &#x26A3; &#x26A4; &#x26A5; &#x26A6; &#x26A7; &#x26A8; &#x26A9; &#x26AA; &#x26AB; &#x26AC; &#x26AD; &#x26AE; &#x26AF; &#x26B0; </Group-88>
+    <Group-89>&#x26B1; &#x26B2; &#x26B3; &#x26B4; &#x26B5; &#x26B6; &#x26B7; &#x26B8; &#x26B9; &#x26BA; &#x26BB; &#x26BC; &#x26BD; &#x26BE; &#x26BF; &#x26C0; </Group-89>
+    <Group-90>&#x26C1; &#x26C2; &#x26C3; &#x26C4; &#x26C5; &#x26C6; &#x26C7; &#x26C8; &#x26C9; &#x26CA; &#x26CB; &#x26CC; &#x26CD; &#x26CE; &#x26CF; &#x26D0; </Group-90>
+    <Group-91>&#x26D1; &#x26D2; &#x26D3; &#x26D4; &#x26D5; &#x26D6; &#x26D7; &#x26D8; &#x26D9; &#x26DA; &#x26DB; &#x26DC; &#x26DD; &#x26DE; &#x26DF; &#x26E0; </Group-91>
+    <Group-92>&#x26E1; &#x26E2; &#x26E3; &#x26E4; &#x26E5; &#x26E6; &#x26E7; &#x26E8; &#x26E9; &#x26EA; &#x26EB; &#x26EC; &#x26ED; &#x26EE; &#x26EF; &#x26F0; </Group-92>
+    <Group-93>&#x26F1; &#x26F2; &#x26F3; &#x26F4; &#x26F5; &#x26F6; &#x26F7; &#x26F8; &#x26F9; &#x26FA; &#x26FB; &#x26FC; &#x26FD; &#x26FE; &#x26FF; &#x2700; </Group-93>
+    <Group-94>&#x2701; &#x2702; &#x2703; &#x2704; &#x2706; &#x2707; &#x2708; &#x2709; &#x270E; &#x270F; &#x2710; </Group-94>
+    <Group-95>&#x2711; &#x2712; &#x2719; &#x271A; &#x271B; &#x271C; &#x271D; &#x271E; &#x271F; &#x2720; </Group-95>
+    <Group-96>&#x2721; &#x2722; &#x2723; &#x2724; &#x2725; &#x2726; &#x2727; &#x2728; &#x2729; &#x272A; &#x272B; &#x272C; &#x272D; &#x272E; &#x272F; &#x2730; </Group-96>
+    <Group-97>&#x2731; &#x2732; &#x2733; &#x2734; &#x2735; &#x2736; &#x2737; &#x2738; &#x2739; &#x273A; &#x273B; &#x273C; &#x273D; &#x273E; &#x273F; &#x2740; </Group-97>
+    <Group-98>&#x2741; &#x2742; &#x2743; &#x2744; &#x2745; &#x2746; &#x2747; &#x2748; &#x2749; &#x274A; &#x274B; &#x274D; </Group-98>
+    <Group-99>&#x274F; &#x2750; &#x2751; &#x2752; &#x2753; &#x2754; &#x2755; &#x2756; &#x2757; &#x2758; &#x2759; &#x275A; &#x275B; &#x275C; &#x275D; &#x275E; &#x275F; &#x2760; </Group-99>
+    <Group-100>&#x2761; &#x2762; &#x2763; &#x2764; &#x2765; &#x2766; &#x2767; &#x2768; &#x2769; &#x276A; &#x276B; &#x276C; &#x276D; &#x276E; &#x276F; &#x2770; &#x2771; </Group-100>
+    <Group-101>&#x2772; &#x2773; &#x2774; &#x2775; </Group-101>
+    <Group-102>&#x2795; &#x2796; &#x2797; &#x27B0; &#x27BF; </Group-102>
+    <Group-103>&#x27C1; &#x27C2; &#x27C3; &#x27C4; &#x27C5; &#x27C6; &#x27C7; &#x27C8; &#x27C9; &#x27CA; &#x27CB; &#x27CC; &#x27CD; &#x27CE; &#x27CF; &#x27D0; </Group-103>
+    <Group-104>&#x27D1; &#x27D2; &#x27D3; &#x27D4; &#x27D5; &#x27D6; &#x27D7; &#x27D8; &#x27D9; &#x27DA; &#x27DB; &#x27DC; &#x27DD; &#x27DE; &#x27DF; &#x27E0; </Group-104>
+    <Group-105>&#x27E1; &#x27E2; &#x27E3; &#x27E4; &#x27E5; &#x27E6; &#x27E7; &#x27E8; &#x27E9; &#x27EA; &#x27EB; &#x27EC; &#x27ED; &#x27EE; &#x27EF; </Group-105>
+    <Group-106>&#x2980; &#x2981; &#x2982; &#x2983; &#x2984; &#x2985; &#x2986; &#x2987; &#x2988; &#x2989; &#x298A; &#x298B; &#x298C; &#x298D; &#x298E; &#x298F; &#x2990; </Group-106>
+    <Group-107>&#x2991; &#x2992; &#x2993; &#x2994; &#x2995; &#x2996; &#x2997; &#x2998; &#x2999; &#x299A; &#x299B; &#x299C; &#x299D; &#x299E; &#x299F; &#x29A0; </Group-107>
+    <Group-108>&#x29A1; &#x29A2; &#x29A3; &#x29A4; &#x29A5; &#x29A6; &#x29A7; &#x29A8; &#x29A9; &#x29AA; &#x29AB; &#x29AC; &#x29AD; &#x29AE; &#x29AF; &#x29B0; </Group-108>
+    <Group-109>&#x29B1; &#x29B2; &#x29B3; &#x29B4; &#x29B5; &#x29B6; &#x29B7; &#x29B8; &#x29B9; &#x29BA; &#x29BB; &#x29BC; &#x29BD; &#x29BE; &#x29BF; &#x29C0; </Group-109>
+    <Group-110>&#x29C1; &#x29C2; &#x29C3; &#x29C4; &#x29C5; &#x29C6; &#x29C7; &#x29C8; &#x29C9; &#x29CA; &#x29CB; &#x29CC; &#x29CD; &#x29CE; &#x29CF; &#x29D0; </Group-110>
+    <Group-111>&#x29D1; &#x29D2; &#x29D3; &#x29D4; &#x29D5; &#x29D6; &#x29D7; &#x29D8; &#x29D9; &#x29DA; &#x29DB; &#x29DC; &#x29DD; &#x29DE; &#x29DF; &#x29E0; </Group-111>
+    <Group-112>&#x29E1; &#x29E2; &#x29E3; &#x29E4; &#x29E5; &#x29E6; &#x29E7; &#x29E8; &#x29E9; &#x29EA; &#x29EB; &#x29EC; &#x29ED; &#x29EE; &#x29EF; &#x29F0; </Group-112>
+    <Group-113>&#x29F1; &#x29F2; &#x29F3; &#x29F4; &#x29F5; &#x29F6; &#x29F7; &#x29F8; &#x29F9; &#x29FA; &#x29FB; &#x29FC; &#x29FD; &#x29FE; &#x29FF; &#x2A00; </Group-113>
+    <Group-114>&#x2A01; &#x2A02; &#x2A03; &#x2A04; &#x2A05; &#x2A06; &#x2A07; &#x2A08; &#x2A09; &#x2A0A; &#x2A0B; &#x2A0C; &#x2A0D; &#x2A0E; &#x2A0F; &#x2A10; </Group-114>
+    <Group-115>&#x2A11; &#x2A12; &#x2A13; &#x2A14; &#x2A15; &#x2A16; &#x2A17; &#x2A18; &#x2A19; &#x2A1A; &#x2A1B; &#x2A1C; &#x2A1D; &#x2A1E; &#x2A1F; &#x2A20; </Group-115>
+    <Group-116>&#x2A21; &#x2A22; &#x2A23; &#x2A24; &#x2A25; &#x2A26; &#x2A27; &#x2A28; &#x2A29; &#x2A2A; &#x2A2B; &#x2A2C; &#x2A2D; &#x2A2E; &#x2A2F; &#x2A30; </Group-116>
+    <Group-117>&#x2A31; &#x2A32; &#x2A33; &#x2A34; &#x2A35; &#x2A36; &#x2A37; &#x2A38; &#x2A39; &#x2A3A; &#x2A3B; &#x2A3C; &#x2A3D; &#x2A3E; &#x2A3F; &#x2A40; </Group-117>
+    <Group-118>&#x2A41; &#x2A42; &#x2A43; &#x2A44; &#x2A45; &#x2A46; &#x2A47; &#x2A48; &#x2A49; &#x2A4A; &#x2A4B; &#x2A4C; &#x2A4D; &#x2A4E; &#x2A4F; &#x2A50; </Group-118>
+    <Group-119>&#x2A51; &#x2A52; &#x2A53; &#x2A54; &#x2A55; &#x2A56; &#x2A57; &#x2A58; &#x2A59; &#x2A5A; &#x2A5B; &#x2A5C; &#x2A5D; &#x2A5E; &#x2A5F; &#x2A60; </Group-119>
+    <Group-120>&#x2A61; &#x2A62; &#x2A63; &#x2A64; &#x2A65; &#x2A66; &#x2A67; &#x2A68; &#x2A69; &#x2A6A; &#x2A6B; &#x2A6C; &#x2A6D; &#x2A6E; &#x2A6F; &#x2A70; </Group-120>
+    <Group-121>&#x2A71; &#x2A72; &#x2A73; &#x2A74; &#x2A75; &#x2A76; &#x2A77; &#x2A78; &#x2A79; &#x2A7A; &#x2A7B; &#x2A7C; &#x2A7D; &#x2A7E; &#x2A7F; &#x2A80; </Group-121>
+    <Group-122>&#x2A81; &#x2A82; &#x2A83; &#x2A84; &#x2A85; &#x2A86; &#x2A87; &#x2A88; &#x2A89; &#x2A8A; &#x2A8B; &#x2A8C; &#x2A8D; &#x2A8E; &#x2A8F; &#x2A90; </Group-122>
+    <Group-123>&#x2A91; &#x2A92; &#x2A93; &#x2A94; &#x2A95; &#x2A96; &#x2A97; &#x2A98; &#x2A99; &#x2A9A; &#x2A9B; &#x2A9C; &#x2A9D; &#x2A9E; &#x2A9F; &#x2AA0; </Group-123>
+    <Group-124>&#x2AA1; &#x2AA2; &#x2AA3; &#x2AA4; &#x2AA5; &#x2AA6; &#x2AA7; &#x2AA8; &#x2AA9; &#x2AAA; &#x2AAB; &#x2AAC; &#x2AAD; &#x2AAE; &#x2AAF; &#x2AB0; </Group-124>
+    <Group-125>&#x2AB1; &#x2AB2; &#x2AB3; &#x2AB4; &#x2AB5; &#x2AB6; &#x2AB7; &#x2AB8; &#x2AB9; &#x2ABA; &#x2ABB; &#x2ABC; &#x2ABD; &#x2ABE; &#x2ABF; &#x2AC0; </Group-125>
+    <Group-126>&#x2AC1; &#x2AC2; &#x2AC3; &#x2AC4; &#x2AC5; &#x2AC6; &#x2AC7; &#x2AC8; &#x2AC9; &#x2ACA; &#x2ACB; &#x2ACC; &#x2ACD; &#x2ACE; &#x2ACF; &#x2AD0; </Group-126>
+    <Group-127>&#x2AD1; &#x2AD2; &#x2AD3; &#x2AD4; &#x2AD5; &#x2AD6; &#x2AD7; &#x2AD8; &#x2AD9; &#x2ADA; &#x2ADB; &#x2ADC; &#x2ADD; &#x2ADE; &#x2ADF; &#x2AE0; </Group-127>
+    <Group-128>&#x2AE1; &#x2AE2; &#x2AE3; &#x2AE4; &#x2AE5; &#x2AE6; &#x2AE7; &#x2AE8; &#x2AE9; &#x2AEA; &#x2AEB; &#x2AEC; &#x2AED; &#x2AEE; &#x2AEF; &#x2AF0; </Group-128>
+    <Group-129>&#x2AF1; &#x2AF2; &#x2AF3; &#x2AF4; &#x2AF5; &#x2AF6; &#x2AF7; &#x2AF8; &#x2AF9; &#x2AFA; &#x2AFB; &#x2AFC; &#x2AFD; &#x2AFE; &#x2AFF; </Group-129>
+    <Group-130>&#x2B12; &#x2B13; &#x2B14; &#x2B15; &#x2B16; &#x2B17; &#x2B18; &#x2B19; &#x2B1A; &#x2B1B; &#x2B1C; &#x2B1D; &#x2B1E; &#x2B1F; &#x2B20; </Group-130>
+    <Group-131>&#x2B21; &#x2B22; &#x2B23; &#x2B24; &#x2B25; &#x2B26; &#x2B27; &#x2B28; &#x2B29; &#x2B2A; &#x2B2B; &#x2B2C; &#x2B2D; &#x2B2E; &#x2B2F; &#x2B30; </Group-131>
+    <Group-132>&#x2B50; &#x2B51; &#x2B52; &#x2B53; &#x2B54; &#x2B55; &#x2B56; &#x2B57; &#x2B58; &#x2B59; </Group-132>
+    <Group-133>&#x2BB9; &#x2BBA; &#x2BBB; &#x2BBC; &#x2BBD; &#x2BBE; &#x2BBF; &#x2BC0; &#x2BC1; &#x2BC2; &#x2BC3; </Group-133>
+    <Group-134>&#x2BC4; &#x2BC9; &#x2BCA; &#x2BCB; &#x2BCC; &#x2BCD; &#x2BCE; &#x2BCF; &#x2BD0; &#x2BD1; &#x2BD2; &#x2BD3; </Group-134>
+    <Group-135>&#x2BD4; &#x2BD5; &#x2BD6; &#x2BD7; &#x2BD8; &#x2BD9; &#x2BDA; &#x2BDB; &#x2BDC; &#x2BDD; &#x2BDE; &#x2BDF; &#x2BE0; &#x2BE1; &#x2BE2; &#x2BE3; </Group-135>
+    <Group-136>&#x2BE4; &#x2BE5; &#x2BE6; &#x2BE7; &#x2BE8; &#x2BE9; &#x2BEA; &#x2BEB; &#x2BEC; &#x2BED; &#x2BEE; &#x2BEF; &#x2BF0; &#x2BF1; &#x2BF2; &#x2BF3; </Group-136>
+    <Group-137>&#x2BF4; &#x2BF5; &#x2BF6; &#x2BF7; &#x2BF8; &#x2BF9; &#x2BFA; &#x2BFB; &#x2BFC; &#x2BFD; &#x2BFE; &#x2BFF; &#x2E00; &#x2E01; &#x2E02; &#x2E03; </Group-137>
+    <Group-138>&#x2E04; &#x2E05; &#x2E06; &#x2E07; &#x2E08; &#x2E09; &#x2E0A; &#x2E0B; &#x2E0C; &#x2E0D; &#x2E0E; &#x2E0F; &#x2E10; &#x2E11; &#x2E12; &#x2E13; </Group-138>
+    <Group-139>&#x2E14; &#x2E15; &#x2E16; &#x2E17; &#x2E18; &#x2E19; &#x2E1A; &#x2E1B; &#x2E1C; &#x2E1D; &#x2E1E; &#x2E1F; &#x2E20; &#x2E21; &#x2E22; &#x2E23; </Group-139>
+    <Group-140>&#x2E24; &#x2E25; &#x2E26; &#x2E27; &#x2E28; &#x2E29; &#x2E2A; &#x2E2B; &#x2E2C; &#x2E2D; &#x2E2E; &#x2E2F; &#x2E30; &#x2E31; &#x2E32; &#x2E33; </Group-140>
+    <Group-141>&#x2E34; &#x2E35; &#x2E36; &#x2E37; &#x2E38; &#x2E39; &#x2E3A; &#x2E3B; &#x2E3C; &#x2E3D; &#x2E3E; &#x2E3F; &#x2E40; &#x2E41; &#x2E42; &#x2E43; </Group-141>
+    <Group-142>&#x2E44; &#x2E45; &#x2E46; &#x2E47; &#x2E48; &#x2E49; &#x2E4A; &#x2E4B; &#x2E4C; &#x2E4D; &#x2E4E; &#x2E4F; &#x2E50; &#x2E51; &#x2E52; &#x2FF0; </Group-142>
+    <Group-143>&#x2FF1; &#x2FF2; &#x2FF3; &#x2FF4; &#x2FF5; &#x2FF6; &#x2FF7; &#x2FF8; &#x2FF9; &#x2FFA; &#x2FFB; &#x3001; &#x3002; &#x3003; &#x3004; </Group-143>
+    <Group-144>&#x3006; &#x3008; &#x3009; &#x300A; &#x300B; &#x300C; &#x300D; &#x300E; &#x300F; &#x3010; &#x3011; &#x3012; &#x3013; &#x3014; &#x3015; &#x3016; </Group-144>
+    <Group-145>&#x3017; &#x3018; &#x3019; &#x301A; &#x301B; &#x301C; &#x301D; &#x301E; &#x301F; &#x3020; &#x3030; &#x3031; &#x3032; &#x3033; &#x3034; &#x3035; </Group-145>
+    <Group-146>&#x3036; &#x3037; &#x303C; &#x303D; &#x303E; &#x309B; &#x309C; &#x30FB; &#x30FC; </Group-146>
+    <Group-147>&#x31C0; &#x31C1; &#x31C2; &#x31C3; &#x31C4; </Group-147>
+    <Group-148>&#x31C5; &#x31C6; &#x31C7; &#x31C8; &#x31C9; &#x31CA; &#x31CB; &#x31CC; &#x31CD; &#x31CE; &#x31CF; &#x31D0; &#x31D1; &#x31D2; &#x31D3; &#x31D4; </Group-148>
+    <Group-149>&#x31D5; &#x31D6; &#x31D7; &#x31D8; &#x31D9; &#x31DA; &#x31DB; &#x31DC; &#x31DD; &#x31DE; &#x31DF; &#x31E0; &#x31E1; &#x31E2; &#x31E3; </Group-149>
+    <Group-150>&#x3192; &#x3193; &#x3194; &#x3195; &#x3196; &#x3197; &#x3198; &#x3199; &#x319A; &#x319B; &#x319C; &#x319D; &#x319E; &#x319F; </Group-150>
+    <Group-151>&#x3231; &#x3232; &#x3233; &#x3234; &#x3235; &#x3236; &#x3237; &#x3238; &#x3239; &#x323A; &#x323B; &#x323C; &#x323D; &#x323E; &#x323F; &#x3240; &#x3241; &#x3242; &#x3243; </Group-151>
+    <Group-152>&#x3244; &#x3245; &#x3246; &#x3247; &#x3291; &#x3292; &#x3293; &#x3294; &#x3295; &#x3296; &#x3297; &#x3298; &#x3299; &#x329A; &#x329B; &#x329C; &#x329D; &#x329E; &#x329F; &#x32A0; &#x32A1; &#x32A2; &#x32A3; &#x32A4; &#x32A5; &#x32A6; &#x32A7; &#x32A8; &#x32A9; &#x32AA; &#x32AB; &#x32AC; &#x32AD; &#x32AE; &#x32AF; &#x32B0; </Group-152>
+    <Group-153>&#x3250; &#x327F; </Group-153>
+    <Group-154>&#x32CC; &#x32CD; &#x32CE; &#x32CF; &#x32FF; &#x3371; &#x3372; &#x3373; &#x3374; &#x3375; &#x3376; </Group-154>
+    <Group-155>&#x3377; &#x3378; &#x3379; &#x337A; </Group-155>
+    <Group-156>&#x337B; &#x337C; &#x337D; &#x337E; &#x337F; </Group-156>
+    <Group-157>&#x3380; &#x3381; &#x3382; &#x3383; &#x3384; &#x3385; &#x3386; </Group-157>
+    <Group-158>&#x3387; &#x3388; &#x3389; &#x338A; &#x338B; &#x338C; &#x338D; &#x338E; &#x338F; &#x3390; &#x3391; &#x3392; &#x3393; &#x3394; &#x3395; &#x3396; </Group-158>
+    <Group-159>&#x3397; &#x3398; &#x3399; &#x339A; &#x339B; &#x339C; &#x339D; &#x339E; &#x339F; &#x33A0; &#x33A1; &#x33A2; &#x33A3; &#x33A4; &#x33A5; &#x33A6; </Group-159>
+    <Group-160>&#x33A7; &#x33A8; &#x33A9; &#x33AA; &#x33AB; &#x33AC; &#x33AD; &#x33AE; &#x33AF; &#x33B0; &#x33B1; &#x33B2; &#x33B3; &#x33B4; &#x33B5; &#x33B6; </Group-160>
+    <Group-161>&#x33B7; &#x33B8; &#x33B9; &#x33BA; &#x33BB; &#x33BC; &#x33BD; &#x33BE; &#x33BF; &#x33C0; &#x33C1; &#x33C2; &#x33C3; &#x33C4; &#x33C5; &#x33C6; </Group-161>
+    <Group-162>&#x33C7; &#x33C8; &#x33C9; &#x33CA; &#x33CB; &#x33CC; &#x33CD; &#x33CE; &#x33CF; &#x33D0; &#x33D1; &#x33D2; &#x33D3; &#x33D4; &#x33D5; &#x33D6; </Group-162>
+    <Group-163>&#x33D7; &#x33D8; &#x33D9; &#x33DA; &#x33DB; &#x33DC; &#x33DD; &#x33DE; &#x33DF; &#x33FF; </Group-163>
+    <Group-164>&#x4DC0; &#x4DC1; &#x4DC2; &#x4DC3; &#x4DC4; &#x4DC5; &#x4DC6; </Group-164>
+    <Group-165>&#x4DC7; &#x4DC8; &#x4DC9; &#x4DCA; &#x4DCB; &#x4DCC; &#x4DCD; &#x4DCE; &#x4DCF; &#x4DD0; &#x4DD1; &#x4DD2; &#x4DD3; &#x4DD4; &#x4DD5; &#x4DD6; </Group-165>
+    <Group-166>&#x4DD7; &#x4DD8; &#x4DD9; &#x4DDA; &#x4DDB; &#x4DDC; &#x4DDD; &#x4DDE; &#x4DDF; &#x4DE0; &#x4DE1; &#x4DE2; &#x4DE3; &#x4DE4; &#x4DE5; &#x4DE6; </Group-166>
+    <Group-167>&#x4DE7; &#x4DE8; &#x4DE9; &#x4DEA; &#x4DEB; &#x4DEC; &#x4DED; &#x4DEE; &#x4DEF; &#x4DF0; &#x4DF1; &#x4DF2; &#x4DF3; &#x4DF4; &#x4DF5; &#x4DF6; </Group-167>
+    <Group-168>&#x4DF7; &#x4DF8; &#x4DF9; &#x4DFA; &#x4DFB; &#x4DFC; &#x4DFD; &#x4DFE; &#x4DFF; &#xA700; &#xA701; &#xA702; &#xA703; &#xA704; &#xA705; &#xA706; </Group-168>
+    <Group-169>&#xA707; &#xA708; &#xA709; &#xA70A; &#xA70B; &#xA70C; &#xA70D; &#xA70E; &#xA70F; &#xA710; &#xA711; &#xA712; &#xA713; &#xA714; &#xA715; &#xA716; </Group-169>
+    <Group-170>&#xA717; &#xA718; &#xA719; &#xA71A; &#xA71B; &#xA71C; &#xA71D; &#xA71E; &#xA71F; &#xA720; &#xA721; &#xA788; &#xA789; &#xA78A; &#xA830; &#xA831; </Group-170>
+    <Group-171>&#xA832; &#xA833; &#xA834; &#xA835; &#xA836; &#xA837; &#xA838; &#xA839; &#xA92E; &#xA9CF; &#xAB5B; &#xAB6A; &#xAB6B; &#xFD3E; &#xFD3F; &#xFE10; </Group-171>
+    <Group-172>&#xFE11; &#xFE12; &#xFE13; &#xFE14; &#xFE15; &#xFE16; &#xFE17; &#xFE18; &#xFE19; &#xFE30; &#xFE31; &#xFE32; &#xFE33; &#xFE34; &#xFE35; &#xFE36; </Group-172>
+    <Group-173>&#xFE37; &#xFE38; &#xFE39; &#xFE3A; &#xFE3B; &#xFE3C; &#xFE3D; &#xFE3E; &#xFE3F; &#xFE40; &#xFE41; &#xFE42; &#xFE43; &#xFE44; &#xFE45; &#xFE46; </Group-173>
+    <Group-174>&#xFE47; &#xFE48; &#xFE49; &#xFE4A; &#xFE4B; &#xFE4C; &#xFE4D; &#xFE4E; &#xFE4F; &#xFE50; &#xFE51; &#xFE52; &#xFE54; &#xFE55; &#xFE56; &#xFE57; </Group-174>
+    <Group-175>&#xFE59; &#xFE5A; &#xFE5B; &#xFE5C; &#xFE5D; &#xFE5E; &#xFE5F; &#xFE60; &#xFE61; &#xFE62; &#xFE63; &#xFE64; &#xFE65; &#xFE66; &#xFE68; </Group-175>
+    <Group-176>&#xFE69; &#xFE6A; &#xFE6B; &#xFF01; &#xFF02; &#xFF03; &#xFF04; &#xFF05; &#xFF06; &#xFF07; &#xFF08; &#xFF09; &#xFF0A; &#xFF0B; &#xFF0C; </Group-176>
+    <Group-177>&#xFF0D; &#xFF0E; &#xFF0F; &#xFF1A; &#xFF1B; &#xFF1C; &#xFF1D; &#xFF1E; &#xFF1F; &#xFF20; &#xFF3B; &#xFF3C; &#xFF3D; &#xFF3E; &#xFF3F; &#xFF40; </Group-177>
+    <Group-178>&#xFF5B; &#xFF5C; &#xFF5D; &#xFF5E; &#xFF5F; &#xFF60; &#xFF61; &#xFF62; &#xFF63; &#xFF64; &#xFF65; &#xFF70; &#xFF9E; &#xFF9F; &#xFFE0; &#xFFE1; &#xFFE2; &#xFFE3; &#xFFE4; &#xFFE5; &#xFFE6; </Group-178>
+    <Group-179>&#xFE69; &#xFF04; &#xFFE0; &#xFFE1; &#xFFE5; &#xFF65; &#xFFFC; &#xFFFD; &#x10102; </Group-179>
+    <Group-180>&#x10107; &#x10108; &#x10109; &#x1010A; &#x1010B; &#x1010C; &#x1010D; &#x1010E; &#x1010F; </Group-180>
+    <Group-181>&#x10110; &#x10111; &#x10112; &#x10113; &#x10114; &#x10115; &#x10116; &#x10117; &#x10118; </Group-181>
+    <Group-182>&#x10119; &#x1011A; &#x1011B; &#x1011C; &#x1011D; &#x1011E; &#x1011F; &#x10120; &#x10121; </Group-182>
+    <Group-183>&#x10122; &#x10123; &#x10124; &#x10125; &#x10126; &#x10127; &#x10128; &#x10129; &#x1012A; </Group-183>
+    <Group-184>&#x1012B; &#x1012C; &#x1012D; &#x1012E; &#x1012F; &#x10130; &#x10131; &#x10132; &#x10133; </Group-184>
+    <Group-185>&#x10137; &#x10138; &#x10139; &#x1013A; &#x1013B; </Group-185>
+    <Group-186>&#x1013C; &#x1013D; &#x1013E; &#x1013F; &#x10190; &#x10191; &#x10192; &#x10193; &#x10194; &#x10195; &#x10196; &#x10197; &#x10198; &#x10199; &#x1019A; &#x1019B; </Group-186>
+    <Group-187>&#x1019C; &#x101D0; &#x101D1; &#x101D2; &#x101D3; &#x101D4; &#x101D5; &#x101D6; &#x101D7; &#x101D8; &#x101D9; &#x101DA; &#x101DB; &#x101DC; &#x101DD; &#x101DE; </Group-187>
+    <Group-188>&#x101DF; &#x101E0; &#x101E1; &#x101E2; &#x101E3; &#x101E4; &#x101E5; &#x101E6; &#x101E7; &#x101E8; &#x101E9; &#x101EA; &#x101EB; &#x101EC; &#x101ED; &#x101EE; </Group-188>
+    <Group-189>&#x101EF; &#x101F0; &#x101F1; &#x101F2; &#x101F3; &#x101F4; &#x101F5; &#x101F6; &#x101F7; &#x101F8; &#x101F9; &#x101FA; &#x101FB; &#x101FC; &#x102E1; &#x102E2; </Group-189>
+    <Group-190>&#x102E3; &#x102E4; &#x102E5; &#x102E6; &#x102E7; &#x102E8; &#x102E9; &#x102EA; &#x102EB; &#x102EC; &#x102ED; &#x102EE; &#x102EF; &#x102F0; &#x102F1; &#x102F2; </Group-190>
+    <Group-191>&#x102F3; &#x102F4; &#x102F5; &#x102F6; &#x102F7; &#x102F8; &#x102F9; &#x102FA; &#x102FB; &#x1D000; </Group-191>
+    <Group-192>&#x1D001; &#x1D002; &#x1D003; &#x1D004; &#x1D005; &#x1D006; &#x1D007; &#x1D008; &#x1D009; &#x1D00A; &#x1D00B; &#x1D00C; &#x1D00D; &#x1D00E; &#x1D00F; &#x1D010; </Group-192>
+    <Group-193>&#x1D011; &#x1D012; &#x1D013; &#x1D014; &#x1D015; &#x1D016; &#x1D017; &#x1D018; &#x1D019; &#x1D01A; &#x1D01B; &#x1D01C; &#x1D01D; &#x1D01E; &#x1D01F; &#x1D020; </Group-193>
+    <Group-194>&#x1D021; &#x1D022; &#x1D023; &#x1D024; &#x1D025; &#x1D026; &#x1D027; &#x1D028; &#x1D029; &#x1D02A; &#x1D02B; &#x1D02C; &#x1D02D; &#x1D02E; &#x1D02F; &#x1D030; </Group-194>
+    <Group-195>&#x1D031; &#x1D032; &#x1D033; &#x1D034; &#x1D035; &#x1D036; &#x1D037; &#x1D038; &#x1D039; &#x1D03A; &#x1D03B; &#x1D03C; &#x1D03D; &#x1D03E; &#x1D03F; &#x1D040; </Group-195>
+    <Group-196>&#x1D041; &#x1D042; &#x1D043; &#x1D044; &#x1D045; &#x1D046; &#x1D047; &#x1D048; &#x1D049; &#x1D04A; &#x1D04B; &#x1D04C; &#x1D04D; &#x1D04E; &#x1D04F; &#x1D050; </Group-196>
+    <Group-197>&#x1D051; &#x1D052; &#x1D053; &#x1D054; &#x1D055; &#x1D056; &#x1D057; &#x1D058; &#x1D059; &#x1D05A; &#x1D05B; &#x1D05C; &#x1D05D; &#x1D05E; &#x1D05F; &#x1D060; </Group-197>
+    <Group-198>&#x1D061; &#x1D062; &#x1D063; &#x1D064; &#x1D065; &#x1D066; &#x1D067; &#x1D068; &#x1D069; &#x1D06A; &#x1D06B; &#x1D06C; &#x1D06D; &#x1D06E; &#x1D06F; &#x1D070; </Group-198>
+    <Group-199>&#x1D071; &#x1D072; &#x1D073; &#x1D074; &#x1D075; &#x1D076; &#x1D077; &#x1D078; &#x1D079; &#x1D07A; &#x1D07B; &#x1D07C; &#x1D07D; &#x1D07E; &#x1D07F; &#x1D080; </Group-199>
+    <Group-200>&#x1D081; &#x1D082; &#x1D083; &#x1D084; &#x1D085; &#x1D086; &#x1D087; &#x1D088; &#x1D089; &#x1D08A; &#x1D08B; &#x1D08C; &#x1D08D; &#x1D08E; &#x1D08F; &#x1D090; </Group-200>
+    <Group-201>&#x1D091; &#x1D092; &#x1D093; &#x1D094; &#x1D095; &#x1D096; &#x1D097; &#x1D098; &#x1D099; &#x1D09A; &#x1D09B; &#x1D09C; &#x1D09D; &#x1D09E; &#x1D09F; &#x1D0A0; </Group-201>
+    <Group-202>&#x1D0A1; &#x1D0A2; &#x1D0A3; &#x1D0A4; &#x1D0A5; &#x1D0A6; &#x1D0A7; &#x1D0A8; &#x1D0A9; &#x1D0AA; &#x1D0AB; &#x1D0AC; &#x1D0AD; &#x1D0AE; &#x1D0AF; &#x1D0B0; </Group-202>
+    <Group-203>&#x1D0B1; &#x1D0B2; &#x1D0B3; &#x1D0B4; &#x1D0B5; &#x1D0B6; &#x1D0B7; &#x1D0B8; &#x1D0B9; &#x1D0BA; &#x1D0BB; &#x1D0BC; &#x1D0BD; &#x1D0BE; &#x1D0BF; &#x1D0C0; </Group-203>
+    <Group-204>&#x1D0C1; &#x1D0C2; &#x1D0C3; &#x1D0C4; &#x1D0C5; &#x1D0C6; &#x1D0C7; &#x1D0C8; &#x1D0C9; &#x1D0CA; &#x1D0CB; &#x1D0CC; &#x1D0CD; &#x1D0CE; &#x1D0CF; &#x1D0D0; </Group-204>
+    <Group-205>&#x1D0D1; &#x1D0D2; &#x1D0D3; &#x1D0D4; &#x1D0D5; &#x1D0D6; &#x1D0D7; &#x1D0D8; &#x1D0D9; &#x1D0DA; &#x1D0DB; &#x1D0DC; &#x1D0DD; &#x1D0DE; &#x1D0DF; &#x1D0E0; </Group-205>
+    <Group-206>&#x1D0E1; &#x1D0E2; &#x1D0E3; &#x1D0E4; &#x1D0E5; &#x1D0E6; &#x1D0E7; &#x1D0E8; &#x1D0E9; &#x1D0EA; &#x1D0EB; &#x1D0EC; &#x1D0ED; &#x1D0EE; &#x1D0EF; &#x1D0F0; </Group-206>
+    <Group-207>&#x1D0F1; &#x1D0F2; &#x1D0F3; &#x1D0F4; &#x1D0F5; </Group-207>
+    <Group-208>&#x1D2E0; </Group-208>
+    <Group-209>&#x1D2E1; &#x1D2E2; &#x1D2E3; &#x1D2E4; </Group-209>
+    <Group-210>&#x1D2E5; &#x1D2E6; &#x1D2E7; &#x1D2E8; &#x1D2E9; </Group-210>
+    <Group-211>&#x1D2EA; &#x1D2EB; &#x1D2EC; &#x1D2ED; &#x1D2EE; </Group-211>
+    <Group-212>&#x1D2EF; &#x1D2F0; &#x1D2F1; &#x1D2F2; &#x1D2F3; </Group-212>
+    <Group-213>&#x1D300; &#x1D301; &#x1D302; &#x1D303; &#x1D304; &#x1D305; </Group-213>
+    <Group-214>&#x1D306; &#x1D307; &#x1D308; &#x1D309; &#x1D30A; &#x1D30B; &#x1D30C; &#x1D30D; &#x1D30E; &#x1D30F; &#x1D310; &#x1D311; &#x1D312; &#x1D313; &#x1D314; &#x1D315; </Group-214>
+    <Group-215>&#x1D316; &#x1D317; &#x1D318; &#x1D319; &#x1D31A; &#x1D31B; &#x1D31C; &#x1D31D; &#x1D31E; &#x1D31F; &#x1D320; &#x1D321; &#x1D322; &#x1D323; &#x1D324; &#x1D325; </Group-215>
+    <Group-216>&#x1D326; &#x1D327; &#x1D328; &#x1D329; &#x1D32A; &#x1D32B; &#x1D32C; &#x1D32D; &#x1D32E; &#x1D32F; &#x1D330; &#x1D331; &#x1D332; &#x1D333; &#x1D334; &#x1D335; </Group-216>
+    <Group-217>&#x1D336; &#x1D337; &#x1D338; &#x1D339; &#x1D33A; &#x1D33B; &#x1D33C; &#x1D33D; &#x1D33E; &#x1D33F; &#x1D340; &#x1D341; &#x1D342; &#x1D343; &#x1D344; &#x1D345; </Group-217>
+    <Group-218>&#x1D346; &#x1D347; &#x1D348; &#x1D349; &#x1D34A; &#x1D34B; &#x1D34C; &#x1D34D; &#x1D34E; &#x1D34F; &#x1D350; &#x1D351; &#x1D352; &#x1D353; &#x1D354; &#x1D355; </Group-218>
+    <Group-219>&#x1D356; &#x1D360; &#x1D361; &#x1D362; &#x1D363; &#x1D364; &#x1D365; &#x1D366; &#x1D367; &#x1D368; &#x1D369; &#x1D36A; &#x1D36B; &#x1D36C; &#x1D36D; &#x1D36E; </Group-219>
+    <Group-220>&#x1D36F; &#x1D370; &#x1D371; &#x1D372; &#x1D373; &#x1D374; &#x1D375; &#x1D376; &#x1D377; &#x1D378; </Group-220>
+    <Group-221>&#x1EC71; &#x1EC72; </Group-221>
+    <Group-222>&#x1EC73; &#x1EC74; &#x1EC75; &#x1EC76; &#x1EC77; &#x1EC78; &#x1EC79; &#x1EC7A; &#x1EC7B; &#x1EC7C; &#x1EC7D; &#x1EC7E; &#x1EC7F; &#x1EC80; &#x1EC81; &#x1EC82; </Group-222>
+    <Group-223>&#x1EC83; &#x1EC84; &#x1EC85; &#x1EC86; &#x1EC87; &#x1EC88; &#x1EC89; &#x1EC8A; &#x1EC8B; &#x1EC8C; &#x1EC8D; &#x1EC8E; &#x1EC8F; &#x1EC90; &#x1EC91; &#x1EC92; </Group-223>
+    <Group-224>&#x1EC93; &#x1EC94; &#x1EC95; &#x1EC96; &#x1EC97; &#x1EC98; &#x1EC99; &#x1EC9A; &#x1EC9B; &#x1EC9C; &#x1EC9D; &#x1EC9E; &#x1EC9F; &#x1ECA0; &#x1ECA1; &#x1ECA2; </Group-224>
+    <Group-225>&#x1ECA3; &#x1ECA4; &#x1ECA5; &#x1ECA6; &#x1ECA7; &#x1ECA8; &#x1ECA9; &#x1ECAA; &#x1ECAB; &#x1ECAC; &#x1ECAD; &#x1ECAE; &#x1ECAF; &#x1ECB0; &#x1ECB1; &#x1ECB2; </Group-225>
+    <Group-226>&#x1ECB3; &#x1ECB4; </Group-226>
+    <Group-227>&#x1F12A; &#x1F12B; &#x1F12C; &#x1F12D; &#x1F12E; &#x1F12F; &#x1F14A; &#x1F14B; &#x1F14C; &#x1F14D; &#x1F14E; &#x1F14F; </Group-227>
+    <Group-228>&#x1F16A; &#x1F16B; &#x1F16C; </Group-228>
+    <Group-229>&#x1F18A; &#x1F18B; &#x1F18C; &#x1F18D; &#x1F18E; &#x1F18F; &#x1F190; &#x1F19B; &#x1F19C; &#x1F19D; &#x1F19E; &#x1F19F; &#x1F1A0; &#x1F1A1; &#x1F1A2; &#x1F1A3; &#x1F1A4; &#x1F1A5; &#x1F1A6; &#x1F1A7; &#x1F1A8; &#x1F1A9; &#x1F1AA; &#x1F1AB; &#x1F1AC; </Group-229>
+    <Group-230>&#x1F30D; &#x1F30E; &#x1F30F; &#x1F311; &#x1F312; &#x1F313; &#x1F314; &#x1F315; &#x1F316; &#x1F317; &#x1F318; &#x1F31C; &#x1F321; &#x1F322; &#x1F323; &#x1F324; &#x1F325; &#x1F326; &#x1F327; &#x1F328; &#x1F329; &#x1F32A; &#x1F32B; &#x1F32C; </Group-230>
+    <Group-231>&#x1F336; &#x1F378; &#x1F37D; &#x1F393; &#x1F394; &#x1F395; &#x1F396; &#x1F397; &#x1F398; &#x1F399; &#x1F39A; &#x1F39B; &#x1F39E; &#x1F39F; &#x1F3A7; &#x1F3AC; &#x1F3AD; &#x1F3AE; &#x1F3C2; &#x1F3C4; &#x1F3C6; &#x1F3CA; &#x1F3CB; &#x1F3CC; &#x1F3CD; &#x1F3CE; </Group-231>
+    <Group-232>&#x1F3D4; &#x1F3D5; &#x1F3D6; &#x1F3D7; &#x1F3D8; &#x1F3D9; &#x1F3DA; &#x1F3DB; &#x1F3DC; &#x1F3DD; &#x1F3DE; &#x1F3DF; &#x1F3E0; &#x1F3ED; &#x1F3F1; &#x1F3F2; &#x1F3F3; &#x1F3F5; &#x1F3F6; &#x1F3F7; </Group-232>
+    <Group-233>&#x1F408; &#x1F415; &#x1F41F; &#x1F426; &#x1F42D; &#x1F42E; &#x1F431; &#x1F435; &#x1F43F; </Group-233>
+    <Group-234>&#x1F440; &#x1F441; &#x1F442; &#x1F453; &#x1F46A; &#x1F47D; </Group-234>
+    <Group-235>&#x1F493; &#x1F494; &#x1F495; &#x1F496; &#x1F497; &#x1F498; &#x1F499; </Group-235>
+    <Group-236>&#x1F4A1; &#x1F4A2; &#x1F4A3; &#x1F4A4; &#x1F4A6; </Group-236>
+    <Group-237>&#x1F4B0; &#x1F4B1; &#x1F4B2; &#x1F4B3; &#x1F4B4; &#x1F4B5; &#x1F4B6; &#x1F4B7; </Group-237>
+    <Group-238>&#x1F4B9; &#x1F4BB; &#x1F4BF; &#x1F4C8; &#x1F4C9; &#x1F4CA; &#x1F4CB; &#x1F4CE; &#x1F4DA; &#x1F4DF; &#x1F4E4; &#x1F4E5; &#x1F4E6; &#x1F4EA; &#x1F4EB; &#x1F4EC; &#x1F4ED; </Group-238>
+    <Group-239>&#x1F4F6; &#x1F4F7; &#x1F4F9; &#x1F4FA; &#x1F4FB; &#x1F4FD; &#x1F4FE; &#x1F503; </Group-239>
+    <Group-240>&#x1F507; &#x1F508; &#x1F509; &#x1F50A; &#x1F50B; &#x1F50D; &#x1F512; &#x1F513; </Group-240>
+    <Group-241>&#x1F53E; &#x1F53F; &#x1F540; &#x1F541; &#x1F542; &#x1F543; &#x1F544; &#x1F545; &#x1F546; &#x1F547; &#x1F548; &#x1F549; &#x1F54A; &#x1F54F; </Group-241>
+    <Group-242>&#x1F568; &#x1F569; &#x1F56A; &#x1F56B; &#x1F56C; &#x1F56D; &#x1F56E; &#x1F56F; &#x1F571; &#x1F572; &#x1F573; &#x1F574; &#x1F575; &#x1F576; &#x1F577; </Group-242>
+    <Group-243>&#x1F578; &#x1F579; &#x1F57B; &#x1F57C; &#x1F57D; &#x1F57E; &#x1F57F; &#x1F580; &#x1F581; &#x1F582; &#x1F583; &#x1F584; &#x1F585; &#x1F586; &#x1F587; </Group-243>
+    <Group-244>&#x1F588; &#x1F589; &#x1F58A; &#x1F58B; &#x1F58C; &#x1F58D; &#x1F5A5; &#x1F5A6; &#x1F5A7; </Group-244>
+    <Group-245>&#x1F5A8; &#x1F5A9; &#x1F5AA; &#x1F5AB; &#x1F5AC; &#x1F5AD; &#x1F5AE; &#x1F5AF; &#x1F5B0; &#x1F5B1; &#x1F5B2; &#x1F5B3; &#x1F5B4; &#x1F5B5; &#x1F5B6; &#x1F5B7; </Group-245>
+    <Group-246>&#x1F5B8; &#x1F5B9; &#x1F5BA; &#x1F5BB; &#x1F5BC; &#x1F5BD; &#x1F5BE; &#x1F5BF; &#x1F5C0; &#x1F5C1; &#x1F5C2; &#x1F5C3; &#x1F5C4; &#x1F5C5; &#x1F5C6; &#x1F5C7; </Group-246>
+    <Group-247>&#x1F5C8; &#x1F5C9; &#x1F5CA; &#x1F5CB; &#x1F5CC; &#x1F5CD; &#x1F5CE; &#x1F5CF; &#x1F5D0; &#x1F5D1; &#x1F5D2; &#x1F5D3; &#x1F5D4; &#x1F5D5; &#x1F5D6; &#x1F5D7; </Group-247>
+    <Group-248>&#x1F5D8; &#x1F5DA; &#x1F5DB; &#x1F5DC; &#x1F5DD; &#x1F5DE; &#x1F5DF; &#x1F5E0; &#x1F5E1; &#x1F5E2; &#x1F5E3; &#x1F5E4; &#x1F5E5; &#x1F5E6; &#x1F5E7; </Group-248>
+    <Group-249>&#x1F5E8; &#x1F5E9; &#x1F5EA; &#x1F5EB; &#x1F5EC; &#x1F5ED; &#x1F5EE; &#x1F5EF; &#x1F5F0; &#x1F5F1; &#x1F5F2; &#x1F5F3; &#x1F5FA; </Group-249>
+    <Group-250>&#x1F650; &#x1F651; &#x1F652; &#x1F653; &#x1F654; &#x1F655; &#x1F656; &#x1F657; </Group-250>
+    <Group-251>&#x1F658; &#x1F659; &#x1F65A; &#x1F65B; &#x1F65C; &#x1F65D; &#x1F65E; &#x1F65F; &#x1F660; &#x1F661; &#x1F662; &#x1F663; &#x1F664; &#x1F665; &#x1F666; &#x1F667; </Group-251>
+    <Group-252>&#x1F668; &#x1F669; &#x1F66A; &#x1F66B; &#x1F66C; &#x1F66D; &#x1F66E; &#x1F66F; &#x1F670; &#x1F671; &#x1F672; &#x1F673; &#x1F674; &#x1F675; &#x1F676; &#x1F677; </Group-252>
+    <Group-253>&#x1F678; &#x1F679; &#x1F67A; &#x1F67B; &#x1F67C; &#x1F67D; &#x1F67E; &#x1F67F; &#x1F687; </Group-253>
+    <Group-254>&#x1F68D; &#x1F691; &#x1F694; &#x1F698; </Group-254>
+    <Group-255>&#x1F6AB; &#x1F6AD; &#x1F6AE; &#x1F6B2; &#x1F6B9; &#x1F6BA; &#x1F6BB; &#x1F6BC; &#x1F6BE; &#x1F6C6; &#x1F6C7; </Group-255>
+    <Group-256>&#x1F6C8; &#x1F6C9; &#x1F6CA; &#x1F6CB; &#x1F6CD; &#x1F6CE; &#x1F6CF; &#x1F6D3; &#x1F6D4; &#x1F6D5; &#x1F6D6; &#x1F6D7; </Group-256>
+    <Group-257>&#x1F6E0; &#x1F6E1; &#x1F6E2; &#x1F6E3; &#x1F6E4; &#x1F6E5; &#x1F6E6; &#x1F6E7; &#x1F6E8; &#x1F6E9; &#x1F6EA; &#x1F6F0; &#x1F6F1; &#x1F6F2; </Group-257>
+    <Group-258>&#x1F6F3; &#x1F6F7; &#x1F6F8; &#x1F6F9; &#x1F6FA; &#x1F6FB; &#x1F6FC; &#x1F700; &#x1F701; &#x1F702; &#x1F703; &#x1F704; &#x1F705; </Group-258>
+    <Group-259>&#x1F706; &#x1F707; &#x1F708; &#x1F709; &#x1F70A; &#x1F70B; &#x1F70C; &#x1F70D; &#x1F70E; &#x1F70F; &#x1F710; &#x1F711; &#x1F712; &#x1F713; &#x1F714; &#x1F715; </Group-259>
+    <Group-260>&#x1F716; &#x1F717; &#x1F718; &#x1F719; &#x1F71A; &#x1F71B; &#x1F71C; &#x1F71D; &#x1F71E; &#x1F71F; &#x1F720; &#x1F721; &#x1F722; &#x1F723; &#x1F724; &#x1F725; </Group-260>
+    <Group-261>&#x1F726; &#x1F727; &#x1F728; &#x1F729; &#x1F72A; &#x1F72B; &#x1F72C; &#x1F72D; &#x1F72E; &#x1F72F; &#x1F730; &#x1F731; &#x1F732; &#x1F733; &#x1F734; &#x1F735; </Group-261>
+    <Group-262>&#x1F736; &#x1F737; &#x1F738; &#x1F739; &#x1F73A; &#x1F73B; &#x1F73C; &#x1F73D; &#x1F73E; &#x1F73F; &#x1F740; &#x1F741; &#x1F742; &#x1F743; &#x1F744; &#x1F745; </Group-262>
+    <Group-263>&#x1F746; &#x1F747; &#x1F748; &#x1F749; &#x1F74A; &#x1F74B; &#x1F74C; &#x1F74D; &#x1F74E; &#x1F74F; &#x1F750; &#x1F751; &#x1F752; &#x1F753; &#x1F754; &#x1F755; </Group-263>
+    <Group-264>&#x1F756; &#x1F757; &#x1F758; &#x1F759; &#x1F75A; &#x1F75B; &#x1F75C; &#x1F75D; &#x1F75E; &#x1F75F; &#x1F760; &#x1F761; &#x1F762; &#x1F763; &#x1F764; &#x1F765; </Group-264>
+    <Group-265>&#x1F766; &#x1F767; &#x1F768; &#x1F769; &#x1F76A; &#x1F76B; &#x1F76C; &#x1F76D; &#x1F76E; &#x1F76F; &#x1F770; &#x1F771; &#x1F772; &#x1F773; &#x1F784; </Group-265>
+    <Group-266>&#x1F785; &#x1F786; &#x1F787; &#x1F788; &#x1F789; &#x1F78A; &#x1F78B; &#x1F78C; &#x1F78D; &#x1F78E; &#x1F78F; &#x1F790; &#x1F791; </Group-266>
+    <Group-267>&#x1F792; &#x1F793; &#x1F794; &#x1F795; &#x1F796; &#x1F797; &#x1F798; &#x1F799; &#x1F79A; &#x1F79B; &#x1F79C; &#x1F79D; &#x1F79E; &#x1F79F; &#x1F7A0; </Group-267>
+    <Group-268>&#x1F7A1; &#x1F7A2; &#x1F7A3; &#x1F7A4; &#x1F7A5; &#x1F7A6; &#x1F7A7; </Group-268>
+    <Group-269>&#x1F7AF; &#x1F7B0; &#x1F7B1; &#x1F7B2; &#x1F7B3; &#x1F7B4; &#x1F7B5; &#x1F7B6; &#x1F7B7; &#x1F7B8; &#x1F7B9; &#x1F7BA; &#x1F7BB; &#x1F7BC; &#x1F7BD; &#x1F7BE; &#x1F7BF; </Group-269>
+    <Group-270>&#x1F7C0; &#x1F7C1; &#x1F7C2; &#x1F7C3; &#x1F7C4; &#x1F7C5; &#x1F7C6; &#x1F7C7; &#x1F7C8; &#x1F7C9; &#x1F7CA; &#x1F7CB; &#x1F7CC; &#x1F7CD; &#x1F7CE; &#x1F7CF; &#x1F7D0; &#x1F7D1; </Group-270>
+    <Group-271>&#x1F7D2; &#x1F7D3; &#x1F7D4; &#x1F7D5; &#x1F7D6; &#x1F7D7; &#x1F7D8; &#x1F7E0; &#x1F7E1; &#x1F7E2; &#x1F7E3; &#x1F7E4; &#x1F7E5; &#x1F7E6; &#x1F7E7; &#x1F7E8; &#x1F7E9; &#x1F7EA; &#x1F7EB; </Group-271>
+    <Group-272>&#x1F93B; &#x1F946; &#x1FA70; &#x1FA71; &#x1FA72; &#x1FA73; &#x1FA74; &#x1FA78; &#x1FA79; </Group-272>
+    <Group-273>&#x1FA7A; &#x1FA80; &#x1FA81; &#x1FA82; &#x1FA83; &#x1FA84; &#x1FA85; &#x1FA86; &#x1FA90; &#x1FA91; &#x1FA92; &#x1FA93; &#x1FA94; &#x1FA95; &#x1FA96; &#x1FA97; </Group-273>
+    <Group-274>&#x1FA98; &#x1FA99; &#x1FA9A; &#x1FA9B; &#x1FA9C; &#x1FA9D; &#x1FA9E; &#x1FA9F; &#x1FAA0; &#x1FAA1; &#x1FAA2; &#x1FAA3; &#x1FAA4; &#x1FAA5; &#x1FAA6; &#x1FAA7; </Group-274>
+    <Group-275>&#x1FAA8; &#x1FAB0; &#x1FAB1; &#x1FAB2; &#x1FAB3; &#x1FAB4; &#x1FAB5; &#x1FAB6; &#x1FAC0; &#x1FAC1; &#x1FAC2; &#x1FAD0; &#x1FAD1; &#x1FAD2; &#x1FAD3; &#x1FAD4; </Group-275>
+    <Group-276>&#x1FAD5; &#x1FAD6; &#x1FB00; &#x1FB01; &#x1FB02; &#x1FB03; &#x1FB04; &#x1FB05; &#x1FB06; &#x1FB07; &#x1FB08; &#x1FB09; &#x1FB0A; &#x1FB0B; &#x1FB0C; &#x1FB0D; </Group-276>
+    <Group-277>&#x1FB0E; &#x1FB0F; &#x1FB10; &#x1FB11; &#x1FB12; &#x1FB13; &#x1FB14; &#x1FB15; &#x1FB16; &#x1FB17; &#x1FB18; &#x1FB19; &#x1FB1A; &#x1FB1B; &#x1FB1C; &#x1FB1D; </Group-277>
+    <Group-278>&#x1FB1E; &#x1FB1F; &#x1FB20; &#x1FB21; &#x1FB22; &#x1FB23; &#x1FB24; &#x1FB25; &#x1FB26; &#x1FB27; &#x1FB28; &#x1FB29; &#x1FB2A; &#x1FB2B; &#x1FB2C; &#x1FB2D; </Group-278>
+    <Group-279>&#x1FB2E; &#x1FB2F; &#x1FB30; &#x1FB31; &#x1FB32; &#x1FB33; &#x1FB34; &#x1FB35; &#x1FB36; &#x1FB37; &#x1FB38; &#x1FB39; &#x1FB3A; &#x1FB3B; &#x1FB3C; &#x1FB3D; </Group-279>
+    <Group-280>&#x1FB3E; &#x1FB3F; &#x1FB40; &#x1FB41; &#x1FB42; &#x1FB43; &#x1FB44; &#x1FB45; &#x1FB46; &#x1FB47; &#x1FB48; &#x1FB49; &#x1FB4A; &#x1FB4B; &#x1FB4C; &#x1FB4D; </Group-280>
+    <Group-281>&#x1FB4E; &#x1FB4F; &#x1FB50; &#x1FB51; &#x1FB52; &#x1FB53; &#x1FB54; &#x1FB55; &#x1FB56; &#x1FB57; &#x1FB58; &#x1FB59; &#x1FB5A; &#x1FB5B; &#x1FB5C; &#x1FB5D; </Group-281>
+    <Group-282>&#x1FB5E; &#x1FB5F; &#x1FB60; &#x1FB61; &#x1FB62; &#x1FB63; &#x1FB64; &#x1FB65; &#x1FB66; &#x1FB67; &#x1FB68; &#x1FB69; &#x1FB6A; &#x1FB6B; &#x1FB6C; &#x1FB6D; </Group-282>
+    <Group-283>&#x1FB6E; &#x1FB6F; &#x1FB70; &#x1FB71; &#x1FB72; &#x1FB73; &#x1FB74; &#x1FB75; &#x1FB76; &#x1FB77; &#x1FB78; &#x1FB79; &#x1FB7A; &#x1FB7B; &#x1FB7C; &#x1FB7D; </Group-283>
+    <Group-284>&#x1FB7E; &#x1FB7F; &#x1FB80; &#x1FB81; &#x1FB82; &#x1FB83; &#x1FB84; &#x1FB85; &#x1FB86; &#x1FB87; &#x1FB88; &#x1FB89; &#x1FB8A; &#x1FB8B; &#x1FB8C; &#x1FB8D; </Group-284>
+    <Group-285>&#x1FB8E; &#x1FB8F; &#x1FB90; &#x1FB91; &#x1FB92; &#x1FB94; &#x1FB95; &#x1FB96; &#x1FB97; &#x1FB98; &#x1FB99; &#x1FB9A; &#x1FB9B; &#x1FB9C; &#x1FB9D; &#x1FB9E; </Group-285>
+    <Group-286>&#x1FB9F; &#x1FBA0; &#x1FBA1; &#x1FBA2; &#x1FBA3; &#x1FBA4; &#x1FBA5; &#x1FBA6; &#x1FBA7; &#x1FBA8; &#x1FBA9; &#x1FBAA; &#x1FBAB; &#x1FBAC; &#x1FBAD; &#x1FBAE; </Group-286>
+    <Group-287>&#x1FBAF; &#x1FBB0; &#x1FBB2; &#x1FBB3; &#x1FBB4; &#x1FBB9; &#x1FBBA; &#x1FBBB; &#x1FBBC; &#x1FBBE; </Group-287>
+    <Group-288>&#x1FBBF; &#x1FBC1; &#x1FBC2; &#x1FBC3; &#x1FBC4; &#x1FBC5; &#x1FBC6; &#x1FBC7; &#x1FBC8; &#x1FBC9; &#x1FBCA; </Group-288>
+  </Miscs>
+</Common-Characters>
