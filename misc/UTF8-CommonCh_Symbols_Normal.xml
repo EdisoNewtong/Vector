@@ -1,5 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Common-Characters>
+  <Favourite>
+    <group-1>¢ £ ¥ ¦ § © ® ° ± ∓ ´ µ · × ÷ ʹ ʺ</group-1>
+    <group-2>˽ ․ ‥ … ‧ ⁝ ⁞ ℃ ℉ ℗ ℡</group-2>
+    <group-3>␣ ⏎ </group-3>
+    <group-4>∶ ‰ ‱ ∞ ℼ ℿ 𝛑 𝜋 𝝅 𝝿 𝞹 Ⲡ ⲡ</group-4>
+    <group-5>™ ℹ℻ ⅀ ∀ ∃ ∄ ∅ ∈ ∉ ∊</group-5>
+    <group-6>√ ∛ ∜ ∧ ∨ ∟ ∡ ∢ ∩ ∪</group-6>
+    <group-7>′ ″ ‴ ∫ ∬ ∭ ∮ ∯ ∰</group-7>
+    <group-8>∴ ∵ ≈ ≉ ≠ ≤ ≥ ⩽ ⩾ ⊂ ⊃ ⊄ ⊅ ⊆ ⊇</group-8>
+    <group-9>⊈ ⊉ ⊊ ⊋ ⋯ ⋮ ⋯ ⌨ ⌗ ⌥ ⌘ ⌫ ⌛ ⌦ ⌧ ⎇</group-9>
+    <group-10>⎗ ⎘ ⏏ ⏻ ⏼ ■ □ ▢ ▣ ▪ ▫ ▬ ▭ ▮ ▯</group-10>
+    <group-11>▰ ▱ ▲ △ ▴ ▵ ○ ● ◎ ◯ ★ ☆ ☊ ☋</group-11>
+    <group-12>☎ ☏ ☔ ☕ ☘ ☠ ☢ ☣ ☪ ☫ ☬ ☭ ☮ ☯ ☸ ☼</group-12>
+    <group-13>⚐ ⚑ ⚒ ⚓ ⚔ ⚖ ⚙ ⚛ ⚝ ⚠ ⚡ ⚽ ⚾ ⚿ ⛄</group-13>
+    <group-14>⛅ ⛇ ⛈ ⛑ ⛔ ⛤⛥ ⛦ ⛧ ⛨ ⛪ ⛰ ⛲</group-14>
+    <group-15>⛳ ⛴ ⛷ ⛾ ⛿ ✀ ✆ ✈ ✉ ✎ ✡ ✩ ✪ ✭</group-15>
+    <group-16>〠 ￼ � 𐄷 🌍 🌎 🌏 🌡 🌢 🌣 🌥 🌦 🌧 🌬</group-16>
+    <group-17>🌶 🍸 🍽 🎓 🎔 🎕  🎖 🎞 🎬 🎧 🎮 🏂 🏆</group-17>
+    <group-18>🏊 🏋 🏌 🏍 🏔 🏭 🏱 🏲 🏳 👪 💗 💔 💘</group-18>
+    <group-19>💰 💱 💲 💳 💴 💵 💶 💷</group-19>
+    <group-20>💡 💣 💤 📈 📉 📎 📟 📤 📥 📶 📷 📹 📺 📻</group-20>
+    <group-21>📽 📾 🔃 🔇 🔈🔉 🔋 🔍 🔒 🔓 🕨 🕩 🕪 🕫 🕬</group-21>
+    <group-22>🕭 🕮 🕯 🕱 🕲 🕵 🕶 🕷 🕸 🕹 🕻 🕽 🕾 🕿 🖁</group-22>
+    <group-23>🖂 🖈 🖉 🖥 🖦 🖧 🖨 🖩 🖮 🖰 🖲 🖳 🖵 🖸 🖶</group-23>
+    <group-24>🖿 🗀 🗁 🗕 🗖 🗗 🗘 🗝 🗢 🗨 🗱 🗲 🗺</group-24>
+    <group-25>🚑 🚔 🚘 🚭 🚮 🚲 🚹 🚺 🚻 🚾 🛈 🛗 🛤 🛠</group-25>
+    <group-26>🛺 🛥 🛧 🛰 🪑 🪜 🪣 🪂 🪚 🫖 🪲 🪵 🪝 🫂</group-26>
+    <group-27>🫕 🫖 🯄 ㎚ ㎛ ㎜ ㎝ ㍷ ㎞ ㎭ ㎮ ㎯</group-27>
+  </Favourite>
   <Alphabet>
     <Group-1>𝐀 𝐁 𝐂 𝐃 𝐄 𝐅 𝐆 𝐇 𝐈 𝐉 𝐊 𝐋 𝐌 𝐍 𝐎 𝐏 𝐐 𝐑 𝐒 𝐓 𝐔 𝐕 𝐖 𝐗 𝐘 𝐙 </Group-1>
     <Group-2>𝐚 𝐛 𝐜 𝐝 𝐞 𝐟 𝐠 𝐡 𝐢 𝐣 𝐤 𝐥 𝐦 𝐧 𝐨 𝐩 𝐪 𝐫 𝐬 𝐭 𝐮 𝐯 𝐰 𝐱 𝐲 𝐳 </Group-2>
@@ -246,7 +275,7 @@
     <Group-16>𝇣 𝇤 𝇥 𝇦 𝇧 𝇨 </Group-16>
   </Musical-Symbols>
   <Check-Cross>
-    <Group-1>☑ ☒ ☓ ✅ ❎ 🯀 ✓ ✔ ✕ ✖ ✗ ✘ ❌ ⨯ 𐄂 🗙 🗴 🗵 🗶 🗷 🗸 🗹 🞨 🞩 🞪 🞫 🞬 🞭 🞮 🮱 🮽 ⮽ ⮾ ⮿ </Group-1>
+    <Group-1>☑ ☒ ☓ ✅ 🯀 ✓ ✔ ✕ ✖ ✗ ✘ ❌ ❎ ⨯ 𐄂 🗙 🗴 🗵 🗶 🗷 🗸 🗹 🞨 🞩 🞪 🞫 🞬 🞭 🞮 🮱 🮽 ⮽ ⮾ ⮿ </Group-1>
   </Check-Cross>
   <Fingers>
     <Group-1>☚ ☛ ☜ ☝ ☞ ☟ ✍ </Group-1>
