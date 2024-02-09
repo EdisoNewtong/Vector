@@ -39,19 +39,19 @@ void lineSegment(void)
 	glBegin(GL_LINES);	// 设置为绘制图元模式 , 直线为2个顶点分为1组
 		// OpenGL Coordinate , left-bottom is the Original-Point
 		// Line 1
-		glColor3f(1.0,0.0,0.0);
+		glColor3f(1.0,0.0,0.0);  // Red 
 		glVertex2i(10,10);
 		glVertex2i(390,10);
 		// Line 2
-		glColor3f(1.0,1.0,0.0);
+		glColor3f(1.0,1.0,0.0);  // Yellow 
 		glVertex2i(10, 20);
 		glVertex2i(400, 20);
 		// Line 3
-		glColor3f(0.0,0.0,1.0);
+		glColor3f(0.0,0.0,1.0);  // Blue
 		glVertex2i(10, 30);
 		glVertex2i(490, 30);
 		// Line 4
-		glColor3f(1.0,1.0,1.0);
+		glColor3f(1.0,1.0,1.0);  // White
 		glVertex2i(10, 40);
 		glVertex2i(495, 40);
 	glEnd();
