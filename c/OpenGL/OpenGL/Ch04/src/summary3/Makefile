@@ -1,9 +1,9 @@
 # makefile
 
-all:summary3
-#gcc -g -Wall -o main main.c -framework OPENGL -framework GLUT
+linux:summary3.c
+	gcc  -Wall  -o  summary3  summary3.c    -lglut  -lGL  -lGLU
 
-summary3:summary3.cpp
+macosx:summary3.cpp
 	g++ -g -Wall -o summary3 summary3.cpp -framework OPENGL -framework GLUT
 
 

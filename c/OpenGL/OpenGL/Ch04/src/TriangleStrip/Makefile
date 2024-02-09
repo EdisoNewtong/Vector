@@ -1,9 +1,9 @@
 # makefile
 
-all:mainTriangleStrip
+linux:mainTriangleStrip.c
+	gcc  -Wall  -o  mainTriangleStrip  mainTriangleStrip.c    -lglut  -lGL  -lGLU
 
-#gcc -g -Wall -o main main.c -framework OPENGL -framework GLUT
-mainTriangleStrip:mainTriangleStrip.c
+macosx:mainTriangleStrip.c
 	gcc -g -Wall -o mainTriangleStrip mainTriangleStrip.c -framework OPENGL -framework GLUT
 
 .PHONY:clean

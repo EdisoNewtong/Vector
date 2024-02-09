@@ -1,7 +1,16 @@
 #include <stdio.h>
 
 // Apple Mac OX , OpenGL header files
+#if defined(__GNUC__) // Linux Part
+#include <GL/glu.h>
+#include <GL/glut.h>
+#include <GL/freeglut.h>
+#else                // !(Linux) Part
 #include <GLUT/glut.h>
+#include <GLUT/freeglut.h>
+#endif
+
+
 
 void init(void)
 {
@@ -78,7 +87,7 @@ void lineSegment(void)
 	glFlush();
 }
 
-void main(int argc,char** argv)
+int main(int argc,char** argv)
 {
 	// 1st . init GLUT
 	glutInit(&argc,argv);
@@ -96,6 +105,8 @@ void main(int argc,char** argv)
 	glutDisplayFunc(lineSegment);
 	// last. 最后 调用主循环
 	glutMainLoop();
+
+    return 0;
 }
 
 

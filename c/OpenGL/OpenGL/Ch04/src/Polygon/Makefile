@@ -1,10 +1,10 @@
 # makefile
 
-all:mainPolygon
 
-#gcc -g -Wall -o main main.c -framework OPENGL -framework GLUT
+linux:mainPolygon.c
+	gcc  -Wall  -o  mainPolygon  mainPolygon.c    -lglut  -lGL  -lGLU
 
-mainPolygon:mainPolygon.c
+macosx:mainPolygon.c
 	gcc -g -Wall -o mainPolygon mainPolygon.c -framework OPENGL -framework GLUT
 
 .PHONY:clean

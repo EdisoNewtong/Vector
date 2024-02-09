@@ -1,9 +1,9 @@
 # makefile
 
-all:mainCube
+linux:mainCube.c
+	gcc  -Wall  -o  mainCube    mainCube.c  -lglut  -lGL  -lGLU
 
-
-mainCube:mainCube.c
+macosx:mainCube.c
 	gcc -g -Wall -o mainCube mainCube.c -framework OPENGL -framework GLUT
 
 .PHONY:clean

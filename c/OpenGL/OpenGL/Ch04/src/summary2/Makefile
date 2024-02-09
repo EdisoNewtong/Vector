@@ -1,9 +1,9 @@
 # makefile
 
-all:summary2
-#gcc -g -Wall -o main main.c -framework OPENGL -framework GLUT
+linux:summary2.c
+	gcc  -Wall  -o  summary2  summary2.c    -lglut  -lGL  -lGLU
 
-summary2:summary2.c
+macosx:summary2.c
 	gcc -g -Wall -o summary2 summary2.c -framework OPENGL -framework GLUT
 
 

@@ -1,7 +1,18 @@
-#include <GLUT/glut.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+
+
+
+// Apple Mac OX , OpenGL header files
+#if defined(__GNUC__) // Linux Part
+#include <GL/glu.h>
+#include <GL/glut.h>
+#include <GL/freeglut.h>
+#else                // !(Linux) Part
+#include <GLUT/glut.h>
+#include <GLUT/freeglut.h>
+#endif
 
 GLsizei winWidth  = 600;
 GLsizei winHeight = 600;
@@ -255,3 +266,4 @@ int main(int argc,char* argv[])
 	glutMainLoop();
 	return 0;
 }
+

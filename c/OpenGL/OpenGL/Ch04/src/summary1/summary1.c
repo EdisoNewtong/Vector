@@ -1,7 +1,16 @@
 #include <stdio.h>
 
 // Apple Mac OX , OpenGL header files
+#if defined(__GNUC__) // Linux Part
+#include <GL/glu.h>
+#include <GL/glut.h>
+#include <GL/freeglut.h>
+#else                // !(Linux) Part
 #include <GLUT/glut.h>
+#include <GLUT/freeglut.h>
+#endif
+
+
 
 GLsizei winWidth = 600;
 GLsizei winHeight = 500;
@@ -92,7 +101,7 @@ void winReshapeFunc(GLint newWidth, GLint newHeight)
 	glClear(GL_COLOR_BUFFER_BIT);
 }
 
-void main(int argc,char* argv[])
+int main(int argc,char* argv[])
 {
 	glutInit(&argc,argv);
 	glutInitDisplayMode( GLUT_SINGLE | GLUT_RGB);
@@ -105,4 +114,6 @@ void main(int argc,char* argv[])
 	glutReshapeFunc(winReshapeFunc);
 
 	glutMainLoop();
+    return 0;
 }
+

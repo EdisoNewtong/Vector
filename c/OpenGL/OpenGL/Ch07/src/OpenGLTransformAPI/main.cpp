@@ -1,7 +1,19 @@
-#include <GLUT/glut.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+
+
+// Apple Mac OX , OpenGL header files
+#if defined(__GNUC__) // Linux Part
+#include <GL/glu.h>
+#include <GL/glut.h>
+#include <GL/freeglut.h>
+#else                // !(Linux) Part
+#include <GLUT/glut.h>
+#include <GLUT/freeglut.h>
+#endif
+
+
 
 GLsizei winWidth  = 1000;
 GLsizei winHeight = 1000;
@@ -37,7 +49,7 @@ void displayFcn(void)
 
 	// 1. Translate
 	glColor3f(1.0, 0.0, 0.0);
-	glTranslatef(-200,-50.0, 0.0);
+	glTranslatef(100,70.0, 0.0);
 	glRecti(50, 100, 200, 150);
 
 	// 2. Rotate
@@ -86,3 +98,4 @@ int main(int argc,char* argv[])
 	glutMainLoop();
 	return 0;
 }
+

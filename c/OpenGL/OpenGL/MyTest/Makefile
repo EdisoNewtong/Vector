@@ -1,9 +1,9 @@
 # makefile
 
-all:main
+linux:main.c
+	gcc  -Wall  -o  main  main.c    -lglut  -lGL  -lGLU
 
-#gcc -g -Wall -o main main.c -framework OPENGL -framework GLUT
-main:main.c
+macosx:main.c
 	gcc -g -Wall -o main main.c -framework OPENGL -framework GLUT
 
 clean:

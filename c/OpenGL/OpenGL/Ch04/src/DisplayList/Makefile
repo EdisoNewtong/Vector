@@ -1,9 +1,12 @@
 # makefile
 
-all:main
 
 
-main:main.cpp
+linux:main.cpp
+	g++  -Wall  -o  main    main.cpp  -lglut  -lGL  -lGLU
+
+
+macosx:main.cpp
 	g++ -g -Wall -o main main.cpp -framework OPENGL -framework GLUT
 
 .PHONY:clean

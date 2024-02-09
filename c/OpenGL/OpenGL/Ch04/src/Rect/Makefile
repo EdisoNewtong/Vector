@@ -1,9 +1,9 @@
 # makefile
 
-all:mainRect
+linux:mainRect.c
+	gcc  -Wall  -o  mainRect  mainRect.c    -lglut  -lGL  -lGLU
 
-#gcc -g -Wall -o main main.c -framework OPENGL -framework GLUT
-mainRect:mainRect.c
+macosx:mainRect.c
 	gcc -g -Wall -o mainRect mainRect.c -framework OPENGL -framework GLUT
 
 .PHONY:clean

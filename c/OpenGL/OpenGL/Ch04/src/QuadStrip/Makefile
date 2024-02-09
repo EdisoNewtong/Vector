@@ -1,9 +1,10 @@
 # makefile
 
-all:mainQuadStrip
+linux:mainQuadStrip.c
+	gcc  -Wall  -o  mainQuadStrip  mainQuadStrip.c    -lglut  -lGL  -lGLU
 
-#gcc -g -Wall -o main main.c -framework OPENGL -framework GLUT
-mainQuadStrip:mainQuadStrip.c
+
+macosx:mainQuadStrip.c
 	gcc -g -Wall -o mainQuadStrip mainQuadStrip.c -framework OPENGL -framework GLUT
 
 

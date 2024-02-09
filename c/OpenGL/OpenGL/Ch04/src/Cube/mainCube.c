@@ -1,18 +1,27 @@
 #include <stdio.h>
 
+
 // Apple Mac OX , OpenGL header files
+#if defined(__GNUC__) // Linux Part
+#include <GL/glu.h>
+#include <GL/glut.h>
+#include <GL/freeglut.h>
+#else                // !(Linux) Part
 #include <GLUT/glut.h>
+#include <GLUT/freeglut.h>
+#endif
+
 
 static const float vertex_list[][3] = {
-	-0.5f, -0.5f, -0.5f,
-	 0.5f, -0.5f, -0.5f,
-	-0.5f,  0.5f, -0.5f,
-	 0.5f,  0.5f, -0.5f,
+    { -0.5f, -0.5f, -0.5f },
+    { 0.5f, -0.5f, -0.5f  },
+	{-0.5f,  0.5f, -0.5f  },
+	{ 0.5f,  0.5f, -0.5f  },
 
-	-0.5f, -0.5f,  0.5f,
-	0.5f,  -0.5f,  0.5f,
-	-0.5f,  0.5f,  0.5f,
-	 0.5f,  0.5f,  0.5f
+    { -0.5f, -0.5f,  0.5f },
+	{ 0.5f,  -0.5f,  0.5f },
+	{ -0.5f,  0.5f,  0.5f },
+	{  0.5f,  0.5f,  0.5f }
 };
 
 static const GLint index_list[][2] = {

@@ -1,9 +1,10 @@
 # makefile
 
-all:mainTriangleFan
+linux:mainTriangleFan.c
+	gcc  -Wall  -o  mainTriangleFan  mainTriangleFan.c    -lglut  -lGL  -lGLU
 
-#gcc -g -Wall -o main main.c -framework OPENGL -framework GLUT
-mainTriangleFan:mainTriangleFan.c
+
+macosx:mainTriangleFan.c
 	gcc -g -Wall -o mainTriangleFan mainTriangleFan.c -framework OPENGL -framework GLUT
 
 .PHONY:clean

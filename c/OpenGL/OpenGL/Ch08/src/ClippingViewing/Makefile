@@ -1,8 +1,9 @@
 # makefile
 
-all:main
+linux:main.cpp
+	g++  -Wall  -o  main  main.cpp    -lglut  -lGL  -lGLU
 
-main:main.cpp
+macosx:main.cpp
 	g++ -g -Wall -o main main.cpp -framework OPENGL -framework GLUT
 
 

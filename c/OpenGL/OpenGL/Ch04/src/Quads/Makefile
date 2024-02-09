@@ -1,9 +1,10 @@
 # makefile
 
-all:mainQuads
 
-#gcc -g -Wall -o main main.c -framework OPENGL -framework GLUT
-mainQuads:mainQuads.c
+linux:mainQuads.c
+	gcc  -Wall  -o  mainQuads  mainQuads.c    -lglut  -lGL  -lGLU
+
+macosx:mainQuads.c
 	gcc -g -Wall -o mainQuads mainQuads.c -framework OPENGL -framework GLUT
 
 .PHONY:clean
