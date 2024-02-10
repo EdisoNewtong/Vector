@@ -727,7 +727,7 @@ static const luaL_Reg co_funcs[] = {
 static void auxopen (lua_State *L, const char *name,
                      lua_CFunction f, lua_CFunction u) {
   /* lua_pushcfunction(L, u); */
-  lua_pushcclosure(L, u, 0);
+  lua_pushcclosure(L, u, 0); // 0: 0 upvalues
   /* 1: 1 upvalue count is   `u` which has been pushed previously */
   lua_pushcclosure(L, f, 1);
   lua_setfield(L, -2, name);
@@ -783,11 +783,11 @@ static void base_open (lua_State *L) {
 extern int luaopen_base (lua_State *L) {
   base_open(L);
   /* LUA_COLIBNAME  "coroutine" */
-  luaL_register(L, LUA_COLIBNAME, co_funcs);
+  luaL_register(L, LUA_COLIBNAME, co_funcs); /* lauxlib.c:262  */
 
   // 2 means the result count of the   luaopen_base(...)
-  // #1st : base_open(L)       : push 1 result
-  // #2nd : luaL_register(...) : push 1 result
+  // #1st : base_open(L)       : push 1 result  ( push    `L->l_gt`   into  stack )
+  // #2nd : luaL_register(...) : push 1 result  
   //                     Total : 1+1 = 2
   return 2;
 }

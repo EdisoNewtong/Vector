@@ -36,6 +36,10 @@ extern void *lua_touserdata (lua_State *L, int idx) { ... }
 static TValue *index2adr (lua_State *L, int idx) { ... } // partially
 // Do garbage collection , only for the switch-case LUA_GCSTOP:
 extern int lua_gc (lua_State *L, int what, int data) { ... } // partially
+// push a new-created table         with 'narray' array element(s)    
+//                              &&       'nrec'   key-value pair(s)  into the stack 
+void lua_createtable (lua_State *L, int narray, int nrec)
+
 
 
 --------------------------------------------------

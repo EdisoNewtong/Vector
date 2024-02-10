@@ -42,7 +42,7 @@ Closure *luaF_newCclosure (lua_State *L, int nelems, Table *e) {
         typedef struct CClosure {
           ClosureHeader;
           lua_CFunction f;
-          TValue upvalue[1];  // occupy 1 Tvalue , so use exp : (nelems-1) * sizeof(TValue)    to turn out the exact size of CClosure
+          TValue upvalue[1];  // occupy 1 TValue , so use exp : (nelems-1) * sizeof(TValue)    to turn out the exact size of CClosure
         } CClosure;
 
 

@@ -279,6 +279,16 @@ extern void luaL_openlib (lua_State *L, const char *libname,
   if (libname) {
     int size = libsize(l);
     /* check whether lib already exists */
+	/* lauxlib.c:409
+		extern const char *luaL_findtable (lua_State *L, int idx,
+                                       const char *fname, int szhint) { ... }
+
+		search a key's name "_LOADED"  inside the table    (&(L->l_G)->l_registry)
+
+		Push a new empty table onto the stack :    {     }   ====>   (&(L->l_G)->l_registry)["_LOADED"]
+
+	*/
+
     luaL_findtable(L, LUA_REGISTRYINDEX, "_LOADED", 1);
     lua_getfield(L, -1, libname); /* get _LOADED[libname] */
     if ( !lua_istable(L, -1) ) { /* not found? */
@@ -295,6 +305,17 @@ extern void luaL_openlib (lua_State *L, const char *libname,
     lua_remove(L, -2); /* remove _LOADED table */
     lua_insert(L, -(nup+1)); /* move library table to below upvalues */
   }
+
+
+  /*
+	    ["coroutine"]["create"]   = &luaB_cocreate;
+	    ["coroutine"]["resume"]   = &luaB_coresume;
+	    ["coroutine"]["running"]  = &luaB_corunning;
+
+		         ....
+
+	    ["coroutine"]["yield"]  = &luaB_yield;
+  */
   for (; l->name; l++) {
     int i;
     for (i=0; i<nup; i++) { /* copy upvalues to the top */
@@ -401,22 +422,125 @@ extern const char *luaL_gsub (lua_State *L, const char *s, const char *p,
   return lua_tolstring(L, (-1), NULL);
 }
 
+/**********************************************************************************************************************************************
+We assume the `fname` argument's value is  "aaa.bbb.ccc"               |
+                                                                       |
+                                                                       |
+Before execute :                                                       |   After execute :
+                                                                       |                     
+                   |                      |                            |                                                           |                      |   <==    L->top
+                   |______________________|                            |                                                           |______________________|
+                   |                      |  <==    L->top             |    (&(L->l_G)->l_registry)["aaa"]["bbb"]["ccc"] -->       |   {               }  |   
+                   |______________________|                            |                                                           |______________________|
+                   |   A certain Value    |                            |                                                           |   A certain Value    |
+				   |______________________|                            |                                                           |______________________|
+				   |       ......         |                            |                                                           |       ......         |
+				                                                       |
 
+***********************************************************************************************************************************************/
 extern const char *luaL_findtable (lua_State *L, int idx,
                                        const char *fname, int szhint) {
   const char *e;
-  lua_pushvalue(L, idx);
+  lua_pushvalue(L, idx); // push the target table ( to be searched ) which is indicate by the given idx into the stack
   do {
+	/* 
+	    #include <string.h>
+
+	    char*  strchr(const char* str, int ch);
+
+	    在 str 这个字符串中，找出第1次 ch 出现的位置
+        ----------------------------------------------------------------------------------------------------
+        	如果找到了  :  则返回 ch 开头的子串
+        	如果没有找到:  返回 NULL
+        ----------------------------------------------------------------------------------------------------
+
+	*/
     e = strchr(fname, '.');
     if (e == NULL) {
+	  /* 
+		 e -->  the null-terminated char  '\0'   
+
+		 e.g. 
+
+		      "_LOADED"
+
+		 |_|L|O|A|D|E|D|\0|
+
+		                ^^
+						 e
+
+	  */
       e = fname + strlen(fname);
     }
+
+	/* e - fname = strlen(`substring`)   ==> The delta offset between the cursor of 'e' and the cursor of 'fname' */
     lua_pushlstring(L, fname, e - fname);
-    lua_rawget(L, -2);
+    lua_rawget(L, -2); /*  push  the value of table[fname] into stack ( if not existed , push `nil` ) and override the table[key]  into  `key`'s  #Slot  */
       /* lua_type(L, (-1)) == 0 */
     if ( lua_isnil(L, -1) ) { /* no such field? */
       /* lua_pop(L, 1); */
       lua_settop(L, -(1)-1); /* remove this nil */
+
+	  /* 
+			assume field is  "aaa.bbb.ccc"
+
+
+			//                                a new table created by function :  lua_createtable(...)
+			(&(L->l_G)->l_registry)["aaa"] = { }
+
+
+		 -----------------
+     -----  {        }     // lua_pushvalue(L,-2) which has the same address of  lua_createtable(...)
+	 |	 -----------------
+Same |        "aaa"        // lua_pushlstring(...)
+	 |	 -----------------
+	 |----> {         }    // lua_createtable
+		 -----------------
+			l_registry
+		 -----------------
+
+
+        After set :
+			    (&(L->l_G)->l_registry)["aaa"] = { }
+
+
+                       <----   L->top
+	 	 -----------------
+	       {         }    // lua_createtable
+		 -----------------
+			l_registry
+		 -----------------
+		       tmp
+		 -----------------
+
+
+
+
+
+
+
+	 	 -----------------
+	                    <----    L->top
+		 -----------------
+		   {         }	
+		 -----------------
+		       tmp
+		 -----------------
+
+
+
+
+		 
+		t1 = (&(L->l_G)->l_registry)["aaa"] = { }
+		t2 =                      t1["bbb"] = { }
+		t3 =                      t2["ccc"] = { }
+
+
+
+		t3    ===>     (&(L->l_G)->l_registry)["aaa"]["bbb"]["ccc"] =    { }
+
+
+	  */
 
       lua_createtable(L, 0, (*e == '.' ? 1 : szhint)); /* new table for field */
       lua_pushlstring(L, fname, e - fname);

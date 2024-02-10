@@ -670,14 +670,14 @@ extern void lua_pushcclosure (lua_State *L, lua_CFunction fn, int n) {
       Move L->top backward to   the upvalue <Beginning> index
 
       assign each upvalue to 
-        L->top + (n-1)          cl->c.upvalue[n-1]
-        L->top + (n-2)          cl->c.upvalue[n-2]
-        L->top + (n-3)          cl->c.upvalue[n-3]
+        L->top + (n-1)          ==>   cl->c.upvalue[n-1]
+        L->top + (n-2)          ==>   cl->c.upvalue[n-2]
+        L->top + (n-3)          ==>   cl->c.upvalue[n-3]
 
                  ...
 
-        L->top + (n- (n-1) )    cl->c.upvalue[1]
-        L->top + (n-n)          cl->c.upvalue[0]
+        L->top + (n- (n-1) )    ==>   cl->c.upvalue[1]
+        L->top + (n-n)          ==>   cl->c.upvalue[0]
   */
   L->top -= n;
   while (n--) {
@@ -693,14 +693,15 @@ extern void lua_pushcclosure (lua_State *L, lua_CFunction fn, int n) {
      Now << override >> the   upvalue[0]  <== the passed new   C closure
 
      We assume that n == 3          
-
 ----------------------------------------------------------------------------------------------------
-     Before invoke this function    |  After invoke this function
-                                    |
-                    upvalue-0       |   L->top  ==>   cl->c.f = fn;     // override this slot
-                    upvalue-1       |                 upvalue-1       
-                    upvalue-2       |                 upvalue-2       
-      L->top  ==>   ???             |   (L->top)      | ???          |  // previously pointer 
+     Before invoke this function                      |  After invoke this function
+ ( upvalue *fucntion* has been already pushed )       |
+      L->top  ==>                                     |
+                    upvalue-2                         |                                upvalue-2    ( cl->c.upvalue[2] = upvalue-2 )
+                    upvalue-1                         |                                upvalue-1    ( cl->c.upvalue[1] = upvalue-1 )  <==     the latest     L->top
+                    upvalue-0                         |  L->top => (L->top -= n; )     cl           ( cl->c.upvalue[0] = upvalue-0 )                                 ( cl->c.f = fn; )
+                                                      | 
+
 
   */
   /* { TValue *i_o=(L->top); i_o->value.gc=((GCObject *)((cl))); i_o->tt=LUA_TFUNCTION; ((void)0); }; */
@@ -774,7 +775,12 @@ extern void lua_getfield (lua_State *L, int idx, const char *k) {
   lua_unlock(L); /* ((void) 0); */
 }
 
+/*
+   push the  table  which is indicated by      ( idx )
+        raw get the key of the table ( talbe[key] ) which is indicated by    ( L->top - 1 )
 
+   And <Override> the result value at Slot  # ( L->top - 1 )
+*/
 extern void lua_rawget (lua_State *L, int idx) {
   StkId t;
   lua_lock(L); /* ((void) 0); */
