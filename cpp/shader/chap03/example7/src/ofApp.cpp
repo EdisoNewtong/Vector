@@ -29,7 +29,7 @@ void ofApp::setup(){
     quad.addIndices(indices, IDX_COUNT);
     
     // set shader script into shader program
-    shader.load("uv_passthrough.vert", "uv_vis.frag");
+    shader.load("uv_scrolling.vert", "uv_vis.frag");
 
     // openFrameworks 默认使用像索坐标而不是UV坐标的纹理类型，而我们希望使用更标准的纹理类型，因此需要禁用这部分功能
     ofDisableArbTex();
