@@ -1,12 +1,15 @@
 ======================================================================================================================================================
-In Ubantu like Linux :
+In Ubantu like Linux ( Tested Success on Mint Linux ) :
 ======================================================================================================================================================
     Enter the following command to install the development environment for OpenGL in the given ordering
     Then OpenGL development environment is well ready to work for you.
 
-// Package #1  "freeglut3-dev"     is a  *** Must ***
+-- Step by Step
+[1] 
+// Package #1  "freeglut3-dev"     is a  *** Must *** //  the dependencies list of freeglut3-dev contains    ( libgl1-mesa-dev && libglu1-mesa-dev ) , so Step2 is not necessary ( can be omitted )
 $ sudo apt-get install freeglut3-dev 
 
+[2] 
 // Package 2~3 is optional , it rely on the compiler's process result
 $ sudo apt-get install libgl1-mesa-dev
 $ sudo apt-get install libglu1-mesa-dev
