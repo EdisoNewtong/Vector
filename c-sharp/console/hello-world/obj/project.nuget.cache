@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "/U0MqF0gAhlIQG+9c715vUEWQOQsjymLfMhlWNucfop08smhtd3VcAHijGvnhsKEgeuGa4o4gtg+J903bZugmg==",
+  "success": true,
+  "projectFilePath": "/home/edison/work/gitrepo/myrepo/Vector/c-sharp/console/hello-world/hello-world.csproj",
+  "expectedPackageFiles": [
+    "/home/edison/.nuget/packages/microsoft.aspnetcore.app.ref/8.0.1/microsoft.aspnetcore.app.ref.8.0.1.nupkg.sha512"
+  ],
+  "logs": []
+}
