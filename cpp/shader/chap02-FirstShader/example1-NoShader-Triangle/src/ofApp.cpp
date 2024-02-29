@@ -2,9 +2,9 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-	m_triangle.addVertex( glm::vec3(0.0,      0.0, 0.0) );	    // vertex 0
-	m_triangle.addVertex( glm::vec3(0.0,    768.0, 0.0) );      // vertex 1
-	m_triangle.addVertex( glm::vec3(1024.0, 768.0, 0.0) );      // vertex 2
+	m_triangle.addVertex( glm::vec3(0.0,      0.0, 0.0) );	    // vertex 0 , left-top     corner
+	m_triangle.addVertex( glm::vec3(0.0,    768.0, 0.0) );      // vertex 1 , left-bottom  corner
+	m_triangle.addVertex( glm::vec3(1024.0, 768.0, 0.0) );      // vertex 2 , right-bottom corner
 }
 
 //--------------------------------------------------------------
