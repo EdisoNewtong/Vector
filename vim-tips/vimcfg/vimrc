@@ -60,19 +60,25 @@ set cinkeys-=0#
 set fileformat=unix
 set fileformats=unix,dos
 
-# Newly added
-# As we all know , As a convention that a text file will be endup with a '\n' in Unix like OS
-# So Vim will append a '\n' at the end of common text file .
-#
-####################################################################################################
-#
-# Do not append '\n' automatically while saving buffer to file
-#
-####################################################################################################
-autocmd BufWritePre *  {
-    set noeol
-    set binary
-}
+" Newly added
+" As we all know , As a convention that a text file will be endup with a '\n' in Unix like OS
+" So Vim will append a '\n' at the end of common text file .
+"
+"###################################################################################################
+"
+" Do not append '\n' automatically while saving buffer to file
+"
+"###################################################################################################
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" autocmd BufWritePre *  {
+"     set noeol
+"     set binary
+" }
+
+
+
+
 
 
 " or 
