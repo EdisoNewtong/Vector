@@ -13,7 +13,7 @@ person.o:personModule.cpp
 
 
 main.o:main.cpp
-	g++   $(cpp_module_flag)  -c -x c++-system-header  iostream string
+	g++   $(cpp_module_flag)  -c -x c++-system-header  iostream
 	g++   $(cpp_module_flag)  -c  -o  main.o  main.cpp
 
 
