@@ -11,14 +11,15 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
 
 bool prepareTriangleVertexData(unsigned int& rVAO, 
-                         unsigned int& rVBO, 
-                         unsigned int& rVertexShaderID, 
-                         unsigned int& rFragmentShaderID, 
-                         unsigned int& rShaderProgramID, 
-                         GLsizei LOG_BUFFER_SIZE,
-                         char* errorMsg);
+                               unsigned int& rVBO, 
+                               unsigned int& rEBO, 
+                               unsigned int& rVertexShaderID, 
+                               unsigned int& rFragmentShaderID, 
+                               unsigned int& rShaderProgramID, 
+                               GLsizei LOG_BUFFER_SIZE,
+                               char* errorMsg);
 
-void drawOneTriangle(unsigned int VAO_ID, unsigned int shaderProgramID);
+void drawOneTriangleByVertexIndices(unsigned int ebo_ID, unsigned int shaderProgramID);
 
 // settings
 const unsigned int SCR_WIDTH = 800;
@@ -63,12 +64,13 @@ int main()
     //
     unsigned int vao_id = 0;
     unsigned int vbo_id = 0;
+    unsigned int ebo_id = 0;
     unsigned int vertexShader_id = 0;
     unsigned int fragmentShader_id = 0;
     unsigned int shaderProgram_id = 0;
     const GLsizei LOG_SIZE = 512;
     char errorMsg[LOG_SIZE] = { 0 };
-    auto bIsPrepareOK = prepareTriangleVertexData(vao_id, vbo_id, vertexShader_id, fragmentShader_id, shaderProgram_id, LOG_SIZE, errorMsg );
+    auto bIsPrepareOK = prepareTriangleVertexData(vao_id, vbo_id, ebo_id, vertexShader_id, fragmentShader_id, shaderProgram_id, LOG_SIZE, errorMsg );
 
 
     // render loop
@@ -87,7 +89,7 @@ int main()
         // Actually Render Here
         //
         if ( bIsPrepareOK ) {
-            drawOneTriangle(vao_id, shaderProgram_id);
+            drawOneTriangleByVertexIndices(vao_id, shaderProgram_id);
         }
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
@@ -101,6 +103,7 @@ int main()
         // optional: de-allocate all resources once they've outlived their purpose:
         glDeleteVertexArrays(1, &vao_id);
         glDeleteBuffers(1, &vbo_id);
+        glDeleteBuffers(1, &ebo_id);
         glDeleteProgram( shaderProgram_id );
     }
 
@@ -132,6 +135,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 
 bool prepareTriangleVertexData(unsigned int& rVAO, 
                                unsigned int& rVBO, 
+                               unsigned int& rEBO, 
                                unsigned int& rVertexShaderID, 
                                unsigned int& rFragmentShaderID, 
                                unsigned int& rShaderProgramID, 
@@ -140,35 +144,32 @@ bool prepareTriangleVertexData(unsigned int& rVAO,
 {
     // 0. program side , indicate the vertex's NDC Position
     float vertices[] = {
-        -0.5f, -0.5f, 0.0f, // triangle's  left  vertex
-         0.5f, -0.5f, 0.0f, // triangle's  right vertex
-         0.0f,  0.5f, 0.0f  // triangle's  top   vertex
+        0.5f, 0.5f, 0.0f,   // 右上角
+        0.5f, -0.5f, 0.0f,  // 右下角
+        -0.5f, -0.5f, 0.0f, // 左下角
+        -0.5f, 0.5f, 0.0f   // 左上角
+    };
+
+    unsigned int indices[] = {
+        // 注意索引从0开始! 
+        // 此例的索引(0,1,2,3)就是顶点数组vertices的下标，
+        // 这样可以由下标代表顶点组合成矩形
+
+        0, 1, 3, // 第一个三角形
+        1, 2, 3  // 第二个三角形
     };
 
     //
     // 1. create a new VBO and copy the real vertex data which is given from Step 0    into VBO memory
     // 
     
-    /**************************************************************************************************
-     ** Error Code snippet **                         | ** Correct Code snippet **
-     -------------------------------------------------|----------------------------------------|
-            glGenVertexArrays(1, &rVAO);              |  glGenVertexArrays(1, &rVAO);  
-                                                      |
-            // bind VAO -> VAO  ( bind itself )       |  // now the current machine state belongs to VBO
-            glBindVertexArray(rVAO);                  |  glGenBuffers(1, &rVBO);
-                                                      |
-                                                      |  // bind previous VBO  --> VAO
-            glGenBuffers(1, &rVBO);                   |  glBindVertexArray(rVAO);
-                                                      |
-     ------------------------------------------------------------------------------------------|
-                                                      
-     **************************************************************************************************/
 
     // generate 1 Vertex Array  Object   and assign its return value to the varible VAO 
     glGenVertexArrays(1, &rVAO);
 
-    // generate 1 Vertex Buffer Object   and assign its return value to the varible VBO 
     glGenBuffers(1, &rVBO);
+    // generate 1 Vertex Buffer Object   and assign its return value to the varible VBO 
+    glGenBuffers(1, &rEBO);
 
     /*
     
@@ -181,8 +182,13 @@ bool prepareTriangleVertexData(unsigned int& rVAO,
     // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
     glBindVertexArray(rVAO);
 
+    // bind VBO and copy vertex positon info into array
     glBindBuffer(GL_ARRAY_BUFFER, rVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    // bind EBO and copy vertex indices info into element array
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, rEBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     //
     // 2. set vertex's property id and its pointer
@@ -293,14 +299,26 @@ bool prepareTriangleVertexData(unsigned int& rVAO,
 }
 
 
-void drawOneTriangle(unsigned int VAO_ID, unsigned int shaderProgramID)
+void drawOneTriangleByVertexIndices(unsigned int VAO_ID, unsigned int shaderProgramID)
 {
-
     glUseProgram(shaderProgramID);
 
-    glBindVertexArray(VAO_ID);
+    /*
     // We draw 1 triangle with 3 vertex 
     glDrawArrays(GL_TRIANGLES, 0, 3);
+    */
+
+    glBindVertexArray(VAO_ID);
+
+    // set wire-frame mode
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+    // [Default] mode filled with color
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+    //vertex index's data type is an **unsigned int**
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0 );
+    // glBindVertexArray(0);
 
 }
 
