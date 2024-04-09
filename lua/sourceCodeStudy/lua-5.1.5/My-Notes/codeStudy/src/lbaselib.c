@@ -744,10 +744,14 @@ static void base_open (lua_State *L) {
 
   /* open lib into global table */
   /*
+
       _G["assert"] = luaB_assert;
       _G["collectgarbage"] = luaB_collectgarbage;
       _G["dofile"] = luaB_dofile;
+
          ...
+
+      _G["xpcall"] = luaB_xpcall;
 
   */
   luaL_register(L, "_G", base_funcs);

@@ -59,7 +59,7 @@ LUA_API  lua_State *lua_newstate (lua_Alloc f, void *ud) { ... } // Done
 // base         ->    [1] / 45 * TValue
 ////////////////////////////////////////////////////
 // stack        ->    [0] / 45 * TValue
-// stacksize    =     45
+// stacksize    ->    45
 // top          ->    [0] / 45 * TValue ( top->tt = LUA_TNIL )
 //  top          ->   [1] / 45 * TValue // latest
 // stack_last   ->    [39]/ 45 * TValue
@@ -248,7 +248,7 @@ lfunc.h
 --------------------------------------------------
 linit.c   // All Done
 --------------------------------------------------
-// Open All Lua Library : such as lua build-in function    coroutine / debuga / io / math / os / package / string / table
+// Open All Lua Library : such as lua build-in function    coroutine / debug / io / math / os / package / string / table
 LUALIB_API void luaL_openlibs (lua_State *L) { ... }
 
 
