@@ -111,4 +111,79 @@ L->stack
                             ...
 
 
+--------------------------------------------------
+Date : 2024-04-19
+--------------------------------------------------
+
+
+Table Size   --  print("table's size = " .. #Table_Name )
+
+*********************************************
+
+*** How to calculate a given table's size ***
+
+*********************************************
+
+
+
+--[[
+
+/*
+** Try to find a boundary in table `t'. A `boundary' is an integer index
+** such that t[i] is non-nil and t[i+1] is nil (and 0 if t[1] is nil).
+*/
+int luaH_getn (Table *t) {
+  unsigned int j = t->sizearray;
+  if (j > 0 && ttisnil(&t->array[j - 1])) {
+    /* there is a boundary in the array part: (binary) search for it */
+    unsigned int i = 0;
+    while (j - i > 1) {
+      unsigned int m = (i+j)/2;
+      if (ttisnil(&t->array[m - 1])) j = m;
+      else i = m;
+    }
+    return i;
+  }
+  /* else must find a boundary in hash part */
+  else if (t->node == dummynode)  /* hash part is empty? */
+    return j;  /* that is easy... */
+  else return unbound_search(t, j);
+}
+
+
+
+
+
+    |------|-------------------------|--------------------------------------------------|-----------------|------------------------------------------------------------
+	|      |                         |                                                  |                 |
+    | Step |  (  j  +  i ) / 2       |          Comment                                 |  j - i > 1 ?    |
+	|      |                         |                                                  |                 |
+	|------|-------------------------|--------------------------------------------------------------------|------------------------------------------------------------
+	|   1  |  (  9  +  0 ) / 2 = 4   |     -- tb[4]   ( nil ) is     nil , set i <- 4   |  4 - 0 > 1 : T  |
+	|      |                         |                                                  |                 |
+	|   2  |  (  4  +  0 ) / 2 = 2   |     -- tb[2]   (  2  ) is not nil , set i <- 2   |  4 - 2 > 1 : T  |
+	|      |                         |                                                  |                 |
+	|   3  |  (  4  +  2 ) / 2 = 3   |     -- tb[3]   (  3  ) is     nil , set i <- 3   |  4 - 3 > 1 : F  |   return i <-- 3 ( #tb = 3 )
+	|      |                         |                                                  |                 |
+	-------|-------------------------|--------------------------------------------------|-----------------|------------------------------------------------------------
+
+--]]
+
+
+
+```lua
+local tb = { nil,2,3,nil,5,6,7,8,9 }
+print("0. #tb = " .. #tb);                        -- Output :   0. #tb = 9
+print("0. tb.maxn = " .. table.maxn(tb) .. "\n"); -- Output :   0. #tb.maxn = 9 ( It is !!! Correct !!! )
+
+tb[9] = nil                                       -- Set the last element as  **==nil==**
+
+print("1. #tb = " .. #tb)                         -- Output :    1. #tb = 3      ( Why #tb is 3 rather than 8 , Why ??? )
+print("1. tb.maxn = " .. table.maxn(tb) );        -- Output :    1. tb.maxn = 8  ( It is !!! Correct !!! )
+
+
+```
+
+
+
 
