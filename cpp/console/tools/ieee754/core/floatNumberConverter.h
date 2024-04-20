@@ -47,6 +47,8 @@ struct floatInfo
 
     string convertIntPart;
     string convertFloatPart;
+    string entireBinaryFloatNumber;  //  entireBinaryFloatNumber = (+/-)  + convertIntPart +  '.' + convertFloatPart
+
     list< pair<string,int> > floatPartCalcList;
 
     bool   isFloatPartCalcFinished;
@@ -54,11 +56,17 @@ struct floatInfo
     int    loopStartIdx;
     int    loopEndIdx;
 
+    int    ieee754Exponent;
+    int    presentExponent;
+    string strFractionPart;
+    string wellFormedBinaryHumanReadEqualtion;
+
+
     // int    power2;
     char   binaryAry[constPart::BINARY_ARRAY_SIZE];
 
-    uint32_t           cvtIntBinary;
-    unsigned long long cvtLLBinary;
+    uint32_t           cvtIntBinary; // int presentation of a float  number ( 32 bits ) 
+    unsigned long long cvtLLBinary;  // int presentation of a double number ( 64 bits ) 
 
     floatInfo();
     void reset();

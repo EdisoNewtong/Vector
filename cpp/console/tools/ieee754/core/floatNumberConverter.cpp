@@ -150,13 +150,19 @@ void floatInfo::reset()
     processedString = "";
     convertIntPart = "";
     convertFloatPart = "";
+    entireBinaryFloatNumber = "";
+
     floatPartCalcList.clear();
 
     isFloatPartCalcFinished = false;
     isFloatPartLoop = false;
     loopStartIdx = 0;
     loopEndIdx = 0;
-    // power2 = 0;
+
+    ieee754Exponent = 0;
+    presentExponent = 0;
+    strFractionPart = "";
+    wellFormedBinaryHumanReadEqualtion = "";
 
     cvtIntBinary = 0U;
     cvtLLBinary = 0UL;
@@ -690,6 +696,8 @@ bool FloatConverter::doConvert(string& errorMsg)
         positiveIntPart2Binary();
         // cout << "m_floatCvtInfo.convertIntPart = " << m_floatCvtInfo.convertIntPart << endl;
         floatPart2Binary();
+        m_floatCvtInfo.entireBinaryFloatNumber = m_floatCvtInfo.sign1.second + (m_floatCvtInfo.convertIntPart +  string(".") + m_floatCvtInfo.convertFloatPart);
+
         // cout << "m_floatCvtInfo.convertFloatPart = " << m_floatCvtInfo.convertFloatPart << endl;
 
         auto    allFractionBits = !m_floatCvtInfo.fFlag.second.empty() ? FLOAT_MAX_FRACTION_BIT : DOUBLE_MAX_FRACTION_BIT;
@@ -779,7 +787,7 @@ if the 24th bit is 1 , then increase to 23th
             0.2  * 2 = 0.4 | 0 <--
             0.4  * 2 = 0.8 | 0
             0.8  * 2 = 1.6 | 1
-            0.6  * 2 = 1.2 | 1 <--
+            0.6  * 2 = 1.2 | 1 <--     //  1.2 - 1.0 = 0.2   pass to next step as the input parameter
             0.2  * 2 = 0.4 | 0 <--
             0.4  * 2 = 0.8 | 0
             0.8  * 2 = 1.6 | 1
@@ -810,6 +818,9 @@ if the 24th bit is 1 , then increase to 23th
                     floatValidBitsString += ZERO_ASCII_CODE;
                 }
                 exponent = 0U;
+
+                // m_floatCvtInfo.ieee754Exponent = 0;
+                // m_floatCvtInfo.presentExponent = 0;
             } else {
                 // pos2 != string::npos
                 // 1. split all valid bits
@@ -817,6 +828,9 @@ if the 24th bit is 1 , then increase to 23th
                 // 2. split to size allFractionBits , trimmed other tail bits
                 floatValidBitsString = floatValidBitsString.substr(0,allFractionBits + 1);
                 exponent = (-1) * static_cast<int>(pos2+1) + exponent_bias;
+
+                // m_floatCvtInfo.ieee754Exponent = exponent;
+                // m_floatCvtInfo.presentExponent = (-1) * static_cast<int>(pos2+1);
 
                 if ( floatValidBitsString.back() == ZERO_ASCII_CODE ) {
                     floatValidBitsString = floatValidBitsString.substr(0,allFractionBits);
@@ -838,6 +852,9 @@ if the 24th bit is 1 , then increase to 23th
             // condition = 2
             int rest = static_cast<int>( allFractionBits - intValidBitsString.size() );
             exponent = static_cast<int>(intValidBitsString.size()) + exponent_bias;
+
+            // m_floatCvtInfo.ieee754Exponent = exponent;
+            // m_floatCvtInfo.presentExponent = static_cast<int>(intValidBitsString.size());
 
             if ( rest < 0 ) {
                 ssErrorStr << "int part is out of max fraction part length , len = " << intValidBitsString.size();
@@ -867,8 +884,29 @@ if the 24th bit is 1 , then increase to 23th
             }
         }
 
+        // ieee754Exponent = original + (127 or 1023)
+        m_floatCvtInfo.ieee754Exponent = exponent;
+
+        // original exp
+        if ( m_floatCvtInfo.ieee754Exponent == 0 ) {
+            m_floatCvtInfo.presentExponent = 0;
+        } else {
+            m_floatCvtInfo.presentExponent = (m_floatCvtInfo.ieee754Exponent - exponent_bias);
+        }
+                           
+
+
+
 
         fractionPartString = intValidBitsString + floatValidBitsString;
+        m_floatCvtInfo.strFractionPart = fractionPartString;
+
+        if ( m_floatCvtInfo.presentExponent == 0 ) {
+            // 0.0000
+            m_floatCvtInfo.wellFormedBinaryHumanReadEqualtion = m_floatCvtInfo.sign1.second + string("1 *   (0) *   (2 ^ 0)");
+        } else {
+            m_floatCvtInfo.wellFormedBinaryHumanReadEqualtion = m_floatCvtInfo.sign1.second + string("1 *   (1.") + fractionPartString + string(") *   (2 ^ ") + to_string(m_floatCvtInfo.presentExponent) + string(")");
+        }
         // cout << "fractionPartString = " << fractionPartString << endl;
 
         // fill all bits
@@ -969,6 +1007,50 @@ void  FloatConverter::printConvertDetail()
 		cout << "loopStartIdx = " << m_floatCvtInfo.loopStartIdx << endl;
 		cout << "loopEndIdx = " << m_floatCvtInfo.loopEndIdx << endl;
 	}
+
+
+    cout << "exp = " << std::dec      <<  m_floatCvtInfo.presentExponent      << endl;
+    cout << "bias exp = " << std::dec << m_floatCvtInfo.ieee754Exponent << endl;
+    cout << "presentation = " << m_floatCvtInfo.wellFormedBinaryHumanReadEqualtion << endl;
+
+    cout << "binary group display = ";
+    if ( !m_floatCvtInfo.fFlag.second.empty() ) {
+        // 3.14f ( has 'f' suffix )      32 bits
+        //          Float Number :   32 bits = 1 + 8 + 23
+        
+        // flag +/-
+        cout << m_floatCvtInfo.binaryAry[0] << " ";
+
+        // bias exponent
+        for ( auto i = 1; i <= 8; ++i ) {
+            cout << m_floatCvtInfo.binaryAry[i];
+        }
+        cout << " ";
+
+        // fraction part
+        for ( auto i = 9; i < 32; ++i ) {
+            cout << m_floatCvtInfo.binaryAry[i];
+        }
+    } else {
+        // 3.14   64 bits ( no 'f' suffix )
+        //          Double Number :   64 bits = 1 + 11 + 52
+        
+        // flag +/-
+        cout << m_floatCvtInfo.binaryAry[0] << " ";
+
+        // bias exponent
+        for ( auto i = 1; i <= 11; ++i ) {
+            cout << m_floatCvtInfo.binaryAry[i];
+        }
+        cout << " ";
+
+        // fraction part
+        for ( auto i = 9; i < 64; ++i ) {
+            cout << m_floatCvtInfo.binaryAry[i];
+        }
+    }
+    cout << endl;
+
 	cout << "============================================================" << endl;
 }
 

@@ -111,9 +111,7 @@ R"([ERROR] : invalid command-line format"
 
                     if ( G_NEED_PRINT_CONVERT_DETAIL ) {
                         cout << "[Detail] : " << endl;
-                        cout << "--------------------------------------------------" << endl;
                         cvt.printConvertDetail();
-                        cout << "--------------------------------------------------" << endl;
                     }
 
                 } else {
