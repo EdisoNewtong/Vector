@@ -5,6 +5,9 @@
 #include <cmath>
 #include <iomanip>
 
+#include <map>
+
+
 using namespace std;
 
 /*
@@ -24,6 +27,12 @@ Too Large :  10 ^ 10
 */
 
 
+typedef struct CmpResult
+{
+	int  arySz;
+	vector<int*> pAry;
+} CmpResult;
+
 
 int**  genSortTestCaseArray(unsigned long long arySz)
 {
@@ -31,6 +40,8 @@ int**  genSortTestCaseArray(unsigned long long arySz)
         cout << "arySz can't be  <= 1. " << endl;
         return nullptr;
     }
+
+	map<string, CmpResult*> cmpMap;
 
     // arySz >= 2
     unsigned long long genSize = static_cast<unsigned long long>( pow(arySz, arySz) );
@@ -51,13 +62,40 @@ int**  genSortTestCaseArray(unsigned long long arySz)
 
         // if ( i < arySz && j < arySz ) {
 
-        cout << setw(4) << setfill('0') << (genIdx+1) << ".   [ ";
+
+        // cout << setw(4) << setfill('0') << (genIdx+1) << ".   [ ";
+		string cmpTag;
         for ( unsigned long long idx = 0; idx < arySz; ++idx ) { 
             int num = idxAry[idx] + 1;
             allCollection[genIdx][idx] = num;
-            cout << num << ((idx!=arySz-1) ? ", " : " ");
+            // cout << num << ((idx!=arySz-1) ? ", " : " ");
+
+			if ( idx > 0 ) {
+				if ( allCollection[genIdx][idx-1]  <  allCollection[genIdx][idx] ) {
+					// <
+					cmpTag += "<";
+				} else if ( allCollection[genIdx][idx-1]  ==  allCollection[genIdx][idx] ) {
+					// = 
+					cmpTag += "=";
+				} else {
+					// >
+					cmpTag += ">";
+				}
+			}
         }
-        cout << " ] " << endl;
+
+        // cout << " ] " << endl;
+
+		if ( cmpMap.find( cmpTag ) == cmpMap.end() ) {
+			auto res = new CmpResult;
+			res->arySz = arySz;
+			res->pAry.push_back( allCollection[genIdx] );
+			cmpMap[cmpTag] = res;
+		} else {
+			cmpMap[cmpTag]->pAry.push_back( allCollection[genIdx] );
+		}
+
+
 
         // } else {
             //cout << "either i or j is out of range : i = " << i << ", j = " << j << endl;
@@ -86,6 +124,39 @@ int**  genSortTestCaseArray(unsigned long long arySz)
     // release tmp index array's memory
     delete [] idxAry; idxAry = nullptr;
 
+
+	int idx = 0;
+	for ( auto& [tag,obj] : cmpMap ) {
+		cout << (idx+1) << ". [ ";
+		for( auto& c :  tag ) {
+			cout << c << " ";
+		}
+		cout << "] : " << endl;
+
+		int cnt = 0;
+		for ( auto it = obj->pAry.begin(); it!= obj->pAry.end(); ++it, ++cnt ) {
+			cout << "\t " << (cnt+1) << ". [ ";
+			for( auto k = 0; k < obj->arySz; ++k ) {
+				cout << (*it)[k] << " ";
+			}
+			cout << " ]. " << endl;
+		}
+
+		cout << endl;
+		++idx;
+	}
+
+	for ( auto& [tag,obj] : cmpMap ) {
+		(void)tag;
+		if ( obj != nullptr ) {
+			delete obj;
+			obj = nullptr;
+		}
+	}
+
+	cmpMap.clear();
+
+
     return allCollection;
 }
 
@@ -107,5 +178,4 @@ int main(int argc, char* argv[])
 
     return 0;
 }
-
 
