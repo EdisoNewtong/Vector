@@ -119,7 +119,6 @@ int**  genSortTestCaseArray(unsigned long long arySz)
         ++genIdx;
     } while ( static_cast<unsigned long long>( idxAry[0] )  < arySz );
 
-    cout << "genIdx = " << genIdx << endl;
 
     // release tmp index array's memory
     delete [] idxAry; idxAry = nullptr;
@@ -134,17 +133,25 @@ int**  genSortTestCaseArray(unsigned long long arySz)
 		cout << "] : " << endl;
 
 		int cnt = 0;
-		for ( auto it = obj->pAry.begin(); it!= obj->pAry.end(); ++it, ++cnt ) {
+		for ( auto it = obj->pAry.begin(); it!= obj->pAry.end(); ++it, ++cnt  ) {
 			cout << "\t " << (cnt+1) << ". [ ";
 			for( auto k = 0; k < obj->arySz; ++k ) {
 				cout << (*it)[k] << " ";
 			}
 			cout << " ]. " << endl;
+
+            if ( cnt >= 9 ) {
+                cout << "\t Omit the rest , only print 10 arrays ... " << endl;
+                break;
+            }
 		}
 
 		cout << endl;
 		++idx;
 	}
+
+    cout << "Generate count = pow( " << arySz << ", " << arySz << " ) = " << genIdx << endl;
+    cout << "Totally : " << idx << " kinds of comparison possibilities. " << endl;
 
 	for ( auto& [tag,obj] : cmpMap ) {
 		(void)tag;
@@ -155,7 +162,6 @@ int**  genSortTestCaseArray(unsigned long long arySz)
 	}
 
 	cmpMap.clear();
-
 
     return allCollection;
 }
