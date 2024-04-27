@@ -4,7 +4,7 @@
 #include <vector>
 #include <cmath>
 #include <iomanip>
-
+#include <list>
 #include <map>
 
 
@@ -34,47 +34,39 @@ typedef struct CmpResult
 } CmpResult;
 
 
-int**  genSortTestCaseArray(unsigned long long arySz)
+bool  genSortTestCaseArray(unsigned long long arySz, list<int*>& result)
 {
     if (  arySz <= 1 ) {
         cout << "arySz can't be  <= 1. " << endl;
-        return nullptr;
+        return false;
     }
 
 	map<string, CmpResult*> cmpMap;
 
     // arySz >= 2
+	result.clear();
     unsigned long long genSize = static_cast<unsigned long long>( pow(arySz, arySz) );
+	int* generatedAry = new int[arySz];
 
-    int** allCollection = new int*[genSize];
-    for( unsigned long long i = 0; i < genSize; ++i ) {
-        allCollection[i] = new int[arySz];
-    }
 
     int* idxAry = new int[arySz];
     for ( unsigned long long i = 0 ; i < arySz; ++i ) { idxAry[i] = 0; }
 
     unsigned long long genIdx = 0;
-    // unsigned long long rangeCnt = static_cast<unsigned long long>( pow(arySz, arySz-1) );
     do {
-        // unsigned long long i = static_cast<int>( genIdx / rangeCnt );
-        // unsigned long long j = static_cast<int>( genIdx % rangeCnt );
-
-        // if ( i < arySz && j < arySz ) {
-
 
         // cout << setw(4) << setfill('0') << (genIdx+1) << ".   [ ";
 		string cmpTag;
         for ( unsigned long long idx = 0; idx < arySz; ++idx ) { 
             int num = idxAry[idx] + 1;
-            allCollection[genIdx][idx] = num;
+            generatedAry[idx] = num;
             // cout << num << ((idx!=arySz-1) ? ", " : " ");
 
 			if ( idx > 0 ) {
-				if ( allCollection[genIdx][idx-1]  <  allCollection[genIdx][idx] ) {
+				if ( generatedAry[idx-1]  <  generatedAry[idx] ) {
 					// <
 					cmpTag += "<";
-				} else if ( allCollection[genIdx][idx-1]  ==  allCollection[genIdx][idx] ) {
+				} else if ( generatedAry[idx-1]  ==  generatedAry[idx] ) {
 					// = 
 					cmpTag += "=";
 				} else {
@@ -87,14 +79,28 @@ int**  genSortTestCaseArray(unsigned long long arySz)
         // cout << " ] " << endl;
 
 		if ( cmpMap.find( cmpTag ) == cmpMap.end() ) {
+			// create a new
 			auto res = new CmpResult;
 			res->arySz = arySz;
-			res->pAry.push_back( allCollection[genIdx] );
+			res->pAry.push_back( generatedAry );
 			cmpMap[cmpTag] = res;
-		} else {
-			cmpMap[cmpTag]->pAry.push_back( allCollection[genIdx] );
-		}
+			result.push_back( generatedAry );
 
+			int iddx = 0;
+			cout << " [ ";
+			for( iddx = 0; iddx < static_cast<int>(cmpTag.size()); ++iddx ) {
+				cout << cmpTag[iddx] << (iddx < static_cast<int>(cmpTag.size()-1) ? ", " : "");
+			}
+			cout << " ] : ";
+
+			cout << " [ ";
+			for( iddx = 0; iddx < static_cast<int>(arySz); ++iddx ) {
+				cout << generatedAry[iddx] << (iddx < static_cast<int>(arySz-1) ? ", " : "");
+			}
+			cout << " ]. " << endl;
+		} else {
+			
+		}
 
 
         // } else {
@@ -122,8 +128,9 @@ int**  genSortTestCaseArray(unsigned long long arySz)
 
     // release tmp index array's memory
     delete [] idxAry; idxAry = nullptr;
+    delete [] generatedAry; generatedAry = nullptr;
 
-
+	/*
 	int idx = 0;
 	for ( auto& [tag,obj] : cmpMap ) {
 		cout << (idx+1) << ". [ ";
@@ -149,9 +156,10 @@ int**  genSortTestCaseArray(unsigned long long arySz)
 		cout << endl;
 		++idx;
 	}
+	*/
 
-    cout << "Generate count = pow( " << arySz << ", " << arySz << " ) = " << genIdx << endl;
-    cout << "Totally : " << idx << " kinds of comparison possibilities. " << endl;
+    cout << "Generate count = pow( " << arySz << ", " << arySz << " ) = " << genSize << endl;
+    cout << "Totally : " << cmpMap.size() << " kinds of comparison possibilities. " << endl;
 
 	for ( auto& [tag,obj] : cmpMap ) {
 		(void)tag;
@@ -163,25 +171,31 @@ int**  genSortTestCaseArray(unsigned long long arySz)
 
 	cmpMap.clear();
 
-    return allCollection;
+    return true;
 }
 
 
 int main(int argc, char* argv[])
 {
     unsigned long long sz = stoul( string(argv[1]) );
-    auto ppArray = genSortTestCaseArray(sz);
+	list<int*> resList;
+    auto bret = genSortTestCaseArray(sz, resList);
+	cout << "bret = " << (bret ? " true" : " false") << endl;
 
-    if ( ppArray != nullptr ) {
+
+	/*
+    if ( ppArray ) {
+		/ *
         for( unsigned long long i = 0; i < sz; ++i ) {
             delete [] ppArray[i]; ppArray[i] = nullptr;
         }
+		* /
 
         delete [] ppArray;
         ppArray = nullptr;
     }
+	*/
 
 
     return 0;
 }
-

@@ -1,0 +1,6 @@
+ [ = ] :  [ 1, 1 ]. 
+ [ < ] :  [ 1, 2 ]. 
+ [ > ] :  [ 2, 1 ]. 
+Generate count = pow( 2, 2 ) = 4
+Totally : 3 kinds of comparison possibilities. 
+bret =  true
