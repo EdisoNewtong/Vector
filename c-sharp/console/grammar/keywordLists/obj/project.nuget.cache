@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "ouYbT34vnyf5PMhoeGNOYuMOqSjTY9ScVHefxTwBsHjaTGicMb0SABaG1VTeTElPZPL3ekukUT8RrATLzmYDtA==",
+  "success": true,
+  "projectFilePath": "/home/edison/work/gitrepo/myrepo/Vector/c-sharp/console/grammar/keywordLists/keywordLists.csproj",
+  "expectedPackageFiles": [
+    "/home/edison/.nuget/packages/microsoft.aspnetcore.app.ref/8.0.4/microsoft.aspnetcore.app.ref.8.0.4.nupkg.sha512"
+  ],
+  "logs": []
+}
