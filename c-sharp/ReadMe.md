@@ -54,6 +54,10 @@ namespace MyApp {
 // cde to the directory :  console/hello-world
 ```bash
 $ dotnet build
+$ dotnet build -c Debug    #  Default : build debug mode binary code
+$ dotnet build -c Release    #  Default : build debug mode binary code
+
+$ dotnet build --configuration Release
 ```
 
 
@@ -61,7 +65,12 @@ $ dotnet build
 // if no error occurs, then run the program 
 //   Otherwise fix the compiling error 
 ```bash
-$ dotnet run
+$ dotnet run [ arg1 arg2 arg3 arg4 ... ]
+
+
+$ dotnet run --configuration Release
+$ dotnet run -c Debug    #  Default run
+$ dotnet run -c Release
 ```
 
 or 
