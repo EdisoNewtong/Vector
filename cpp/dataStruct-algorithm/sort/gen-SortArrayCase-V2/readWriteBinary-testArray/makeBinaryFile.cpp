@@ -7,35 +7,40 @@ using namespace std;
 
 /******************************************************************************************************
  
-  2 ~ 10,  max element is 10 ( 0xA -> 0b1010 ) , only contain 4 bits in all
-so 2 elements can be merged into 1 byte
+  Number  range at [ 2 , 10],  the  Max value of all elements is 10 ( 0xA -> 0b1010 ) , only contain 4 bits in all
+so every 2 elements can be combined into 1 byte
 
-if the array's size is odd number such as 3 , the array will be like [1,2,3]
+If the array's size is an odd number such as 3 , the array will be like [1, 2, 3]
 
-encoding in detail will be like the following : 
+encoding in detail will be like as the following with  2 bytes : 
         [1, 2,   3]
-        00010010 0011???? 
+        00010010 0011????  ( we assume that   ????  as 0000
 
-    the total bytes equaltion will be like :  ( array_size / 2 ) + (array_size % 2 == 0 : 0 : 1)
+# 1st		0x12 :  array[0]
+# 2nd		0x30 :  array[1]
+
+
+    The Total bytes equaltion will be like :  ( array_size / 2 ) + (array_size % 2 == 0 : 0 : 1)
 
 the possibility equaltion : pow(3, (array_size-1) )
 
     array with 2 elements : 3 possiblilities [ < , = , > ]
         3 * (2 * 4 bytes) in all
 
-the binary file format is like the following :
+the Binary file format is like the following :
 
 ----------------------------------------------------------------------------------------------------
          1 byte
-2 :   | array-size | array#1 | array#2 | ... | array#possibility-count
-3 :   | array-size | array#1 | array#2 | ... | array#possibility-count
-4 :   | array-size | array#1 | array#2 | ... | array#possibility-count
+2 :   | array-size | array#1 | array#2 | ... | array#N
+3 :   | array-size | array#1 | array#2 | ... | array#N
+4 :   | array-size | array#1 | array#2 | ... | array#N
 
                  ...
                  ...
                  ...
 
-10 :  | array-size | array#1 | array#2 | ... | array#possibility-count
+
+10 :  | array-size | array#1 | array#2 | ... | array#N
 
 ----------------------------------------------------------------------------------------------------
 
@@ -289,5 +294,4 @@ int main(int argc, char* argv[], char* env[])
 
     return 0;
 }
-
 
