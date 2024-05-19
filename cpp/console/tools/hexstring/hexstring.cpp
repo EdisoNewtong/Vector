@@ -25,6 +25,8 @@ int main(int argc,char* argv[], char* env[])
 
     // argc >= 2
     string arg1( argv[1] );
+	char* fileBufArray = nullptr; 
+
     if ( arg1 == fixedarg1 ) {
         if ( argc != 4 ) {
             printUsgae();
@@ -66,16 +68,71 @@ int main(int argc,char* argv[], char* env[])
         size_t filelen = static_cast<int>( inputfile.tellg() );
         inputfile.seekg(0, ios::beg);
 
-        outputfile << "\"";
         if ( filelen > 0 ) {
-            for ( size_t idx = 0; idx < filelen; ++idx ) {
-                char ch = 0;
-                inputfile.read(&ch, sizeof(ch) );
-                // cout << std::dec << idx << ". 0x" << std::hex << static_cast<int>(ch & 0xFFU) << endl;
-                outputfile << "\\x" << std::hex << setw(2) << setfill('0') << std::uppercase << static_cast<int>(ch & 0xFFU);
+			fileBufArray = new char[filelen];
+			if ( fileBufArray == nullptr ) {
+				inputfile.close();
+				outputfile.flush();
+				outputfile.close();
+				cout << "[ERROR] Can't read file content into file-Buffer." << endl;
+				return -1;
+			} else {
+				outputfile << "\"";
+			}
+
+			inputfile.read(fileBufArray, filelen);
+            inputfile.close();
+
+            auto lastIsEOLFlag = false;
+            for ( size_t idx = 0; idx < filelen; ) {
+                char ch = fileBufArray[idx];
+
+				if ( ch == '\r' ) {
+					size_t nextIdx = idx + 1;
+					if ( nextIdx  < filelen ) {
+						if ( fileBufArray[nextIdx] == '\n' ) {
+							// \r \n
+                            outputfile << "\"\n";
+                            if ( (nextIdx+1) < filelen ) {
+                                cout << "\"";
+                            } else {
+                                lastIsEOLFlag = true;
+                            }
+                            idx += 2;
+						} else {
+							// \r a
+                            outputfile << "\"\n\"";
+                            ++idx;
+						}
+					} else {
+						// \r is the last character
+                        // do nothing
+                        outputfile << "\"\n";
+                        lastIsEOLFlag = true;
+
+                        ++idx;
+					}
+				} else if ( ch == '\n' ) {
+                    outputfile << "\"\n";
+                    if ( (idx+1) < filelen ) {
+                        outputfile << "\"";
+                    } else {
+                        lastIsEOLFlag = true;
+                    }
+
+                    ++idx;
+				} else {
+					outputfile << "\\x" << std::hex << setw(2) << setfill('0') << std::uppercase << static_cast<int>(ch & 0xFFU);
+
+                    ++idx;
+				}
+            }
+
+            if ( !lastIsEOLFlag ) {
+                outputfile << "\"";
             }
         }
-        outputfile << "\"";
+
 
         outputfile.flush();
         outputfile.close();
@@ -97,22 +154,78 @@ int main(int argc,char* argv[], char* env[])
 
         ///////////////////////////////////////////////////////////////////////////
         // Begin
-        cout << "\"";
-
         if ( filelen > 0 ) {
-            for ( size_t idx = 0; idx < filelen; ++idx ) {
-                char ch = 0;
-                inputfile.read(&ch, sizeof(ch) );
-                // cout << std::dec << idx << ". 0x" << std::hex << static_cast<int>(ch & 0xFFU) << endl;
-                cout << "\\x" << std::hex << setw(2) << setfill('0') << std::uppercase << static_cast<int>(ch & 0xFFU);
+			fileBufArray = new char[filelen];
+			if ( fileBufArray == nullptr ) {
+				inputfile.close();
+				cout << "[ERROR] Can't read file content into file-Buffer." << endl;
+				return -1;
+			} else {
+				cout << "\"";
+			}
+
+			inputfile.read(fileBufArray, filelen);
+			inputfile.close();
+
+            auto lastIsEOLFlag = false;
+            for ( size_t idx = 0; idx < filelen; ) {
+                char ch = fileBufArray[idx];
+
+				if ( ch == '\r' ) {
+					size_t nextIdx = idx + 1;
+					if ( nextIdx  < filelen ) {
+						if ( fileBufArray[nextIdx] == '\n' ) {
+							// \r \n
+                            cout << "\"\n";
+                            if ( (nextIdx+1) < filelen ) {
+                                cout << "\"";
+                            } else {
+                                lastIsEOLFlag = true;
+                            }
+                            idx += 2;
+						} else {
+							// \r a
+                            cout << "\"\n\"";
+                            ++idx;
+						}
+					} else {
+						// \r is the last character
+                        // do nothing
+                        cout << "\"\n";
+                        lastIsEOLFlag = true;
+
+                        ++idx;
+					}
+				} else if ( ch == '\n' ) {
+                    cout << "\"\n";
+                    if ( (idx+1) < filelen ) {
+                        cout << "\"";
+                    } else {
+                        lastIsEOLFlag = true;
+                    }
+
+                    ++idx;
+				} else {
+					cout << "\\x" << std::hex << setw(2) << setfill('0') << std::uppercase << static_cast<int>(ch & 0xFFU);
+
+                    ++idx;
+				}
+            }
+
+            if ( !lastIsEOLFlag  ) {
+                cout << "\"";
             }
         }
 
-        cout << "\""; 
-        cout << endl;
         // End
         ///////////////////////////////////////////////////////////////////////////
     }
+
+
+	if ( fileBufArray != nullptr ) {
+		delete [] fileBufArray;
+		fileBufArray = nullptr;
+	}
 
     return 0;
 }
