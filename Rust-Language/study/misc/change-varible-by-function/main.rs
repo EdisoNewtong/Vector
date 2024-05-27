@@ -41,8 +41,8 @@ fn main() {
 	// Change Referenced Type
 	//
 	let mut s : String = String::from("Hello");
-	println!("0.   s = \"{}\"", s);
-	println!("0x2  s = \"{}\"", s);
+	println!("0.  s = \"{}\"", s);
+	println!("2.  s = \"{}\"", s);
 	unchange_string(&s);
 	change_string(&mut s);
 
