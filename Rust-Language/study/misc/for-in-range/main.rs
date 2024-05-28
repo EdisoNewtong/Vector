@@ -49,13 +49,20 @@ fn main()
         println!("{:>2}. [{}].  {} ",i+1, i, ary[i]);
     }
 
+    //
+    // the function step_by(...) doesn't accept negative step such as (-2)
+    //
     println!();
-    println!("Backward traversal -> step (-2) ... ");
-    // You must use step_by(2) before  rev() due to the function step_by(...) doesn't accept  negative step such as (-2) 
+    println!("Backward traversal -> step (-2)  use `step_by(2).rev()` ... ");
     for i in (0..11).step_by(2).rev() {
         println!("{:>2}. [{}].  {} ", i+1, i, ary[i]);
     }
 
+    println!();
+    println!("Backward traversal -> step (-2) use `rev().step_by(2)`... ");
+    for i in (0..11).rev().step_by(2) {
+        println!("{:>2}. [{}].  {} ", i+1, i, ary[i]);
+    }
 
 }
 
