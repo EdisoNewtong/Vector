@@ -47,6 +47,18 @@ fn my_func_with_conditional_return(a: i32, b: i32) -> i32
 
 
 
+fn fn_a() -> i32 { println!("In fn_a() "); 10 }
+fn fn_b() -> i32 { println!("In fn_b() "); 20 } 
+fn fn_c() -> i32 { println!("In fn_c() "); 30 }
+
+fn test(a: i32,b: i32, c:i32){ 
+    println!("a = {a}"); 
+    println!("b = {b}"); 
+    println!("c = {c}"); 
+}
+
+
+
 fn main()
 {
 	let mut x = 3;
@@ -58,4 +70,22 @@ fn main()
 
 	x = 15;
 	println!("3. {} - {} = {}", x,y, my_func_with_conditional_return(x,y) );
+
+    println!();
+    //--------------------------------------------------
+    // the ***[Correct]*** Rust language Evaluate order is   Pascal Call-Convension
+    //
+    //     1st : fn_a()
+    //     2nd : fn_b()
+    //     3rd : fn_c()
+    //--------------------------------------------------
+    //       rather than  Std-Call
+    //
+    //  1st : fn_c()
+    //  2nd : fn_b()
+    //  3rd : fn_a()
+    test( fn_a(), fn_b(), fn_c() );
+
 }
+
+
