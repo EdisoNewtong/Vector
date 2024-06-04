@@ -1,4 +1,102 @@
 
+fn test_turple()
+{
+	// Compile deduce the tup1's type is (i32, f64, u8)
+	let tup1                  = (500, 6.4, 1);
+	let tup2 : (i32, f64, u8) = (500, 6.4, 1);
+	println!("tup1.0 = {}", tup1.0);
+	println!("tup2.1 = {}", tup2.1);
+
+	//
+	// Struct unbind to each varible e1, e2, e3
+	//
+	// e1 is a type if i32
+	// e2 is a type if f64
+	// e3 is a type if u8
+	let (e1, e2, e3) = tup1;
+	println!("e1 = {e1}, e2 = {e2}, e3 = {e3}");
+
+
+
+	let v1 = tup1.0;
+	let v2 = tup1.1;
+	let v3 = tup1.2;
+	println!("v1 = {v1}, v2 = {v2}, v3 = {v3}");
+
+
+}
+
+fn test_array()
+{
+	// the array's dataType is a [i32;10] 
+	// an array with 10 elements and each of the element is the i32 dataType
+	/* 
+	Different from C language :
+
+           C use {          ...         }
+        Rust use [          ...         ]
+
+	int a1[]   = { 1,2,3,4,5,6,7,8,9,10 };                            */
+	let a1     = [ 1,2,3,4,5,6,7,8,9,10 ];
+	let mut idx;
+	idx = 0;
+	for ele in a1.iter() {
+		println!("[{idx}].  {ele}");
+		idx = idx + 1;
+	}
+
+	println!();
+    println!("a1[5] = {}", a1[5]);
+	println!();
+
+
+	// use explicit data type annotation
+	let a2: [i32;10] = [ 1,2,3,4,5,6,7,8,9,10 ];
+	idx = 0;
+	for ele in a2.iter() {
+		println!("[{idx}].  {ele}");
+		idx = idx + 1;
+	}
+
+	println!();
+    println!("a2[5] = {}", a2[5]);
+
+
+	// a3 is a kind of [i32;5] array that contain 5 elements and each element is assignment to value 3 =>   [ 3, 3, 3, 3, 3 ]
+	let a3 = [3;5];
+	idx = 0;
+	for ele in a3.iter() {
+		println!("[{idx}].  {ele}");
+		idx = idx + 1;
+	}
+
+	println!();
+    println!("a3[2] = {}", a3[2]);
+
+
+	// a4 is a kind of [f32;5] array that contain 5 elements and each element is assignment to value 3.14 as float
+	/*	=>   
+
+		[ 
+		  3.14 as f32,  
+		  3.14 as f32, 
+		  3.14 as f32, 
+		  3.14 as f32, 
+		  3.14 as f32 
+		]
+	*/
+	let a4 = [3.14 as f32;5];
+	idx = 0;
+	for ele in a4.iter() {
+		println!("[{idx}].  {ele}");
+		idx = idx + 1;
+	}
+
+	println!();
+    println!("a4[2] = {}", a4[2]);
+
+}
+
 
 fn test_int()
 {
@@ -21,9 +119,12 @@ fn test_int()
     let i_num_5: i32 = 0xFF;
     let i_num_6: i32 = 0b1000; // 0b1000 (in binary represent) = 8(10)
     
+	// '0'   : first  is number 
+	//  'o'  : second is alphabet letter ( small case )
+	//
     // 0o is a must prefix for an octal number represent
     /***************************************************
-       different to The C languaage
+       different to The C language
 
     int i_num_7      =   010                             ****************************************************/
     let i_num_7: i32 = 0o10;    // 0o10 (in octal represent) = 8(10)
@@ -113,5 +214,13 @@ fn main()
     println!();
 
     test_string();
+    println!();
+
+    test_array();
+    println!();
+
+    test_turple();
+    println!();
 
 }
+
