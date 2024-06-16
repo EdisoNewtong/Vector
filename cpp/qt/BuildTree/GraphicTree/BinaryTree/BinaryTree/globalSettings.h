@@ -16,7 +16,7 @@ namespace GlobalSetting
 	extern const QString RIGHT_TAG;
 	extern const QString TEXT_TAG;
 
-    extern const QString GLOBAL_SETTINGS_TAG;
+	extern const QString GLOBAL_SETTINGS_TAG;
 	 extern const QString SCENE_BG_TAG;
 	 extern const QString RADIUS;
 	 extern const QString LR_GAP1;

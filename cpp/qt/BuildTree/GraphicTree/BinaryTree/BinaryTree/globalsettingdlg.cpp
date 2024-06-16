@@ -2,10 +2,12 @@
 #include "ui_globalsettingdlg.h"
 
 #include "globalSettings.h"
+#include "globalSettingsLoadSave.h"
 
 #include <QColorDialog>
 #include <QFontDialog>
 #include <QMessageBox>
+#include <QFileDialog>
 
 
 GlobalSettingDlg::GlobalSettingDlg(QWidget *parent /* = nullptr */) :
@@ -216,6 +218,7 @@ background-repeat : no-repeat; )"  );
 	ui->lineEdit_8->setText( QString("%1").arg(m_bottomMargin) );
 
 }
+
 void GlobalSettingDlg::on_GlobalSettingDlg_finished(int result)
 {
 	if ( result == QDialog::Accepted ) {
@@ -364,3 +367,61 @@ bool GlobalSettingDlg::updateValueFromEditor(QLineEdit* lineEdit, int tag, QStri
 
 
 }
+
+void GlobalSettingDlg::on_loadBtn_clicked()
+{
+	auto loadFileName = QFileDialog::getOpenFileName(this,"Load Global Setting Config  ");
+    if ( loadFileName.trimmed().isEmpty() ) {
+        return;
+    }
+
+    QString errorMsg;
+    auto ret = GSettingLoadSave::loadFromConfigFile(loadFileName, &errorMsg);
+    if ( !ret ) {
+        QMessageBox::critical(this, QStringLiteral("Load Global Render Setting Error"), errorMsg);
+        return;
+    }
+
+    QMessageBox::information(this, QStringLiteral("Load Status"), QStringLiteral("TreeRender Config Load Successfully") );
+
+	// update UI
+	m_sceneBg = GlobalSetting::scene_bg;
+	
+	m_circleBrush = GlobalSetting::circle_brush;
+	m_circlePen = GlobalSetting::circle_outline;
+	m_textFont = GlobalSetting::text_font;
+	m_textColor = GlobalSetting::text_color;
+	m_connectionLine = GlobalSetting::connection_line;
+	
+	m_circleRadius = GlobalSetting::circle_radius;
+	m_gap1 = GlobalSetting::distance_between_leftright;
+	m_gap2 = GlobalSetting::distance_between_right__left;
+	m_disHeight = GlobalSetting::height_between_parent_and_children;
+	
+	m_leftMargin = GlobalSetting::left_margin;
+	m_rightMargin = GlobalSetting::right_margin;
+	m_topMargin = GlobalSetting::top_margin;
+	m_bottomMargin = GlobalSetting::bottom_margin;
+
+	updateUI();
+}
+
+void GlobalSettingDlg::on_saveBtn_clicked()
+{
+    // bool GSettingLoadSave::saveToConfigFile(const QString& cfgFileName, QString* pErrorStr)
+    auto savedfile = QFileDialog::getSaveFileName(this,"Save TreeRender Config" ,QString(), tr("XML files (*.xml)"));
+    if ( savedfile.trimmed().isEmpty() ) {
+        return;
+    }
+
+    QString errorMsg;
+    auto ret = GSettingLoadSave::saveToConfigFile(savedfile, &errorMsg);
+    if ( !ret ) {
+        QMessageBox::critical(this, QStringLiteral("Saving Error"), errorMsg);
+        return;
+    } 
+        
+    QMessageBox::information(this, QStringLiteral("Saving Status"), QStringLiteral("TreeRender Config File Saved") );
+}
+
+

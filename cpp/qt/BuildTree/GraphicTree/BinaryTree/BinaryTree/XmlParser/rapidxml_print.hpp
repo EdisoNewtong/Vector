@@ -45,12 +45,16 @@ namespace rapidxml
 
         ==================================================
     */
+
+
+
+
     // Added by Edison , you can use <Space> instead of Tab
-    /*const*/ int   print_use_space_count = 4; // none default
-    /*const*/ bool  print_use_space_instead = false;
+    /*const*/static int   print_use_space_count = 4; // none default
+    /*const*/static bool  print_use_space_instead = false;
 
     // Added by Edison
-    void set_use_space_instead(bool b_flag, int space_cnt)
+    static void set_use_space_instead(bool b_flag, int space_cnt)
     {
         print_use_space_instead = b_flag;
         if ( b_flag ) {

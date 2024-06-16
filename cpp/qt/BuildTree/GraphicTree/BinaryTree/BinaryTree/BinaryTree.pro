@@ -31,14 +31,15 @@ SOURCES += \
         binarytreeview.cpp \
         mysettingbtndelegate.cpp \
         globalSettings.cpp \
+        globalSettingsLoadSave.cpp \
         nodestylesettingdlg.cpp \
         nodestylecfg.cpp \
         binarytreemodel.cpp \
-		treenode.cpp \
-		mygraphicscircleitem.cpp \
-		mygraphicsrectitem.cpp \
-		mygraphicsview.cpp \
-		mytextanimationitem.cpp
+        treenode.cpp \
+        mygraphicscircleitem.cpp \
+        mygraphicsrectitem.cpp \
+        mygraphicsview.cpp \
+        mytextanimationitem.cpp
 
 HEADERS += \
     globalsettingdlg.h \
@@ -49,11 +50,12 @@ HEADERS += \
         nodestylesettingdlg.h \
         nodestylecfg.h \
         binarytreemodel.h \
-		treenode.h \
-		mygraphicscircleitem.h \
-		mygraphicsrectitem.h \
-		mygraphicsview.h \
-		mytextanimationitem.h \
+        treenode.h \
+        mygraphicscircleitem.h \
+        mygraphicsrectitem.h \
+        mygraphicsview.h \
+        mytextanimationitem.h \
+        globalSettingsLoadSave.h \
         XmlParser/rapidxml.hpp \
         XmlParser/rapidxml_iterators.hpp \
         XmlParser/rapidxml_print.hpp \

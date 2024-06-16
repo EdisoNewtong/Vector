@@ -40,6 +40,10 @@ private slots:
 
     void on_GlobalSettingDlg_finished(int result);
 
+    void on_loadBtn_clicked();
+
+    void on_saveBtn_clicked();
+
 private:
     Ui::GlobalSettingDlg *ui;
 

@@ -50,7 +50,7 @@ MainWindow::MainWindow(QWidget *parent)
 	m_pScene->setBackgroundBrush( GlobalSetting::scene_bg );
 
 	ui->graphicsView->setScene( m_pScene );
-	ui->graphicsView->setRenderHints( QPainter::Antialiasing | QPainter::TextAntialiasing );
+    ui->graphicsView->setRenderHints(   QPainter::TextAntialiasing /* | QPainter::SmoothPixmapTransform */);
 
 	m_pTreeModel = new binarytreemodel( this );
 	ui->treeView->setModel( m_pTreeModel );

@@ -450,7 +450,6 @@ bool binarytreemodel::setData(const QModelIndex &index, const QVariant &value, i
 				auto y = (d - dHeight) / 2.0;
 
 				textRenderObject->setPos( QPointF(x,y) );
-				textRenderObject->setText( selectedNode->text() );
 			}
 		}
 

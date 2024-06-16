@@ -10,7 +10,7 @@ namespace GlobalSetting
 	extern const QString RIGHT_TAG("right");
 	extern const QString TEXT_TAG("text");
 
-    extern const QString GLOBAL_SETTINGS_TAG("globalsettings");
+	extern const QString GLOBAL_SETTINGS_TAG("globalsettings");
 	 extern const QString SCENE_BG_TAG("sceneBg");
 	 extern const QString RADIUS("r");
 	 extern const QString LR_GAP1("leftRightNodeGap1");
@@ -36,15 +36,15 @@ namespace GlobalSetting
 	extern const QBrush SCENE_BG = QBrush(Qt::white);
 	//
 	extern const QBrush CIRCLE_BRUSH = QBrush(Qt::red);
-    extern const QPen CIRCLE_OUTLINE = QPen( QBrush(Qt::green), 2.5 );
+	extern const QPen CIRCLE_OUTLINE = QPen( QBrush(Qt::green), 2.5 );
 	extern const QFont TEXT_FONT = QFont("SimSun", 9);
-    extern const QBrush TEXT_COLOR = QBrush(Qt::black);
-    extern const QPen CONNECTION_LINE = QPen( QBrush(Qt::blue), 3);
+	extern const QBrush TEXT_COLOR = QBrush(Qt::black);
+	extern const QPen CONNECTION_LINE = QPen( QBrush(Qt::blue), 3);
 
 
 	extern const qreal CIRCLE_RADIUS = 40.0;
-    extern const qreal DISTANCE_BETWEEN_LEFTRIGHT = 20.0;
-    extern const qreal DISTANCE_BETWEEN_RIGHT__LEFT = 35.0;
+	extern const qreal DISTANCE_BETWEEN_LEFTRIGHT = 20.0;
+	extern const qreal DISTANCE_BETWEEN_RIGHT__LEFT = 35.0;
 	extern const qreal HEIGHT_BETWEEN_PARENT_AND_CHILDREN = 23.0;
 
 	extern const qreal LEFT_MARGIN = 20.0;
