@@ -70,6 +70,15 @@ public:
 	bool preOrderTravelsal(treenode* node,  QVector<treenode*>& retList);
 	bool inOrderTravelsal(treenode* node,   QVector<treenode*>& retList);
 	bool postOrderTravelsal(treenode* node, QVector<treenode*>& retList);
+
+
+    // treenode* getRootNode();
+    // set all tree node with a theme style
+    void setNodeStyle_preOrderTravelsal();
+    void setNodeStyle_preOrderTravelsal_by_givenNode(treenode* givenTargetRoot);
+
+    QString genCode_by_givenNode(treenode* givenTargetRoot);
+
 protected slots:
 	bool create_AddLeftNode(const QModelIndex& parent);
 	bool create_AddRightNode(const QModelIndex& parent);
@@ -89,6 +98,10 @@ protected:
 	void innerPreOrderTravelsal(treenode* node, QVector<treenode*>& nodeList);
 	void innerInOrderTravelsal(treenode* node, QVector<treenode*>& nodeList);
 	void innerPostOrderTravelsal(treenode* node, QVector<treenode*>& nodeList);
+
+    void inner_setNodeStyle_preOrderTravelsal(treenode* node, const nodeStyleCfg& new_theme_cfg);
+
+    void recursively_gen_code( treenode* givenTargetRoot, QString& lastCode, int* pNodeId , const QString& rootName);
 protected:
 	// invisible Root node
 	treenode* m_pInvisibleRootItem;
@@ -108,3 +121,5 @@ protected:
 
 
 };
+
+

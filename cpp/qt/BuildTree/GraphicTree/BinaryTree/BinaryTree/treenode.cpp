@@ -260,3 +260,5 @@ void treenode::setNodeStyle(const nodeStyleCfg& newCfg) { m_nodeStyle = newCfg; 
 bool treenode::isSelected() { return m_selectedState; }
 void treenode::select()   { m_selectedState = true; }
 void treenode::unselect() { m_selectedState = false; }
+
+

@@ -69,6 +69,8 @@ protected:
 	void updateUI();
 	bool updateValueFromEditor(QLineEdit* lineEdit, int tag, QString& errorMsg);
 
+    void uiWidget_2_Varible();
+
 };
 
 #endif // GLOBALSETTINGDLG_H

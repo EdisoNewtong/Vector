@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1300</width>
+    <width>1660</width>
     <height>706</height>
    </rect>
   </property>
@@ -30,10 +30,10 @@
    <widget class="MyGraphicsView" name="graphicsView">
     <property name="geometry">
      <rect>
-      <x>510</x>
-      <y>32</y>
-      <width>771</width>
-      <height>520</height>
+      <x>500</x>
+      <y>31</y>
+      <width>781</width>
+      <height>531</height>
      </rect>
     </property>
     <property name="focusPolicy">
@@ -47,9 +47,9 @@
     <property name="geometry">
      <rect>
       <x>50</x>
-      <y>600</y>
+      <y>582</y>
       <width>141</width>
-      <height>51</height>
+      <height>41</height>
      </rect>
     </property>
     <property name="text">
@@ -98,9 +98,9 @@
    <widget class="QPushButton" name="clearBtn">
     <property name="geometry">
      <rect>
-      <x>680</x>
+      <x>728</x>
       <y>620</y>
-      <width>61</width>
+      <width>51</width>
       <height>41</height>
      </rect>
     </property>
@@ -124,10 +124,10 @@
    <widget class="QPushButton" name="treeOptionBtn">
     <property name="geometry">
      <rect>
-      <x>540</x>
-      <y>620</y>
+      <x>509</x>
+      <y>609</y>
       <width>111</width>
-      <height>41</height>
+      <height>28</height>
      </rect>
     </property>
     <property name="text">
@@ -137,9 +137,9 @@
    <widget class="QPushButton" name="drawTreeBtn">
     <property name="geometry">
      <rect>
-      <x>750</x>
+      <x>788</x>
       <y>620</y>
-      <width>81</width>
+      <width>45</width>
       <height>41</height>
      </rect>
     </property>
@@ -275,6 +275,71 @@
     <property name="readOnly">
      <bool>true</bool>
     </property>
+   </widget>
+   <widget class="QPushButton" name="applyOptionBtn">
+    <property name="geometry">
+     <rect>
+      <x>510</x>
+      <y>645</y>
+      <width>111</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Apply Option</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="genCodeBtn">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>637</y>
+      <width>141</width>
+      <height>35</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Gen Code</string>
+    </property>
+   </widget>
+   <widget class="QGroupBox" name="codeBtn">
+    <property name="geometry">
+     <rect>
+      <x>1290</x>
+      <y>20</y>
+      <width>371</width>
+      <height>661</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Arial</family>
+      <pointsize>10</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="title">
+     <string>Code</string>
+    </property>
+    <widget class="QPlainTextEdit" name="codeEditor">
+     <property name="geometry">
+      <rect>
+       <x>4</x>
+       <y>19</y>
+       <width>361</width>
+       <height>635</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>Arial</family>
+       <pointsize>10</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+    </widget>
    </widget>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>

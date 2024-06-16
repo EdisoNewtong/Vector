@@ -25,4 +25,6 @@ public:
 
 public:
 	static const nodeStyleCfg& DefaultCfg(); 
+
+    static const nodeStyleCfg& CurrentCfg();
 };

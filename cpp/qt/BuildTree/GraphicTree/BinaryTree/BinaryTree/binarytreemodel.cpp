@@ -1403,4 +1403,144 @@ void binarytreemodel::innerPostOrderTravelsal(treenode* node, QVector<treenode*>
 	nodeList.push_back(node); // 3. root
 }
 
+void binarytreemodel::inner_setNodeStyle_preOrderTravelsal(treenode* node, const nodeStyleCfg& new_theme_cfg)
+{
+	if ( node == nullptr ) {
+		return;
+	}
+
+    // 1st. root
+    // 2nd. left 
+    // 3rd. right
+	node->setNodeStyle(new_theme_cfg);
+    inner_setNodeStyle_preOrderTravelsal( node->leftNode(),  new_theme_cfg);
+    inner_setNodeStyle_preOrderTravelsal( node->rightNode(), new_theme_cfg);
+}
+
+void binarytreemodel::setNodeStyle_preOrderTravelsal()
+{
+    inner_setNodeStyle_preOrderTravelsal(m_pRoot, nodeStyleCfg::DefaultCfg() );
+}
+
+// treenode* binarytreemodel::getRootNode()
+// {
+//     return m_pRoot;
+// }
+
+void binarytreemodel::setNodeStyle_preOrderTravelsal_by_givenNode(treenode* givenTargetRoot)
+{
+    inner_setNodeStyle_preOrderTravelsal(givenTargetRoot, nodeStyleCfg::DefaultCfg() );
+}
+
+void binarytreemodel::recursively_gen_code( treenode* givenTargetRoot, QString& lastCode, int* pNodeId , const QString& strRootName)
+{
+    if ( givenTargetRoot == nullptr ) {
+        return;
+    }
+
+    QString rootName;
+    QString oneCode_gen;
+    bool isRoot = false;
+    if ( *pNodeId == 0 ) {
+        rootName = strRootName;
+        isRoot = true;
+    } else {
+        rootName = QString("node_%1").arg( *pNodeId );
+        isRoot = false;
+    }
+
+    oneCode_gen = QString("\tTreeNode* %1 = new TreeNode(R\"(%2)\");\n").arg(rootName).arg( givenTargetRoot->text() );
+    lastCode += oneCode_gen;
+
+    // travelsal left part
+    int leftID = -1;
+    auto lNode = givenTargetRoot->leftNode();
+    if ( lNode != nullptr ) {
+        *pNodeId += 1;
+        leftID = *pNodeId;
+    }
+    recursively_gen_code( lNode, lastCode, pNodeId, strRootName);
+    if ( lNode != nullptr ) {
+        lastCode += ( QString("\t%1->left = node_%2;\n").arg(rootName).arg(leftID) );
+    }
+
+    // travelsal right part
+    int rightID = -1;
+    auto rNode = givenTargetRoot->rightNode();
+    if ( rNode != nullptr ) {
+        *pNodeId += 1;
+        rightID = *pNodeId;
+    }
+    recursively_gen_code( rNode, lastCode, pNodeId, strRootName);
+    if ( rNode != nullptr ) {
+        lastCode += ( QString("\t%1->right = node_%2;\n").arg(rootName).arg(rightID) );
+    }
+}
+
+
+QString binarytreemodel::genCode_by_givenNode(treenode* givenTargetRoot)
+{
+    static const QString SC_STRUCT_DECLARE_PART = R"(
+static bool G_TRACE_MEMORY_LEAK = true;
+static int G_NODE_CNT = 0;
+
+typedef struct TreeNode {
+    std::string val;
+    TreeNode* left;
+    TreeNode* right;
+    
+    TreeNode(const std::string& v) : val(v), left(nullptr), right(nullptr) { 
+        if ( G_TRACE_MEMORY_LEAK ) { ++G_NODE_CNT; }
+    }
+    virtual ~TreeNode() {
+        if ( left != nullptr ) {
+            delete left;
+            left = nullptr;
+        }
+
+        if ( right != nullptr ) {
+            delete right;
+            right = nullptr;
+        }
+
+        if ( G_TRACE_MEMORY_LEAK ) { --G_NODE_CNT; }
+        // delete this;
+    }
+} TreeNode;
+
+// define a test case tree function
+void Build_TestCaseTree()
+{
+)";
+    QString code;
+    if ( givenTargetRoot == nullptr ) {
+        givenTargetRoot = m_pRoot;
+    }
+
+    if ( givenTargetRoot == nullptr ) {
+        code = "[ERROR] Root TreeNode hasn't been given\n";
+        return code;
+    }
+
+    code += SC_STRUCT_DECLARE_PART;
+
+    int node_id = 0;
+    QString rootName("Root");
+    recursively_gen_code( givenTargetRoot, code, &node_id, rootName);
+
+    code += R"(
+
+    if ( G_TRACE_MEMORY_LEAK ) { cout << "After BuildTree : G_NODE_CNT = " << G_NODE_CNT << endl; }
+    delete Root; Root = nullptr;
+    if ( G_TRACE_MEMORY_LEAK ) { cout << "After Release   : G_NODE_CNT = " << G_NODE_CNT << endl; }
+
+}
+
+
+)";
+
+    return code;
+}
+
+
 

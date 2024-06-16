@@ -40,6 +40,7 @@ MainWindow::MainWindow(QWidget *parent)
 	, m_bEnumerateNodeWithAnimation( false )
 	, m_pTreeModel( nullptr )
 	, m_btnDelegate( nullptr )
+    , m_lastRenderedTreeRootNode( nullptr )
 {
 
     ui->setupUi(this);
@@ -50,7 +51,8 @@ MainWindow::MainWindow(QWidget *parent)
 	m_pScene->setBackgroundBrush( GlobalSetting::scene_bg );
 
 	ui->graphicsView->setScene( m_pScene );
-    ui->graphicsView->setRenderHints(   QPainter::TextAntialiasing /* | QPainter::SmoothPixmapTransform */);
+    // ui->graphicsView->setRenderHints( QPainter::Antialiasing |  QPainter::TextAntialiasing);
+    ui->graphicsView->setRenderHints( QPainter::Antialiasing |  QPainter::TextAntialiasing    | QPainter::SmoothPixmapTransform);
 
 	m_pTreeModel = new binarytreemodel( this );
 	ui->treeView->setModel( m_pTreeModel );
@@ -103,56 +105,6 @@ MainWindow::~MainWindow()
 
 
 	stopEnuerateAnimationIfNecessary(true);
-
-
-	/*
-	if ( m_pHighLightAnimation != nullptr ) {
-		m_pHighLightAnimation->stop();
-
-		delete m_pHighLightAnimation;
-		m_pHighLightAnimation = nullptr;
-	}
-
-
-
-
-
-
-
-
-	if ( m_pEnumerateHVBarAni != nullptr ) {
-		m_pEnumerateHVBarAni->stop();
-
-		delete m_pEnumerateHVBarAni;
-		m_pEnumerateHVBarAni = nullptr;
-	}
-
-	if ( m_pEnumerateMoveRectAni != nullptr ) {
-		m_pEnumerateMoveRectAni->stop();
-
-		delete m_pEnumerateMoveRectAni;
-		m_pEnumerateMoveRectAni = nullptr;
-	}
-
-	if( m_pEnumerateTextItem != nullptr ) {
-		delete m_pEnumerateTextItem;
-		m_pEnumerateTextItem = nullptr;
-	}
-
-	if ( m_pEnumerateStatusTextAni != nullptr ) {
-		m_pEnumerateStatusTextAni->stop();
-
-		delete m_pEnumerateStatusTextAni;
-		m_pEnumerateStatusTextAni = nullptr;
-	}
-
-	if ( m_pEnumerateAnimationGrp != nullptr ) {
-		m_pEnumerateAnimationGrp->stop();
-
-		delete m_pEnumerateAnimationGrp;
-		m_pEnumerateAnimationGrp = nullptr;
-	}
-	*/
 
     delete ui;
 }
@@ -242,39 +194,6 @@ void MainWindow::on_clearBtn_clicked()
 	if ( m_pScene != nullptr ) {
 		stopEnuerateAnimationIfNecessary(true);
 
-
-		/*
-		if ( m_pHighLightAnimation != nullptr ) {
-			m_pHighLightAnimation->stop();
-
-			delete m_pHighLightAnimation;
-			m_pHighLightAnimation = nullptr;
-		}
-
-		if( m_pHighLightCircleFrame != nullptr ) {
-			m_pHighLightCircleFrame->setVisible( false );
-			m_pScene->removeItem( m_pHighLightCircleFrame );
-
-			m_pHighLightCircleFrame = nullptr;
-		}
-
-
-		if ( m_pEnumerateMoveRect != nullptr ) {
-			m_pEnumerateMoveRect->setVisible( false );
-			m_pScene->removeItem( m_pEnumerateMoveRect );
-
-			m_pEnumerateMoveRect = nullptr;
-		}
-
-
-		if( m_pEnumerateTextItem != nullptr ) {
-			delete m_pEnumerateTextItem;
-			m_pEnumerateTextItem = nullptr;
-		}
-		*/
-
-		
-
 		m_pScene->clear();
 		m_pScene->update( m_pScene->sceneRect() );
 
@@ -288,6 +207,10 @@ void MainWindow::on_clearBtn_clicked()
 				}
 			}
 		}
+
+        if ( m_lastRenderedTreeRootNode!=nullptr ) {
+            m_lastRenderedTreeRootNode = nullptr;
+        }
 
 	}
 
@@ -319,6 +242,9 @@ void MainWindow::on_drawTreeBtn_clicked()
 			ui->statusBar->showMessage("Please Select the 1st column of the Node", 3500);
 			return;
 		}
+
+        // 
+        m_lastRenderedTreeRootNode = selectedTreeNode;
 
         QPointF mostRightBottomCenterPoint;
 		m_pTreeModel->updateGlobalTree();
@@ -1169,3 +1095,114 @@ void MainWindow::on_stopAnimationBtn_clicked()
 {
 	stopEnuerateAnimationIfNecessary( true );
 }
+
+void MainWindow::on_applyOptionBtn_clicked()
+{
+    if ( m_pTreeModel!=nullptr ) {
+        m_pTreeModel->setNodeStyle_preOrderTravelsal_by_givenNode( m_lastRenderedTreeRootNode );
+
+        // on_drawTreeBtn_clicked();
+        reRenderPreRootTree();
+    }
+}
+
+void MainWindow::reRenderPreRootTree()
+{
+	using namespace GlobalSetting;
+    auto lastRootNode = m_lastRenderedTreeRootNode;
+	on_clearBtn_clicked();
+
+	if ( m_pTreeModel != nullptr ) {
+		auto selectedTreeNode = lastRootNode;
+		if ( selectedTreeNode == nullptr ) {
+			ui->statusBar->showMessage("Last render tree is not existed. ", 3500);
+			return;
+		} 
+
+
+        QPointF mostRightBottomCenterPoint;
+		m_pTreeModel->updateGlobalTree();
+        m_pTreeModel->updateDepthAndHeight( selectedTreeNode, &mostRightBottomCenterPoint);
+		if ( m_pScene != nullptr ) {
+			auto d = 2.0 * circle_radius;
+			QPointF rightbottomPt = (mostRightBottomCenterPoint + QPointF( circle_radius, circle_radius )) + QPointF(left_margin, top_margin) + QPointF(right_margin, bottom_margin);
+			m_pScene->setSceneRect( QRectF( QPointF(0.0, 0.0),  rightbottomPt ) );
+
+			auto hBar = ui->graphicsView->horizontalScrollBar();
+			if ( hBar != nullptr ) {
+				hBar->setPageStep( static_cast<int>(d) );
+			}
+
+			auto vBar = ui->graphicsView->verticalScrollBar();
+			if ( vBar != nullptr ) {
+				vBar->setPageStep( static_cast<int>(d) );
+			}
+			
+			// qDebug() << "rightbottomPt = " << rightbottomPt;
+		}
+
+
+
+		const auto& nodevec = m_pTreeModel->getTreeNodes();
+		for( auto nd = nodevec.begin(); nd != nodevec.end(); ++nd ) 
+		{
+			treenode* node = *nd;
+			if ( node != nullptr ) {
+				// alloc circle with text by the passed node struct
+				auto circleTextPr = allocCircle( node );
+				auto circle = circleTextPr.first;
+				auto text = circleTextPr.second;
+				QPointF centerPt( left_margin + node->x(), top_margin + node->y() );
+				QPointF leftTop = centerPt - QPointF(circle_radius, circle_radius);
+				
+				if ( circle!=nullptr   &&   text!=nullptr ) {
+					circle->setPos( leftTop );
+					// Core Core Core : attach render circle with text
+					node->setCircle(circle);
+					node->setTextObject(text);
+
+					m_pScene->addItem( circle );
+				}
+				
+				// render the connection line
+				if ( selectedTreeNode != node ) {
+                    QPointF lineUpperLayerPos( left_margin + node->connectionLineParent_x() , top_margin + node->connectionLineParent_y() );
+                    auto connectionLine = new QGraphicsLineItem( left_margin + node->connectionLineSelfDot_x(), top_margin + node->connectionLineSelfDot_y(),  lineUpperLayerPos.x(), lineUpperLayerPos.y() );
+					auto styleCfg = node->getNodeStyle();
+					connectionLine->setPen( styleCfg.m_connectionLinePen );
+
+					// Core Core Core : attach render connection line
+					node->setLine( connectionLine );
+					m_pScene->addItem( connectionLine );
+				}
+			}
+			
+		}
+
+		// center focus on the selected node 
+		auto rootCircleObject = selectedTreeNode->circleObject();
+		if ( rootCircleObject != nullptr ) {
+			ui->graphicsView->centerOn( rootCircleObject );
+		}
+	}
+
+}
+
+
+
+
+
+void MainWindow::on_genCodeBtn_clicked()
+{
+    if ( m_pTreeModel!=nullptr ) {
+		int selectedCol = 0;
+		auto pr = ui->treeView->getSelectedNodeItem(&selectedCol);
+		auto selectedTreeNode = pr.second;
+        QString code = m_pTreeModel->genCode_by_givenNode( selectedTreeNode );
+        ui->codeEditor->setPlainText( code );
+    }
+
+}
+
+
+

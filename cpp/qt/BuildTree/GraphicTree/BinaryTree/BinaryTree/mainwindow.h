@@ -64,6 +64,10 @@ private slots:
     void on_postOrderBtn_clicked();
     void on_stopAnimationBtn_clicked();
 
+    void on_applyOptionBtn_clicked();
+
+    void on_genCodeBtn_clicked();
+
 private:
     Ui::MainWindow *ui;
 
@@ -88,6 +92,7 @@ private:
 	// TreeView related object
 	binarytreemodel* m_pTreeModel;
 	mysettingbtndelegate*  m_btnDelegate;  // styled delegate
+    treenode* m_lastRenderedTreeRootNode;
 
 	// void drawTreeBySelectedItem( const QModelIndex& selected, int level); 
     QPair<QGraphicsEllipseItem*,QGraphicsSimpleTextItem*>  allocCircle(treenode* node);
@@ -98,6 +103,7 @@ private:
 	void enumerateNodes(int type, const QVector<treenode*>& nodeList, bool bAnimationFlag);
 	void stopEnuerateAnimationIfNecessary(bool needForce = false);
 
+    void reRenderPreRootTree();
 	
 };
 

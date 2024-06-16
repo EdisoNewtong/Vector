@@ -4,11 +4,11 @@
 
 void nodeStyleCfg::reset2Default()
 {
-	m_circleBrushColor = GlobalSetting::circle_brush;
-	m_circlePen = GlobalSetting::circle_outline;
-	m_textFont =  GlobalSetting::text_font;
-	m_textBrush = GlobalSetting::text_color;
-	m_connectionLinePen = GlobalSetting::connection_line;
+	m_circleBrushColor = GlobalSetting::CIRCLE_BRUSH;
+	m_circlePen = GlobalSetting::CIRCLE_OUTLINE;
+	m_textFont =  GlobalSetting::TEXT_FONT;
+	m_textBrush = GlobalSetting::TEXT_COLOR;
+    m_connectionLinePen = GlobalSetting::CONNECTION_LINE;
 }
 
 
@@ -24,3 +24,6 @@ const nodeStyleCfg& nodeStyleCfg::DefaultCfg()
 
 	return dftCfg;
 }
+
+
+

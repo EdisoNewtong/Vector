@@ -414,6 +414,8 @@ void GlobalSettingDlg::on_saveBtn_clicked()
         return;
     }
 
+    uiWidget_2_Varible();
+
     QString errorMsg;
     auto ret = GSettingLoadSave::saveToConfigFile(savedfile, &errorMsg);
     if ( !ret ) {
@@ -422,6 +424,53 @@ void GlobalSettingDlg::on_saveBtn_clicked()
     } 
         
     QMessageBox::information(this, QStringLiteral("Saving Status"), QStringLiteral("TreeRender Config File Saved") );
+}
+
+void GlobalSettingDlg::uiWidget_2_Varible()
+{
+    GlobalSetting::scene_bg = m_sceneBg;
+    
+    GlobalSetting::circle_brush = m_circleBrush;
+    GlobalSetting::circle_outline = m_circlePen;
+    GlobalSetting::text_font = m_textFont;
+    GlobalSetting::text_color = m_textColor;
+    GlobalSetting::connection_line = m_connectionLine;
+    
+
+    const int LINE_EDIT_CNT = 8;
+    QLineEdit* lineEditAry[LINE_EDIT_CNT] = {
+        ui->lineEdit_1,
+        ui->lineEdit_2,
+        ui->lineEdit_3,
+        ui->lineEdit_4,
+        ui->lineEdit_5,
+        ui->lineEdit_6,
+        ui->lineEdit_7,
+        ui->lineEdit_8
+    };
+
+
+    auto meetError = false;
+    QString errMsg;
+    for( auto tag = 0; tag < LINE_EDIT_CNT; ++tag)
+    {
+        if ( !updateValueFromEditor( lineEditAry[tag], tag+1, errMsg) ) {
+            meetError = true;
+            break;
+        }
+    }
+
+    if ( !meetError ) {
+        GlobalSetting::circle_radius = m_circleRadius;
+        GlobalSetting::distance_between_leftright = m_gap1;
+        GlobalSetting::distance_between_right__left = m_gap2;
+        GlobalSetting::height_between_parent_and_children = m_disHeight;
+        
+        GlobalSetting::left_margin = m_leftMargin;
+        GlobalSetting::right_margin = m_rightMargin;
+        GlobalSetting::top_margin = m_topMargin;
+        GlobalSetting::bottom_margin = m_bottomMargin;
+    }
 }
 
 

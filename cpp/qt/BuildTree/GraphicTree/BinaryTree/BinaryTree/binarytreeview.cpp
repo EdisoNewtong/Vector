@@ -235,3 +235,5 @@ void binarytreeview::initEventHandler()
 		connect(this, SIGNAL(deleteNode(const QModelIndex&)), model, SLOT(delete_SelectedNode(const QModelIndex&)) );
 	}
 }
+
+
