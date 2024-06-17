@@ -72,7 +72,7 @@ public:
 	bool postOrderTravelsal(treenode* node, QVector<treenode*>& retList);
 
 
-    // treenode* getRootNode();
+    treenode* getRootNode();
     // set all tree node with a theme style
     void setNodeStyle_preOrderTravelsal();
     void setNodeStyle_preOrderTravelsal_by_givenNode(treenode* givenTargetRoot);

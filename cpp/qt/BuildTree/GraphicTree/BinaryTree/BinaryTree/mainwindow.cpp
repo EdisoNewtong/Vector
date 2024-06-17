@@ -11,7 +11,8 @@
 #include <QBrush>
 #include <QFontMetricsF>
 #include <QMessageBox>
-#include <QScrollBar> 
+#include <QScrollBar>
+#include <QBitmap>
 
 #include <QGraphicsLineItem>
 
@@ -40,7 +41,7 @@ MainWindow::MainWindow(QWidget *parent)
 	, m_bEnumerateNodeWithAnimation( false )
 	, m_pTreeModel( nullptr )
 	, m_btnDelegate( nullptr )
-    , m_lastRenderedTreeRootNode( nullptr )
+    // , m_lastRenderedTreeRootNode( nullptr )
 {
 
     ui->setupUi(this);
@@ -208,9 +209,6 @@ void MainWindow::on_clearBtn_clicked()
 			}
 		}
 
-        if ( m_lastRenderedTreeRootNode!=nullptr ) {
-            m_lastRenderedTreeRootNode = nullptr;
-        }
 
 	}
 
@@ -243,8 +241,6 @@ void MainWindow::on_drawTreeBtn_clicked()
 			return;
 		}
 
-        // 
-        m_lastRenderedTreeRootNode = selectedTreeNode;
 
         QPointF mostRightBottomCenterPoint;
 		m_pTreeModel->updateGlobalTree();
@@ -344,12 +340,20 @@ void MainWindow::on_saveGraphicBtn_clicked()
     auto rectSz = m_pScene->sceneRect().size().toSize();
 
     QPixmap pixmap( rectSz );
+    // in order to save a transparent background 
+    //  You must do the following code to set the mask of the pixmap
+    QBitmap mask( rectSz );
+    mask.fill( Qt::black );
+    pixmap.setMask( mask );
+
     QPainter painter;
-    painter.begin(&pixmap);
-    // painter.setBackground(  m_pScene->backgroundBrush() );
+    painter.setBackgroundMode(  Qt::TransparentMode );
     painter.setBackground( GlobalSetting::scene_bg );
     painter.setRenderHints( QPainter::Antialiasing |  QPainter::TextAntialiasing );
-    m_pScene->render(&painter);
+
+    painter.begin(&pixmap);
+    // painter.setBackground(  m_pScene->backgroundBrush() );
+      m_pScene->render(&painter);
     painter.end();
 
     auto succ = pixmap.save(savedfile,"PNG");
@@ -1099,93 +1103,24 @@ void MainWindow::on_stopAnimationBtn_clicked()
 void MainWindow::on_applyOptionBtn_clicked()
 {
     if ( m_pTreeModel!=nullptr ) {
-        m_pTreeModel->setNodeStyle_preOrderTravelsal_by_givenNode( m_lastRenderedTreeRootNode );
+        int selectedCol = 0;
+		auto selectedNode = ui->treeView->getSelectedNodeItem(&selectedCol).second;
+        if ( selectedNode == nullptr ) {
+            selectedNode = m_pTreeModel->getRootNode();
+        }
 
-        // on_drawTreeBtn_clicked();
-        reRenderPreRootTree();
+        if( selectedNode != nullptr ) {
+            m_pTreeModel->setNodeStyle_preOrderTravelsal_by_givenNode( selectedNode );
+        }
+
+        // reRenderPreRootTree();
     }
 }
 
 void MainWindow::reRenderPreRootTree()
 {
 	using namespace GlobalSetting;
-    auto lastRootNode = m_lastRenderedTreeRootNode;
-	on_clearBtn_clicked();
-
-	if ( m_pTreeModel != nullptr ) {
-		auto selectedTreeNode = lastRootNode;
-		if ( selectedTreeNode == nullptr ) {
-			ui->statusBar->showMessage("Last render tree is not existed. ", 3500);
-			return;
-		} 
-
-
-        QPointF mostRightBottomCenterPoint;
-		m_pTreeModel->updateGlobalTree();
-        m_pTreeModel->updateDepthAndHeight( selectedTreeNode, &mostRightBottomCenterPoint);
-		if ( m_pScene != nullptr ) {
-			auto d = 2.0 * circle_radius;
-			QPointF rightbottomPt = (mostRightBottomCenterPoint + QPointF( circle_radius, circle_radius )) + QPointF(left_margin, top_margin) + QPointF(right_margin, bottom_margin);
-			m_pScene->setSceneRect( QRectF( QPointF(0.0, 0.0),  rightbottomPt ) );
-
-			auto hBar = ui->graphicsView->horizontalScrollBar();
-			if ( hBar != nullptr ) {
-				hBar->setPageStep( static_cast<int>(d) );
-			}
-
-			auto vBar = ui->graphicsView->verticalScrollBar();
-			if ( vBar != nullptr ) {
-				vBar->setPageStep( static_cast<int>(d) );
-			}
-			
-			// qDebug() << "rightbottomPt = " << rightbottomPt;
-		}
-
-
-
-		const auto& nodevec = m_pTreeModel->getTreeNodes();
-		for( auto nd = nodevec.begin(); nd != nodevec.end(); ++nd ) 
-		{
-			treenode* node = *nd;
-			if ( node != nullptr ) {
-				// alloc circle with text by the passed node struct
-				auto circleTextPr = allocCircle( node );
-				auto circle = circleTextPr.first;
-				auto text = circleTextPr.second;
-				QPointF centerPt( left_margin + node->x(), top_margin + node->y() );
-				QPointF leftTop = centerPt - QPointF(circle_radius, circle_radius);
-				
-				if ( circle!=nullptr   &&   text!=nullptr ) {
-					circle->setPos( leftTop );
-					// Core Core Core : attach render circle with text
-					node->setCircle(circle);
-					node->setTextObject(text);
-
-					m_pScene->addItem( circle );
-				}
-				
-				// render the connection line
-				if ( selectedTreeNode != node ) {
-                    QPointF lineUpperLayerPos( left_margin + node->connectionLineParent_x() , top_margin + node->connectionLineParent_y() );
-                    auto connectionLine = new QGraphicsLineItem( left_margin + node->connectionLineSelfDot_x(), top_margin + node->connectionLineSelfDot_y(),  lineUpperLayerPos.x(), lineUpperLayerPos.y() );
-					auto styleCfg = node->getNodeStyle();
-					connectionLine->setPen( styleCfg.m_connectionLinePen );
-
-					// Core Core Core : attach render connection line
-					node->setLine( connectionLine );
-					m_pScene->addItem( connectionLine );
-				}
-			}
-			
-		}
-
-		// center focus on the selected node 
-		auto rootCircleObject = selectedTreeNode->circleObject();
-		if ( rootCircleObject != nullptr ) {
-			ui->graphicsView->centerOn( rootCircleObject );
-		}
-	}
-
+    on_drawTreeBtn_clicked();
 }
 
 

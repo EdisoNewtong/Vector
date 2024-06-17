@@ -1422,10 +1422,10 @@ void binarytreemodel::setNodeStyle_preOrderTravelsal()
     inner_setNodeStyle_preOrderTravelsal(m_pRoot, nodeStyleCfg::DefaultCfg() );
 }
 
-// treenode* binarytreemodel::getRootNode()
-// {
-//     return m_pRoot;
-// }
+treenode* binarytreemodel::getRootNode()
+{
+    return m_pRoot;
+}
 
 void binarytreemodel::setNodeStyle_preOrderTravelsal_by_givenNode(treenode* givenTargetRoot)
 {
