@@ -73,9 +73,18 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
+	if ( m_pHighLightAnimation != nullptr ) {
+		m_pHighLightAnimation->stop();
+        m_pHighLightAnimation->setParent( nullptr );
+
+        delete m_pHighLightAnimation; m_pHighLightAnimation = nullptr;
+    }
+
 	if ( m_pScene != nullptr ) {
 		if ( m_pHighLightCircleFrame != nullptr ) {
 			m_pScene->removeItem( m_pHighLightCircleFrame );
+
+            delete m_pHighLightCircleFrame;
 			m_pHighLightCircleFrame = nullptr;
 		}
 
@@ -194,6 +203,13 @@ void MainWindow::on_clearBtn_clicked()
 {
 	if ( m_pScene != nullptr ) {
 		stopEnuerateAnimationIfNecessary(true);
+
+        if ( m_pHighLightCircleFrame!=nullptr ) {
+			m_pScene->removeItem( m_pHighLightCircleFrame );
+
+            delete m_pHighLightCircleFrame;
+            m_pHighLightCircleFrame = nullptr;
+        }
 
 		m_pScene->clear();
 		m_pScene->update( m_pScene->sceneRect() );
@@ -408,10 +424,30 @@ QPair<QGraphicsEllipseItem*, QGraphicsSimpleTextItem*> MainWindow::allocCircle(t
 
 void MainWindow::onSelectionNodeChanged(const QItemSelection &selected, const QItemSelection &deselected)
 {
+    // bool bLaterDeleteFlag = false;
 	// Stop animation if it exists
 	if ( m_pHighLightAnimation != nullptr ) {
 		m_pHighLightAnimation->stop();
+        m_pHighLightAnimation->setParent( nullptr );
 
+        /*
+         
+           Because the animation's target is m_pHighLightCircleFrame
+           So it can't be destroied at once
+
+           after invoke the following code;
+                delete m_pHighLightAnimation;
+
+
+           its binded parent named 'm_pHighLightCircleFrame' will be destroied  in the deleteLater pool
+
+           so the following code 'm_pHighLightCircleFrame' if ( m_pHighLightCircleFrame!=nullptr )   will return true
+
+           But m_pHighLightCircleFrame will be delete later , its memory will be referenced  m_pHighLightCircleFrame->setVisible( false );
+
+
+        */
+        // bLaterDeleteFlag = true;
         delete m_pHighLightAnimation;
         m_pHighLightAnimation = nullptr;
 	}
@@ -420,8 +456,19 @@ void MainWindow::onSelectionNodeChanged(const QItemSelection &selected, const QI
 		m_pHighLightCircleFrame->setVisible( false );
         m_pScene->removeItem( m_pHighLightCircleFrame );
 
+        //////////////////////////////////////////////////////////////////////////////////////////////
+        //
+        // DON'T delete it because , it will be automatically deleted by    'm_pHighLightAnimation'
+        //
+        //////////////////////////////////////////////////////////////////////////////////////////////
+        delete m_pHighLightCircleFrame;
 		m_pHighLightCircleFrame = nullptr;
 	}
+
+    // if ( bLaterDeleteFlag ) {
+    //     delete m_pHighLightAnimation;
+    //     m_pHighLightAnimation = nullptr;
+    // }
 
 
 	auto idxList = selected.indexes();
@@ -594,7 +641,7 @@ void MainWindow::onSelectionNodeChanged(const QItemSelection &selected, const QI
         m_pScene->addItem( m_pHighLightCircleFrame );
 
 		if ( m_pHighLightAnimation == nullptr ) {
-			m_pHighLightAnimation = new QPropertyAnimation( m_pHighLightCircleFrame, "rect");
+			m_pHighLightAnimation = new QPropertyAnimation(m_pHighLightCircleFrame, "rect");
 		}
 
 		m_pHighLightAnimation->setDuration( m_animationMsec );
