@@ -26,7 +26,7 @@ ld param1 param2 param3
 例如：
 
 **-Wl,-Bstatic -l<font color="red">a</font> -l<font color="red">b</font> -l<font color="red">c</font>                                  -Wl,-Bdynamic -l<font color="#FF00FF">d</font>  -l <font color="#FF00FF">e\*\*</font>**
-会被解释成 ：ld   <font color="blue">lib</font><font color="red">a</font>.a   <font color="blue">lib</font><font color="red">b</font>.a    <font color="blue">lib</font><font color="red">c</font>.a                                 <font color="blue">lib</font><font color="#FF00FF">d</font>.so   <font color="blue">lib</font>**<font color="#FF00FF">e</font>**.so
+会被解释成 ：ld   <font color="blue">lib</font><font color="red">a</font>.a   <font color="blue">lib</font><font color="red">b</font>.a    <font color="blue">lib</font><font color="red">c</font>.a                                 <font color="blue">lib</font><font color="#FF00FF">d</font>.so   <font color="blue">lib</font><font color="#FF00FF">e</font>\*\*.so
 
 **-Wl,-rpath -Wl,/data/workroom/libs/lib** 
 会被解释成：ld -rpath /data/workroom/libs/lib
