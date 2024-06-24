@@ -33,34 +33,110 @@
 	一旦，成功生成了 xxxx.so / xxxx.dll 后，这个静态库就可以删除了
 	
 1. lua 脚本调用
-   ```lua
-   --[[
-        注意：
-             加载的搜索顺序是
-   
-        先 找  CDivide.lua 文件
-        后 找  CDivide.so / CDivide.dll 文件
-   
-        换句话说，如果同一目录下，有2个文件
-          1. CDivide.lua
-          2. CDivide.so / CDivide.dll
-   
-        那么，加载的一定是  CDivide.lua 而不是  CDivide.so / CDivide.dll
-   
-   --]]
-   
-   -- 加载 a/b/c/CDivide.so    ( Unix/Linux )  
-   --  or  a/b/c/CDivide.dll   ( Windows )
-   local cFunctionSet = require("a.b.c.CDivide");
-   
-   local ret = cFunctionSet.func1(...)
-   ```
+	```lua
+	--[[
+	     注意：
+	          加载的搜索顺序是
+	
+	     先 找  CDivide.lua 文件
+	     后 找  CDivide.so / CDivide.dll 文件
+	
+	     换句话说，如果同一目录下，有2个文件
+	       1. CDivide.lua
+	       2. CDivide.so / CDivide.dll
+	
+	     那么，加载的一定是  CDivide.lua 而不是  CDivide.so / CDivide.dll
+	
+	--]]
+	
+	-- 加载 a/b/c/CDivide.so    ( Unix/Linux )  
+	--  or  a/b/c/CDivide.dll   ( Windows )
+	local cFunctionSet = require("a.b.c.CDivide");
+	
+	local ret = cFunctionSet.func1(...)
+	```
+	
+1. 运行 lua 脚本
+	
+	```bash
+	# Because  the function luaL_register(...)  is based on the version 5.1 of lua
+	$ lua5.1    main.lua
+	
+	or 
+	
+	$ lua    main.lua
+	
+	```
+
+# About the runtime error
+**If the dynamic library's source code break the function name rules mentioned previously !!**
+
+```lua
+--[[
+
+The lua script require a dynmaic library whose relative path is   outputDynamicLib/CDivide.so
+the the dynmaic library must export a function whose name is "luaopen_outputDynamicLib_CDivide"
+Otherwise the runtime error will be raised during the lua script's running time
+
+Notes : 
+      The lua scirpt search the    CDivide.lua  [[First]]
+          then CDivide.so
+
+
+        so if you try to rename the CDivide1.lua  to  CDivide.lua  ( delete the suffix number '1' )
+
+The function defined in CDivide.lua will be imported and be invoked at the future
+**Rather than**  import the dynmaic library named "CDivide.so"
+          
+--]]
+local util = require("outputDynamicLib.CDivide")
+```
+
+e.g.    
+
+```c
+
+/************************************************** 
+   File Name : lua_need_to_require.c    
+**************************************************/
+
+/*  Correct version
+int luaopen_outputDynamicLib_CDivide(lua_State* L)    */
+int luaopen_CDivide(lua_State* L)  /* lua runtime !![Error]!! function name */
+{ 
+    ... 
+}
+```
+
+
+**==The following error will be raised : ==**
+$ lua5.1   main.lua
+lua5.1: error loading module 'outputDynamicLib.CDivide' from file './outputDynamicLib/CDivide.so':
+	./outputDynamicLib/CDivide.so: undefined symbol: luaopen_outputDynamicLib_CDivide
+stack traceback:
+	[C]: ?
+	[C]: in function 'require'
+	main.lua:2: in main chunk
+	[C]: ?
 
 
 
+```c
+
+/************************************************** 
+   File Name : lua_need_to_require.c    
+**************************************************/
+
+/* lua runtime !![Error]!! function name 
+int luaopen_CDivide(lua_State* L)    */
+int luaopen_outputDynamicLib_CDivide(lua_State* L)  /* Correct version */
+{ 
+    ... 
+}
+```
 
 
-Also see the following image : 
+# Also see the following image : 
 
 ![load C dynamic library in lua script](./image.png) 
 
