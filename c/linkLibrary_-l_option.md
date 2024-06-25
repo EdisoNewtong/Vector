@@ -1,7 +1,7 @@
 # About gcc -L / -l option
 - **==-L==** option special the library search path : 
     If you have more than 2 search paths to be specified
-    Please use the following syntax : -LPath1 -LPath2 -LPath3
+    Please use the following syntax : -LPath1 -LPath2 -LPath3   ( Path1, Path2, Path3 are all directories rather than filename)
 
     ```bash
     #############################################
@@ -21,7 +21,7 @@
 
 
 - **==-l==** option special the library to be linked : 
-    -lmyUtil      => the linker need a library file whose name is either  libmyUtil.a   or libmyUtil.so
+    -lmyUtil      => the linker need a library file whose name is either  libmyUtil.a   or libmyUtil.so   ( myUtil is a filename rather than directory's name )
 
     //
     // **==Break the Restriction==** that the library to be linked must has a prefix "lib"
