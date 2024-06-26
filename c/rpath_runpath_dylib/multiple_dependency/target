@@ -1,0 +1,9 @@
+dylib
+noset
+noset_Error
+
+myRpath0        # set  RUNPATH 0
+myRpath1        # set  RUNPATH 1   with    $ORIGIN   syntax
+myRpath_dis     # set  rpath     <==    -Wl,--disable-new-dtag
+myRunpath_ena   # set  RUNPATH   <==    -Wl,--enable-new-dtag
+
