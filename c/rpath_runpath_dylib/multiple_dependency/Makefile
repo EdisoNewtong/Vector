@@ -50,6 +50,13 @@ dylib:dylib_src/util.c  dylib_src/util_rpath.c   dylib_src/util_runpath.c  dylib
 	gcc -Wall -shared -fPIC -o build/my_runpath/libutil.so   dylib_src/util_runpath.c -Lbuild -lcommon
 
 
+dylib_Error:dylib_src/util.c  dylib_src/util_rpath.c   dylib_src/util_runpath.c  dylib_src/common.c
+	gcc -Wall -shared -fPIC -o build/libcommon.so            dylib_src/common.c
+	gcc -Wall -shared -fPIC -o libutil.so                    dylib_src/util.c   -Lbuild -lcommon
+	gcc -Wall -shared -fPIC -o build/my_rpath/libutil.so     dylib_src/util_rpath.c -Lbuild -lcommon
+	gcc -Wall -shared -fPIC -o build/my_runpath/libutil.so   dylib_src/util_runpath.c -Lbuild -lcommon
+
+
 .PHONY:clean
 clean:
 	find . -iname '*.so' -exec rm -Rf {} \;
