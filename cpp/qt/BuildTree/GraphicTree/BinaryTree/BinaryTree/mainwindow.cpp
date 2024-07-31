@@ -16,6 +16,9 @@
 
 #include <QGraphicsLineItem>
 
+// #include <QGLWidget>
+// #include <QGLFormat>
+
 #include "globalSettings.h"
 #include "nodestylecfg.h"
 #include "globalsettingdlg.h"
@@ -53,6 +56,9 @@ MainWindow::MainWindow(QWidget *parent)
 
 	ui->graphicsView->setScene( m_pScene );
     // ui->graphicsView->setRenderHints( QPainter::Antialiasing |  QPainter::TextAntialiasing);
+    // ui->graphicsView->setViewport( new QGLWidget(
+    //             QGLFormat(QGL::SampleBuffers)) );
+
     ui->graphicsView->setRenderHints( QPainter::Antialiasing |  QPainter::TextAntialiasing    | QPainter::SmoothPixmapTransform);
 
 	m_pTreeModel = new binarytreemodel( this );
@@ -365,7 +371,8 @@ void MainWindow::on_saveGraphicBtn_clicked()
     QPainter painter;
     painter.setBackgroundMode(  Qt::TransparentMode );
     painter.setBackground( GlobalSetting::scene_bg );
-    painter.setRenderHints( QPainter::Antialiasing |  QPainter::TextAntialiasing );
+    painter.setRenderHints( QPainter::Antialiasing |  QPainter::TextAntialiasing | QPainter::SmoothPixmapTransform);
+
 
     painter.begin(&pixmap);
     // painter.setBackground(  m_pScene->backgroundBrush() );
@@ -1185,6 +1192,5 @@ void MainWindow::on_genCodeBtn_clicked()
     }
 
 }
-
 
 
