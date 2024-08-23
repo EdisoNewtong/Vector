@@ -132,7 +132,7 @@ void VariblePool::printAllVaribles(unsigned int flag)
         if ( it != m_pool.end() ) {
             VaribleInfo* pVarInfo = it->second;
             if ( pVarInfo != nullptr ) {
-                cout << (idx+1) << ".  " << EnumUtil::enumName(pVarInfo->dataVal.type) << " " << pVarInfo->varName << " = " << pVarInfo->dataVal.getPrintValue(flag, previousHasEqual) << endl;
+                cout << (idx+1) << ".  " << EnumUtil::enumName(pVarInfo->dataVal.type) << " " << pVarInfo->varName << " = " << pVarInfo->dataVal.getPrintValue(flag, previousHasEqual) << (!pVarInfo->isInitialed ? " // Uninitialized. " : "") << endl;
             }
         }
 

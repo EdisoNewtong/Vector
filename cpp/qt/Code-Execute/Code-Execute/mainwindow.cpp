@@ -385,9 +385,8 @@ QString MainWindow::getVersionDetail()
 {
     constexpr const int V_G_MAJOR = 1;
     constexpr const int V_G_MINOR = 4;
-    constexpr const int V_G_PATCH = 11;
+    constexpr const int V_G_PATCH = 12;
     const QString V_S_FEATURE_DESCRIPTION(" Support Function-Call ");
     return QString("Arith Ver %1.%2.%3 [%4]").arg(V_G_MAJOR).arg(V_G_MINOR).arg(V_G_PATCH).arg(V_S_FEATURE_DESCRIPTION);
 }
-
 

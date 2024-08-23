@@ -137,7 +137,7 @@ QString VariblePool::printAllVaribles(unsigned int flag)
         if ( it != m_pool.end() ) {
             VaribleInfo* pVarInfo = it->second;
             if ( pVarInfo != nullptr ) {
-                ts << (idx+1) << ".  " << EnumUtil::enumName(pVarInfo->dataVal.type).c_str() << " " << pVarInfo->varName.c_str() << " = " << pVarInfo->dataVal.getPrintValue(flag, previousHasEqual).c_str() << endl;
+                ts << (idx+1) << ".  " << EnumUtil::enumName(pVarInfo->dataVal.type).c_str() << " " << pVarInfo->varName.c_str() << " = " << pVarInfo->dataVal.getPrintValue(flag, previousHasEqual).c_str() << (!pVarInfo->isInitialed ? " // Uninitialized" : "") << endl;
             }
         }
 
@@ -146,4 +146,3 @@ QString VariblePool::printAllVaribles(unsigned int flag)
 
     return retstr;
 }
-
