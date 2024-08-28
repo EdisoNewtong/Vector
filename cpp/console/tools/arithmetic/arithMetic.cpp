@@ -26,7 +26,7 @@ using namespace std;
 
 constexpr static const int G_MAJOR = 1;
 constexpr static const int G_MINOR = 4;
-constexpr static const int G_PATCH = 11;
+constexpr static const int G_PATCH = 12;
 
 
 
