@@ -110,6 +110,9 @@ unordered_map<MyException::ErrorType,string>    MyException::s_exceptionMap{
     { enumCvt(E_THROW_FUNCTION_ARGUMENT_CANNOT_BE_EMPTY_WHEN_MEET_COMMA),               "one function argument expression can't be empty when meet   ',' . " },
     { enumCvt(E_THROW_FUNCTION_IS_NOT_VALID_BY_MISSING_CLOSE_PARENTHESIS),               "the function is not valid because of missing a ')' . " },
 
+    // for force type cast    new feature
+    { enumCvt(E_THROW_FORCE_TYPE_CAST_LIST_IS_EMPTY),               "the force type cast list is empty . " },
+
     { enumCvt(E_THROW_CALL_STACK_SHOULD_NEVER_BE_EMPTY) , "Call Stack should never be empty. " }
 };
 

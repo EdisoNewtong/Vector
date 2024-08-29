@@ -19,6 +19,8 @@ public:
 
     E_OperatorType getOperatorType();
     void           setOpType(E_OperatorType opTp);
+    void           setOpForceCastDataType(E_DataType dt);
+    E_DataType     getOpForceCastDataType();
 
     E_DataType     getDataType();
     void           setDataType(E_DataType dt);
@@ -63,10 +65,13 @@ public:
 
 	void            setContextRoleForOp(const E_OpAnotherRoleFlag& flag);
 	E_OpAnotherRoleFlag getContextRoleForOp();
+
 protected:
     E_TokenType    m_tokenType;
 
     E_OperatorType m_opType;
+    E_DataType     m_opForceTypeCastType;
+
     E_DataType     m_dataType;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////

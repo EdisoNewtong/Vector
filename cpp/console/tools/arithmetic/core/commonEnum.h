@@ -51,6 +51,8 @@ enum E_OperatorType
         E_POSITIVE, // +  , e.g.   +a
         E_NEGATIVE, // -  , e.g.   -a
 
+        E_FORCE_TYPE_CAST,  // int a = (int)( 3.14f  * 2.5 ); for   force type cast     new feature
+
     // E_OPERATOR_UNKNOWN 
 
 };
@@ -59,22 +61,28 @@ enum E_OpAnotherRoleFlag
 {
     E_OP_FLAG_UNKNOWN = 0,
 
-    E_OP_FLAG_OPEN_PARENTHESIS_PRIORITY_PREMOTE,    // a = ( b + c ) * d
-                                                    //     ^
-    E_OP_FLAG_OPEN_PARENTHESIS_FUNCTION_START,      // a = sin( angle )
-                                                    //        ^
+    E_OP_FLAG_OPEN_PARENTHESIS_PRIORITY_PREMOTE,        // a = ( b + c ) * d
+                                                        //     ^
+    E_OP_FLAG_OPEN_PARENTHESIS_FUNCTION_START,          // a = sin( angle )
+                                                        //        ^
 
-    E_OP_FLAG_CLOSE_PARENTHESIS_PRIORITY_PREMOTE,   //  a = ( b + c ) * d
-                                                    //              ^
-    E_OP_FLAG_CLOSE_PARENTHESIS_FUNCTION_END,       //  a = sin( angle ) 
-                                                    //                 ^
+    E_OP_FLAG_OPEN_PARENTHESIS_FORCE_TYPE_CAST_START,   // int a = (int)3.14f;
+                                                        //         ^
 
-    E_OP_COMMA_NORMAL_FOR_COMMA_EXPRESSION,         //  a = 3 , 5
-                                                    //        ^
-    E_OP_COMMA_FUNCTION_ARG_SEP,                    // function( a , b )
-                                                    //             ^
-    E_OP_COMMA_DEFINATION_SEP                       //   int a , b , c
-                                                    //         ^   ^
+    E_OP_FLAG_OPEN_PARENTHESIS_FORCE_TYPE_CAST_END,     // int a = (int)3.14f;
+                                                        //             ^
+
+    E_OP_FLAG_CLOSE_PARENTHESIS_PRIORITY_PREMOTE,       //  a = ( b + c ) * d
+                                                        //              ^
+    E_OP_FLAG_CLOSE_PARENTHESIS_FUNCTION_END,           //  a = sin( angle ) 
+                                                        //                 ^
+
+    E_OP_COMMA_NORMAL_FOR_COMMA_EXPRESSION,             //  a = 3 , 5
+                                                        //        ^
+    E_OP_COMMA_FUNCTION_ARG_SEP,                        // function( a , b )
+                                                        //             ^
+    E_OP_COMMA_DEFINATION_SEP                           //   int a , b , c
+                                                        //         ^   ^
 };
 
 
@@ -265,6 +273,8 @@ enum E_ExceptionType
 	E_THROW_CANNOT_DEFINE_A_VARIBLE_WITH_THE_SAME_NAME_OF_BUILT_IN_FUNCTION,
     E_THROW_FUNCTION_ARGUMENT_CANNOT_BE_EMPTY_WHEN_MEET_COMMA,
     E_THROW_FUNCTION_IS_NOT_VALID_BY_MISSING_CLOSE_PARENTHESIS,
+
+    E_THROW_FORCE_TYPE_CAST_LIST_IS_EMPTY, // for force type cast   for new feature
 
     E_THROW_CALL_STACK_SHOULD_NEVER_BE_EMPTY,
 

@@ -351,14 +351,12 @@ const TokenMgr::OpPairCfg TokenMgr::s_OpPairCfgTable[OPERATOR_CNT][OPERATOR_CNT]
         TokenMgr::OpPairCfg( true, true ),     // )  & 
         TokenMgr::OpPairCfg( true, true ),     // )  | 
         TokenMgr::OpPairCfg( true, true ),     // )  ^ 
-        TokenMgr::OpPairCfg( false, false ),   // )  ~ 
+        TokenMgr::OpPairCfg( true, true ),     // )  ~     only if (int)~5  :  the ) is the end of force-type-cast ( new feature )
         TokenMgr::OpPairCfg( true, true ),     // )  << 
         TokenMgr::OpPairCfg( true, true ),     // )  >> 
-        TokenMgr::OpPairCfg( false, false ),   // )  ( 
+        TokenMgr::OpPairCfg( true, true ),     // )  (     =>   (   only if (int)( 3.14f * 2)    the 1st ) is the end of force-type-cast ( new feature )
         TokenMgr::OpPairCfg( true, true ),     // )  ) 
-        // TokenMgr::OpPairCfg( false, false ),     // )  =      (a) = 3;      is valid
-        // (a) = 3;  or  (a)=3;      is valid
-        TokenMgr::OpPairCfg( true, true ),     // )  = 
+        TokenMgr::OpPairCfg( true, true ),     // )  =   // (a) = 3;  or  (a)=3;      is valid
         TokenMgr::OpPairCfg( true, true ),     // )  += 
         TokenMgr::OpPairCfg( true, true ),     // )  -= 
         TokenMgr::OpPairCfg( true, true ),     // )  *= 
@@ -804,6 +802,7 @@ TokenMgr::TokenMgr()
 
     m_oneSentence.clear();
 
+
     m_openParenthesisList.clear();
 }
 
@@ -813,18 +812,13 @@ TokenMgr::~TokenMgr()
     for( auto it = m_allTokenList.begin(); it != m_allTokenList.end(); ++it )
     {
         auto pToken = *it;
-        if ( pToken != nullptr ) {
-            delete pToken;
-            pToken = nullptr;
-        }
+        INNER_SAFE_DELETE(pToken);
     }
     m_allTokenList.clear();
 
     m_validTokenList.clear();
 
     m_oneSentence.clear();
-
-
 }
 
 
@@ -989,12 +983,11 @@ void TokenMgr::executeCode_supportFunction()
 
 
                         beginIdx             endIdx       beginIdx             endIdx
-                            |                  |             |
+                            |                  |             |                   |
                 int         a   = (  3 + 4  )  ,             b =                 4;
         */
         varbileDefGrp.push_back( make_pair(-1, -1)  );
 
-        TokenBase* previousToken = nullptr;
         auto meetError = false;
         TokenBase* errorToken = nullptr;
 
@@ -1006,6 +999,9 @@ void TokenMgr::executeCode_supportFunction()
                     auto opType = token->getOperatorType();
 
                     if ( opType == E_OPEN_PARENTHESIS ) {
+                        ++openParenthesisCnt;
+
+                        /********************************************************************************************************************************************
                         if ( previousToken!=nullptr  ) {
                             if ( previousToken->isVarible() ) {
                                 ++openParenthesisCnt;
@@ -1018,6 +1014,7 @@ void TokenMgr::executeCode_supportFunction()
                             // token->setContextRoleForOp( E_OP_FLAG_OPEN_PARENTHESIS_PRIORITY_PREMOTE );
                             ++openParenthesisCnt;
                         }
+                        *********************************************************************************************************************************************/
                     } else if ( opType == E_CLOSE_PARENTHESIS ) {
                         if ( openParenthesisCnt == 0  ) {
                             // no matched '('
@@ -1033,7 +1030,7 @@ void TokenMgr::executeCode_supportFunction()
                             // start a new group to push new token expressions
                             needAdd = false;
                             varbileDefGrp.push_back( make_pair(-1,-1) ); // create a new pair tag
-                            // Do not push it into  varbileDefGrp.back() 
+                            // Do not push seperator ','    into  varbileDefGrp.back() 
                         } 
                     }
                 } 
@@ -1049,8 +1046,6 @@ void TokenMgr::executeCode_supportFunction()
                     varbileDefGrp.back().second = idx;
                 }
             }
-
-            previousToken = token;
         }
 
 
@@ -1298,16 +1293,23 @@ bool TokenMgr::process_SequenceWithPriorToken(TokenBase* toBePushed, TokenBase* 
         }
     } else {
         // preType == E_TOKEN_OPERATOR
-        if ( toBePushed->isKeyword() ) {
-			if ( priorToken->getOperatorType() == E_OPEN_PARENTHESIS ) {
-				// future feature : TODO , if support type force convertion ?
-				// e.g.      (int)3.14f;
-				return false;
-			} else {
-				return false;
-			}
+        if (  toBePushed->isKeyword() ) {
+            if ( priorToken->getOperatorType() == E_OPEN_PARENTHESIS ) {
+                return true;
+            } else {
+                return false;
+            }
         } else if ( priorToken->getOperatorType() == E_CLOSE_PARENTHESIS ) {
-            return false;
+            // force type cast for new feature support
+            /*
+                 (int)3
+                 (int)3.14
+                 (int)a
+                 (int)sin(3.14
+                 ()char
+            */
+            return !toBePushed->isKeyword();
+            // return false;
         } else {
             return true;
         }
@@ -1340,7 +1342,11 @@ bool TokenMgr::process_OperatorWithPriorToken(TokenBase* toBePushed, TokenBase* 
                 return true;
             }
         } else if ( priorToken->isKeyword() ) {
-            return false;
+            // in order to support 
+            // e.g.
+            //       int a = (int)3.14f;        
+            //                   ^
+            return (opType == E_CLOSE_PARENTHESIS);
         } else {
             // int / float :  fixed literal number
             if (       opType == E_BIT_NOT 
@@ -1398,6 +1404,20 @@ bool TokenMgr::process_OperatorWithPriorToken(TokenBase* toBePushed, TokenBase* 
 
     return false;
 }
+
+
+
+// static 
+E_DataType TokenMgr::getDataTypeByString(const std::string typeName)
+{
+    auto mapedDtIt = s_keywordsDataTypeMap.find(typeName);
+    if ( mapedDtIt == s_keywordsDataTypeMap.end() ) {
+        return E_TP_UNKNOWN;
+    }
+
+    return mapedDtIt->second;
+}
+
 
 
 

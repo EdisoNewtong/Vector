@@ -19,6 +19,7 @@ public:
     TokenBase* evaluateSuffixExpression(std::list<TokenBase*>& suffixExpression, bool needCheckVarible);
 
     static TokenBase* generateTmpExpression(E_DataType dt, const std::string& expression, TokenBase* begtoken, TokenBase* endtoken);
+    static TokenBase* generateTmpExpression_4ForceTypeCast(E_DataType dt, const std::string& expression, TokenBase* begtoken, TokenBase* endtoken);
     static ExpEvaluation* createANewEvaluator();
 
 protected:
@@ -116,6 +117,7 @@ protected:
     TokenBase* doPositive(TokenBase* op, TokenBase* right);
     TokenBase* doNegative(TokenBase* op, TokenBase* right);
     TokenBase* doBitNot(TokenBase* op, TokenBase* right);
+    TokenBase* doForceTypeCastConversion(TokenBase* op, TokenBase* right);
 
     // for only one operand ,  dataType conversion ( such as : + , - , ~ )
     E_DataType operatorPrepairDataTypeConversion1(DataValue* pRightVal);

@@ -26,13 +26,13 @@ using namespace std;
 
 constexpr static const int G_MAJOR = 1;
 constexpr static const int G_MINOR = 4;
-constexpr static const int G_PATCH = 12;
+constexpr static const int G_PATCH = 19;
 
 
 
 std::string getProgram_Version()
 {
-    const std::string S_FEATURE_DESCRIPTION("( Support Function-Call )");
+    const std::string S_FEATURE_DESCRIPTION("( Support Function-Call && Force-Type-Cast : Alpla-Test-Version  Feature )");
 
     return    string("  Arith V ")
             + to_string(G_MAJOR) + string(".") 
