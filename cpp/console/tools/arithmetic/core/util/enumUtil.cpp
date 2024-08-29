@@ -69,6 +69,8 @@ string EnumUtil::enumName(E_OperatorType tp)
     INNER_ENUM_2_STRING_MAP(E_BIT_RIGHT_SHIFT_ASSIGNMENT)
 	// New feature for function call
     INNER_ENUM_2_STRING_MAP(E_COMMA)
+	// new feature for force type cast
+    INNER_ENUM_2_STRING_MAP(E_FORCE_TYPE_CAST)
     default:
         retstr = string("??? E_OperatorType ??? | value = ") + to_string( static_cast<int>(tp) );
         break;

@@ -1012,7 +1012,7 @@ TokenBase* ExpEvaluation::evaluateSuffixExpression(list<TokenBase*>& suffixExpre
             if ( isbinaryOp ) {
                 if ( previousExpCnt < 2 ) {
                     MyException e(E_THROW_SUFFIXEXPR_BINARY_OP_MISS_TWO_OPERANDS, currentElement->getBeginPos() );
-                    // e.setDetail( currentElement->getBeginPos().getPos() );
+                    e.setDetail( currentElement->getTokenContent() );
                     throw e;
                 }
 
@@ -1070,14 +1070,8 @@ TokenBase* ExpEvaluation::evaluateSuffixExpression(list<TokenBase*>& suffixExpre
                 it = suffixExpression.erase(it, nextIt);
                 // insert a new tmp 
                 it = suffixExpression.insert(it, genTmpExp);
-
-
-                /*
-                // previousExpCnt -= 3;
-                // previousExpCnt += 1;
-                previousExpCnt -= 2;     
-                */
-
+                // fix a bug ( move iterator to the item after tmp-expression being pushed just now
+                ++it;
 
                 // previousExpCnt -= 2;
                 // previousExpCnt += 1;
@@ -1085,7 +1079,7 @@ TokenBase* ExpEvaluation::evaluateSuffixExpression(list<TokenBase*>& suffixExpre
             } else {
                 if ( previousExpCnt < 1 ) {
                     MyException e(E_THROW_SUFFIXEXPR_UNARY_OP_MISS_ONE_OPERAND, currentElement->getBeginPos());
-                    // e.setDetail( currentElement->getBeginPos().getPos() );
+                    e.setDetail( currentElement->getTokenContent() );
                     throw e;
                 }
 
@@ -1116,17 +1110,12 @@ TokenBase* ExpEvaluation::evaluateSuffixExpression(list<TokenBase*>& suffixExpre
 
                 it = suffixExpression.erase(it, nextIt);
                 it = suffixExpression.insert(it, genTmpExp);
-
-                /*
-                // previousExpCnt -= 2;
-                // previousExpCnt += 1;
-                --previousExpCnt;
-                */
+                // fix a bug ( move iterator to the item after tmp-expression being pushed just now
+                ++it;
 
                 // previousExpCnt -= 1;
                 // previousExpCnt += 1;
                 previousExpCnt += 0;   // keep original count
-
             }
 
         }
@@ -2052,7 +2041,7 @@ TokenBase* ExpEvaluation::generateTmpExpression_4ForceTypeCast(E_DataType dt, co
     TokenBase* pForceCastOperator = new TokenBase( E_TOKEN_OPERATOR );
     pForceCastOperator->setOpType( E_FORCE_TYPE_CAST );
     pForceCastOperator->setOpForceCastDataType( dt );
-    // pTmpExpression->setAsTmpExpression();
+    // pForceCastOperator->setAsTmpExpression();
     pForceCastOperator->setTokenContent( expression );
     pForceCastOperator->setGeneratedExp( expression );
     pForceCastOperator->setBeginPos( begtoken->getBeginPos() );
