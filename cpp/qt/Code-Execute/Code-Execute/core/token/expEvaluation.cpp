@@ -1,4 +1,5 @@
 #include "expEvaluation.h"
+#include "tokenMgr.h"
 #include "opUtil.h"
 #include "variblePool.h"
 #include "cmdOptions.h"
@@ -139,17 +140,72 @@ void ExpEvaluation::buildSuffixExpression(const vector<TokenBase*>& expList, int
     //
     for ( auto idx = begIdx; idx < sz; ++idx  ) {
         auto token = expList.at(idx);
-        auto tokenType = token->getTokenType();
         if ( token == nullptr ) {
             previousToken = token;
             continue;
         }
 
+        auto tokenType = token->getTokenType();
         if ( tokenType == E_TOKEN_EXPRESSION ) {
             // fixed literal / varible|funcName / KeyWord
             if ( token->isKeyword() ) {
-                MyException e(E_THROW_CANNOT_PUSH_TOKEN_KEYWORD, token->getBeginPos() );
-                throw e;
+                string strTypeKeyWords = token->getTokenContent();
+                int keywordsCnt = 1; // token -> 1
+                if (   previousToken != nullptr ) {
+                    if ( previousToken->isKeyword() ) {
+                        ++keywordsCnt; // previousToken -> ++
+                        strTypeKeyWords += " ";
+                        strTypeKeyWords += previousToken->getTokenContent();
+
+                        // new feature for force type cast
+                        // such as (unsigned         int)(3.14f * 5.0)
+                        //              ^             ^
+                        //          previousToken   token
+                        TokenBase* previousMatchedBegin = nullptr;
+                        // do previous search until the token is not keyword
+                        for ( int j = idx-2; j >=0; --j ) {
+                            auto curPreToken = expList.at(j);
+                            if ( curPreToken != nullptr  ) {
+                                if ( curPreToken->isKeyword() ) {
+                                    strTypeKeyWords += " ";
+                                    strTypeKeyWords += curPreToken->getTokenContent();
+                                    ++keywordsCnt;
+                                } else {
+                                    previousMatchedBegin = curPreToken;
+                                    break;
+                                }
+                            }
+                        }
+
+                        //                                     == 4
+                        if ( keywordsCnt > TokenMgr::s_MAX_KEYWORDS_CNT ) {
+                            MyException e(E_THROW_TOO_MANY_KEYWORDS, token->getBeginPos() );
+                            e.setDetail( strTypeKeyWords );
+                            throw e;
+                        }
+
+                        if (   previousMatchedBegin == nullptr 
+                            || !(       previousMatchedBegin->getTokenType()    == E_TOKEN_OPERATOR
+                                    &&  previousMatchedBegin->getOperatorType() == E_OPEN_PARENTHESIS
+                                    &&  previousMatchedBegin->getContextRoleForOp() == E_OP_FLAG_OPEN_PARENTHESIS_FORCE_TYPE_CAST_START 
+                                 ) 
+                        ) 
+                        {
+                            MyException e(E_THROW_CANNOT_PUSH_TOKEN_KEYWORD, token->getBeginPos() );
+                            throw e;
+                        }
+                    } else if (   previousToken->getTokenType()    == E_TOKEN_OPERATOR 
+                               && previousToken->getOperatorType() == E_OPEN_PARENTHESIS ) {
+                        previousToken->setContextRoleForOp( E_OP_FLAG_OPEN_PARENTHESIS_FORCE_TYPE_CAST_START );
+                    } else {
+                        MyException e(E_THROW_CANNOT_PUSH_TOKEN_KEYWORD, token->getBeginPos() );
+                        throw e;
+                    }
+                } else {
+                    MyException e(E_THROW_CANNOT_PUSH_TOKEN_KEYWORD, token->getBeginPos() );
+                    throw e;
+                }
+
             } else if ( token->isVarible() ) {
 
                 if ( checkVaibleIsValid ) {
@@ -173,6 +229,10 @@ void ExpEvaluation::buildSuffixExpression(const vector<TokenBase*>& expList, int
             }
 
             if ( currentEnv!=nullptr ) {
+                /*
+                      (int)3.14f
+                */
+                // the token can be a keyword such as int/short/unsigned/long  etc.
                 currentEnv->suffixExpression.push_back( token );
             }
 
@@ -318,6 +378,16 @@ int ExpEvaluation::preCheckOperator(TokenBase* previousToken, const std::pair<To
                 auto preOpType = previousToken->getOperatorType();
                 if ( preOpType != E_CLOSE_PARENTHESIS ) {
                     needChangeType = true;
+                } else {
+                    // previousToken is ')'    force type cast  for new feature
+                    /*
+                           (int)-a             (int)+a
+                           (int)-sin(3.14f)
+                           (int)-3.14f
+                    */
+                    if ( previousToken->getContextRoleForOp() == E_OP_FLAG_OPEN_PARENTHESIS_FORCE_TYPE_CAST_END ) {
+                        needChangeType = true;
+                    }
                 }
             }
         }
@@ -371,6 +441,9 @@ int ExpEvaluation::preCheckOperator(TokenBase* previousToken, const std::pair<To
             if ( roleFlag == E_OP_FLAG_OPEN_PARENTHESIS_FUNCTION_START ) {
                 pToken->setContextRoleForOp( E_OP_FLAG_CLOSE_PARENTHESIS_FUNCTION_END );
                 special_retFlag = 2;
+            } else if ( roleFlag == E_OP_FLAG_OPEN_PARENTHESIS_FORCE_TYPE_CAST_START ) { // previous '(' is   force  type cast  begin   for new feature  such as     (int)3.14f
+                pToken->setContextRoleForOp( E_OP_FLAG_OPEN_PARENTHESIS_FORCE_TYPE_CAST_END );
+                // special_retFlag = 4;
             } else {
                 // E_OP_FLAG_OPEN_PARENTHESIS_PRIORITY_PREMOTE
                 if ( (matchedPr.second + 1) == currentIdx ) {
@@ -696,6 +769,10 @@ ExpEvaluation::suffixExpEnv* ExpEvaluation::processOperatorStack(TokenBase* prev
     if ( bNeedDoNormalProcess  &&  currentEnv!=nullptr  ) {
         auto opType = token->getOperatorType();
 
+        auto bOpNeedProcess = false;
+        int matchedForceTypeCastOpenParenthesisIdx = -1;
+        TokenBase* pTokenForceTypeCast = nullptr;
+
         if ( opType == E_CLOSE_PARENTHESIS ) {
             // '('
             auto pr = findClosestOpenParenthesis( currentEnv->operatorStack );
@@ -703,12 +780,97 @@ ExpEvaluation::suffixExpEnv* ExpEvaluation::processOperatorStack(TokenBase* prev
                 MyException e(E_THROW_NO_MATCHED_OPEN_PARENTHESIS, token->getBeginPos() );
                 throw e;
             } else {
-                popUntilOpenParenthesis( currentEnv );
-            }
+                if ( token->getContextRoleForOp() == E_OP_FLAG_OPEN_PARENTHESIS_FORCE_TYPE_CAST_END ) {
+                    if ( pr.first->getContextRoleForOp() != E_OP_FLAG_OPEN_PARENTHESIS_FORCE_TYPE_CAST_START ) {
+                        MyException e(E_THROW_NO_MATCHED_OPEN_PARENTHESIS, token->getBeginPos() );
+                        throw e;
+                    }
 
+                    //
+                    // prepare keyword list
+                    //
+                    int keywordsCnt = 0;
+                    std::list<string> tmpKeywordsList;
+                    string placehold_space(" ");
+                    while( !currentEnv->suffixExpression.empty() ) 
+                    {
+                        auto pKeyword_token = currentEnv->suffixExpression.back();
+                        if ( pKeyword_token!=nullptr && pKeyword_token->isKeyword() ) {
+                            tmpKeywordsList.push_front( pKeyword_token->getTokenContent() );
+                            tmpKeywordsList.push_front( placehold_space );
+                            ++keywordsCnt;
+
+                            //
+                            // erase all the keywords at tail until meet an unmatched one
+                            //
+                            currentEnv->suffixExpression.pop_back();
+                        } else {
+                            break;
+                        }
+                    }
+
+                    if ( keywordsCnt == 0 ) {
+                        MyException e(E_THROW_FORCE_TYPE_CAST_LIST_IS_EMPTY, token->getBeginPos() );
+                        throw e;
+                    }
+
+                    // keywordsCnt > 0
+                    // delete the front " ";
+                    tmpKeywordsList.pop_front();
+                    
+                    string str_force_type_cast_name;
+                    for( auto s_key : tmpKeywordsList ) {
+                        str_force_type_cast_name += s_key;
+                    }
+
+                    if ( keywordsCnt > TokenMgr::s_MAX_KEYWORDS_CNT ) {
+                        MyException e(E_THROW_TOO_MANY_KEYWORDS, token->getBeginPos() );
+                        e.setDetail( str_force_type_cast_name );
+                        throw e;
+                    }
+
+
+                    // cout << "str_force_type_cast_name = \"" << str_force_type_cast_name << "\" ." << endl;
+                    auto forceTypeCast4_dt = TokenMgr::getDataTypeByString( str_force_type_cast_name );
+                    if ( forceTypeCast4_dt == E_TP_UNKNOWN ) {
+                        MyException e(E_THROW_SENTENCE_UNKNOWN_DATA_TYPE, token->getBeginPos() );
+                        e.setDetail( str_force_type_cast_name );
+                        throw e;
+                    }
+
+
+                    // Core Core Core
+                    // generate a new token for   such as  :   (unsigned long long long)
+                    pTokenForceTypeCast = generateTmpExpression_4ForceTypeCast(forceTypeCast4_dt, (charUtil::STR_OPEN_PARENTHESIS + str_force_type_cast_name + charUtil::STR_CLOSE_PARENTHESIS), pr.first, token );
+
+                    // pop the previous (    of    (int)
+                    //                  ^
+                    currentEnv->operatorStack.pop_back();
+
+                    if ( pTokenForceTypeCast == nullptr ) {
+                        MyException e(E_THROW_SENTENCE_UNKNOWN_DATA_TYPE , token->getBeginPos() );
+                        e.setDetail( string("\"") +  str_force_type_cast_name + string("\"") );
+                        throw e;
+                    } 
+
+                    // Core Core Core
+                    // (int)  -->  change the sequence into a force type cast operator type     for new feature
+                    opType = E_FORCE_TYPE_CAST;
+                    bOpNeedProcess = true;
+                    matchedForceTypeCastOpenParenthesisIdx = pr.second;
+                } else {
+                    popUntilOpenParenthesis( currentEnv );
+                }
+            }
         } else {
+            bOpNeedProcess = true;
+        }
+
+        if ( bOpNeedProcess ) {
+            pair<TokenBase*,int> toProcessTokenPair = (matchedForceTypeCastOpenParenthesisIdx==-1) ? tokenPair : make_pair(pTokenForceTypeCast, matchedForceTypeCastOpenParenthesisIdx);
+
             if ( currentEnv->operatorStack.empty() ) {
-                currentEnv->operatorStack.push_back( tokenPair );
+                currentEnv->operatorStack.push_back( toProcessTokenPair );
                 traceOperatorStack( token, true);
                 retEnv = currentEnv;
                 return retEnv;
@@ -730,18 +892,18 @@ ExpEvaluation::suffixExpEnv* ExpEvaluation::processOperatorStack(TokenBase* prev
 
                 if ( toPushed_p < cmp_p ) {
                     // toPush.priority is higher than the priority of top operator
-                    currentEnv->operatorStack.insert( rit.base(), tokenPair );
+                    currentEnv->operatorStack.insert( rit.base(), toProcessTokenPair );
                     traceOperatorStack(token, true );
 
                     pushedFlag = true;
                 } else if ( toPushed_p == cmp_p ) {
                     if ( opType == E_OPEN_PARENTHESIS ) { // '(' is right-to-Left Associativity
-                        currentEnv->operatorStack.insert( rit.base(), tokenPair );
+                        currentEnv->operatorStack.insert( rit.base(), toProcessTokenPair );
                         traceOperatorStack( token, true );
                     } else {
                         if ( cmp_rightAss ) {
                             // Associativity is   right to left
-                            forwardIt = currentEnv->operatorStack.insert( rit.base(), tokenPair );
+                            forwardIt = currentEnv->operatorStack.insert( rit.base(), toProcessTokenPair );
                             traceOperatorStack( token, true );
                             // rit = reverse_iterator< decltype(forwardIt) >( forwardIt );
                         } else {
@@ -759,7 +921,7 @@ ExpEvaluation::suffixExpEnv* ExpEvaluation::processOperatorStack(TokenBase* prev
                             traceOpMove2SuffixExpression( pVisitToken );
 
 
-                            currentEnv->operatorStack.insert( forwardIt, tokenPair ); // 3
+                            currentEnv->operatorStack.insert( forwardIt, toProcessTokenPair ); // 3
                             // rit = reverse_iterator< decltype(forwardIt) >( forwardIt );
                             traceOperatorStack( token, true );
                         }
@@ -770,7 +932,7 @@ ExpEvaluation::suffixExpEnv* ExpEvaluation::processOperatorStack(TokenBase* prev
                     // toPushed_p > cmp_p
                     // toPush.priority is lower than the priority of top operator
                     if ( visitOpType == E_OPEN_PARENTHESIS ) {
-                        forwardIt = currentEnv->operatorStack.insert( rit.base(), tokenPair );
+                        forwardIt = currentEnv->operatorStack.insert( rit.base(), toProcessTokenPair );
                         // rit = reverse_iterator< decltype(forwardIt) >( forwardIt );
                         traceOperatorStack( token, true );
 
@@ -823,7 +985,7 @@ ExpEvaluation::suffixExpEnv* ExpEvaluation::processOperatorStack(TokenBase* prev
                 //----------------------------------------------------------------------------------------------------
                 //     the final suffixExpr :          | a | 3 | 4 | 5 | * | + | = | 6 | , |
                 //----------------------------------------------------------------------------------------------------
-                currentEnv->operatorStack.push_back( tokenPair );
+                currentEnv->operatorStack.push_back( toProcessTokenPair  );
                 traceOperatorStack( token, true );
             }
         }
@@ -918,7 +1080,7 @@ TokenBase* ExpEvaluation::evaluateSuffixExpression(list<TokenBase*>& suffixExpre
             if ( isbinaryOp ) {
                 if ( previousExpCnt < 2 ) {
                     MyException e(E_THROW_SUFFIXEXPR_BINARY_OP_MISS_TWO_OPERANDS, currentElement->getBeginPos() );
-                    // e.setDetail( currentElement->getBeginPos().getPos() );
+                    e.setDetail( currentElement->getTokenContent() );
                     throw e;
                 }
 
@@ -976,14 +1138,8 @@ TokenBase* ExpEvaluation::evaluateSuffixExpression(list<TokenBase*>& suffixExpre
                 it = suffixExpression.erase(it, nextIt);
                 // insert a new tmp 
                 it = suffixExpression.insert(it, genTmpExp);
-
-
-                /*
-                // previousExpCnt -= 3;
-                // previousExpCnt += 1;
-                previousExpCnt -= 2;     
-                */
-
+                // fix a bug ( move iterator to the item after tmp-expression being pushed just now
+                ++it;
 
                 // previousExpCnt -= 2;
                 // previousExpCnt += 1;
@@ -991,7 +1147,7 @@ TokenBase* ExpEvaluation::evaluateSuffixExpression(list<TokenBase*>& suffixExpre
             } else {
                 if ( previousExpCnt < 1 ) {
                     MyException e(E_THROW_SUFFIXEXPR_UNARY_OP_MISS_ONE_OPERAND, currentElement->getBeginPos());
-                    // e.setDetail( currentElement->getBeginPos().getPos() );
+                    e.setDetail( currentElement->getTokenContent() );
                     throw e;
                 }
 
@@ -1022,12 +1178,8 @@ TokenBase* ExpEvaluation::evaluateSuffixExpression(list<TokenBase*>& suffixExpre
 
                 it = suffixExpression.erase(it, nextIt);
                 it = suffixExpression.insert(it, genTmpExp);
-
-                /*
-                // previousExpCnt -= 2;
-                // previousExpCnt += 1;
-                --previousExpCnt;
-                */
+                // fix a bug ( move iterator to the item after tmp-expression being pushed just now
+                ++it;
 
                 // previousExpCnt -= 1;
                 // previousExpCnt += 1;
@@ -1040,8 +1192,24 @@ TokenBase* ExpEvaluation::evaluateSuffixExpression(list<TokenBase*>& suffixExpre
 
     auto afterEvaluateSz = static_cast<int>( suffixExpression.size() );
     if ( afterEvaluateSz != 1 ) {
+        using namespace charUtil;
         // TODO 
-        (void)backupSuffixExpression;
+        QString retstr;
+        QTextStream ts(&retstr);
+        int iidx = 0;
+        for( auto it = backupSuffixExpression.begin(); it != backupSuffixExpression.end(); ++it, ++iidx ) {
+            auto currentElement = *it;
+            if ( currentElement!=nullptr ) {
+                ts << (iidx+1) << ". " << SINGLE_QUOTO.c_str() << currentElement->getTokenContent().c_str() << SINGLE_QUOTO.c_str() << endl;
+            }
+        }
+
+        ts.flush();
+        if ( s_pTextEditor != nullptr ) {
+            auto outputstr = s_pTextEditor->toPlainText();
+            outputstr += retstr;
+            s_pTextEditor->setPlainText(  outputstr );
+        }
 
         MyException e(E_THROW_SUFFIXEXPR_FINAL_EVALUATE_MUST_LEAVE_ONLY_ONE_ELEMENT);
         throw e;
@@ -1177,6 +1345,9 @@ TokenBase* ExpEvaluation::doUnaryOp(TokenBase* op, TokenBase* right)
         break;
     case E_BIT_NOT:
         genTmpExp = doBitNot(op,right);
+        break;
+    case E_FORCE_TYPE_CAST: // for   force type cast    for new feature
+        genTmpExp = doForceTypeCastConversion(op, right);
         break;
     default:
         break;
@@ -1697,6 +1868,36 @@ TokenBase* ExpEvaluation::doBitNot(TokenBase* op, TokenBase* right)
 
 
 
+
+TokenBase* ExpEvaluation::doForceTypeCastConversion(TokenBase* op, TokenBase* right)
+{
+    E_DataType castType = op->getOpForceCastDataType();
+    using namespace charUtil;
+
+    string rightContent = right->getExpressionContent();
+    string finalExpr =   STR_OPEN_PARENTHESIS + EnumUtil::enumName(castType) + STR_CLOSE_PARENTHESIS 
+                       + STR_OPEN_PARENTHESIS + rightContent + STR_CLOSE_PARENTHESIS;
+
+    DataValue rightVal = right->getRealValue();
+
+    // calc 
+    DataValue forceCastResultData = rightVal.doForceDataTypeCast( castType );
+    traceTmpOpResult(finalExpr, forceCastResultData);
+
+    TokenBase* ret = generateTmpExpression(castType, finalExpr, op, right);
+    ret->setRealValue( forceCastResultData );
+
+    return ret;
+}
+
+
+
+
+
+
+
+
+
 E_DataType ExpEvaluation::operatorPrepairDataTypeConversion1(DataValue* pRightVal)
 {
     auto retType = pRightVal->type;
@@ -1710,6 +1911,10 @@ E_DataType ExpEvaluation::operatorPrepairDataTypeConversion1(DataValue* pRightVa
     return retType;
 
 }
+
+
+
+
 
 
 E_DataType ExpEvaluation::operatorPrepairDataTypeConversion2(DataValue* pLeftVal, DataValue* pRightVal)
@@ -1746,6 +1951,28 @@ E_DataType ExpEvaluation::operatorPrepairDataTypeConversion2(DataValue* pLeftVal
     return retType;
 
 }
+
+
+
+// static 
+TokenBase* ExpEvaluation::generateTmpExpression_4ForceTypeCast(E_DataType dt, const std::string& expression, TokenBase* begtoken, TokenBase* endtoken)
+{
+    TokenBase* pForceCastOperator = new TokenBase( E_TOKEN_OPERATOR );
+    pForceCastOperator->setOpType( E_FORCE_TYPE_CAST );
+    pForceCastOperator->setOpForceCastDataType( dt );
+    // pForceCastOperator->setAsTmpExpression();
+    pForceCastOperator->setTokenContent( expression );
+    pForceCastOperator->setGeneratedExp( expression );
+    pForceCastOperator->setBeginPos( begtoken->getBeginPos() );
+    pForceCastOperator->setEndPos( endtoken->getEndPos() );
+
+    s_generatedTmpTokenPool.push_back( pForceCastOperator );
+    return pForceCastOperator;
+}
+
+
+
+
 
 void ExpEvaluation::traceUnInitializedVarWhenUsed(TokenBase* pToken)
 {

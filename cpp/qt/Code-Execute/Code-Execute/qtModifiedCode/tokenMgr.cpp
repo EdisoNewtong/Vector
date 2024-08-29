@@ -1230,10 +1230,10 @@ void TokenMgr::tracePushedTokenWarning(TokenBase* pToken)
 
 
         auto tp = pToken->getTokenType();
-        ts << SC_WARNING_TITLE.c_str();
+        ts << SC_WARNING_TITLE;
         if ( !(tp == E_TOKEN_SINGLE_LINE_COMMENT || tp == E_TOKEN_MULTI_LINE_COMMENT ) ) {
             auto content = pToken->getTokenContent();
-            ts << "\"" << content.c_str() << "\"" << endl;
+            ts << "\"" << content << "\"" << endl;
         }
 
         ts << strWarning.c_str()

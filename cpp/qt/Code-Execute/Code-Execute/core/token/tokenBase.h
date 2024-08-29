@@ -19,6 +19,8 @@ public:
 
     E_OperatorType getOperatorType();
     void           setOpType(E_OperatorType opTp);
+    void           setOpForceCastDataType(E_DataType dt);
+    E_DataType     getOpForceCastDataType();
 
     E_DataType     getDataType();
     void           setDataType(E_DataType dt);
@@ -46,8 +48,8 @@ public:
     bool           isVarible();
     void           setAsVarible();
 
-    bool           isFunction();
-    void           setAsFunction(FunctionBase* pFunc);
+	bool           isFunction();
+	void           setAsFunction(FunctionBase* pFunc);
     FunctionBase*  getFuncObject();
 
     void           setBeginPos(const ChInfo& beg);
@@ -61,12 +63,15 @@ public:
     void           setWarningContent( const std::string& content);
     std::string    getWarningContent();
 
-    void            setContextRoleForOp(const E_OpAnotherRoleFlag& flag);
-    E_OpAnotherRoleFlag getContextRoleForOp();
+	void            setContextRoleForOp(const E_OpAnotherRoleFlag& flag);
+	E_OpAnotherRoleFlag getContextRoleForOp();
+
 protected:
     E_TokenType    m_tokenType;
 
     E_OperatorType m_opType;
+    E_DataType     m_opForceTypeCastType;
+
     E_DataType     m_dataType;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -83,12 +88,12 @@ protected:
     ////////////////////////////////////////////////////////////////////////////////////////////////////////
     unsigned char  m_expTypeFlag;
 
-    // function call is under develop ,    
-    // 
-    //      ','( Comma )  ,    
-    //      '(' ( Open Parenthese )    
-    //       play role flag
-    E_OpAnotherRoleFlag m_opFlag;
+	// function call is under develop ,    
+	// 
+	//      ','( Comma )  ,    
+	//      '(' ( Open Parenthese )    
+	//       play role flag
+	E_OpAnotherRoleFlag m_opFlag;
 
     std::string    m_token_content;
     std::string    m_token_build_exp;

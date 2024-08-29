@@ -3511,3 +3511,18 @@ bool DataValue::isIntOutOfRange(E_DataType leftDt, string& strMinVal, string& st
     return !isInRange;
 }
 
+
+//
+// for  force type cast     for new feature
+//
+DataValue DataValue::doForceDataTypeCast(E_DataType cast2Type)
+{
+    DataValue retVal;
+    retVal.type = cast2Type;
+    retVal.doAssignment( *this );
+    return retVal;
+}
+
+
+
+

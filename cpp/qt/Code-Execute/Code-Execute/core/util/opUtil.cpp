@@ -170,8 +170,12 @@ unordered_map<OpUtil::OpType, OpInfo> OpUtil::s_operatorMap{
     make_pair(enumCvt(E_BIT_XOR_ASSIGNMENT),         OpInfo( BINARY_OP_MASK | ASS_RIGHT_2_LEFT | PRIORITY_MASK(16U) | static_cast<unsigned int>(E_BIT_XOR_ASSIGNMENT)    ) ),
     make_pair(enumCvt(E_BIT_LEFT_SHIFT_ASSIGNMENT),  OpInfo( BINARY_OP_MASK | ASS_RIGHT_2_LEFT | PRIORITY_MASK(16U) | static_cast<unsigned int>(E_BIT_LEFT_SHIFT_ASSIGNMENT)    ) ),
     make_pair(enumCvt(E_BIT_RIGHT_SHIFT_ASSIGNMENT), OpInfo( BINARY_OP_MASK | ASS_RIGHT_2_LEFT | PRIORITY_MASK(16U) | static_cast<unsigned int>(E_BIT_RIGHT_SHIFT_ASSIGNMENT)    ) ),
-    // new feature for function call
-    make_pair(enumCvt(E_COMMA), OpInfo( BINARY_OP_MASK | ASS_LEFT_2_RIGHT | PRIORITY_MASK(17U) | static_cast<unsigned int>(E_COMMA)    ) )
+	// new feature for function call
+    make_pair(enumCvt(E_COMMA), OpInfo( BINARY_OP_MASK | ASS_LEFT_2_RIGHT | PRIORITY_MASK(17U) | static_cast<unsigned int>(E_COMMA)    ) ),
+
+    // new feature for force-type-cast
+    make_pair(enumCvt(E_FORCE_TYPE_CAST), OpInfo( UNARY_OP_MASK  | ASS_RIGHT_2_LEFT  | PRIORITY_MASK(3U) | static_cast<unsigned int>(E_FORCE_TYPE_CAST)    ) )
+
 };
 
 
@@ -188,4 +192,5 @@ OpInfo OpUtil::getOpInfo(E_OperatorType dp)
     
     return it->second;
 }
+
 
