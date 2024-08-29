@@ -82,6 +82,7 @@ struct DataValue
     DataValue operator + (); // positive
     DataValue operator - (); // negative
     DataValue operator ~ (); // bit not
+    DataValue doForceDataTypeCast(E_DataType cast2Type); // force type cast    for new feature    e.g.  (int)3.14f
 
     DataValue operator + ( const DataValue& right);
     DataValue operator - ( const DataValue& right);

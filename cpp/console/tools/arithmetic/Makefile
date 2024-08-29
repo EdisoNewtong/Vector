@@ -78,7 +78,7 @@ build/tokenMgr.o:core/token/tokenMgr.cpp  core/token/tokenMgr.h core/token/token
 	g++    $(COMPILE_OPT)  -o  build/tokenMgr.o   core/token/tokenMgr.cpp
 
 
-build/expEvaluation.o:core/token/expEvaluation.cpp  core/token/expEvaluation.h   core/token/tokenBase.h  core/commonEnum.h core/variblePool/variblePool.h core/cmdOptions.h core/util/charUtil.h  core/util/opUtil.h  core/myException.h  core/functionPool/functionMgr.h   core/functionPool/functionBase.h   core/util/dataTypeUtil.h   core/util/enumUtil.h
+build/expEvaluation.o:core/token/expEvaluation.cpp  core/token/expEvaluation.h  core/token/tokenMgr.h   core/token/tokenBase.h  core/commonEnum.h core/variblePool/variblePool.h core/cmdOptions.h core/util/charUtil.h  core/util/opUtil.h  core/myException.h  core/functionPool/functionMgr.h   core/functionPool/functionBase.h   core/util/dataTypeUtil.h   core/util/enumUtil.h
 	g++    $(COMPILE_OPT)  -o  build/expEvaluation.o   core/token/expEvaluation.cpp
 
 

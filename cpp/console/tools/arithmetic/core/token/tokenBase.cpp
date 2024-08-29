@@ -12,6 +12,7 @@ using namespace std;
 TokenBase::TokenBase(E_TokenType tp)
     : m_tokenType(tp)
     , m_opType(E_OPERATOR_UNKNOWN)
+    , m_opForceTypeCastType( E_TP_UNKNOWN )
     , m_dataType(E_TP_UNKNOWN)
     , m_expTypeFlag(0U)
 	, m_opFlag( E_OP_FLAG_UNKNOWN )
@@ -30,6 +31,7 @@ TokenBase::TokenBase(E_TokenType tp)
 TokenBase::TokenBase(E_DataType dt)
     : m_tokenType( E_TOKEN_EXPRESSION ) // set as expression flag
     , m_opType(E_OPERATOR_UNKNOWN)
+    , m_opForceTypeCastType( E_TP_UNKNOWN )
     , m_dataType(dt)
     , m_expTypeFlag(0U)
 	, m_opFlag( E_OP_FLAG_UNKNOWN )
@@ -72,6 +74,20 @@ void TokenBase::setOpType(E_OperatorType opTp)
 {
     m_opType = opTp;
 }
+
+
+void TokenBase::setOpForceCastDataType(E_DataType dt)
+{
+    if ( m_opType == E_FORCE_TYPE_CAST ) {
+        m_opForceTypeCastType = dt;
+    }
+}
+
+E_DataType TokenBase::getOpForceCastDataType()
+{
+    return m_opForceTypeCastType;
+}
+
 
 //////////////////////////////////////////////////////////////////////
 //

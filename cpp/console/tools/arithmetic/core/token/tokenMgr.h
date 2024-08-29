@@ -72,14 +72,17 @@ protected:
     bool is1stTokenTypeKeyWord();
     void executeCode_supportFunction();
 
-    void tracePushedTokenWarning(TokenBase* pToken);//
+    void tracePushedTokenWarning(TokenBase* pToken); //
     void traceBlankStatement();
 protected:
     static TokenMgr* s_gInstance;
 
     static const OpPairCfg s_OpPairCfgTable[OPERATOR_CNT][OPERATOR_CNT];
 
+public:
     static const int s_MAX_KEYWORDS_CNT;
+    static E_DataType getDataTypeByString(const std::string typeName);
+protected:
     static const std::unordered_map<std::string, E_DataType> s_keywordsDataTypeMap;
 protected:
     std::vector<TokenBase*> m_allTokenList;    // for memory pool manager
