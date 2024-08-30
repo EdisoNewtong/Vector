@@ -239,7 +239,7 @@ void ExpEvaluation::buildSuffixExpression(const vector<TokenBase*>& expList, int
             traceSuffixExpression(token, true);
         } else  {
             // tokenType == E_TOKEN_OPERATOR
-            currentEnv = processOperatorStack(previousToken, make_pair(token, idx), currentEnv);
+            currentEnv = processOperatorStack(previousToken, make_pair(token, idx), currentEnv, expList);
         }
 
         previousToken = token;
@@ -667,7 +667,7 @@ void ExpEvaluation::traceOperatorStack(TokenBase* pToken, bool push)
 }
 
 
-ExpEvaluation::suffixExpEnv* ExpEvaluation::processOperatorStack(TokenBase* previousToken, const std::pair<TokenBase*,int>& tokenPair, ExpEvaluation::suffixExpEnv* currentEnv)
+ExpEvaluation::suffixExpEnv* ExpEvaluation::processOperatorStack(TokenBase* previousToken, const std::pair<TokenBase*,int>& tokenPair, ExpEvaluation::suffixExpEnv* currentEnv, const vector<TokenBase*>& expList)
 {
     auto retEnv = currentEnv;
     if ( currentEnv == nullptr ) {
@@ -792,20 +792,23 @@ ExpEvaluation::suffixExpEnv* ExpEvaluation::processOperatorStack(TokenBase* prev
                     int keywordsCnt = 0;
                     std::list<string> tmpKeywordsList;
                     string placehold_space(" ");
-                    while( !currentEnv->suffixExpression.empty() ) 
-                    {
-                        auto pKeyword_token = currentEnv->suffixExpression.back();
-                        if ( pKeyword_token!=nullptr && pKeyword_token->isKeyword() ) {
-                            tmpKeywordsList.push_front( pKeyword_token->getTokenContent() );
-                            tmpKeywordsList.push_front( placehold_space );
-                            ++keywordsCnt;
 
-                            //
-                            // erase all the keywords at tail until meet an unmatched one
-                            //
-                            currentEnv->suffixExpression.pop_back();
+                    auto startPickFlag = false;
+                    for( auto t : expList ) {
+                        if ( !startPickFlag ) {
+                            if ( t == pr.first ) {
+                                startPickFlag = true;
+                            }
                         } else {
-                            break;
+                            if ( t == token ) {
+                                break;
+                            } else {
+                                if ( t!=nullptr ) {
+                                    tmpKeywordsList.push_back( t->getTokenContent() );
+                                    tmpKeywordsList.push_back( placehold_space );
+                                    ++keywordsCnt;
+                                }
+                            }
                         }
                     }
 
@@ -815,8 +818,8 @@ ExpEvaluation::suffixExpEnv* ExpEvaluation::processOperatorStack(TokenBase* prev
                     }
 
                     // keywordsCnt > 0
-                    // delete the front " ";
-                    tmpKeywordsList.pop_front();
+                    // delete the tail " ";
+                    tmpKeywordsList.pop_back();
                     
                     string str_force_type_cast_name;
                     for( auto s_key : tmpKeywordsList ) {
@@ -830,7 +833,6 @@ ExpEvaluation::suffixExpEnv* ExpEvaluation::processOperatorStack(TokenBase* prev
                     }
 
 
-                    // cout << "str_force_type_cast_name = \"" << str_force_type_cast_name << "\" ." << endl;
                     auto forceTypeCast4_dt = TokenMgr::getDataTypeByString( str_force_type_cast_name );
                     if ( forceTypeCast4_dt == E_TP_UNKNOWN ) {
                         MyException e(E_THROW_SENTENCE_UNKNOWN_DATA_TYPE, token->getBeginPos() );
@@ -843,15 +845,25 @@ ExpEvaluation::suffixExpEnv* ExpEvaluation::processOperatorStack(TokenBase* prev
                     // generate a new token for   such as  :   (unsigned long long long)
                     pTokenForceTypeCast = generateTmpExpression_4ForceTypeCast(forceTypeCast4_dt, (charUtil::STR_OPEN_PARENTHESIS + str_force_type_cast_name + charUtil::STR_CLOSE_PARENTHESIS), pr.first, token );
 
-                    // pop the previous (    of    (int)
-                    //                  ^
-                    currentEnv->operatorStack.pop_back();
 
                     if ( pTokenForceTypeCast == nullptr ) {
                         MyException e(E_THROW_SENTENCE_UNKNOWN_DATA_TYPE , token->getBeginPos() );
                         e.setDetail( string("\"") +  str_force_type_cast_name + string("\"") );
                         throw e;
                     } 
+
+                    int cmpCnt = 0;
+                    while( !currentEnv->suffixExpression.empty() )
+                    {
+                        currentEnv->suffixExpression.pop_back();
+                        if ( ++cmpCnt == keywordsCnt ) {
+                            break;
+                        }
+                    }
+
+                    // pop the previous (    of    (int)
+                    //                  ^
+                    currentEnv->operatorStack.pop_back();
 
                     // Core Core Core
                     // (int)  -->  change the sequence into a force type cast operator type     for new feature

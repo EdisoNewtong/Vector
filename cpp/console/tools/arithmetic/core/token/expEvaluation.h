@@ -60,7 +60,7 @@ protected:
 
     std::pair<TokenBase*,int>  findClosestOpenParenthesis(const std::list< std::pair<TokenBase*,int> >& operatorStack);
     void popUntilOpenParenthesis(ExpEvaluation::suffixExpEnv* pEnv);
-    ExpEvaluation::suffixExpEnv* processOperatorStack(TokenBase* previousToken, const std::pair<TokenBase*,int>& tokenPair, ExpEvaluation::suffixExpEnv* currentEnv);
+    ExpEvaluation::suffixExpEnv* processOperatorStack(TokenBase* previousToken, const std::pair<TokenBase*,int>& tokenPair, ExpEvaluation::suffixExpEnv* currentEnv,const std::vector<TokenBase*>& expList );
 
 
 
