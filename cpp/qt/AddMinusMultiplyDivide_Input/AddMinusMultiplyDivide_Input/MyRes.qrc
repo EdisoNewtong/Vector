@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/img">
+        <file>321_Go.gif</file>
+        <file>no.png</file>
+        <file>undecided.png</file>
+        <file>yes.png</file>
+        <file>nextQuestion.png</file>
+    </qresource>
+    <qresource prefix="/audio">
+        <file>3_2_1_Go.mp3</file>
+    </qresource>
+</RCC>
