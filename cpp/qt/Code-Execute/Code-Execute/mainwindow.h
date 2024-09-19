@@ -20,8 +20,12 @@ private slots:
     void onMenu0ItemTriggered(bool checked);
     void onMenu1ItemTriggered(bool checked);
 
+
     void onSaveToCfg(bool checked);
     void on_pushButton_clicked();
+
+public slots:
+    void onMenu1PrintFunctionListTriggered(bool checked);
 
 private:
     void setupLayout();

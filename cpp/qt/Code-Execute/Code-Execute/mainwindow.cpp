@@ -24,7 +24,7 @@
 #include <QSplitter> 
 #include <QSpacerItem>
 
-static auto SG_debugFlag = true;
+static auto SG_debugFlag = false;
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -68,6 +68,7 @@ void MainWindow::setupLayout()
     auto pVLayout = new QVBoxLayout();
     auto pSp      = new QSplitter(Qt::Vertical);
     pSp->setHandleWidth(10);
+    pSp->setChildrenCollapsible(false);
 
     pSp->addWidget( ui->codeEdit);
     pSp->addWidget( ui->outputEdit);
@@ -177,6 +178,10 @@ void MainWindow::initMenuBar1()
         connect( pActionAry[cIndex], SIGNAL( toggled(bool) ), this, SLOT(onMenu1ItemTriggered(bool)) );
     }
 
+    menu1->addSeparator();
+    act = menu1->addAction( "print supported built-in-function-list.");                           
+    act->setEnabled(true);
+    connect(act, SIGNAL( triggered(bool)  ), this, SLOT( onMenu1PrintFunctionListTriggered(bool) ) );
 }
 
 
@@ -403,4 +408,17 @@ QString MainWindow::getVersionDetail()
     const QString V_S_FEATURE_DESCRIPTION(" Support Function-Call && Force-Type-Cast : Alpla-Test-Version  Feature ");
     return QString("Arith Ver %1.%2.%3 [%4]").arg(V_G_MAJOR).arg(V_G_MINOR).arg(V_G_PATCH).arg(V_S_FEATURE_DESCRIPTION);
 }
+
+
+void MainWindow::onMenu1PrintFunctionListTriggered(bool checked)
+{
+    // qDebug() << "onMenu1PrintFunctionListTriggered(bool)  ==> ";
+    Q_UNUSED(checked)
+
+    QString str_function_introduction = QString::fromStdString( CmdOptions::getFunctionsList() );
+    ui->outputEdit->setPlainText( str_function_introduction );
+}
+
+
+
 
