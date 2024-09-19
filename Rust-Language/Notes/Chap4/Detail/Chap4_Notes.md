@@ -39,6 +39,76 @@ Stack vs Heap 访同数据
 - 但是知道管理 Heap 数据是所有权存在的原因，这有助解释它为什么会这样工作。
 
 
+### The Stack and the Heap
+> Many programming languages don’t require you to think about the stack 
+> and the heap very often. But in a systems programming language like 
+> Rust, whether a value is on the stack or the heap affects how the 
+> language behaves and why you have to make certain decisions. Parts of 
+> ownership will be described in relation to the stack and the heap later 
+> in this chapter, so here is a brief explanation in preparation.
+> 
+> Both the stack and the heap are parts of memory available to your code 
+> to use at runtime, but they are structured in different ways. The stack 
+> stores values in the order it gets them and removes the values in the 
+> opposite order. This is referred to as last in, first out. Think of a 
+> stack of plates: when you add more plates, you put them on top of the 
+> pile, and when you need a plate, you take one off the top. Adding or 
+> removing plates from the middle or bottom wouldn’t work as well! Adding 
+> data is called pushing onto the stack, and removing data is called 
+> popping off the stack. All data stored on the stack must have a known, 
+> fixed size. Data with an unknown size at compile time or a size that 
+> might change must be stored on the heap instead.
+> 
+> The heap is less organized: when you put data on the heap, you request a 
+> certain amount of space. The memory allocator finds an empty spot in the 
+> heap that is big enough, marks it as being in use, and returns a 
+> pointer, which is the address of that location. This process is called 
+> allocating on the heap and is sometimes abbreviated as just allocating 
+> (pushing values onto the stack is not considered allocating). Because 
+> the pointer to the heap is a known, fixed size, you can store the 
+> pointer on the stack, but when you want the actual data, you must follow 
+> the pointer. ==**Think of being seated at a restaurant. When you enter, you**== 
+> ==**state the number of people in your group, and the host finds an empty**== 
+> ==**table that fits everyone and leads you there. If someone in your group**== 
+> ==**comes late, they can ask where you’ve been seated to find you.**==  
+> ==** Here the number of people is a changeable amount , the host plays a role of OS **== 
+> ==** which knows which memory is avaliable for guest use , and the table number given by the host **==
+> ==** is like the pointer address. **==
+> 
+> Pushing to the stack is faster than allocating on the heap because the 
+> allocator never has to search for a place to store new data; that 
+> location is always at the top of the stack. Comparatively, allocating 
+> space on the heap requires more work because the allocator must first 
+> find a big enough space to hold the data and then perform bookkeeping to 
+> prepare for the next allocation.
+> 
+> Accessing data in the heap is slower than accessing data on the stack 
+> because you have to follow a pointer to get there. Contemporary 
+> processors are faster if they jump around less in memory. ==**Continuing the**== 
+> ==**analogy, consider a server at a restaurant taking orders from many **== 
+> ==**tables. It’s most efficient to get all the orders at one table before **== 
+> ==**moving on to the next table. Taking an order from table A, then an order **== 
+> ==**from table B, then one from A again, and then one from B again would be **== 
+> ==**a much slower process. if the server has moved between table A and B frequently (Table A is far away from Table B)**== 
+> ==** It is in efficient . The time waste on the movement between table-A and table-B for many times. **== 
+> By the same token, a processor can do its job 
+> better if it works on data that’s close to other data (as it is on the 
+> stack) rather than farther away (as it can be on the heap).
+> 
+> When your code calls a function, the values passed into the function 
+> (including, potentially, pointers to data on the heap) and the 
+> function’s local variables get pushed onto the stack. When the function 
+> is over, those values get popped off the stack.
+> 
+> Keeping track of what parts of code are using what data on the heap, 
+> minimizing the amount of duplicate data on the heap, and cleaning up 
+> unused data on the heap so you don’t run out of space are all problems 
+> that ownership addresses. Once you understand ownership, you won’t need 
+> to think about the stack and the heap very often, but knowing that the 
+> main purpose of ownership is to manage heap data can help explain why it 
+> works the way it does.
+
+
 # Rust 4.1.2 所有权规则 
 ## 3 Rules of the Rust Owership 
 - 每个值(可能)都有一个变量，这个变量是该值的所有者 
@@ -164,7 +234,7 @@ fn main()
 
 - 可变引用有一个重要的限制: 在特定作用域内，对某一块数据，只能有一个可变的引用。
 	- 一这样做的好处是可在编译时防止数据竞争。 
-    
+  
 - 以下三种行为下会发生数据竞争: 
 	- 两个或多个指针同时访问同一个数据 
 	- 至少有一个指针用于**==写入==**数据 
@@ -237,5 +307,4 @@ fn dangle() -> &String {
     - 任意数量不可变的引用
 
 - 引用必须一直有效
-
 
