@@ -19,7 +19,10 @@
 #include <QList>
 #include <QTextEdit>
 
-#include <QGridLayout>
+#include <QHBoxLayout> 
+#include <QVBoxLayout> 
+#include <QSplitter> 
+#include <QSpacerItem>
 
 static auto SG_debugFlag = true;
 
@@ -59,13 +62,24 @@ MainWindow::~MainWindow()
 
 void MainWindow::setupLayout()
 {
-    auto* pGridLayout = new QGridLayout();
+    // auto hSpace = new QSpacerItem(100, 20, QSizePolicy::Expanding, QSizePolicy::Preferred);
 
-    pGridLayout->addWidget( ui->codeEdit,   0, 0 , 7, 5 );
-    pGridLayout->addWidget( ui->outputEdit, 7, 0,  3, 5 );
-    pGridLayout->addWidget( ui->pushButton, 10, 4,  1, 1 );
+    auto pHLayout = new QHBoxLayout();
+    auto pVLayout = new QVBoxLayout();
+    auto pSp      = new QSplitter(Qt::Vertical);
+    pSp->setHandleWidth(10);
 
-    ui->centralwidget->setLayout( pGridLayout );
+    pSp->addWidget( ui->codeEdit);
+    pSp->addWidget( ui->outputEdit);
+
+    pHLayout->addStretch( 7 );
+    pHLayout->addWidget(ui->pushButton, 3 );
+
+    pVLayout->addWidget(pSp , 7 );
+    pVLayout->addLayout(pHLayout, 3 );
+
+
+    ui->centralwidget->setLayout( pVLayout );
 }
 
 
