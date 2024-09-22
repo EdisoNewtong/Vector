@@ -500,7 +500,7 @@ void Dialog::on_saveBtn_clicked()
     fileContent += QString("\t iAdd2RangeMinRangeMax = %1\n").arg( ui->addn2minSpn->maximum() );
       fileContent += QString("\t iAdd2RangeMinUIValue = %1\n").arg( ui->addn2minSpn->value() );
     fileContent += QString("\t iAdd2RangeMaxRangeMin = %1\n").arg( ui->addn2maxSpn->minimum() );
-    fileContent += QString("\t iAdd2RangeMaxRangeMax = %1\n").arg( ui->addn2maxSpn->minimum() );
+    fileContent += QString("\t iAdd2RangeMaxRangeMax = %1\n").arg( ui->addn2maxSpn->maximum() );
       fileContent += QString("\t iAdd2RangeMaxUIValue = %1\n").arg( ui->addn2maxSpn->value() );
 
     fileContent += QString("\t iAdd1rate = %1\n").arg( ui->add1rateSpn->value() );
@@ -525,7 +525,7 @@ void Dialog::on_saveBtn_clicked()
     fileContent += QString("\t  iMinus2RangeMinRangeMax = %1\n").arg( ui->minus2minSpn->maximum() );
       fileContent += QString("\t  iMinus2RangeMinUIValue = %1\n").arg( ui->minus2minSpn->value() );
     fileContent += QString("\t  iMinus2RangeMaxRangeMin = %1\n").arg( ui->minus2maxSpn->minimum() );
-    fileContent += QString("\t  iMinus2RangeMaxRangeMax = %1\n").arg( ui->minus2maxSpn->minimum() );
+    fileContent += QString("\t  iMinus2RangeMaxRangeMax = %1\n").arg( ui->minus2maxSpn->maximum() );
       fileContent += QString("\t  iMinus2RangeMaxUIValue = %1\n").arg( ui->minus2maxSpn->value() );
 
     fileContent += QString("\t  iMinus1rate = %1\n").arg( ui->minus1rateSpn->value() );
