@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file>NextMatch.png</file>
+        <file>PreviousMatch.png</file>
+        <file>Scan.png</file>
+        <file>Stop.png</file>
+        <file>Refresh.png</file>
+    </qresource>
+</RCC>
