@@ -166,7 +166,7 @@
                 </font>
                </property>
                <property name="placeholderText">
-                <string>.txt;.backup</string>
+                <string>*.txt;.*.bk</string>
                </property>
               </widget>
              </item>
@@ -384,6 +384,15 @@
         </item>
         <item>
          <widget class="QTreeWidget" name="visitResultTree">
+          <property name="editTriggers">
+           <set>QAbstractItemView::AnyKeyPressed|QAbstractItemView::DoubleClicked|QAbstractItemView::SelectedClicked</set>
+          </property>
+          <property name="selectionMode">
+           <enum>QAbstractItemView::SingleSelection</enum>
+          </property>
+          <property name="selectionBehavior">
+           <enum>QAbstractItemView::SelectItems</enum>
+          </property>
           <property name="columnCount">
            <number>2</number>
           </property>

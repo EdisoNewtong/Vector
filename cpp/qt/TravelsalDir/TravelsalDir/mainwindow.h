@@ -7,6 +7,8 @@
 #include <QMap>
 #include <QElapsedTimer>
 
+#include "myVisitThread.h"
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -53,9 +55,22 @@ private:
     void refreshFileSystemModel(bool needDeletePrevious);
 
     void visitDir( const QDir& toBeTravelsaled, unsigned long long layer);
+    void fill_ScanResultIntoTreeView();
 private:
     Ui::MainWindow *ui;
     QFileSystemModel* m_pFileSystemModel;
+
+    bool                                   m_bPickDirs;
+    bool                                   m_bPickFiles;
+
+    QString                                m_ignoredFolderPattern;
+	QStringList                            m_ignoredFolderPatternList;
+    bool                                   m_bIgnoredFolderCaseSensitive;
+
+    QString                                m_ignoredFilePattern;
+	QStringList                            m_ignoredFilePatternList;
+    bool                                   m_bIgnoredFileCaseSensitive;
+
 
     QElapsedTimer                          m_timerTotal;
     QElapsedTimer                          m_timerDirs;
@@ -66,7 +81,14 @@ private:
     unsigned long long m_visitedFileCnt;
     unsigned long long m_maxLayer;
 
-    QMap<QString, unsigned long long> m_extensionMap;
+
+    int                m_multiThreadState; // 0:stoped    1:visitDir    2:visitFiles
+    myVisitThread*     m_pDirVisitThread;
+    myVisitThread*     m_pFileVisitThread;
+
+    QMap<QString, QList<QFileInfo> > m_extensionMap;
+
+
     QMap<unsigned long long, QList<QDir> > m_depthDirs;
     QList<QDir>*                           m_pAllDirs;
 
