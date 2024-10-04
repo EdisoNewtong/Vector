@@ -19,3 +19,5 @@
 - SpecialCharFindAndReplace      // 特殊字符 搜索/替换 工具 《 ->  <      。-> .      ，-> , 
 - TravelsalDir                   // 遍历某个目录/盘符 ，  按照相同文件扩展名 进行文件分类 
 - UTF8Principle                  // 单个字符的 UTF-8 查看器
+- Lua-In-Qt                      // the demo sample to guide you use lua inside Qt project 
+
