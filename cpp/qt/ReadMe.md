@@ -1,0 +1,21 @@
+# Project Summary 
+- AddMinusMultiplyDivide_Input   // 加减乘除 手动输入答案 版
+- AddMinusMultiplyDivide_Watch   // 加减乘除 口述版 (家长监督 版)
+- BinaryFileEditor               // 二进制 文件编辑器
+- BuildTree                      
+	- GraphicTree/BinaryTree     // 二叉树 高级版，可以设置 绘制 二叉树的一些细节设置
+	- GraphicTree/NormalTree     // 普通树 
+	- GraphicTree/Tree2FileOnly  // 二叉树 简易版 ( 能存储到文件 / 从文件加载 )
+- ByteViewer                     // 字节 查看器 ( 可以查看一个被载入文件的 原始二进制形式， 还可以在  | \n |   \r\n   |   \r   | HyBrid |    这4种换行模式中，自由切换
+- Code-Execute                   // C++语言 简易运行器 ( 需要一些 **==编译原理==** 的知识点 )
+- CommonResource                 // 公共美术资源
+- ConfigFileParser
+	- RapidJsonParser            // 高亮 JSon 格式文本查看器
+	- RapidXMLParser             // 高亮 XML  格式文本查看器
+- DHB                            // Decimal-Hex-Binary    查看/转换器
+- DHB_V2                         // Decimal-Hex-Binary V2 查看/转换器 ( 有 位/ 字节 颜色对应功能 )
+- FileSafeBox                    // State:  文件本地加密/解密 工具 (有后门)
+- LuaStackSimulator              // State:  Lua 栈数据 模拟器 **==Not==** getting developed yet 
+- SpecialCharFindAndReplace      // 特殊字符 搜索/替换 工具 《 ->  <      。-> .      ，-> , 
+- TravelsalDir                   // 遍历某个目录/盘符 ，  按照相同文件扩展名 进行文件分类 
+- UTF8Principle                  // 单个字符的 UTF-8 查看器
