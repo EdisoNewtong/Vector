@@ -6,6 +6,7 @@
 #include <QDir>
 #include <QMap>
 #include <QElapsedTimer>
+#include <QTreeWidgetItem>
 
 #include "myVisitThread.h"
 
@@ -50,12 +51,20 @@ private slots:
     void on_actionSingleThread_triggered();
 
 
+    void on_resultFileSearhingInput_returnPressed();
+
+    void on_displayFileContent();
+
 private:
     void initUI();
     void refreshFileSystemModel(bool needDeletePrevious);
 
     void visitDir( const QDir& toBeTravelsaled, unsigned long long layer);
     void fill_ScanResultIntoTreeView();
+
+    void focusSearchMatched();
+    void focusNextBtnMatched();
+    void focusPreviousBtnMatched();
 private:
     Ui::MainWindow *ui;
     QFileSystemModel* m_pFileSystemModel;
@@ -91,6 +100,10 @@ private:
 
     QMap<unsigned long long, QList<QDir> > m_depthDirs;
     QList<QDir>*                           m_pAllDirs;
+
+    QList<QTreeWidgetItem*>                m_generatedTreeNodeList;
+    QList<QTreeWidgetItem*>                m_searchMatchedResultNodeList;
+    int                                    m_currentPreviousNextIdx;
 
 
 };

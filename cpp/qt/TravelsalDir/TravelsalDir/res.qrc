@@ -5,5 +5,8 @@
         <file>Scan.png</file>
         <file>Stop.png</file>
         <file>Refresh.png</file>
+        <file>Dir.png</file>
+        <file>File.png</file>
+        <file>Ext.png</file>
     </qresource>
 </RCC>

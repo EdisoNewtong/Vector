@@ -3,10 +3,11 @@
 
 #include <QDebug>
 #include <QDir>
+#include <QFile>
 #include <QItemSelectionModel>
 #include <QRegExp>
 #include <QMessageBox>
-#include <stdint.h>
+#include <QTableWidget>
 
 static const QString sc_STATUS_BAR_SHEET_NONE("");
 static const QString sc_STATUS_BAR_SHEET_ERROR(R"( color: red; )");
@@ -48,6 +49,9 @@ MainWindow::MainWindow(QWidget *parent)
     , m_extensionMap()
     , m_depthDirs()
     , m_pAllDirs( nullptr )
+    , m_generatedTreeNodeList()
+    , m_searchMatchedResultNodeList( )
+    , m_currentPreviousNextIdx( -1 ) 
 {
     ui->setupUi(this);
 
@@ -63,6 +67,8 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
+    ui->visitResultTree->clear();
+
     delete ui;
 
     if ( m_pAllDirs!=nullptr ) {
@@ -90,10 +96,12 @@ void MainWindow::initUI()
         ui->actionSingleThread->setChecked( true );
     }
 
-    ui->visitResultTree->setHeaderLabels( QStringList{ QString("Name/Tag"), QString("Count/AbsPath") });
+    ui->visitResultTree->setHeaderLabels( QStringList{ QString("Name / Tag"), QString("Count / Path") });
     ui->visitResultTree->setColumnWidth(0, 240);
+    connect( ui->visitResultTree, SIGNAL( itemSelectionChanged() ), this,  SLOT( on_displayFileContent() ) );
 
     refreshFileSystemModel( false );
+
 }
 
 
@@ -125,6 +133,10 @@ void MainWindow::refreshFileSystemModel(bool needDeletePrevious)
 //////////////////////////////////////////////////
 void MainWindow::on_scanBtn_clicked()
 {
+    m_generatedTreeNodeList.clear();
+    m_searchMatchedResultNodeList.clear();
+    m_currentPreviousNextIdx = -1;
+
     // Is show folder-tree or not  after travelsal the entire target dir recursively
     m_bPickDirs = ui->folderChk->isChecked();
     m_bPickFiles = ui->fileChk->isChecked();
@@ -238,6 +250,7 @@ void MainWindow::on_scanBtn_clicked()
 
         QDir d( selectedInfo.absoluteFilePath() );
         d.setFilter(QDir::NoDotAndDotDot | QDir::Dirs | QDir::Files | QDir::Hidden );
+        m_visitedDirCnt = 1; // take the selected target-root dir into account
         visitDir(d, 0ULL);
 
         qDebug() << "Elapsed tick = " << m_timerTotal.elapsed() / 1000.0 << " second(s).";
@@ -252,8 +265,6 @@ void MainWindow::on_scanBtn_clicked()
         ui->scanBtn->setEnabled( true );
         ui->clearBtn->setEnabled( true );
 
-        ui->previousBtn->setEnabled(true);
-        ui->nextBtn->setEnabled(true);
 
         fill_ScanResultIntoTreeView( );
     } else {
@@ -264,12 +275,12 @@ void MainWindow::on_scanBtn_clicked()
 
         ui->progressBar->reset();
 
-
         QDir d( selectedInfo.absoluteFilePath() );
         d.setFilter(QDir::NoDotAndDotDot | QDir::Dirs | QDir::Hidden);
 
         m_depthDirs.clear();
         // CORE CORE CORE : insert root first
+        m_visitedDirCnt = 1; // take the selected target-root dir into account
         m_depthDirs.insert(0, QList<QDir>({ QDir(d) }) );
 
         m_timerDirs.start();
@@ -300,43 +311,10 @@ void MainWindow::on_scanBtn_clicked()
 //////////////////////////////////////////////////
 void MainWindow::on_clearBtn_clicked()
 {
-    // Test Only
-    int idx;
-    QString s;
-    s = ".git";
-    auto ary = s.split(";");
-    qDebug() << "1. ";
-    idx = 0;
-    for ( auto e : ary ) {
-        qDebug() << "\t" << (++idx) << ". " <<  e;
-    }
+    ui->visitResultTree->clear();
 
-
-    s = ".git;";
-    qDebug() << "2. ";
-    ary = s.split(";");
-    idx = 0;
-    for ( auto e : ary ) {
-        qDebug() << "\t" << (++idx) << ". " <<  e;
-    }
-
-
-    s = ".git;.config";
-    qDebug() << "3. ";
-    ary = s.split(";");
-    idx = 0;
-    for ( auto e : ary ) {
-        qDebug() << "\t" << (++idx) << ". " <<  e;
-    }
-    
-    s = ".git;.config;";
-    qDebug() << "4. ";
-    ary = s.split(";");
-    idx = 0;
-    for ( auto e : ary ) {
-        qDebug() << "\t" << (++idx) << ". " <<  e;
-    }
-
+    ui->previousBtn->setEnabled( false );
+    ui->nextBtn->setEnabled( false );
 
     /*
      The Tree Widget will be look like the following struct
@@ -367,6 +345,8 @@ void MainWindow::on_clearBtn_clicked()
     */
 
 
+/*
+
 
     // QFileInfo f("C:\\xxx\\yyy\\main.txt");
     QFileInfo f("C:/xxx/yyy/main.txt.backup");
@@ -378,8 +358,10 @@ void MainWindow::on_clearBtn_clicked()
     qDebug() << "f.baseName = |" << f.baseName() << "|";                 // baseName = main
     qDebug() << "f.completeBaseName = |" << f.completeBaseName() << "|"; // completeBaseName = main.txt
     qDebug() << "f.suffix = |" << f.suffix() << "|";                     // suffix = backup
-    qDebug() << "f.completeSuffix = |" << f.completeSuffix() << "|";     // completeSuffix =txt.backup
+    qDebug() << "f.completeSuffix = |" << f.completeSuffix() << "|";     // completeSuffix = txt.backup
 
+
+*/
 
 /*
     QRegExp re1("(hello|world)+", Qt::CaseInsensitive);
@@ -499,7 +481,7 @@ void MainWindow::on_slashFlipBtn_clicked()
 //////////////////////////////////////////////////
 void MainWindow::on_previousBtn_clicked()
 {
-
+    focusPreviousBtnMatched();
 }
 
 
@@ -508,7 +490,7 @@ void MainWindow::on_previousBtn_clicked()
 //////////////////////////////////////////////////
 void MainWindow::on_nextBtn_clicked()
 {
-
+    focusNextBtnMatched();
 }
 
 
@@ -527,6 +509,26 @@ void MainWindow::on_refreshDirBtn_clicked()
 //////////////////////////////////////////////////
 void MainWindow::on_pickFolderInput_returnPressed()
 {
+    // QModelIndex QFileSystemModel::index(const QString &path, int column = 0)
+    auto absPath = ui->pickFolderInput->text().trimmed();
+    if ( absPath.isEmpty() ) {
+        return;
+    }
+
+    QFileInfo d(absPath);
+    if ( d.isDir() ) {
+        QModelIndex pickedByInputDirModel = m_pFileSystemModel->index(absPath, 0);
+        if ( pickedByInputDirModel.isValid() ) {
+            QItemSelectionModel* selModel = ui->diskTreeView->selectionModel();
+            if ( selModel != nullptr ) {
+                selModel->clear();
+                selModel->select( pickedByInputDirModel, QItemSelectionModel::SelectCurrent);
+            }
+
+            ui->diskTreeView->scrollTo( pickedByInputDirModel, QAbstractItemView::EnsureVisible);
+            ui->diskTreeView->setExpanded(pickedByInputDirModel, true);
+        }
+    }
 
 }
 
@@ -536,6 +538,10 @@ void MainWindow::visitDir(const QDir& toBeTravelsaled, unsigned long long layer)
 {
     if ( layer > m_maxLayer ) {
         m_maxLayer = layer;
+    }
+
+    if ( layer == 0 ) {
+        m_pAllDirs->push_back( toBeTravelsaled );
     }
 
     // qDebug() << "dir = " << toBeTravelsaled;
@@ -750,13 +756,8 @@ void MainWindow::onVisitAllFileFinished()
         ui->statusbar->showMessage("[INFO] : Visit All-Files Finished ", 3000);
     }
 
-    ui->previousBtn->setEnabled(true);
-    ui->nextBtn->setEnabled(true);
 
-    fill_ScanResultIntoTreeView( );
-    m_multiThreadState = 0;
-
-
+    fill_ScanResultIntoTreeView();
 }
 
 
@@ -772,25 +773,37 @@ void MainWindow::onVisitOneDirAllFiles(unsigned long long finishedCnt)
 
 void MainWindow::fill_ScanResultIntoTreeView()
 {
+    m_generatedTreeNodeList.clear();
+    m_searchMatchedResultNodeList.clear();
+    m_currentPreviousNextIdx = -1;
+
+    m_multiThreadState = 0;
+
     ui->visitResultTree->clear();
 
     QTreeWidgetItem *pFileRoot = new QTreeWidgetItem( ui->visitResultTree );
     pFileRoot->setText(0, "Files");
     pFileRoot->setText(1, QString("%1 file(s) of %2 ext-kinds").arg( m_visitedFileCnt ).arg( m_extensionMap.size() ) );
+    pFileRoot->setIcon(0, QIcon(":/icons/File.png") );
 
     if ( m_bPickFiles ) {
         auto idx = 0;
         for ( auto it = m_extensionMap.begin(); it!=m_extensionMap.end(); ++it, ++idx ) {
             QTreeWidgetItem *pFileExtTreeRoot = new QTreeWidgetItem( pFileRoot );
             pFileExtTreeRoot->setText(0, QString("#%1 %2").arg(idx+1).arg( it.key() ) );
+            pFileExtTreeRoot->setIcon(0, QIcon(":/icons/Ext.png") );
             pFileExtTreeRoot->setText(1, QString("%1").arg( it.value().size() ) );
 
             for( auto fileit = it.value().begin(); fileit!=it.value().end(); ++fileit ) {
                 QTreeWidgetItem *pFile = new QTreeWidgetItem(pFileExtTreeRoot );
                 auto fileName = fileit->fileName();
+                m_generatedTreeNodeList.push_back( pFile );
                 pFile->setText(0, fileName );
-                pFile->setText(1, QString("%1 / %2").arg(fileit->path()).arg( fileName )  );
+                pFile->setText(1, QString("%1").arg( fileit->absoluteFilePath() ) );
+                pFile->setIcon(0, QIcon(":/icons/File.png") );
                 pFile->setFlags(pFile->flags() | Qt::ItemIsEditable );
+                // QVariant(1) -> file   |  QVariant(2) -> dir
+                pFile->setData(0,  Qt::UserRole, QVariant(1) );
             }
         }
     }
@@ -799,11 +812,12 @@ void MainWindow::fill_ScanResultIntoTreeView()
     QTreeWidgetItem *pDirRoot = new QTreeWidgetItem( ui->visitResultTree );
     pDirRoot->setText(0, "Dirs");
     pDirRoot->setText(1, QString("%1 count of %2 types").arg(m_visitedDirCnt).arg(m_bPickDirs ?  m_pAllDirs->size() : 0 ) );
+    pDirRoot->setIcon(0, QIcon(":/icons/Dir.png") );
     if ( m_bPickDirs ) {
         if ( m_pAllDirs != nullptr && !m_pAllDirs->isEmpty() ) {
             QMap<QString, QList<QDir> > groups;
 
-            for( auto it = m_pAllDirs->begin(); it!=m_pAllDirs->end(); ++it ) {
+            for ( auto it = m_pAllDirs->begin(); it!=m_pAllDirs->end(); ++it ) {
                 groups[ it->dirName()  ].push_back( *it );
             }
 
@@ -811,12 +825,21 @@ void MainWindow::fill_ScanResultIntoTreeView()
             for( auto it = groups.begin(); it!=groups.end(); ++it, ++idx ) {
                 QTreeWidgetItem *pDirType = new QTreeWidgetItem( pDirRoot );
                 pDirType->setText(0, QString("#%1 %2").arg(idx+1).arg( it.key() ) );
-                pDirType->setText(1, QString("%1 same count").arg(it.value().size()) );
+                pDirType->setText(1, QString("%1 with same name").arg(it.value().size()) );
+                pDirType->setIcon(0, QIcon(":/icons/Dir.png") );
 
                 for( auto it2 = it.value().begin(); it2!=it.value().end(); ++it2 ) {
                     QTreeWidgetItem *pDirObj = new QTreeWidgetItem( pDirType );
+
+                    m_generatedTreeNodeList.push_back( pDirObj );
+
                     pDirObj->setText(0, QString("%1").arg( it2->absolutePath() ) );
                     pDirObj->setFlags(pDirObj->flags() | Qt::ItemIsEditable );
+
+                    // QVariant(1) -> file   |  QVariant(2) -> dir
+                    pDirObj->setData(0, Qt::UserRole, QVariant(2) );
+
+                    pDirObj->setIcon(0, QIcon(":/icons/Dir.png") );
                 }
             }
         }
@@ -827,5 +850,162 @@ void MainWindow::fill_ScanResultIntoTreeView()
 }
 
 
+
+
+
+
+void MainWindow::on_resultFileSearhingInput_returnPressed()
+{
+    m_searchMatchedResultNodeList.clear();
+    m_currentPreviousNextIdx = -1;
+    ui->previousBtn->setEnabled(false);
+    ui->nextBtn->setEnabled(false);
+    if ( m_multiThreadState != 0 ) {
+        return;
+    }
+
+    auto strSearchWhat = ui->resultFileSearhingInput->text().trimmed();
+    if ( strSearchWhat.isEmpty() ) {
+        return;
+    }
+
+
+    auto bIsIgnoreSearchResultCaseSensitive = ui->prevNextIgnoreChk->isChecked();
+    for ( auto item : m_generatedTreeNodeList ) {
+        if ( item!=nullptr ) {
+            if ( item->text(0).contains(strSearchWhat, bIsIgnoreSearchResultCaseSensitive ? Qt::CaseInsensitive : Qt::CaseSensitive) ) {
+                m_searchMatchedResultNodeList.push_back( item );
+            }
+        }
+    }
+
+    if ( m_searchMatchedResultNodeList.empty() ) {
+        ui->statusbar->clearMessage();
+        ui->statusbar->setStyleSheet( sc_STATUS_BAR_SHEET_ERROR  );
+        ui->statusbar->showMessage( QString("[ERROR] Oops ... No item matched keyword !") , 3000 );
+
+        ui->previousBtn->setEnabled(false);
+        ui->nextBtn->setEnabled(false);
+        m_currentPreviousNextIdx = -1;
+    } else {
+        ui->previousBtn->setEnabled( true );
+        ui->nextBtn->setEnabled( true );
+
+        m_currentPreviousNextIdx = 0;
+        focusSearchMatched();
+    }
+
+}
+
+void MainWindow::focusSearchMatched()
+{
+    auto sz = m_searchMatchedResultNodeList.size();
+    if ( sz == 0  || m_currentPreviousNextIdx == -1 ) {
+        return;
+    }
+
+    if ( m_currentPreviousNextIdx>=0 && m_currentPreviousNextIdx < sz ) {
+        auto selItem = m_searchMatchedResultNodeList.at(m_currentPreviousNextIdx);
+        if ( selItem!=nullptr ) {
+            ui->visitResultTree->setCurrentItem(selItem, 0, QItemSelectionModel::ClearAndSelect );
+            ui->visitResultTree->scrollToItem( selItem );
+
+        }
+    }
+}
+
+void MainWindow::focusNextBtnMatched()
+{
+    auto isLoop = ui->loopChk->isChecked();
+    auto sz = m_searchMatchedResultNodeList.size();
+    if ( sz == 0  || m_currentPreviousNextIdx == -1 ) {
+        ui->statusbar->clearMessage();
+        ui->statusbar->setStyleSheet( sc_STATUS_BAR_SHEET_WARNING  );
+        ui->statusbar->showMessage( QString("[WARNING] No Item(s) matched keyword!") , 3000 );
+        return;
+    }
+
+    ++m_currentPreviousNextIdx;
+    if ( isLoop ) {
+        m_currentPreviousNextIdx = (m_currentPreviousNextIdx + sz) % sz;
+    }
+
+    if ( m_currentPreviousNextIdx >= sz ) {
+        m_currentPreviousNextIdx = sz-1;
+
+        ui->statusbar->clearMessage();
+        ui->statusbar->setStyleSheet( sc_STATUS_BAR_SHEET_WARNING  );
+        ui->statusbar->showMessage( QString("[WARNING] Reached <Last> matched item ") , 3000 );
+        return;
+    }
+
+    focusSearchMatched();
+}
+
+void MainWindow::focusPreviousBtnMatched()
+{
+    auto isLoop = ui->loopChk->isChecked();
+    auto sz = m_searchMatchedResultNodeList.size();
+    if ( sz == 0  || m_currentPreviousNextIdx == -1 ) {
+        ui->statusbar->clearMessage();
+        ui->statusbar->setStyleSheet( sc_STATUS_BAR_SHEET_WARNING  );
+        ui->statusbar->showMessage( QString("[WARNING] No Item(s) matched keyword!") , 3000 );
+        return;
+    }
+
+    --m_currentPreviousNextIdx;
+    if ( isLoop ) {
+        m_currentPreviousNextIdx = (m_currentPreviousNextIdx + sz) % sz;
+    }
+
+    if ( m_currentPreviousNextIdx < 0 ) {
+        m_currentPreviousNextIdx = 0;
+
+        ui->statusbar->clearMessage();
+        ui->statusbar->setStyleSheet( sc_STATUS_BAR_SHEET_WARNING  );
+        ui->statusbar->showMessage( QString("[WARNING] Reached <First> matched item !") , 3000 );
+        return;
+    }
+    focusSearchMatched();
+}
+
+
+void MainWindow::on_displayFileContent()
+{
+    auto items = ui->visitResultTree->selectedItems();
+    if ( items.size() != 1 ) {
+        return;
+    }
+
+    auto item = items.at(0);
+    if ( item!=nullptr ) {
+        auto vdata = item->data( 0, Qt::UserRole);
+        auto isValid = false;
+        auto val = vdata.toInt(&isValid);
+        if ( isValid ) {
+            if ( val == 1 ) {
+                // File
+                auto dirOrFile_Path = item->text(1);
+                ui->processingFolderPath->setText( dirOrFile_Path );
+                QFileInfo info( dirOrFile_Path );
+                if ( info.isFile() ) {
+                    QFile file( dirOrFile_Path );
+                    if ( file.open( QIODevice::ReadOnly | QIODevice::ExistingOnly) ) {
+                        auto byteArray = file.readAll();
+                        ui->fileContentView->setPlainText( QString(byteArray) );
+                    } else {
+                        ui->statusbar->clearMessage();
+                        ui->statusbar->setStyleSheet( sc_STATUS_BAR_SHEET_ERROR );
+                        ui->statusbar->showMessage("[ERROR] : 打开文件失败", 5000);
+                    }
+                    file.close();
+                }
+            }
+        }
+
+    }
+
+
+}
 
 
