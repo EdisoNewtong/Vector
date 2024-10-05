@@ -87,6 +87,8 @@ private slots:
     void on_updateLCDNumber();
     void on_randomQuestion();
     void on_321goFinished();
+
+    void on_mediaStatusChanged(QMediaPlayer::MediaStatus status);
 private:
     Ui::MainWindow *ui;
 
@@ -107,6 +109,11 @@ private:
           int       m_incorrectCnt;
 
     QMovie*         m_321goGif;
+    int             m_countDownSoundIdx;
+    const int       m_countDownSoundMaxCnt;
+    QList<QString>  m_cdSoundFileList;
+    int             m_soundTag;
+    int             m_originalFontSize;
 
     QList<QPair<int,int> >    m_plusQuestionList;
     QList<QPair<int,int> >    m_plusQuestionListBackup;
@@ -131,6 +138,7 @@ private:
     QString                   m_currentModAnswer;
 
     QMediaPlayer*             m_pSoundPlayer;
+    QMediaPlayer*             m_pEffectPlayer;
 
     Dialog*                   m_pSettingDlg;
 

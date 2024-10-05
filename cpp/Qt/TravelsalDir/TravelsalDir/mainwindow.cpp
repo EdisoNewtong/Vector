@@ -9,6 +9,8 @@
 #include <QMessageBox>
 #include <QTableWidget>
 
+static const bool sc_b_USE_ICON = true;
+
 static const QString sc_STATUS_BAR_SHEET_NONE("");
 static const QString sc_STATUS_BAR_SHEET_ERROR(R"( color: red; )");
 static const QString sc_STATUS_BAR_SHEET_CORRECT(R"( color: green; )");
@@ -29,9 +31,11 @@ MainWindow::MainWindow(QWidget *parent)
     , m_ignoredFolderPattern("")
     , m_ignoredFolderPatternList()
     , m_bIgnoredFolderCaseSensitive( false )
+    , m_bOnlyVisitMatchedFolder( false )
     , m_ignoredFilePattern("")
     , m_ignoredFilePatternList()
     , m_bIgnoredFileCaseSensitive( false )
+    , m_bOnlyVisitMatchedExtFiles( false )
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     , m_timerTotal()
     , m_timerDirs()
@@ -52,6 +56,10 @@ MainWindow::MainWindow(QWidget *parent)
     , m_generatedTreeNodeList()
     , m_searchMatchedResultNodeList( )
     , m_currentPreviousNextIdx( -1 ) 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    , m_treeFileIcon(":/icons/File.png")
+    , m_treeExtIcon(":/icons/Ext.png")
+    , m_treeDirIcon(":/icons/Dir.png")
 {
     ui->setupUi(this);
 
@@ -140,6 +148,9 @@ void MainWindow::on_scanBtn_clicked()
     // Is show folder-tree or not  after travelsal the entire target dir recursively
     m_bPickDirs = ui->folderChk->isChecked();
     m_bPickFiles = ui->fileChk->isChecked();
+
+    m_bOnlyVisitMatchedFolder   = ui->folderMatchChk->isChecked();
+    m_bOnlyVisitMatchedExtFiles = ui->fileExtMatchChk->isChecked();
 
     if ( !m_bPickDirs  && !m_bPickFiles ) {
         ui->statusbar->clearMessage();
@@ -293,7 +304,7 @@ void MainWindow::on_scanBtn_clicked()
 
         m_pDirVisitThread->setType( myVisitThread::E_DIRS );
         // set dir filter ( if a certain dir matched the filter condition ( match with dir.startsWith(pattern) -> true ), !![Do NOT]!! take it into account ( !![DO NOT]!! Add it into the result dir list )  )
-        m_pDirVisitThread->setDirIgnoreOption(m_bIgnoredFolderCaseSensitive,  m_ignoredFolderPattern);
+        m_pDirVisitThread->setDirIgnoreOption(m_bIgnoredFolderCaseSensitive,  m_ignoredFolderPattern, m_bOnlyVisitMatchedFolder );
         m_pDirVisitThread->setStartDir( d );
 
         connect(m_pDirVisitThread, &myVisitThread::visitOneDir, this, &MainWindow::onVisitOneDir );
@@ -563,7 +574,14 @@ void MainWindow::visitDir(const QDir& toBeTravelsaled, unsigned long long layer)
                 }
             }
 
-            if ( !isMatched ) {
+            auto bNeedVisit = false;
+            if ( m_bOnlyVisitMatchedFolder ) {
+                bNeedVisit = isMatched;
+            } else {
+                bNeedVisit = !isMatched;
+            }
+
+            if ( bNeedVisit ) {
                 ++m_visitedDirCnt;
                 m_pAllDirs->push_back( dirObj );
                 visitDir(dirObj, layer+1 );
@@ -606,7 +624,14 @@ void MainWindow::visitDir(const QDir& toBeTravelsaled, unsigned long long layer)
                     }
                 }
 
-                if ( !isMatchedFile ) {
+                auto bNeedVisitFile = false;
+                if ( m_bOnlyVisitMatchedExtFiles ) {
+                    bNeedVisitFile = isMatchedFile;
+                } else {
+                    bNeedVisitFile = !isMatchedFile;
+                }
+
+                if ( bNeedVisitFile ) {
                     ++m_visitedFileCnt;
                     // such as  "Makefile"
                     if ( completeSuffixExt.isEmpty() && suffixExt.isEmpty() ) {
@@ -691,7 +716,7 @@ void MainWindow::onVisitAllDirsFinished()
     m_pFileVisitThread->setType( myVisitThread::E_FILES );
 
     // set file filter ( if a certain file matched the filter condition, !![Do NOT]!! take it into account ( do not add it into the result file list )  )
-    m_pFileVisitThread->setFileIgnoreOption( m_bIgnoredFileCaseSensitive, m_ignoredFilePattern );
+    m_pFileVisitThread->setFileIgnoreOption( m_bIgnoredFileCaseSensitive, m_ignoredFilePattern, m_bOnlyVisitMatchedExtFiles );
 
     m_pFileVisitThread->setVisitedDirs( m_pAllDirs );
     connect(m_pFileVisitThread, &myVisitThread::visitOneFile, this, &MainWindow::onVisitOneFile );
@@ -784,14 +809,14 @@ void MainWindow::fill_ScanResultIntoTreeView()
     QTreeWidgetItem *pFileRoot = new QTreeWidgetItem( ui->visitResultTree );
     pFileRoot->setText(0, "Files");
     pFileRoot->setText(1, QString("%1 file(s) of %2 ext-kinds").arg( m_visitedFileCnt ).arg( m_extensionMap.size() ) );
-    pFileRoot->setIcon(0, QIcon(":/icons/File.png") );
+    if ( sc_b_USE_ICON ) { pFileRoot->setIcon(0, m_treeFileIcon ); }
 
     if ( m_bPickFiles ) {
         auto idx = 0;
         for ( auto it = m_extensionMap.begin(); it!=m_extensionMap.end(); ++it, ++idx ) {
             QTreeWidgetItem *pFileExtTreeRoot = new QTreeWidgetItem( pFileRoot );
             pFileExtTreeRoot->setText(0, QString("#%1 %2").arg(idx+1).arg( it.key() ) );
-            pFileExtTreeRoot->setIcon(0, QIcon(":/icons/Ext.png") );
+            if ( sc_b_USE_ICON ) { pFileExtTreeRoot->setIcon(0, m_treeExtIcon  ); }
             pFileExtTreeRoot->setText(1, QString("%1").arg( it.value().size() ) );
 
             for( auto fileit = it.value().begin(); fileit!=it.value().end(); ++fileit ) {
@@ -800,7 +825,7 @@ void MainWindow::fill_ScanResultIntoTreeView()
                 m_generatedTreeNodeList.push_back( pFile );
                 pFile->setText(0, fileName );
                 pFile->setText(1, QString("%1").arg( fileit->absoluteFilePath() ) );
-                pFile->setIcon(0, QIcon(":/icons/File.png") );
+                if ( sc_b_USE_ICON ) { pFile->setIcon(0, m_treeFileIcon  ); }
                 pFile->setFlags(pFile->flags() | Qt::ItemIsEditable );
                 // QVariant(1) -> file   |  QVariant(2) -> dir
                 pFile->setData(0,  Qt::UserRole, QVariant(1) );
@@ -812,7 +837,7 @@ void MainWindow::fill_ScanResultIntoTreeView()
     QTreeWidgetItem *pDirRoot = new QTreeWidgetItem( ui->visitResultTree );
     pDirRoot->setText(0, "Dirs");
     pDirRoot->setText(1, QString("%1 count of %2 types").arg(m_visitedDirCnt).arg(m_bPickDirs ?  m_pAllDirs->size() : 0 ) );
-    pDirRoot->setIcon(0, QIcon(":/icons/Dir.png") );
+    if ( sc_b_USE_ICON ) { pDirRoot->setIcon(0, m_treeDirIcon  ); }
     if ( m_bPickDirs ) {
         if ( m_pAllDirs != nullptr && !m_pAllDirs->isEmpty() ) {
             QMap<QString, QList<QDir> > groups;
@@ -826,7 +851,7 @@ void MainWindow::fill_ScanResultIntoTreeView()
                 QTreeWidgetItem *pDirType = new QTreeWidgetItem( pDirRoot );
                 pDirType->setText(0, QString("#%1 %2").arg(idx+1).arg( it.key() ) );
                 pDirType->setText(1, QString("%1 with same name").arg(it.value().size()) );
-                pDirType->setIcon(0, QIcon(":/icons/Dir.png") );
+                if ( sc_b_USE_ICON ) { pDirType->setIcon(0, m_treeDirIcon  ); }
 
                 for( auto it2 = it.value().begin(); it2!=it.value().end(); ++it2 ) {
                     QTreeWidgetItem *pDirObj = new QTreeWidgetItem( pDirType );
@@ -839,7 +864,7 @@ void MainWindow::fill_ScanResultIntoTreeView()
                     // QVariant(1) -> file   |  QVariant(2) -> dir
                     pDirObj->setData(0, Qt::UserRole, QVariant(2) );
 
-                    pDirObj->setIcon(0, QIcon(":/icons/Dir.png") );
+                    if ( sc_b_USE_ICON ) { pDirObj->setIcon(0, m_treeDirIcon  ); }
                 }
             }
         }

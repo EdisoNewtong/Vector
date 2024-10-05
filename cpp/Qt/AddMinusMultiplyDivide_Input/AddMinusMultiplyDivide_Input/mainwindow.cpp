@@ -10,6 +10,9 @@
 
 #include <QUrl>
 
+// at most 5.0 second
+static const double sc_LIMIT_TIME = 5.0;
+
 // static const QString sc_HIGH_LIGHT_STYLE_SHEET(R"(
 //  background-color: #EE82EE;
 //  color: #00FF7F;
@@ -45,6 +48,11 @@ MainWindow::MainWindow(QWidget *parent)
     , m_correctCnt(0)
     , m_incorrectCnt(0)
     , m_321goGif( new QMovie(":/img/321_Go.gif") )
+    , m_countDownSoundIdx( 0 )
+    , m_countDownSoundMaxCnt( 3 )
+    , m_cdSoundFileList{ QString("qrc:///audio/secTick1.mp3"), QString("qrc:///audio/secTick2.mp3"), QString("qrc:///audio/c4boom.mp3") }
+    , m_soundTag(0)
+    , m_originalFontSize( 0 )
     , ms_opRandomPool{ "+" , "-", "×", "÷" }
     , ms_relopRandomPool{ "<", "⩽", ">", "⩾", "=", "==", "≠ ", "≈" }
     , m_currentAnswer()
@@ -52,6 +60,7 @@ MainWindow::MainWindow(QWidget *parent)
     , m_questionType( 0 )
     , m_bNeedInputMod( false )
     , m_pSoundPlayer(nullptr)
+    , m_pEffectPlayer( nullptr )
     , m_pSettingDlg( nullptr )
 {
     ui->setupUi(this);
@@ -67,6 +76,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     // set sound audio player
     m_pSoundPlayer = new QMediaPlayer( this );
+    m_pEffectPlayer = new QMediaPlayer( this );
+    connect(m_pEffectPlayer, &QMediaPlayer::mediaStatusChanged, this, &MainWindow::on_mediaStatusChanged );
 
     initUI();
 
@@ -217,7 +228,11 @@ void MainWindow::nextQuestion(bool correct, const QString& input, const QString&
     ui->cdLabel->show();
     ui->cdLabel->setMovie( m_321goGif );
     m_321goGif->start();
+ 
+    // ++m_countDownSoundIdx;
+    // m_countDownSoundIdx = m_countDownSoundIdx % m_countDownSoundMaxCnt;
 
+    m_soundTag = 0;
     m_pSoundPlayer->setMedia(QUrl("qrc:///audio/3_2_1_Go.mp3"));
     m_pSoundPlayer->setVolume(50);
     m_pSoundPlayer->play();
@@ -403,14 +418,6 @@ void MainWindow::on_action_save_triggered()
                 case E_YES_NO_UNDECIDE_TAG:
                     {
                         content = item->data( Qt::UserRole+1 ).toString();
-                        // qDebug() << i << " -> name = " << content;
-                        // if ( content == "N/A" ) {
-                        //     content = "N/A";
-                        // } else if ( content.endsWith("yes.png") ) {
-                        //     content = "YES";
-                        // } else {
-                        //     content = "NO";
-                        // }
                         fileContent += (content.leftJustified(6) + VLINE);
                     }
                     break;
@@ -495,6 +502,30 @@ void MainWindow::on_updateLCDNumber()
     auto timerItem = ui->tableWidget->item(currentQid, static_cast<int>(E_COUNT_DOWN_TAG) );
     if ( timerItem!=nullptr ) {
         timerItem->setText( strNumber );
+        if ( realtime >= sc_LIMIT_TIME  ) {
+            timerItem->setBackground( QBrush( Qt::black ) );
+            timerItem->setForeground( QBrush( Qt::red ) );
+            auto oldFont = timerItem->font();
+            timerItem->setFont( QFont( oldFont.family(),  m_originalFontSize + 15, QFont::ExtraBold ) );
+            
+            auto pickedsound_info = m_cdSoundFileList.at(m_countDownSoundIdx); 
+
+            auto playedState = m_pEffectPlayer->state();
+            if ( playedState == QMediaPlayer::StoppedState ) {
+                qDebug() << "Play " << pickedsound_info;
+                m_pEffectPlayer->setMedia(QUrl( pickedsound_info ));
+                m_pEffectPlayer->setVolume(80);
+                m_pEffectPlayer->play();
+
+                // loop + 1
+                ++m_countDownSoundIdx;
+                m_countDownSoundIdx = m_countDownSoundIdx % m_countDownSoundMaxCnt;
+            }
+
+            m_soundTag = 2;
+        } else {
+            timerItem->setForeground( QBrush( Qt::green ) );
+        }
     }
 }
 
@@ -816,6 +847,7 @@ void MainWindow::on_321goFinished()
     {
         QTableWidgetItem *newItem = new QTableWidgetItem( "0.00" );
         ui->tableWidget->setItem(currentQid , static_cast<int>(E_COUNT_DOWN_TAG), newItem);
+        m_originalFontSize = newItem->font().pointSize();
     }
 
     // yes/no/ haven't decided yet
@@ -847,7 +879,9 @@ void MainWindow::on_321goFinished()
     {
         QTableWidgetItem *newItem = new QTableWidgetItem( "" );
         ui->tableWidget->setItem(currentQid , static_cast<int>(E_INCORRECT_RATE_TAG), newItem);
+        // ui->tableWidget->scrollToItem( newItem , QAbstractItemView::PositionAtCenter);
     }
+    ui->tableWidget->scrollToBottom();
 
     ui->action_pause->setEnabled(true);
     ui->action_stop->setEnabled(true);
@@ -887,6 +921,14 @@ void MainWindow::updateCurrentResultUI(bool correct, const QString& inputAnswer,
             item->setData( (Qt::UserRole+1) , QVariant(correct ? QString("YES") : QString("NO")) );
             item->setIcon( QIcon(correct ? ":/img/yes.png" : ":/img/no.png") );
         }
+
+        m_soundTag = 1;
+        m_pEffectPlayer->setMedia(QUrl(correct ? "qrc:///audio/correct.mp3" : "qrc:///audio/incorrect.mp3"));
+        m_pEffectPlayer->setVolume(50);
+        m_pEffectPlayer->play();
+        // m_pSoundPlayer->setMedia(QUrl(correct ? "qrc:///audio/correct.mp3" : "qrc:///audio/incorrect.mp3"));
+        // m_pSoundPlayer->setVolume(50);
+        // m_pSoundPlayer->play();
     }
 
     // correct answer
@@ -952,6 +994,14 @@ void MainWindow::updateCurrentResultUI(bool correct, const QString& inputAnswer,
             ui->statusbar->clearMessage();
             ui->statusbar->setStyleSheet( correct ? sc_STATUS_BAR_SHEET_CORRECT : sc_STATUS_BAR_SHEET_ERROR );
             ui->statusbar->showMessage( QString("第 %1 题用时 : %2 秒").arg(currentQid+1).arg( timerItem->text() ), 1000);
+
+            if ( !correct ) {
+                timerItem->setBackground( QBrush( Qt::black ) );
+                timerItem->setForeground( QBrush( Qt::red ) );
+
+                auto oldFont = timerItem->font();
+                timerItem->setFont( QFont( oldFont.family(),  m_originalFontSize + 15, QFont::ExtraBold ) );
+            }
         }
     }
 
@@ -1233,6 +1283,20 @@ void  MainWindow::resetQuestionListByCfg(const Dialog::settingInfo& cfg)
 
 }
 
+void MainWindow::on_mediaStatusChanged(QMediaPlayer::MediaStatus status)
+{
+    if ( m_soundTag == 2 && status == QMediaPlayer::EndOfMedia ) {
+        qDebug() << "loop Next CD";
+        m_pEffectPlayer->setMedia(QUrl( m_cdSoundFileList.at(m_countDownSoundIdx) ));
+        m_pEffectPlayer->setVolume(55);
+        m_pEffectPlayer->play();
 
+        // loop + 1
+        ++m_countDownSoundIdx;
+        m_countDownSoundIdx = m_countDownSoundIdx % m_countDownSoundMaxCnt;
+
+        m_soundTag = 2;
+    }
+}
 
 

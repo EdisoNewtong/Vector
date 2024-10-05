@@ -8,5 +8,10 @@
     </qresource>
     <qresource prefix="/audio">
         <file>3_2_1_Go.mp3</file>
+        <file>c4boom.mp3</file>
+        <file>correct.mp3</file>
+        <file>incorrect.mp3</file>
+        <file>secTick1.mp3</file>
+        <file>secTick2.mp3</file>
     </qresource>
 </RCC>

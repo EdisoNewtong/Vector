@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QFileSystemModel>
+#include <QIcon>
 #include <QDir>
 #include <QMap>
 #include <QElapsedTimer>
@@ -75,10 +76,12 @@ private:
     QString                                m_ignoredFolderPattern;
 	QStringList                            m_ignoredFolderPatternList;
     bool                                   m_bIgnoredFolderCaseSensitive;
+    bool                                   m_bOnlyVisitMatchedFolder;
 
     QString                                m_ignoredFilePattern;
 	QStringList                            m_ignoredFilePatternList;
     bool                                   m_bIgnoredFileCaseSensitive;
+    bool                                   m_bOnlyVisitMatchedExtFiles;
 
 
     QElapsedTimer                          m_timerTotal;
@@ -105,6 +108,12 @@ private:
     QList<QTreeWidgetItem*>                m_searchMatchedResultNodeList;
     int                                    m_currentPreviousNextIdx;
 
+
+    // Resource
+      // --------------------  Icons --------------------
+    QIcon                                  m_treeFileIcon;
+    QIcon                                  m_treeExtIcon;
+    QIcon                                  m_treeDirIcon;
 
 };
 #endif // MAINWINDOW_H

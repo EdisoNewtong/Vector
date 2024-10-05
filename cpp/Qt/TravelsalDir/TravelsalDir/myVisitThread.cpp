@@ -13,8 +13,10 @@ myVisitThread::myVisitThread(QObject* parent /* = nullptr */)
     , m_pVisitedDirs( nullptr )
     , m_bTerminateFlag( false )
 	, m_bIsIgnoreDirCaseSensitive( true )
+    , m_bPickDirOnly( false )
 	, m_strIgnoreDirPatternGrp()
 	, m_bIsIgnoreFileCaseSensitive( true )
+    , m_bPickFileOnly( false )
 	, m_strIgnoreFilePatternGrp()
 {
     // QThread::setTerminationEnabled(true);
@@ -89,7 +91,14 @@ void myVisitThread::run() // Q_DECL_OVERRIDE;
 
 					}
 
-					if ( !isMatched ) {
+                    auto bNeedVisitFile = false;
+                    if ( m_bPickFileOnly ) {
+                        bNeedVisitFile = isMatched;
+                    } else {
+                        bNeedVisitFile = !isMatched;
+                    }
+
+					if ( bNeedVisitFile ) {
 						emit visitOneFile( (i+1) ,  dirInfo );
 					} else {
 						// skip this file , maybe TODO something
@@ -151,7 +160,15 @@ void myVisitThread::travelsalDirs(const QDir& d, unsigned long long layer)
             }
 		}
 
-		if ( !isMatched ) {
+        auto bNeedVisit = false;
+        if ( m_bPickDirOnly ) {
+            bNeedVisit = isMatched;
+        } else {
+            // skip this dir
+            bNeedVisit = !isMatched;
+        }
+
+		if ( bNeedVisit ) {
 			// qDebug() << "\tLoop : " << dPath; // << " -> layer = " << layer;
 			emit visitOneDir(idx, dPath, layer);
 		} else {
@@ -169,9 +186,10 @@ void myVisitThread::setTerminateFlag()
 
 
 
-void myVisitThread::setDirIgnoreOption(bool bIsIgnoreCaseSensitive, const QString& strIgnorePattern)
+void myVisitThread::setDirIgnoreOption(bool bIsIgnoreCaseSensitive, const QString& strIgnorePattern, bool bPickOnly)
 {
 	m_bIsIgnoreDirCaseSensitive = bIsIgnoreCaseSensitive;
+    m_bPickDirOnly = bPickOnly;
 
 	QString pattern = strIgnorePattern.trimmed();
 	m_strIgnoreDirPatternGrp.clear();
@@ -184,9 +202,10 @@ void myVisitThread::setDirIgnoreOption(bool bIsIgnoreCaseSensitive, const QStrin
 }
 
 
-void myVisitThread::setFileIgnoreOption(bool bIsIgnoreCaseSensitive, const QString& strIgnorePattern)
+void myVisitThread::setFileIgnoreOption(bool bIsIgnoreCaseSensitive, const QString& strIgnorePattern, bool bPickOnly)
 {
 	m_bIsIgnoreFileCaseSensitive = bIsIgnoreCaseSensitive;
+    m_bPickFileOnly = bPickOnly;
 
 	QString pattern = strIgnorePattern.trimmed();
 	m_strIgnoreFilePatternGrp.clear();
