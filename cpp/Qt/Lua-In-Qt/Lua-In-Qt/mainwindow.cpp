@@ -1,13 +1,9 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+// for c++ compiler      use  extern "C" wrap  { #include  ... }
+#include "lua.hpp"
 
-extern "C"
-{
-	#include <lua.h>
-	#include <lualib.h>
-	#include <lauxlib.h>
-}
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -90,4 +86,3 @@ sumValue = calcSum(ary)
 
 
 }
-
