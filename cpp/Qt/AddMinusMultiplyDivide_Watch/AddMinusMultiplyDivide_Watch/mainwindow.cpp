@@ -106,19 +106,24 @@ void MainWindow::initUI()
     ui->threePoints->hide();
     ui->mod->hide();
 
-
+    // ui->tableWidget->clear();
     QStringList labels;
     foreach ( int tag, m_tagStringMap.keys() ) {
        labels << m_tagStringMap.value(tag);
     }
 
+
     ui->tableWidget->setHorizontalHeaderLabels(labels);
 
-    ui->tableWidget->setColumnWidth(static_cast<int>(E_QUESTION_TAG), 90);
+    ui->tableWidget->setColumnWidth(static_cast<int>(E_QUESTION_TAG), 150);
+    ui->tableWidget->setColumnWidth(static_cast<int>(E_COUNT_DOWN_TAG), 120 );
     ui->tableWidget->setColumnWidth(static_cast<int>(E_YES_NO_UNDECIDE_TAG),64);
-    ui->tableWidget->setColumnWidth(static_cast<int>(E_ANSWER_TAG), 70);
-    ui->tableWidget->setColumnWidth(static_cast<int>(E_CORRECT_RATE_TAG), 100);
-    ui->tableWidget->setColumnWidth(static_cast<int>(E_INCORRECT_RATE_TAG), 100);
+    ui->tableWidget->setColumnWidth(static_cast<int>(E_ANSWER_TAG), 100);
+    ui->tableWidget->setColumnWidth(static_cast<int>(E_CORRECT_RATE_TAG), 160);
+    ui->tableWidget->setColumnWidth(static_cast<int>(E_INCORRECT_RATE_TAG), 160);
+
+
+    ui->tableWidget->resizeColumnsToContents();
 
 }
 
@@ -252,6 +257,10 @@ void MainWindow::on_action_start_triggered()
     ui->action_stop->setEnabled(true);
 
     ui->action_settings->setEnabled(false);
+
+    ui->tableWidget->clearContents();
+    ui->tableWidget->setRowCount(0);
+    ui->tableWidget->resizeColumnsToContents();
 
     nextQuestion(true);
 
@@ -477,6 +486,10 @@ void MainWindow::on_updateLCDNumber()
             auto pickedsound_info = m_cdSoundFileList.at(m_countDownSoundIdx); 
             auto playedState = m_pEffectPlayer->state();
             if ( playedState == QMediaPlayer::StoppedState ) {
+                qDebug() << "Do Play sound ... ";
+
+                ui->tableWidget->resizeColumnsToContents();
+
                 m_pEffectPlayer->setMedia(QUrl( pickedsound_info ));
                 m_pEffectPlayer->setVolume(55);
                 m_pEffectPlayer->play();
@@ -774,6 +787,7 @@ void MainWindow::on_321goFinished()
         // ui->tableWidget->scrollToItem( newItem , QAbstractItemView::PositionAtCenter);
     }
     ui->tableWidget->scrollToBottom();
+    ui->tableWidget->resizeColumnsToContents();
 
 
     ui->action_pause->setEnabled(true);
@@ -878,6 +892,7 @@ void MainWindow::updateCurrentResultUI(bool correct)
         }
     }
 
+    ui->tableWidget->resizeColumnsToContents();
 }
 
 void  MainWindow::resetQuestionListByCfg(const Dialog::settingInfo& cfg)

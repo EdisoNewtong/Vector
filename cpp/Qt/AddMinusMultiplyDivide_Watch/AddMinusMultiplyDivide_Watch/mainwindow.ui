@@ -249,8 +249,11 @@
       <property name="columnCount">
        <number>6</number>
       </property>
-      <attribute name="horizontalHeaderStretchLastSection">
-       <bool>false</bool>
+      <attribute name="horizontalHeaderMinimumSectionSize">
+       <number>30</number>
+      </attribute>
+      <attribute name="horizontalHeaderDefaultSectionSize">
+       <number>180</number>
       </attribute>
       <column/>
       <column/>

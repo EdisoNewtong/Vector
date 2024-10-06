@@ -482,7 +482,17 @@ void MainWindow::on_stopBtn_clicked()
 //////////////////////////////////////////////////
 void MainWindow::on_slashFlipBtn_clicked()
 {
+    static const QChar SC_BACK_SLASH('\\');
+    static const QChar SC_SLASH('/');
 
+    QString processed_path = ui->processingFolderPath->text();
+
+    if ( processed_path.contains(SC_SLASH) ) {
+        processed_path.replace( SC_SLASH, SC_BACK_SLASH );
+    } else {
+        processed_path.replace( SC_BACK_SLASH, SC_SLASH );
+    }
+    ui->processingFolderPath->setText( processed_path );
 }
 
 
@@ -1008,9 +1018,11 @@ void MainWindow::on_displayFileContent()
         auto isValid = false;
         auto val = vdata.toInt(&isValid);
         if ( isValid ) {
+            QString realPath;
             if ( val == 1 ) {
                 // File
                 auto dirOrFile_Path = item->text(1);
+                realPath = dirOrFile_Path;
                 ui->processingFolderPath->setText( dirOrFile_Path );
                 QFileInfo info( dirOrFile_Path );
                 if ( info.isFile() ) {
@@ -1025,12 +1037,15 @@ void MainWindow::on_displayFileContent()
                     }
                     file.close();
                 }
-            }
+            } else {
+                realPath = item->text(0);
+            } 
+
+            ui->processingFolderPath->setText( realPath );
         }
 
     }
-
-
 }
+
 
 

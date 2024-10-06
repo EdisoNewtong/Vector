@@ -125,7 +125,7 @@ void MainWindow::initUI()
     ui->op2_Edit->hide();
     ui->result_Edit->hide();
 
-
+    // ui->tableWidget->clear();
     QStringList labels;
     foreach ( int tag, m_tagStringMap.keys() ) {
        labels << m_tagStringMap.value(tag);
@@ -141,6 +141,8 @@ void MainWindow::initUI()
 
     ui->tableWidget->setColumnWidth(static_cast<int>(E_CORRECT_RATE_TAG), 100);
     ui->tableWidget->setColumnWidth(static_cast<int>(E_INCORRECT_RATE_TAG), 100);
+
+    ui->tableWidget->resizeColumnsToContents();
 
 }
 
@@ -287,6 +289,10 @@ void MainWindow::on_action_start_triggered()
     ui->action_pause->setEnabled(true);
     ui->action_stop->setEnabled(true);
     ui->action_settings->setEnabled(false);
+
+    ui->tableWidget->clearContents();
+    ui->tableWidget->setRowCount(0);
+    ui->tableWidget->resizeColumnsToContents();
 
     nextQuestion(true, "");
 }
@@ -513,6 +519,9 @@ void MainWindow::on_updateLCDNumber()
             auto playedState = m_pEffectPlayer->state();
             if ( playedState == QMediaPlayer::StoppedState ) {
                 qDebug() << "Play " << pickedsound_info;
+
+                ui->tableWidget->resizeColumnsToContents();
+
                 m_pEffectPlayer->setMedia(QUrl( pickedsound_info ));
                 m_pEffectPlayer->setVolume(80);
                 m_pEffectPlayer->play();
@@ -882,6 +891,7 @@ void MainWindow::on_321goFinished()
         // ui->tableWidget->scrollToItem( newItem , QAbstractItemView::PositionAtCenter);
     }
     ui->tableWidget->scrollToBottom();
+    ui->tableWidget->resizeColumnsToContents();
 
     ui->action_pause->setEnabled(true);
     ui->action_stop->setEnabled(true);
@@ -1004,6 +1014,8 @@ void MainWindow::updateCurrentResultUI(bool correct, const QString& inputAnswer,
             }
         }
     }
+
+    ui->tableWidget->resizeColumnsToContents();
 
 }
 
