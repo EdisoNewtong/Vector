@@ -6,15 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1064</width>
-    <height>718</height>
+    <width>1047</width>
+    <height>745</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Search And Replace</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout" stretch="10,1">
+   <layout class="QVBoxLayout" name="verticalLayout" stretch="12,1">
     <item>
      <widget class="QWidget" name="widget" native="true">
       <property name="sizePolicy">
@@ -80,20 +80,32 @@
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4" stretch="10,2">
            <item>
-            <widget class="QPlainTextEdit" name="plainTextEdit_2"/>
+            <widget class="QPlainTextEdit" name="targetScanTextBox"/>
            </item>
            <item>
             <widget class="QGroupBox" name="SearchGrp">
              <property name="title">
               <string>Search ToolBox</string>
              </property>
-             <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="3,7">
+             <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="2,10">
               <item>
                <widget class="QGroupBox" name="fileGrp1">
                 <property name="title">
                  <string>File</string>
                 </property>
                 <layout class="QHBoxLayout" name="horizontalLayout_2">
+                 <property name="leftMargin">
+                  <number>8</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>20</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>8</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>20</number>
+                 </property>
                  <item>
                   <widget class="QPushButton" name="loadFileBtn">
                    <property name="sizePolicy">
@@ -128,23 +140,52 @@
                 <property name="title">
                  <string>Search &amp;&amp;&amp;&amp; Replace</string>
                 </property>
-                <layout class="QHBoxLayout" name="horizontalLayout_6">
+                <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="2,8">
                  <item>
                   <widget class="QWidget" name="widget_2" native="true">
                    <layout class="QVBoxLayout" name="verticalLayout_3">
                     <item>
-                     <layout class="QHBoxLayout" name="horizontalLayout_4">
+                     <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="1,1">
+                      <property name="spacing">
+                       <number>4</number>
+                      </property>
+                      <property name="leftMargin">
+                       <number>6</number>
+                      </property>
+                      <property name="rightMargin">
+                       <number>6</number>
+                      </property>
                       <item>
-                       <widget class="QToolButton" name="sPrevBtn">
+                       <widget class="QPushButton" name="sPrevBtn">
+                        <property name="sizePolicy">
+                         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                          <horstretch>0</horstretch>
+                          <verstretch>0</verstretch>
+                         </sizepolicy>
+                        </property>
                         <property name="text">
-                         <string>&lt;-</string>
+                         <string/>
+                        </property>
+                        <property name="icon">
+                         <iconset resource="MyRes.qrc">
+                          <normaloff>:/icons/PreviousBtn.png</normaloff>:/icons/PreviousBtn.png</iconset>
                         </property>
                        </widget>
                       </item>
                       <item>
-                       <widget class="QToolButton" name="sNextBtn">
+                       <widget class="QPushButton" name="sNextBtn">
+                        <property name="sizePolicy">
+                         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                          <horstretch>0</horstretch>
+                          <verstretch>0</verstretch>
+                         </sizepolicy>
+                        </property>
                         <property name="text">
-                         <string>-&gt;</string>
+                         <string/>
+                        </property>
+                        <property name="icon">
+                         <iconset resource="MyRes.qrc">
+                          <normaloff>:/icons/NextBtn.png</normaloff>:/icons/NextBtn.png</iconset>
                         </property>
                        </widget>
                       </item>
@@ -164,6 +205,9 @@
                         <property name="text">
                          <string>Loop</string>
                         </property>
+                        <property name="checked">
+                         <bool>true</bool>
+                        </property>
                        </widget>
                       </item>
                      </layout>
@@ -173,6 +217,31 @@
                  </item>
                  <item>
                   <layout class="QHBoxLayout" name="horizontalLayout_3">
+                   <property name="leftMargin">
+                    <number>5</number>
+                   </property>
+                   <property name="topMargin">
+                    <number>20</number>
+                   </property>
+                   <property name="rightMargin">
+                    <number>5</number>
+                   </property>
+                   <property name="bottomMargin">
+                    <number>20</number>
+                   </property>
+                   <item>
+                    <widget class="QPushButton" name="deHighlightBtn">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="text">
+                      <string>De HighLight</string>
+                     </property>
+                    </widget>
+                   </item>
                    <item>
                     <widget class="QPushButton" name="searchBtn">
                      <property name="sizePolicy">
@@ -229,7 +298,24 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_5" stretch="7,3">
+          <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,7,3">
+           <item>
+            <layout class="QFormLayout" name="formLayout">
+             <item row="0" column="0">
+              <widget class="QLabel" name="label">
+               <property name="text">
+                <string>Search</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QLineEdit" name="searchInTableLineEdit"/>
+             </item>
+            </layout>
+           </item>
            <item>
             <widget class="QTableWidget" name="cfgTableWidget">
              <property name="sizePolicy">
@@ -242,14 +328,11 @@
               <bool>true</bool>
              </property>
              <property name="rowCount">
-              <number>3</number>
+              <number>0</number>
              </property>
              <property name="columnCount">
               <number>6</number>
              </property>
-             <row/>
-             <row/>
-             <row/>
              <column/>
              <column/>
              <column/>
@@ -270,6 +353,21 @@
                  <string>Table Operator</string>
                 </property>
                 <layout class="QHBoxLayout" name="horizontalLayout_8">
+                 <property name="spacing">
+                  <number>8</number>
+                 </property>
+                 <property name="leftMargin">
+                  <number>8</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>20</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>8</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>20</number>
+                 </property>
                  <item>
                   <widget class="QPushButton" name="newCfgBtn">
                    <property name="sizePolicy">
@@ -305,6 +403,21 @@
                  <string>File</string>
                 </property>
                 <layout class="QHBoxLayout" name="horizontalLayout_7">
+                 <property name="spacing">
+                  <number>8</number>
+                 </property>
+                 <property name="leftMargin">
+                  <number>8</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>20</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>8</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>20</number>
+                 </property>
                  <item>
                   <widget class="QPushButton" name="loadCfgBtn">
                    <property name="sizePolicy">
@@ -340,6 +453,18 @@
                  <string>Options</string>
                 </property>
                 <layout class="QHBoxLayout" name="horizontalLayout_9">
+                 <property name="leftMargin">
+                  <number>8</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>20</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>8</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>20</number>
+                 </property>
                  <item>
                   <widget class="QPushButton" name="checkLogicBtn">
                    <property name="sizePolicy">
@@ -367,7 +492,26 @@
      </widget>
     </item>
     <item>
-     <widget class="QPlainTextEdit" name="infoBox"/>
+     <widget class="QWidget" name="cmdGrp" native="true">
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QPlainTextEdit" name="infoBox"/>
+       </item>
+       <item>
+        <widget class="QPushButton" name="runCmdBtn">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>Run Code</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -377,7 +521,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1064</width>
+     <width>1047</width>
      <height>18</height>
     </rect>
    </property>
@@ -386,6 +530,7 @@
      <string>Setting</string>
     </property>
     <addaction name="actionShow_InfoBox"/>
+    <addaction name="actionShow_Command_UserManual"/>
    </widget>
    <addaction name="menuSetting"/>
   </widget>
@@ -405,7 +550,7 @@
     <string>Find Previous</string>
    </property>
    <property name="shortcut">
-    <string>F3</string>
+    <string>Alt+Left</string>
    </property>
   </action>
   <action name="actionNextFind">
@@ -416,10 +561,17 @@
     <string>Find Next</string>
    </property>
    <property name="shortcut">
-    <string>F4</string>
+    <string>Alt+Left</string>
+   </property>
+  </action>
+  <action name="actionShow_Command_UserManual">
+   <property name="text">
+    <string>Show Command UserManual</string>
    </property>
   </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="MyRes.qrc"/>
+ </resources>
  <connections/>
 </ui>

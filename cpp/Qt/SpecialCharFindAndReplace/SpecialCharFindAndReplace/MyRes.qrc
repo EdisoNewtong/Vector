@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file>NextBtn.png</file>
+        <file>PreviousBtn.png</file>
+    </qresource>
+</RCC>
