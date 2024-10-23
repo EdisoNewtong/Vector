@@ -111,9 +111,9 @@ private:
 
     // Resource
       // --------------------  Icons --------------------
-    QIcon                                  m_treeFileIcon;
-    QIcon                                  m_treeExtIcon;
-    QIcon                                  m_treeDirIcon;
+    QIcon*                                  m_treeFileIcon;
+    QIcon*                                  m_treeExtIcon;
+    QIcon*                                  m_treeDirIcon;
 
 };
 #endif // MAINWINDOW_H

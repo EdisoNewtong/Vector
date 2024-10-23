@@ -51,6 +51,8 @@ public:
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+protected:
+    void keyPressEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
 
 private slots:
     void on_loadFileBtn_clicked();

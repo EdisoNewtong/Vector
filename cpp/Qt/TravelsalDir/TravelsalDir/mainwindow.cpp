@@ -3,6 +3,10 @@
 
 #include <QDebug>
 #include <QDir>
+#include <QUrl>
+#include <QImage>
+#include <QImageReader>
+#include <QPixmap>
 #include <QFile>
 #include <QItemSelectionModel>
 #include <QRegExp>
@@ -57,9 +61,9 @@ MainWindow::MainWindow(QWidget *parent)
     , m_searchMatchedResultNodeList( )
     , m_currentPreviousNextIdx( -1 ) 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
-    , m_treeFileIcon(":/icons/File.png")
-    , m_treeExtIcon(":/icons/Ext.png")
-    , m_treeDirIcon(":/icons/Dir.png")
+    , m_treeFileIcon( new QIcon(":/icons/File.png") )
+    , m_treeExtIcon(  new QIcon(":/icons/Ext.png")  )
+    , m_treeDirIcon(  new QIcon(":/icons/Dir.png")  )
 {
     ui->setupUi(this);
 
@@ -78,6 +82,10 @@ MainWindow::~MainWindow()
     ui->visitResultTree->clear();
 
     delete ui;
+
+    delete m_treeFileIcon; m_treeFileIcon = nullptr;
+    delete m_treeExtIcon;  m_treeExtIcon = nullptr;
+    delete m_treeDirIcon;  m_treeDirIcon = nullptr;
 
     if ( m_pAllDirs!=nullptr ) {
         m_pAllDirs->clear();
@@ -251,6 +259,8 @@ void MainWindow::on_scanBtn_clicked()
 
     ui->scanBtn->setEnabled( false );
     ui->clearBtn->setEnabled( false );
+    ui->visitResultTree->clear();
+    ui->visitResultTree->setEnabled( false );
 
     if ( !m_bUseMultiThreadMode  ) {
         qDebug() << "Type == 1 :  Use Single-Thread";
@@ -278,6 +288,8 @@ void MainWindow::on_scanBtn_clicked()
 
 
         fill_ScanResultIntoTreeView( );
+
+        ui->visitResultTree->setEnabled( true );
     } else {
         qDebug() << "Type == 2 :  Use Multi-Thread";
 
@@ -441,6 +453,7 @@ void MainWindow::on_stopBtn_clicked()
             ui->statusbar->setStyleSheet( sc_STATUS_BAR_SHEET_WARNING  );
             ui->statusbar->showMessage( QString("[WARNING] User Cancled ") , 3000 );
 
+            ui->visitResultTree->setEnabled( true );
         }
 
         m_multiThreadState = 0;
@@ -464,6 +477,8 @@ void MainWindow::on_stopBtn_clicked()
             ui->statusbar->clearMessage();
             ui->statusbar->setStyleSheet( sc_STATUS_BAR_SHEET_WARNING  );
             ui->statusbar->showMessage( QString("[WARNING] User Cancled ") , 3000 );
+
+            ui->visitResultTree->setEnabled( true );
         }
 
         m_multiThreadState = 0;
@@ -793,6 +808,7 @@ void MainWindow::onVisitAllFileFinished()
 
 
     fill_ScanResultIntoTreeView();
+    ui->visitResultTree->setEnabled( true );
 }
 
 
@@ -819,14 +835,14 @@ void MainWindow::fill_ScanResultIntoTreeView()
     QTreeWidgetItem *pFileRoot = new QTreeWidgetItem( ui->visitResultTree );
     pFileRoot->setText(0, "Files");
     pFileRoot->setText(1, QString("%1 file(s) of %2 ext-kinds").arg( m_visitedFileCnt ).arg( m_extensionMap.size() ) );
-    if ( sc_b_USE_ICON ) { pFileRoot->setIcon(0, m_treeFileIcon ); }
+    if ( sc_b_USE_ICON ) { pFileRoot->setIcon(0, *m_treeFileIcon ); }
 
     if ( m_bPickFiles ) {
         auto idx = 0;
         for ( auto it = m_extensionMap.begin(); it!=m_extensionMap.end(); ++it, ++idx ) {
             QTreeWidgetItem *pFileExtTreeRoot = new QTreeWidgetItem( pFileRoot );
             pFileExtTreeRoot->setText(0, QString("#%1 %2").arg(idx+1).arg( it.key() ) );
-            if ( sc_b_USE_ICON ) { pFileExtTreeRoot->setIcon(0, m_treeExtIcon  ); }
+            if ( sc_b_USE_ICON ) { pFileExtTreeRoot->setIcon(0, *m_treeExtIcon  ); }
             pFileExtTreeRoot->setText(1, QString("%1").arg( it.value().size() ) );
 
             for( auto fileit = it.value().begin(); fileit!=it.value().end(); ++fileit ) {
@@ -835,7 +851,7 @@ void MainWindow::fill_ScanResultIntoTreeView()
                 m_generatedTreeNodeList.push_back( pFile );
                 pFile->setText(0, fileName );
                 pFile->setText(1, QString("%1").arg( fileit->absoluteFilePath() ) );
-                if ( sc_b_USE_ICON ) { pFile->setIcon(0, m_treeFileIcon  ); }
+                if ( sc_b_USE_ICON ) { pFile->setIcon(0, *m_treeFileIcon  ); }
                 pFile->setFlags(pFile->flags() | Qt::ItemIsEditable );
                 // QVariant(1) -> file   |  QVariant(2) -> dir
                 pFile->setData(0,  Qt::UserRole, QVariant(1) );
@@ -847,7 +863,7 @@ void MainWindow::fill_ScanResultIntoTreeView()
     QTreeWidgetItem *pDirRoot = new QTreeWidgetItem( ui->visitResultTree );
     pDirRoot->setText(0, "Dirs");
     pDirRoot->setText(1, QString("%1 count of %2 types").arg(m_visitedDirCnt).arg(m_bPickDirs ?  m_pAllDirs->size() : 0 ) );
-    if ( sc_b_USE_ICON ) { pDirRoot->setIcon(0, m_treeDirIcon  ); }
+    if ( sc_b_USE_ICON ) { pDirRoot->setIcon(0, *m_treeDirIcon  ); }
     if ( m_bPickDirs ) {
         if ( m_pAllDirs != nullptr && !m_pAllDirs->isEmpty() ) {
             QMap<QString, QList<QDir> > groups;
@@ -861,7 +877,7 @@ void MainWindow::fill_ScanResultIntoTreeView()
                 QTreeWidgetItem *pDirType = new QTreeWidgetItem( pDirRoot );
                 pDirType->setText(0, QString("#%1 %2").arg(idx+1).arg( it.key() ) );
                 pDirType->setText(1, QString("%1 with same name").arg(it.value().size()) );
-                if ( sc_b_USE_ICON ) { pDirType->setIcon(0, m_treeDirIcon  ); }
+                if ( sc_b_USE_ICON ) { pDirType->setIcon(0, *m_treeDirIcon  ); }
 
                 for( auto it2 = it.value().begin(); it2!=it.value().end(); ++it2 ) {
                     QTreeWidgetItem *pDirObj = new QTreeWidgetItem( pDirType );
@@ -874,7 +890,7 @@ void MainWindow::fill_ScanResultIntoTreeView()
                     // QVariant(1) -> file   |  QVariant(2) -> dir
                     pDirObj->setData(0, Qt::UserRole, QVariant(2) );
 
-                    if ( sc_b_USE_ICON ) { pDirObj->setIcon(0, m_treeDirIcon  ); }
+                    if ( sc_b_USE_ICON ) { pDirObj->setIcon(0, *m_treeDirIcon  ); }
                 }
             }
         }
@@ -1029,7 +1045,105 @@ void MainWindow::on_displayFileContent()
                     QFile file( dirOrFile_Path );
                     if ( file.open( QIODevice::ReadOnly | QIODevice::ExistingOnly) ) {
                         auto byteArray = file.readAll();
-                        ui->fileContentView->setPlainText( QString(byteArray) );
+
+                        const QRegExp re(".+\\.(bmp|gif|jpg|png|pbm|pgm|ppm|xbm|xpm|svg)$", Qt::CaseInsensitive);
+                        // bool 
+                        // contains(const QRegExp &rx) const
+                        if ( dirOrFile_Path.contains(re) ) {
+                            file.close();
+
+                            if ( 0 ) {
+                                qDebug() << "png hit " << dirOrFile_Path;
+                                ui->fileContentView->setPlainText( QString("") );
+
+                                // QUrl imageUrl( QString("file://%1").arg(dirOrFile_Path) );
+                                // if ( imageUrl.isValid() ) {
+                                //     qDebug() << "url is valid";
+                                // } else {
+                                //     qDebug() << "url is [NOT] valid";
+                                // }
+
+                                QString urlpath = QString("file://%1").arg(dirOrFile_Path);
+                                // QString urlpath = QString("%1").arg(dirOrFile_Path);
+                                QUrl imageUrl(urlpath);
+
+                                // QPixmap icon(dirOrFile_Path); 
+                                // QImage image = icon.toImage();
+                                QImage image = QImageReader ( dirOrFile_Path ).read();
+                                QTextDocument* textDocument = ui->fileContentView->document();
+                                textDocument->addResource( QTextDocument::ImageResource, imageUrl, QVariant ( image ) );
+
+                                QTextCursor cursor = ui->fileContentView->textCursor();
+                                cursor.movePosition(QTextCursor::NextWord, QTextCursor::KeepAnchor );
+
+                                // QTextImageFormat imageFormat;
+                                // imageFormat.setWidth( image.width() );
+                                // imageFormat.setHeight( image.height() );
+                                // imageFormat.setName( imageUrl.toString() );
+
+                                cursor.insertImage( image ); 
+                                // cursor.insertImage( imageUrl.toString() );
+
+                                // ui->fileContentView->setDocument( textDocument );
+                                // ui->fileContentView->update();
+
+                                ui->fileContentView->setTextCursor( cursor );
+                                // ui->fileContentView->setDocument( textDocument );
+                                // ui->fileContentView->update();
+
+                                // qDebug() << "image = " << image;
+
+                                // QVariant imageVar = ui->fileContentView->loadResource( QTextDocument::ImageResource, QUrl(imageUrl) );
+                                // QImage loadedImage = QImage::fromData( byteArray );
+                                // qDebug() << loadedImage;
+
+
+
+
+                                // QTextDocument * textDocument = ui->fileContentView->document();
+                                // textDocument->addResource( QTextDocument::ImageResource, imageUrl, QVariant ( image ) );
+
+                                // QTextCursor cursor = ui->fileContentView->textCursor();
+                                // QTextImageFormat imageFormat;
+                                // imageFormat.setWidth( image.width() );
+                                // imageFormat.setHeight( image.height() );
+                                // imageFormat.setName( imageUrl.toString() );
+                                // cursor.insertImage(imageFormat);
+                                // ui->fileContentView->setTextCursor( cursor );
+
+                                // ui->fileContentView->setDocument( textDocument );
+                                ui->fileContentView->update();
+                            } 
+
+
+
+
+                            /*
+                                QString file = QFileDialog::getOpenFileName(this, tr("Select an image"),
+                                                              ".", tr("Bitmap Files (*.bmp)\n"
+                                                                "JPEG (*.jpg *jpeg)\n"
+                                                                "GIF (*.gif)\n"
+                                                                "PNG (*.png)\n"));
+                                QUrl Uri ( QString ( "file://%1" ).arg ( file ) );
+                                QImage image = QImageReader ( file ).read();
+
+                                QTextDocument * textDocument = m_textEdit->document();
+                                textDocument->addResource( QTextDocument::ImageResource, Uri, QVariant ( image ) );
+                                QTextCursor cursor = m_textEdit->textCursor();
+                                QTextImageFormat imageFormat;
+                                imageFormat.setWidth( image.width() );
+                                imageFormat.setHeight( image.height() );
+                                imageFormat.setName( Uri.toString() );
+                                cursor.insertImage(imageFormat);
+                            */
+
+                            // QVariant var =  ui->fileContentView->loadResource( QTextDocument::ImageResource, QUrl( QString("file:///F:/2023-04-10扫墓/IMG_7729.jpg") ) );
+                            // qDebug() << "var = " << var;
+                        } else {
+                            ui->fileContentView->setPlainText( QString(byteArray) );
+                            // QVariant var = ui->targetScanTextBox->loadResource( QTextDocument::ImageResource, QUrl() );
+                        }
+
                     } else {
                         ui->statusbar->clearMessage();
                         ui->statusbar->setStyleSheet( sc_STATUS_BAR_SHEET_ERROR );

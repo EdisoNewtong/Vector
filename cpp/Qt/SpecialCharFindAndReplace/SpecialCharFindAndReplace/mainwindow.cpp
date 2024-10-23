@@ -956,3 +956,22 @@ void MainWindow::on_actionNextFind_triggered()
         highLightOneMatched(true);
     }
 }
+
+
+// shortcut key is 
+//      F3 -> Previous Search
+//      F4 -> Next     Search
+void MainWindow::keyPressEvent(QKeyEvent *event) // Q_DECL_OVERRIDE
+{
+    auto keyCode = event->key();
+    if( keyCode == Qt::Key_F3 ) {
+        on_actionPreviousFind_triggered();
+        event->accpet();
+    } else if( keyCode == Qt::Key_F4 ) {
+        on_actionNextFind_triggered();
+        event->accpet();
+    } else {
+        QMainWindow::keyPressEvent(event);
+    }
+}
+
