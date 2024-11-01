@@ -24,6 +24,7 @@ static const QChar G_SC_OPTION_SEP(';');
 static const QString G_SC_WILDCARD_PREFIX("*.");
 static const QChar G_SC_CHAR_DOT('.');
 static const QString G_SC_STR_DOT(".");
+static const QChar G_SC_CHAR_LESS_THAN('<');
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -662,15 +663,15 @@ void MainWindow::visitDir(const QDir& toBeTravelsaled, unsigned long long layer)
                     if ( completeSuffixExt.isEmpty() && suffixExt.isEmpty() ) {
                         // such as  "/usr/hello." ( [Pay Attention] Please :  there has a '.' after the word "hello"  ), it has neither completeSuffix() nor suffix()
                         if ( !fullpath.contains( G_SC_CHAR_DOT  ) ) {
-                            m_extensionMap["<No-Suffix>"].push_back( eachfInfo );
+                            m_extensionMap["<No-Suffix>"][""].push_back( eachfInfo );
                         } else {
-                            m_extensionMap["<Suffix-IS-Empty>"].push_back( eachfInfo );
+                            m_extensionMap["<Suffix-IS-Empty>"][""].push_back( eachfInfo );
                         }
                     } else {
                         if ( completeSuffixExt != suffixExt ) {
-                            m_extensionMap[G_SC_STR_DOT + completeSuffixExt].push_back( eachfInfo );
+                            m_extensionMap[G_SC_STR_DOT + suffixExt][G_SC_STR_DOT + completeSuffixExt].push_back( eachfInfo );
                         } else {
-                            m_extensionMap[G_SC_STR_DOT  + suffixExt].push_back( eachfInfo ) ;
+                            m_extensionMap[G_SC_STR_DOT  + suffixExt][""].push_back( eachfInfo ) ;
                         }
                     }
                 }
@@ -762,18 +763,19 @@ void MainWindow::onVisitOneFile(int idx, const QFileInfo& finfo)
     auto completeSuffixExt = finfo.completeSuffix();
     auto suffixExt = finfo.suffix();
 
+    // such as  "Makefile"
     if ( completeSuffixExt.isEmpty() && suffixExt.isEmpty() ) {
         // such as  "/usr/hello." ( [Pay Attention] Please :  there has a '.' after the word "hello"  ), it has neither completeSuffix() nor suffix()
         if ( !fullpath.contains( G_SC_CHAR_DOT  ) ) {
-            m_extensionMap["<No-Suffix>"].push_back( finfo );
+            m_extensionMap["<No-Suffix>"][""].push_back( finfo );
         } else {
-            m_extensionMap["<Suffix-IS-Empty>"].push_back( finfo );
+            m_extensionMap["<Suffix-IS-Empty>"][""].push_back( finfo );
         }
     } else {
         if ( completeSuffixExt != suffixExt ) {
-            m_extensionMap[G_SC_STR_DOT + completeSuffixExt].push_back( finfo );
+            m_extensionMap[G_SC_STR_DOT + suffixExt][G_SC_STR_DOT + completeSuffixExt].push_back( finfo );
         } else {
-            m_extensionMap[G_SC_STR_DOT  + suffixExt].push_back( finfo ) ;
+            m_extensionMap[G_SC_STR_DOT + suffixExt][""].push_back( finfo ) ;
         }
     }
 
@@ -838,14 +840,93 @@ void MainWindow::fill_ScanResultIntoTreeView()
     if ( sc_b_USE_ICON ) { pFileRoot->setIcon(0, *m_treeFileIcon ); }
 
     if ( m_bPickFiles ) {
-        auto idx = 0;
-        for ( auto it = m_extensionMap.begin(); it!=m_extensionMap.end(); ++it, ++idx ) {
+        auto extTypeidx = 0;
+        for ( auto it = m_extensionMap.begin(); it!=m_extensionMap.end(); ++it, ++extTypeidx ) {
+            const auto strExtKey = it.key();
+            const auto& maybe_MultiExtTree = it.value();
+            if ( strExtKey.startsWith(G_SC_CHAR_LESS_THAN) ) {
+                // ext must start with '<'    ( ["<No-Suffix>"]  or ["<Suffix-IS-Empty>"] )
+                QTreeWidgetItem *pFileExtTreeRoot = new QTreeWidgetItem( pFileRoot );
+                pFileExtTreeRoot->setText(0, QString("#%1 %2 ").arg(extTypeidx+1).arg(strExtKey) );
+                pFileExtTreeRoot->setText(1, QString("%1 file(s)").arg( maybe_MultiExtTree[""].size() ) );
+                if ( sc_b_USE_ICON ) { pFileExtTreeRoot->setIcon(0, *m_treeExtIcon  ); }
+                for ( auto fIt = maybe_MultiExtTree[""].begin(); fIt != maybe_MultiExtTree[""].end(); ++fIt ) {
+                    QTreeWidgetItem *pFile = new QTreeWidgetItem( pFileExtTreeRoot );
+                    pFile->setText(0, QString("%1").arg( fIt->fileName() ) );
+                    pFile->setText(1, QString("%1").arg( fIt->absoluteFilePath() ) );
+
+                    if ( sc_b_USE_ICON ) { pFile->setIcon(0, *m_treeFileIcon  ); }
+                    pFile->setFlags(pFile->flags() | Qt::ItemIsEditable );
+                    // QVariant(1) -> file   |  QVariant(2) -> dir
+                    pFile->setData(0,  Qt::UserRole, QVariant(1) );
+
+                    m_generatedTreeNodeList.push_back( pFile );
+
+                }
+            } else {
+                // ext must start with '.'
+                QTreeWidgetItem *pFileExtTreeRoot = new QTreeWidgetItem( pFileRoot );
+
+                if ( sc_b_USE_ICON ) { pFileExtTreeRoot->setIcon(0, *m_treeExtIcon  ); }
+                unsigned long long sameExtFileCnt = 0ULL;
+                auto hasNoComplexExt = false;
+                for ( auto fileMpIt = maybe_MultiExtTree.begin(); fileMpIt != maybe_MultiExtTree.end(); ++fileMpIt ) {
+                    auto sExt = fileMpIt.key();
+                    if ( sExt.isEmpty() ) {
+                        hasNoComplexExt = true;
+                        continue;
+                    }
+
+                    QTreeWidgetItem *pFileSubExtTreeRoot = new QTreeWidgetItem( pFileExtTreeRoot );
+                    if ( sc_b_USE_ICON ) { pFileSubExtTreeRoot->setIcon(0, *m_treeExtIcon  ); }
+                    pFileSubExtTreeRoot->setText(0, QString("%1").arg(sExt) );
+                    pFileSubExtTreeRoot->setText(1, QString("%1 file(s)").arg(fileMpIt.value().size()) );
+                    unsigned long long j = 0;
+                    for ( auto fIt =  fileMpIt.value().begin(); fIt!=fileMpIt.value().end(); ++fIt, ++j ) {
+                        QTreeWidgetItem *pFile = new QTreeWidgetItem( pFileSubExtTreeRoot );
+                        pFile->setText(0, QString("%1").arg( fIt->fileName() ) );
+                        pFile->setText(1, QString("%1").arg( fIt->absoluteFilePath() ) );
+
+                        if ( sc_b_USE_ICON ) { pFile->setIcon(0, *m_treeFileIcon  ); }
+                        pFile->setFlags(pFile->flags() | Qt::ItemIsEditable );
+                        // QVariant(1) -> file   |  QVariant(2) -> dir
+                        pFile->setData(0,  Qt::UserRole, QVariant(1) );
+
+                        m_generatedTreeNodeList.push_back( pFile );
+                        ++sameExtFileCnt;
+                    }
+                }
+
+                if ( hasNoComplexExt ) {
+                    for ( auto normalIt = maybe_MultiExtTree[""].begin(); normalIt != maybe_MultiExtTree[""].end(); ++normalIt ) {
+                        QTreeWidgetItem *pFile = new QTreeWidgetItem( pFileExtTreeRoot );
+                        pFile->setText(0, QString("%1").arg( normalIt->fileName() ) );
+                        pFile->setText(1, QString("%1").arg( normalIt->absoluteFilePath() ) );
+                        if ( sc_b_USE_ICON ) { pFile->setIcon(0, *m_treeFileIcon  ); }
+                        pFile->setFlags(pFile->flags() | Qt::ItemIsEditable );
+                        // QVariant(1) -> file   |  QVariant(2) -> dir
+                        pFile->setData(0,  Qt::UserRole, QVariant(1) );
+                        m_generatedTreeNodeList.push_back( pFile );
+                        ++sameExtFileCnt;
+                    }
+
+                    pFileExtTreeRoot->setText(0, QString("#%1 %2").arg(extTypeidx+1).arg( strExtKey ) );
+                    pFileExtTreeRoot->setText(1, QString("Totally %1 file(s) , %2 pure-ext file(s)").arg(sameExtFileCnt).arg( maybe_MultiExtTree[""].size() ) );
+                } else {
+                    pFileExtTreeRoot->setText(0, QString("#%1 %2").arg(extTypeidx+1).arg( strExtKey ) );
+                    pFileExtTreeRoot->setText(1, QString("Totally %1 file(s)").arg(sameExtFileCnt) );
+                }
+
+            }
+
+
+            /*
             QTreeWidgetItem *pFileExtTreeRoot = new QTreeWidgetItem( pFileRoot );
             pFileExtTreeRoot->setText(0, QString("#%1 %2").arg(idx+1).arg( it.key() ) );
             if ( sc_b_USE_ICON ) { pFileExtTreeRoot->setIcon(0, *m_treeExtIcon  ); }
             pFileExtTreeRoot->setText(1, QString("%1").arg( it.value().size() ) );
 
-            for( auto fileit = it.value().begin(); fileit!=it.value().end(); ++fileit ) {
+            for ( auto fileit = it.value().begin(); fileit!=it.value().end(); ++fileit ) {
                 QTreeWidgetItem *pFile = new QTreeWidgetItem(pFileExtTreeRoot );
                 auto fileName = fileit->fileName();
                 m_generatedTreeNodeList.push_back( pFile );
@@ -856,6 +937,7 @@ void MainWindow::fill_ScanResultIntoTreeView()
                 // QVariant(1) -> file   |  QVariant(2) -> dir
                 pFile->setData(0,  Qt::UserRole, QVariant(1) );
             }
+            */
         }
     }
 

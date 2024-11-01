@@ -98,7 +98,7 @@ private:
     myVisitThread*     m_pDirVisitThread;
     myVisitThread*     m_pFileVisitThread;
 
-    QMap<QString, QList<QFileInfo> > m_extensionMap;
+    QMap<QString, QMap<QString, QList<QFileInfo>> > m_extensionMap;
 
 
     QMap<unsigned long long, QList<QDir> > m_depthDirs;
