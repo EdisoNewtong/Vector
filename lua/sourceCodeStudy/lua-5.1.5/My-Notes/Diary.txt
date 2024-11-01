@@ -186,4 +186,51 @@ print("1. tb.maxn = " .. table.maxn(tb) );        -- Output :    1. tb.maxn = 8 
 
 
 
+--------------------------------------------------
+Date : 2024-10-24
+--------------------------------------------------
+
+/*****************************************************************************************************
+
+   The detail description of  field 'lsizenode' which is defined inside struct Table
+
+*****************************************************************************************************/
+//
+// lobject.h:350
+//
+typedef struct Table {
+  CommonHeader;
+  lu_byte flags;  /* 1<<p means tagmethod(p) is not present */ 
+  lu_byte lsizenode;  /* log2 of size of `node' array */
+  struct Table *metatable;
+  TValue *array;  /* array part */
+  Node *node;
+  Node *lastfree;  /* any free position is before this position */
+  GCObject *gclist;
+  int sizearray;  /* size of `array' array */
+} Table;
+
+
+/*****************************************************************************************************
+
+  -- there are 2 key-value pairs  (a,1) and (b,2)
+  -- tb1.lsizenode = log2(2) = 1 ?   !!! NO NO NO !!! That's wrong !!!
+  -- the correct answer is 0  ( 1 << 0 = 1 = log2(2) )
+  -- in other words :
+       'lsizenode'   is the step(s) of Left-Shift bitwise step(s)    rather than      log2( the number of table's pairs )
+
+	 even if the table is empty , lua background mechanism will pre-alloc the memories (2 slots) of the free slot(s) waiting for the upcoming key-value pair
+
+  tb1 = { a=1, b=2 }; 
+
+  --  lsizenode from   0 --> 1 because ( 1 << 1 ) = 2 , 2^2 = 4 ( 4 slots is enough for 3 key-value pairs )
+  -- the real key-value pairs will be no greater than  the value of expression : 2 ^ ( 1 << tb.lsizenode ) 
+  --                                                   1:fix-number     1:tb.lsizenode
+  -- (a,1) and (b,2) and (c,3) , 3 pairs   4 ( = 2   ^    ( 1      <<   1  )  )             pre-alloced slots to store the 3 pairs
+  -- so the pre-alloced slots number will always be pow(2, ( 1<<lsizenode ) ) 
+  tb1.c = 3;
+
+
+
+*****************************************************************************************************/
 
