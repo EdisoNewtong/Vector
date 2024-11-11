@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <QHash>
 #include <QTextEdit>
+// #include <QEvent>
 
 // static 
 const QMap<QString, QString> MainWindow::sc_punctuationMap{
@@ -966,10 +967,10 @@ void MainWindow::keyPressEvent(QKeyEvent *event) // Q_DECL_OVERRIDE
     auto keyCode = event->key();
     if( keyCode == Qt::Key_F3 ) {
         on_actionPreviousFind_triggered();
-        event->accpet();
+        event->accept();
     } else if( keyCode == Qt::Key_F4 ) {
         on_actionNextFind_triggered();
-        event->accpet();
+        event->accept();
     } else {
         QMainWindow::keyPressEvent(event);
     }
