@@ -148,3 +148,23 @@ In summary:
 - **-rpath-link**: Specifies directories to be searched by the linker during the linking phase to find shared libraries. It's more about helping the linker resolve library paths during the compilation and linking process.
 
 
+
+# Tips  '$ORIGIN' for Linux OS ( -rpath=@executable_path for MacOS , Also search the keywords list  -->  @executable_path, @loader_path and @rpath )
+
+You can use      -Wl,-rpath,**=="\$ORIGIN"==**   to indicate  the  dynamic library runtime load path  is  at the same path of the binary program path
+
+
+
+```bash
+$ ./main   # libxxx.so  is at the same directory of the  binary program named  "main"
+
+$ cd ../
+$ ./testDyLib/main         # Also run successfully , it load dymaic libarary from the same directory of the binary program , Rather Than the path of current working directory ( which is result for command 'pwd' )
+
+
+$ cd /tmp
+$ /home/edison/testDyLib/main       # Also run successfully , it load dymaic libarary from the same directory of the binary program
+
+```
+
+
