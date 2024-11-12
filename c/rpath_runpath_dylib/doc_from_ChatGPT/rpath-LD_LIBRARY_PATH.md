@@ -153,6 +153,9 @@ In summary:
 
 You can use      -Wl,-rpath,**=="\$ORIGIN"==**   to indicate  the  dynamic library runtime load path  is  at the same path of the binary program path
 
+if the command is written in Makefile , Please use the following format :    2 $$ stand for the single '$'   by  escaple  character
+	gcc  -Wall  -o  build/main   build/main.o  -Lbuild  -lmyadd  -Wl,-rpath,"\$$ORIGIN"
+
 
 
 ```bash
@@ -166,5 +169,4 @@ $ cd /tmp
 $ /home/edison/testDyLib/main       # Also run successfully , it load dymaic libarary from the same directory of the binary program
 
 ```
-
 
