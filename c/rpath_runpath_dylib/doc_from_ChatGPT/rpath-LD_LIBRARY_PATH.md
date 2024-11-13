@@ -170,3 +170,9 @@ $ /home/edison/testDyLib/main       # Also run successfully , it load dymaic lib
 
 ```
 
+# reference for shared libaray ( runpath && rpath ) 
+[Shared Libraries: Understanding Dynamic Loading](https://amir.rachum.com/shared-libraries/#rpath-and-runpath) 
+
+Also see the option of   **==--enable-new-dtags==**
+
+
