@@ -234,3 +234,84 @@ typedef struct Table {
 
 *****************************************************************************************************/
 
+
+--------------------------------------------------
+Date : 2024-11-22
+--------------------------------------------------
+
+在使用 MSVC Windows 环境下编译 Lua 5.1.5 时
+需要 修改 3 处
+
+1.  readline(...)
+--------------------------------------------------
+static int pushline(lua_State *L, int firstline) { 
+	     ...
+
+	// lua_readline(L, b, prmt)
+
+    /*                   lua_readline(L, b, prmt) */
+    /*
+    if ( ( (void)L, (b = readline(prmt)) != NULL) == 0) {
+      return 0; / * no input * /
+    }
+    */
+
+         ...
+
+
+	// Correct Version
+	if (lua_readline(L, b, prmt) == 0) {
+	  return 0;  /* no input */
+	}
+
+}
+
+
+2. mkstemp(...)
+--------------------------------------------------
+static int os_tmpname (lua_State *L) {
+
+	   ...
+
+  int err;
+
+  /*
+  { 
+      strcpy(buff, "/tmp/lua_XXXXXX"); 
+      err = mkstemp(buff); 
+      if (err != -1) { 
+        close(err); 
+      }
+      err = (err == -1); 
+  };
+  */
+
+  // Correct Version
+  lua_tmpnam(buff, err);
+
+     ...
+}
+
+
+
+3.  add_history(...)
+--------------------------------------------------
+static int loadline (lua_State *L) {
+
+	    ...
+
+  /*
+  if ( lua_objlen(L, 1) > 0) { 
+	  add_history( lua_tolstring(L, 1, NULL) ); 
+  };
+  */
+
+
+  // Correct Version
+  lua_saveline(L, 1);
+
+	    ...
+
+}
+
+
