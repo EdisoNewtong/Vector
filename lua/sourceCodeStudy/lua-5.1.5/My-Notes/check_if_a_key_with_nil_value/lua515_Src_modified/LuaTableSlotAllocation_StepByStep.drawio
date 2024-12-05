@@ -1,0 +1,211 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/25.0.1 Chrome/128.0.6613.186 Electron/32.2.6 Safari/537.36" version="25.0.1">
+  <diagram name="第 1 页" id="5q9oS06c_006uODcNgmJ">
+    <mxGraphModel dx="896" dy="1393" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" background="#CCCCCC" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="LItd_9sXgdPkV9tP_wUC-37" value="" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="120" y="262" width="390" height="108" as="geometry" />
+        </mxCell>
+        <mxCell id="LItd_9sXgdPkV9tP_wUC-5" value="&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;tb = {}&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;tb.a = 1&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;tb.b = 2&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;&lt;br&gt;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;tb.c = 3&lt;/span&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;tb.d = 4&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;tb.a = nil&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;tb.e = 5&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
+          <mxGeometry x="20" y="20" width="70" height="1170" as="geometry" />
+        </mxCell>
+        <mxCell id="LItd_9sXgdPkV9tP_wUC-6" value="" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="120" y="35" width="390" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="LItd_9sXgdPkV9tP_wUC-7" value="tb" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="100" y="40" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="LItd_9sXgdPkV9tP_wUC-8" value=".node&amp;nbsp;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+          <mxGeometry x="150" y="60" width="40" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="LItd_9sXgdPkV9tP_wUC-17" value="" style="endArrow=classic;html=1;rounded=0;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="190" y="74.83" as="sourcePoint" />
+            <mxPoint x="250" y="74.83" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="LItd_9sXgdPkV9tP_wUC-18" value="dummynode&lt;div&gt;{ key=nil, value = nil&amp;nbsp; }&lt;/div&gt;" style="ellipse;shape=cloud;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="230" y="40" width="280" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="LItd_9sXgdPkV9tP_wUC-19" value="" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="120" y="110" width="390" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="LItd_9sXgdPkV9tP_wUC-20" value="tb" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="100" y="115" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="LItd_9sXgdPkV9tP_wUC-21" value=".node&amp;nbsp;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+          <mxGeometry x="150" y="135" width="40" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="LItd_9sXgdPkV9tP_wUC-22" value="" style="endArrow=classic;html=1;rounded=0;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="190" y="149.82999999999998" as="sourcePoint" />
+            <mxPoint x="250" y="149.82999999999998" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="LItd_9sXgdPkV9tP_wUC-25" value="Array with &lt;font color=&quot;#00ff00&quot;&gt;1&lt;/font&gt; Slot" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+          <mxGeometry x="240" y="117.5" width="100" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="LItd_9sXgdPkV9tP_wUC-24" value="&lt;font color=&quot;#ff3333&quot;&gt;{key=&quot;a&quot;,value=1}&lt;/font&gt;" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;" parent="1" vertex="1">
+          <mxGeometry x="260" y="140" width="130" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="LItd_9sXgdPkV9tP_wUC-26" value="" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="120" y="180" width="390" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="LItd_9sXgdPkV9tP_wUC-27" value="tb" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="100" y="185" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="LItd_9sXgdPkV9tP_wUC-28" value=".node&amp;nbsp;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+          <mxGeometry x="150" y="205" width="40" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="LItd_9sXgdPkV9tP_wUC-29" value="" style="endArrow=classic;html=1;rounded=0;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="190" y="219.82999999999998" as="sourcePoint" />
+            <mxPoint x="250" y="219.82999999999998" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="LItd_9sXgdPkV9tP_wUC-30" value="Array with &lt;font color=&quot;#00ff00&quot;&gt;2&lt;/font&gt;&amp;nbsp;Slots" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+          <mxGeometry x="240" y="187.5" width="100" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="LItd_9sXgdPkV9tP_wUC-31" value="{key=&quot;a&quot;,value=1} &lt;font color=&quot;#ff3333&quot;&gt;{key=&quot;b&quot;,value=2}&lt;/font&gt;" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;" parent="1" vertex="1">
+          <mxGeometry x="260" y="210" width="240" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="LItd_9sXgdPkV9tP_wUC-32" value="tb" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="100" y="270" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="LItd_9sXgdPkV9tP_wUC-33" value=".node&amp;nbsp;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+          <mxGeometry x="150" y="290" width="40" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="LItd_9sXgdPkV9tP_wUC-34" value="" style="endArrow=classic;html=1;rounded=0;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="190" y="304.83" as="sourcePoint" />
+            <mxPoint x="250" y="304.83" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="LItd_9sXgdPkV9tP_wUC-35" value="Array with &lt;font color=&quot;#00ff00&quot;&gt;4&lt;/font&gt;&amp;nbsp;Slots" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+          <mxGeometry x="240" y="272.5" width="100" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="LItd_9sXgdPkV9tP_wUC-36" value="{key=&quot;a&quot;,value=1} {key=&quot;b&quot;,value=2}&lt;div&gt;&lt;font color=&quot;#ff3333&quot;&gt;{key=&quot;c&quot;,value=3}&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;b style=&quot;&quot;&gt;&lt;font color=&quot;#ffccff&quot;&gt;{key=nil,value=nil}&lt;/font&gt;&lt;/b&gt;&lt;/div&gt;" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;" parent="1" vertex="1">
+          <mxGeometry x="260" y="298" width="240" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="LItd_9sXgdPkV9tP_wUC-38" value="" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="120" y="380" width="390" height="108" as="geometry" />
+        </mxCell>
+        <mxCell id="LItd_9sXgdPkV9tP_wUC-39" value="tb" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="100" y="388" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="LItd_9sXgdPkV9tP_wUC-40" value=".node&amp;nbsp;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+          <mxGeometry x="150" y="408" width="40" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="LItd_9sXgdPkV9tP_wUC-41" value="" style="endArrow=classic;html=1;rounded=0;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="190" y="422.83" as="sourcePoint" />
+            <mxPoint x="250" y="422.83" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="LItd_9sXgdPkV9tP_wUC-42" value="Array with &lt;font color=&quot;#00ff00&quot;&gt;4&lt;/font&gt;&amp;nbsp;Slots" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+          <mxGeometry x="240" y="390.5" width="100" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="LItd_9sXgdPkV9tP_wUC-43" value="{key=&quot;a&quot;,value=&lt;span style=&quot;background-color: rgb(255, 255, 255);&quot;&gt;1&lt;/span&gt;} {key=&quot;b&quot;,value=2}&lt;div&gt;{key=&quot;c&quot;,value=3}&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#ff3333&quot;&gt;{key=&quot;d&quot;,value=4}&lt;/font&gt;&lt;br&gt;&lt;/div&gt;" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;" parent="1" vertex="1">
+          <mxGeometry x="260" y="416" width="240" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="LItd_9sXgdPkV9tP_wUC-44" value="" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="120" y="500" width="390" height="108" as="geometry" />
+        </mxCell>
+        <mxCell id="LItd_9sXgdPkV9tP_wUC-45" value="tb" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="100" y="508" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="LItd_9sXgdPkV9tP_wUC-46" value=".node&amp;nbsp;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+          <mxGeometry x="150" y="528" width="40" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="LItd_9sXgdPkV9tP_wUC-47" value="" style="endArrow=classic;html=1;rounded=0;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="190" y="542.8299999999999" as="sourcePoint" />
+            <mxPoint x="250" y="542.8299999999999" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="LItd_9sXgdPkV9tP_wUC-48" value="Array with &lt;font color=&quot;#00ff00&quot;&gt;4&lt;/font&gt;&amp;nbsp;Slots" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+          <mxGeometry x="240" y="510.5" width="100" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="LItd_9sXgdPkV9tP_wUC-49" value="&lt;font color=&quot;#ff3333&quot;&gt;{key=&quot;a&quot;,value=&lt;/font&gt;&lt;b style=&quot;color: rgb(255, 255, 0); background-color: rgb(0, 255, 0);&quot;&gt;&amp;nbsp;&lt;/b&gt;&lt;font color=&quot;#ffff00&quot;&gt;&lt;b style=&quot;background-color: rgb(0, 255, 0);&quot;&gt;nil&amp;nbsp;&lt;/b&gt;&lt;/font&gt;&lt;font color=&quot;#ff3333&quot;&gt;}&lt;/font&gt; {key=&quot;b&quot;,value=2}&lt;div&gt;{key=&quot;c&quot;,value=3}&lt;/div&gt;&lt;div&gt;{ key=&quot;d&quot;,value=4 }&lt;br&gt;&lt;/div&gt;" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;" parent="1" vertex="1">
+          <mxGeometry x="260" y="536" width="240" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="LItd_9sXgdPkV9tP_wUC-50" value="" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="120" y="620" width="390" height="108" as="geometry" />
+        </mxCell>
+        <mxCell id="LItd_9sXgdPkV9tP_wUC-51" value="tb" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="100" y="628" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="LItd_9sXgdPkV9tP_wUC-52" value=".node&amp;nbsp;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+          <mxGeometry x="150" y="648" width="40" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="LItd_9sXgdPkV9tP_wUC-53" value="" style="endArrow=classic;html=1;rounded=0;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="190" y="662.8299999999999" as="sourcePoint" />
+            <mxPoint x="250" y="662.8299999999999" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="LItd_9sXgdPkV9tP_wUC-54" value="Array with &lt;font color=&quot;#00ff00&quot;&gt;4&lt;/font&gt;&amp;nbsp;Slots" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+          <mxGeometry x="240" y="630.5" width="100" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="LItd_9sXgdPkV9tP_wUC-55" value="&lt;font color=&quot;#ff3333&quot;&gt;{key=&quot;e&quot;,value=&lt;/font&gt;&lt;font style=&quot;background-color: rgb(255, 255, 255);&quot; color=&quot;#ff3333&quot;&gt;5&lt;/font&gt;&lt;font color=&quot;#ff3333&quot;&gt;}&lt;/font&gt; {key=&quot;b&quot;,value=2}&lt;div&gt;{key=&quot;c&quot;,value=3}&lt;/div&gt;&lt;div&gt;{ key=&quot;d&quot;,value=4 }&lt;br&gt;&lt;/div&gt;" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;" parent="1" vertex="1">
+          <mxGeometry x="260" y="656" width="240" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="LItd_9sXgdPkV9tP_wUC-57" value="" style="edgeStyle=elbowEdgeStyle;elbow=horizontal;endArrow=classic;html=1;curved=0;rounded=0;endSize=8;startSize=8;fillColor=#ffff88;strokeColor=#FFFF33;strokeWidth=4;" parent="1" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="436" y="544" as="sourcePoint" />
+            <mxPoint x="436" y="664" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="466" y="604" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="LItd_9sXgdPkV9tP_wUC-58" value="" style="shape=flexArrow;endArrow=classic;html=1;rounded=0;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="57" y="58" as="sourcePoint" />
+            <mxPoint x="117" y="58" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="LItd_9sXgdPkV9tP_wUC-59" value="" style="shape=flexArrow;endArrow=classic;html=1;rounded=0;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="68" y="129" as="sourcePoint" />
+            <mxPoint x="118" y="128.5" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="LItd_9sXgdPkV9tP_wUC-60" value="" style="shape=flexArrow;endArrow=classic;html=1;rounded=0;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="69" y="203" as="sourcePoint" />
+            <mxPoint x="119" y="202.5" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="LItd_9sXgdPkV9tP_wUC-61" value="" style="shape=flexArrow;endArrow=classic;html=1;rounded=0;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="69" y="288" as="sourcePoint" />
+            <mxPoint x="119" y="287.5" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="LItd_9sXgdPkV9tP_wUC-63" value="" style="shape=flexArrow;endArrow=classic;html=1;rounded=0;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="68" y="403.5" as="sourcePoint" />
+            <mxPoint x="118" y="403" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="LItd_9sXgdPkV9tP_wUC-65" value="" style="shape=flexArrow;endArrow=classic;html=1;rounded=0;fillColor=#00FF00;strokeColor=#FFFF33;strokeWidth=3;" parent="1" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="69" y="530" as="sourcePoint" />
+            <mxPoint x="119" y="529.5" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="LItd_9sXgdPkV9tP_wUC-67" value="" style="shape=flexArrow;endArrow=classic;html=1;rounded=0;fillColor=#fa6800;strokeColor=#C73500;" parent="1" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="69" y="690" as="sourcePoint" />
+            <mxPoint x="119" y="689.5" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="LItd_9sXgdPkV9tP_wUC-68" value="Lua中，为一个表分配&amp;nbsp;key-value&amp;nbsp;对时，有一定的扩容策略&lt;div&gt;当有newkey,而且newkey使得node-count == 2&lt;sup&gt;n&lt;/sup&gt;+1时,进行扩容&lt;/div&gt;&lt;div&gt;2&lt;sup&gt;&lt;font color=&quot;#ff0000&quot;&gt;&lt;b&gt;0&lt;/b&gt;&lt;/font&gt;&lt;/sup&gt; -&amp;gt; 2&lt;sup&gt;&lt;b&gt;&lt;font color=&quot;#ff0000&quot;&gt;0&lt;/font&gt;&lt;/b&gt;&lt;/sup&gt;+1(2),&amp;nbsp;进行扩容，扩容到2&lt;sup&gt;&lt;font color=&quot;#ff0000&quot;&gt;&lt;b&gt;(0+1)&lt;/b&gt;&lt;/font&gt;&lt;/sup&gt;=2&lt;sup&gt;&lt;font color=&quot;#ff0000&quot;&gt;&lt;b&gt;1&lt;/b&gt;&lt;/font&gt;&lt;/sup&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;=2&lt;/span&gt;&lt;/div&gt;&lt;div&gt;2&lt;b&gt;&lt;font color=&quot;#ff0000&quot;&gt;&lt;sup&gt;1&amp;nbsp;&lt;/sup&gt;&lt;/font&gt;&lt;/b&gt;-&amp;gt; 2&lt;b&gt;&lt;font color=&quot;#ff0000&quot;&gt;&lt;sup&gt;1&lt;/sup&gt;&lt;/font&gt;&lt;/b&gt;+1(3)，进行扩容，扩容到 2&lt;sup&gt;&lt;font color=&quot;#ff0000&quot;&gt;&lt;b&gt;(1+1)&lt;/b&gt;&lt;/font&gt;&lt;/sup&gt;=2&lt;sup&gt;&lt;b&gt;&lt;font color=&quot;#ff0000&quot;&gt;2&lt;/font&gt;&lt;/b&gt;&lt;/sup&gt;=4&lt;/div&gt;&lt;div&gt;2&lt;b&gt;&lt;font color=&quot;#ff0000&quot;&gt;&lt;sup&gt;2&amp;nbsp;&lt;/sup&gt;&lt;/font&gt;&lt;/b&gt;-&amp;gt; 2&lt;b&gt;&lt;font color=&quot;#ff0000&quot;&gt;&lt;sup&gt;2&lt;/sup&gt;&lt;/font&gt;&lt;/b&gt;+1(5)，进行扩容，扩容到 2&lt;sup&gt;&lt;font color=&quot;#ff0000&quot;&gt;&lt;b&gt;(2+1)&lt;/b&gt;&lt;/font&gt;&lt;/sup&gt;=2&lt;sup&gt;&lt;b&gt;&lt;font color=&quot;#ff0000&quot;&gt;3&lt;/font&gt;&lt;/b&gt;&lt;/sup&gt;=8&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;另外，当某个已经存在的 key-value的 value被设置成 &lt;font color=&quot;#ff0000&quot;&gt;&lt;b&gt;&lt;u&gt;nil&lt;/u&gt;&lt;/b&gt;&lt;/font&gt;&amp;nbsp;时，&lt;/div&gt;&lt;div&gt;此槽位被&lt;span style=&quot;background-color: rgb(255, 255, 153);&quot;&gt;&lt;b&gt;&lt;font style=&quot;font-size: 14px;&quot; color=&quot;#ff0000&quot;&gt;标记&lt;/font&gt;&lt;/b&gt;&lt;/span&gt;&lt;font color=&quot;#ff0000&quot; style=&quot;font-size: 14px; background-color: rgb(255, 255, 153);&quot;&gt;&lt;b&gt;成&lt;/b&gt;&lt;/font&gt;是： &lt;font color=&quot;#ff0000&quot;&gt;&lt;font style=&quot;font-size: 14px; background-color: rgb(255, 255, 153);&quot;&gt;可以&lt;/font&gt;被未来的新 key-value&amp;nbsp;占用的&lt;u&gt;&lt;font style=&quot;background-color: rgb(255, 255, 153); font-size: 15px;&quot;&gt;&lt;b&gt;free&lt;/b&gt;&lt;/font&gt;&lt;/u&gt;槽&lt;/font&gt;&lt;/div&gt;&lt;div&gt;不会缩小已经分配&amp;nbsp;key-value&amp;nbsp;对的数组，&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#ff0000&quot;&gt;&lt;span style=&quot;background-color: rgb(255, 255, 153);&quot;&gt;&lt;b&gt;&lt;font style=&quot;font-size: 15px;&quot;&gt;不会&lt;/font&gt;&lt;/b&gt;&lt;/span&gt;在运行时，释放无用空间&lt;/font&gt;&lt;/div&gt;&lt;div&gt;而是，等待新的 key-value对出现，&lt;/div&gt;&lt;div&gt;从而&lt;b style=&quot;&quot;&gt;&lt;font style=&quot;font-size: 16px;&quot; color=&quot;#ff0000&quot;&gt;覆盖&lt;/font&gt;&lt;/b&gt; value值为nil的&amp;nbsp;key-value&amp;nbsp;对&lt;/div&gt;&lt;div&gt;---------------------------------------------------------------------------------------------&lt;/div&gt;&lt;div&gt;另外，当 tb.a = nil&amp;nbsp;之后，还可以通过修改Lua源代码&lt;span style=&quot;background-color: initial;&quot;&gt;来&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;获取 &quot;a&quot;键值，已经被设置成 nil ，而不是&amp;nbsp;不存在&quot;a&quot;&amp;nbsp;键的状态&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;而当 tb.e = 5&amp;nbsp;后， &quot;a&quot; -&amp;gt; nil&amp;nbsp;的槽位信息就被覆盖了&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;再也无法获取到 &quot;a&quot;&amp;nbsp;是因为没有此键值而返回 nil&lt;/span&gt;&lt;/div&gt;&lt;div&gt;还是存在&quot;a&quot;键值，但被代码强行设置成了 nil&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;这种策略是正确的，可以高效地利用&amp;nbsp;已经分配内存的空间&lt;/div&gt;&lt;div&gt;而不至于浪费，否则任何value为nil的键的key都需要占据内存空间&lt;/div&gt;&lt;div&gt;这是一种很浪费的行为&lt;/div&gt;&lt;div&gt;e.g.&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#ff0000&quot;&gt;tb.a=nil; tb.b=nil;&amp;nbsp;&lt;span style=&quot;background-color: initial;&quot;&gt;tb.c=nil; tb.d=nil; tb.e=nil; tb.f=nil; ... ; tb.z=nil&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;就需要分配 2&lt;b&gt;&lt;font style=&quot;font-size: 11px;&quot; color=&quot;#ff0000&quot;&gt;&lt;sup&gt;5&lt;/sup&gt;&lt;/font&gt;&lt;/b&gt;=32 个 key-value&amp;nbsp;键值对(16 &amp;lt; &lt;b style=&quot;&quot;&gt;&lt;font color=&quot;#0000ff&quot;&gt;&lt;u&gt;26&lt;/u&gt;&lt;/font&gt;&lt;/b&gt; &amp;lt; &lt;font color=&quot;#ff0000&quot;&gt;&lt;b&gt;32&lt;/b&gt;&lt;/font&gt; )&lt;/div&gt;&lt;div&gt;是一种极大的内存空间的浪费，而如果应用原始lua源代码的策略&lt;/div&gt;&lt;div&gt;那么，就只分配了1个槽 tb = { “z&quot; = nil&amp;nbsp; }&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="110" y="740" width="400" height="450" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

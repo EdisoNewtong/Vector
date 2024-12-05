@@ -1,0 +1,98 @@
+diff --git a/src/lapi.c b/src/lapi.c
+index 5d5145d..df91627 100644
+--- a/src/lapi.c
++++ b/src/lapi.c
+@@ -1085,3 +1085,13 @@ LUA_API const char *lua_setupvalue (lua_State *L, int funcindex, int n) {
+   return name;
+ }
+ 
++/* Added by Edison */
++LUA_API int lua_isKeyExistedWithNilValue(lua_State *L, int tIndex, int keyIndex)
++{
++    StkId t = index2adr(L, tIndex);
++    api_check(L, ttistable(t));
++    StkId key = index2adr(L, keyIndex);
++    int hasKeyWithNilValue = luaH_isKeyNil( hvalue(t), key);
++    return hasKeyWithNilValue;
++}
++
+diff --git a/src/ltable.c b/src/ltable.c
+index ec84f4f..86a5ff2 100644
+--- a/src/ltable.c
++++ b/src/ltable.c
+@@ -575,7 +575,16 @@ int luaH_getn (Table *t) {
+   else return unbound_search(t, j);
+ }
+ 
+-
++/* Added by Edison */
++int luaH_isKeyNil (Table *t, const TValue *key)
++{
++    const TValue* ret = luaH_get (t,key);
++    if ( ret == luaO_nilobject ) {
++        return 0;
++    } else {
++        return (ttype(ret) == LUA_TNIL ? 1 : 0);
++    }
++}
+ 
+ #if defined(LUA_DEBUG)
+ 
+diff --git a/src/ltable.h b/src/ltable.h
+index f5b9d5e..1eae801 100644
+--- a/src/ltable.h
++++ b/src/ltable.h
+@@ -29,6 +29,8 @@ LUAI_FUNC void luaH_resizearray (lua_State *L, Table *t, int nasize);
+ LUAI_FUNC void luaH_free (lua_State *L, Table *t);
+ LUAI_FUNC int luaH_next (lua_State *L, Table *t, StkId key);
+ LUAI_FUNC int luaH_getn (Table *t);
++/* Added by Edison */
++LUAI_FUNC int luaH_isKeyNil (Table *t, const TValue *key);
+ 
+ 
+ #if defined(LUA_DEBUG)
+diff --git a/src/ltablib.c b/src/ltablib.c
+index b6d9cb4..85ba195 100644
+--- a/src/ltablib.c
++++ b/src/ltablib.c
+@@ -263,6 +263,15 @@ static int sort (lua_State *L) {
+   return 0;
+ }
+ 
++/* Added by Edison */
++static int is_key_existed_with_nilvalue(lua_State *L) {
++  luaL_checktype(L, 1, LUA_TTABLE);
++  /* luaL_checkany(L, 2);  , the 2nd argument is an option argument , if omitted it is `nil`  */
++  int ret = lua_isKeyExistedWithNilValue(L,1,2);
++  lua_pushboolean(L, ret);
++  return 1;
++}
++
+ /* }====================================================== */
+ 
+ 
+@@ -276,6 +285,9 @@ static const luaL_Reg tab_funcs[] = {
+   {"remove", tremove},
+   {"setn", setn},
+   {"sort", sort},
++
++  /* Added by Edison */
++  {"is_key_existed_with_nilvalue", is_key_existed_with_nilvalue },
+   {NULL, NULL}
+ };
+ 
+diff --git a/src/lua.h b/src/lua.h
+index a4b73e7..503c8ce 100644
+--- a/src/lua.h
++++ b/src/lua.h
+@@ -194,6 +194,10 @@ LUA_API void  (lua_rawseti) (lua_State *L, int idx, int n);
+ LUA_API int   (lua_setmetatable) (lua_State *L, int objindex);
+ LUA_API int   (lua_setfenv) (lua_State *L, int idx);
+ 
++/* Added by Edison */
++LUA_API int   (lua_isKeyExistedWithNilValue) (lua_State *L, int tIndex, int keyIndex);
++
++
+ 
+ /*
+ ** `load' and `call' functions (load and run Lua code)
