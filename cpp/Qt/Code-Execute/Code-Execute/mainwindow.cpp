@@ -41,6 +41,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     initCfgFile();
     initMenuBar();
+
+    ui->codeEdit->setFocus(Qt::ActiveWindowFocusReason);
 }
 
 MainWindow::~MainWindow()
