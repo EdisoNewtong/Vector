@@ -3,6 +3,9 @@
 #include <string>
 #include <unordered_map>
 #include <list>
+// #include <vector>
+#include <unordered_map>
+>>>>>>> Stashed changes
 using namespace std;
 
 
@@ -213,9 +216,11 @@ int main(int argc, char* argv[])
 		cout << "[ERROR] Please input only one string to calculate hash. " << endl;
 		return -1;
 	}
+
     /*****************************************************
 	testCase( atoi(argv[1]) );
     *****************************************************/
+
 
 	const char* s = argv[1];
 	size_t len_of_s = strlen(s);
@@ -226,5 +231,3 @@ int main(int argc, char* argv[])
 
 	return 0;
 }
-
-
