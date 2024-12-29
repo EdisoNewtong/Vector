@@ -24,7 +24,7 @@ fn build_user(username: String, email: String) -> User {
 
 fn create_struct_objects_sample_code()
 {
-	println!("---------- Start Generate struct objects code ----------");
+    println!("---------- Start Generate struct objects code ----------");
     let user1: User = User {
         age:      12,
         username: String::from("Tom"),
@@ -67,7 +67,7 @@ fn create_struct_objects_sample_code()
 
 fn tuple_struct_sample_code() 
 {
-	println!("---------- Start tuple struct objects code ----------");
+    println!("---------- Start tuple struct objects code ----------");
 
     //  defination of color        
     //          (red,  green, blue)
@@ -96,14 +96,56 @@ fn tuple_struct_sample_code()
 
 fn unit_like_struct()
 {
-	println!("---------- Start unit like struct code ----------");
-	// empty field struct defination is valid  
-	//                                         for  trait(interface) feature
-	struct EmptyStruct {
-	}
+    println!("---------- Start unit like struct code ----------");
+    // empty field struct defination is valid  
+    //                                         for  trait(interface) feature
+    struct EmptyStruct {
+    }
 
     // #[warn(unused_variables)]
-	let _obj1: EmptyStruct = EmptyStruct{};
+    let _obj1: EmptyStruct = EmptyStruct{};
+}
+
+/**
+    the following line     
+#[derive(Debug)]    
+                     is  a  <must>
+
+Otherwise !!! Compiler Error !!!
+    because println!( object of a struct Rectangle ) need this " directives "
+
+*/
+#[derive(Debug)]
+struct Rectangle {
+    width:  i32,
+    height: i32,
+}
+
+impl Rectangle {
+    fn area(&self) -> i32 {
+        self.width * self.height
+    }
+
+    // static function
+    fn create_a_rect(width: i32, height: i32) -> Rectangle {
+        Rectangle {
+            width,
+            height
+        }
+    }
+}
+
+fn rectangle_struct_sample_code() {
+    println!("---------- Start Rectangle struct code ----------");
+    //                 Rectangle static function
+    let r: Rectangle = Rectangle::create_a_rect(2,4);
+    let s: i32 = r.area();
+    println!("r.area = {}", s);
+    println!("--------------------------------------------------");
+    println!("Normal rect = {:?}", r);
+    println!("--------------------------------------------------");
+    println!("Pretty rect = {:#?}", r);
+    println!("--------------------------------------------------");
 }
 
 fn main() {
@@ -114,5 +156,10 @@ fn main() {
     println!();
     println!();
     unit_like_struct();
+
+    println!();
+    println!();
+    rectangle_struct_sample_code();
+
 }
 
