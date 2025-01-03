@@ -163,8 +163,50 @@ fn case2_test_special_form_of_enum()
     println!("m4 = {:?}", m4);
 }
 
+/*
+
+# Option 枚举
+    - 定义于标准库中
+    - 在 Prelude ( 预导入模块 ) 中
+    - 它描述了 : 某个值 ( 以某种数据类型的样式 存在)  它可能存在  , 或不存在的情况  
 
 
+
+# Rust **[没有]** Null 这个概念
+
+- Null 引用      : Billion Dollar Mistake ( 数十亿 美元 的设计错误 )
+- Null的问题在于 : 当你尝试 像使用非Null值那样 使用Null值的时候，就会引起某种错误
+
+String str_hello = null;
+String str_world = " World"
+String hello_world = str_hello + str_world; // Run-time Error
+
+
+//
+// The defination of Option
+//
+Option<T>
+enum Option<T> {
+    Some(T),
+	None,
+}
+
+
+*/
+
+#[warn(unused_variables)]
+fn test_option_case() 
+{
+    println!();
+    println!("----- Option<T> enum Sample code -----");
+	let some_number = Some(5);
+	let some_string = Some("A String");     //   Option<&str>
+
+    // Core Core Core : Type   'Option<i32>' is a must  
+	//    Otherwise the Rust compiler cannot deduce what is the type specified in Option<T>   ( Because 'None' is a possibility  enumeration of Option<T> )  
+	let absent_number: Option<i32> = None;  
+	
+}
 
 
 fn main() {
@@ -178,9 +220,10 @@ fn main() {
     // try_convert_enum_2_int();
 
     case1_test_special_form_of_enum();
+
     case2_test_special_form_of_enum();
 
+	test_option_case();
+
 }
-
-
 
