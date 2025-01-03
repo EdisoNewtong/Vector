@@ -141,15 +141,25 @@ enum Message {
     ChangeColor(i32, i32, i32),   // a tuple with 3 fileds
 }
 
+impl Message {
+	// Apply some certain member functions
+	fn response_message(&self) {
+	}
+}
+
 
 fn case2_test_special_form_of_enum()
 {
     println!();
     println!("----- #2 -----   Special kind of enum : Example case -----");
 
+	//                Quit the Program ?
     let m1: Message = Message::Quit;
+	//                                move to the destination position (12, 24)
     let m2: Message = Message::Move  { x:12, y:24 };
-    let m3: Message = Message::Write ( String::from("Are you sure to quit Word without saving the changed document ? ") );
+	//                                Write some text onto the screen
+    let m3: Message = Message::Write ( String::from("Hello World ") );
+	//                                change the text's color 
     let m4: Message = Message::ChangeColor(255, 100, 30); // RGB color
     
     // let xval: i32 = (Option::<Message::Move>(m2)).x;
@@ -161,6 +171,8 @@ fn case2_test_special_form_of_enum()
     // println!("m2.detail = {{ x: {}, y:{} }}", xval, yval); 
     println!("m3 = {:?}", m3);
     println!("m4 = {:?}", m4);
+
+	m2.response_message();
 }
 
 /*
@@ -199,12 +211,12 @@ fn test_option_case()
 {
     println!();
     println!("----- Option<T> enum Sample code -----");
-	let some_number = Some(5);
-	let some_string = Some("A String");     //   Option<&str>
+	let _some_number = Some(5);              // Option<i32>
+	let _some_string = Some("A String");     // Option<&str>
 
     // Core Core Core : Type   'Option<i32>' is a must  
 	//    Otherwise the Rust compiler cannot deduce what is the type specified in Option<T>   ( Because 'None' is a possibility  enumeration of Option<T> )  
-	let absent_number: Option<i32> = None;  
+	let _absent_number: Option<i32> = None;  
 	
 }
 
@@ -226,4 +238,3 @@ fn main() {
 	test_option_case();
 
 }
-
