@@ -71,9 +71,9 @@ Stack vs Heap 访同数据
 > ==**state the number of people in your group, and the host finds an empty**== 
 > ==**table that fits everyone and leads you there. If someone in your group**== 
 > ==**comes late, they can ask where you’ve been seated to find you.**==  
-> ==** Here the number of people is a changeable amount , the host plays a role of OS **== 
-> ==** which knows which memory is avaliable for guest use , and the table number given by the host **==
-> ==** is like the pointer address. **==
+> ==**Here the number of people is a changeable amount , the host plays a role of OS**== 
+> ==**which knows which memory is available for guest use , and the table number given by the host**==
+> ==**is like the pointer address.**==
 > 
 > Pushing to the stack is faster than allocating on the heap because the 
 > allocator never has to search for a place to store new data; that 
@@ -85,12 +85,12 @@ Stack vs Heap 访同数据
 > Accessing data in the heap is slower than accessing data on the stack 
 > because you have to follow a pointer to get there. Contemporary 
 > processors are faster if they jump around less in memory. ==**Continuing the**== 
-> ==**analogy, consider a server at a restaurant taking orders from many **== 
-> ==**tables. It’s most efficient to get all the orders at one table before **== 
-> ==**moving on to the next table. Taking an order from table A, then an order **== 
-> ==**from table B, then one from A again, and then one from B again would be **== 
+> ==**analogy, consider a server at a restaurant taking orders from many**== 
+> ==**tables. It’s most efficient to get all the orders at one table before**== 
+> ==**moving on to the next table. Taking an order from table A, then an order**== 
+> ==**from table B, then one from A again, and then one from B again would be**== 
 > ==**a much slower process. if the server has moved between table A and B frequently (Table A is far away from Table B)**== 
-> ==** It is in efficient . The time waste on the movement between table-A and table-B for many times. **== 
+> ==**It is in efficient . The time waste on the movement between table-A and table-B for many times.**== 
 > By the same token, a processor can do its job 
 > better if it works on data that’s close to other data (as it is on the 
 > stack) rather than farther away (as it can be on the heap).
