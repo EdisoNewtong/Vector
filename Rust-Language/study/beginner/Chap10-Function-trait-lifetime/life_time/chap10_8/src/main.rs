@@ -35,12 +35,13 @@ fn test_struct_lifetime()
 fn static_life_time()
 {
     // any string literal is a kind of  'static   lifetime
+    // the 'static will live through the entire program lifetime 
     let s:&'static str = "hello World";
 }
 
 
 fn longest_with_announcement<'a, T>
-   (x: &'a str, y:&'a str, ann: T) -> &'a str
+(x: &'a str, y:&'a str, ann: T) -> &'a str
 where
     T: Display,
 {
