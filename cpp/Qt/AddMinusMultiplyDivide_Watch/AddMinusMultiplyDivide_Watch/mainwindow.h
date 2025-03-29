@@ -52,6 +52,8 @@ public:
         E_CORRECT_RATE_TAG,
         E_INCORRECT_RATE_TAG,
 
+        E_CORRECT_IN_TIME_RATE_TAG, // 在规定的时间内，计算正确的题目的正确率 
+
         E_TAG_MAX
     };
 public:
@@ -107,6 +109,7 @@ private:
           int       m_questionIdx;
           int       m_correctCnt;
           int       m_incorrectCnt;
+          int       m_intimeCorrectCnt;
 
     QMovie*         m_321goGif;
     int             m_countDownSoundIdx;

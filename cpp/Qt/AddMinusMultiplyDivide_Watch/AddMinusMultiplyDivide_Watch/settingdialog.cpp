@@ -116,6 +116,7 @@ Dialog::settingInfo Dialog::s_defaultSettings{
      /*.iDivide2rate = */ 25, // 25%
      /*.iDivide3rate = */ 50, // 50%
 
+     /*.timelimit = */ 5.0, // you must answer the question in 5.0 seconds
 };
 
 
@@ -276,6 +277,8 @@ void Dialog::reset_ui(const Dialog::settingInfo& cfg)
     ui->divide2rateSpn->setValue( cfg.iDivide2rate );
     ui->divide3rateSpn->setValue( cfg.iDivide3rate );
 
+    ui->timelimitSpinBox->setValue( cfg.timelimit );
+
     updateFocus();
 }
 
@@ -293,11 +296,14 @@ Dialog::~Dialog()
 
 void Dialog::on_loadBtn_clicked()
 {    
+    //------------------------------------------------
     // 5 -> Group box checked state
     // 4 -> QCheckBox checked state
     // 3 -> QSpinBox   set minimum Value
     // 2 -> QSpinBox   set maximum Value
     // 1 -> QSpinBox   set current value
+    //------------------------------------------------
+    // 6 -> QDoubleSpinBox   set current value
     static const QMap<QString, QPair<QWidget*,int> > G_keywordsMap{
         { QString("bIsAddGrpEnabled"), qMakePair(ui->addGrp,5) },
         { QString("iAddQuestionsCnt"), qMakePair(ui->addQuestionCntSpn,1) },
@@ -391,7 +397,10 @@ void Dialog::on_loadBtn_clicked()
 
         { QString("iDivide1rate"), qMakePair(ui->divide1rateSpn, 1) },
         { QString("iDivide2rate"), qMakePair(ui->divide2rateSpn, 1) },
-        { QString("iDivide3rate"), qMakePair(ui->divide3rateSpn, 1) }
+        { QString("iDivide3rate"), qMakePair(ui->divide3rateSpn, 1) },
+
+        // for time limit  
+        { QString("timelimit"), qMakePair(ui->timelimitSpinBox, 6) },
     };
 
 
@@ -456,7 +465,15 @@ void Dialog::on_loadBtn_clicked()
                             QMessageBox::warning(this, "错误", "spinBox is nullptr");
                         }
 
-                    } 
+                    } else if ( widgetType == 6 ) {
+                        QDoubleSpinBox* spinbox = qobject_cast<QDoubleSpinBox*>( widget );
+                        if ( spinbox!=nullptr ) {
+                            spinbox->setValue( str_Value.toDouble() );
+                        } else {
+                            QMessageBox::warning(this, "错误", "doubleSpinBox is nullptr");
+                        }
+
+                    }
                 }
             }
         }
@@ -584,6 +601,10 @@ void Dialog::on_saveBtn_clicked()
     fileContent += QString("\t  iDivide2rate = %1\n").arg( ui->divide2rateSpn->value() );
     fileContent += QString("\t  iDivide3rate = %1\n\n\n").arg( ui->divide3rateSpn->value() );
 
+    fileContent += QString("//////////////////////////////////////////////////\n// Time Limit\n");
+    fileContent += QString("\t  timelimit = %1\n\n\n").arg( ui->timelimitSpinBox->value() );
+
+
     QFile file( saveFileName );
     if ( !file.open(QIODevice::WriteOnly | QIODevice::Text) ) {
         QMessageBox::information(this, "保存[四则运算]的配置文件 失败", "保存失败");
@@ -674,6 +695,8 @@ void Dialog::on_confirmBtn_clicked()
             m_currentSettings.iDivide1rate = ui->divide1rateSpn->value();
             m_currentSettings.iDivide2rate = ui->divide2rateSpn->value();
             m_currentSettings.iDivide3rate = ui->divide3rateSpn->value();
+
+            m_currentSettings.timelimit = ui->timelimitSpinBox->value();
         }
 
         this->accept();

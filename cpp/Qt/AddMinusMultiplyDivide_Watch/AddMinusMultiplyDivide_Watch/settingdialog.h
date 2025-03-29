@@ -111,6 +111,8 @@ public:
             int  iDivide1rate;
             int  iDivide2rate;
             int  iDivide3rate;
+
+            double timelimit;
         };
 public:
     explicit Dialog(QWidget *parent = nullptr);
