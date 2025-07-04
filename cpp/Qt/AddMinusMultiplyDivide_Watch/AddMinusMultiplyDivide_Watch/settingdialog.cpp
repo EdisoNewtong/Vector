@@ -42,6 +42,7 @@ Dialog::settingInfo Dialog::s_defaultSettings{
      /*.iAdd1rate = */ 25,  // 25%
      /*.iAdd2rate = */ 25,  // 25%
      /*.iAdd3rate = */ 50,  // 50%
+     /*.bIsAdvanceBitEnabled = */ false,
 
     //////////////////////////////////////////////////
     // -
@@ -66,6 +67,7 @@ Dialog::settingInfo Dialog::s_defaultSettings{
     /*.iMinus1rate = */ 25, // 25%
     /*.iMinus2rate = */ 25, // 25%
     /*.iMinus3rate = */ 50, // 50%
+    /*.bIsBorrowBitEnabled = */ false,
 
     //////////////////////////////////////////////////
     // *
@@ -216,6 +218,7 @@ void Dialog::reset_ui(const Dialog::settingInfo& cfg)
     ui->add1rateSpn->setValue( cfg.iAdd1rate );
     ui->add2rateSpn->setValue( cfg.iAdd2rate );
     ui->add3rateSpn->setValue( cfg.iAdd3rate );
+    ui->advBitChk->setChecked( cfg.bIsAdvanceBitEnabled );
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     // -
@@ -236,6 +239,7 @@ void Dialog::reset_ui(const Dialog::settingInfo& cfg)
     ui->minus1rateSpn->setValue( cfg.iMinus1rate );
     ui->minus2rateSpn->setValue( cfg.iMinus2rate );
     ui->minus3rateSpn->setValue( cfg.iMinus3rate );
+    ui->borrowBitChk->setChecked( cfg.bIsBorrowBitEnabled );
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     // *
@@ -325,6 +329,7 @@ void Dialog::on_loadBtn_clicked()
         { QString("iAdd1rate"), qMakePair(ui->add1rateSpn,1) },
         { QString("iAdd2rate"), qMakePair(ui->add2rateSpn,1) },
         { QString("iAdd3rate"), qMakePair(ui->add3rateSpn,1) },
+        { QString("bIsAdvanceBitEnabled"), qMakePair(ui->advBitChk ,4) },
 
         //////////////////////////////////////////////////
         // -
@@ -349,6 +354,7 @@ void Dialog::on_loadBtn_clicked()
         { QString("iMinus1rate"),  qMakePair(ui->minus1rateSpn, 1) },
         { QString("iMinus2rate"),  qMakePair(ui->minus2rateSpn, 1) },
         { QString("iMinus3rate"),  qMakePair(ui->minus3rateSpn, 1) },
+        { QString("bIsBorrowBitEnabled"), qMakePair(ui->borrowBitChk ,4) },
 
         //////////////////////////////////////////////////
         // *
@@ -522,7 +528,8 @@ void Dialog::on_saveBtn_clicked()
 
     fileContent += QString("\t iAdd1rate = %1\n").arg( ui->add1rateSpn->value() );
     fileContent += QString("\t iAdd2rate = %1\n").arg( ui->add2rateSpn->value()  );
-    fileContent += QString("\t iAdd3rate = %1\n\n\n").arg( ui->add3rateSpn->value() );
+    fileContent += QString("\t iAdd3rate = %1\n").arg( ui->add3rateSpn->value() );
+    fileContent += QString("\t bIsAdvanceBitEnabled = %1\n\n\n").arg( ui->advBitChk->isChecked() ? cstr_true : cstr_false );
 
     //////////////////////////////////////////////////
     // -
@@ -547,7 +554,8 @@ void Dialog::on_saveBtn_clicked()
 
     fileContent += QString("\t  iMinus1rate = %1\n").arg( ui->minus1rateSpn->value() );
     fileContent += QString("\t  iMinus2rate = %1\n").arg(  ui->minus2rateSpn->value() );
-    fileContent += QString("\t  iMinus3rate = %1\n\n\n").arg(  ui->minus3rateSpn->value() );
+    fileContent += QString("\t  iMinus3rate = %1\n").arg(  ui->minus3rateSpn->value() );
+    fileContent += QString("\t  bIsBorrowBitEnabled = %1\n\n\n").arg( ui->borrowBitChk->isChecked() ? cstr_true : cstr_false );
 
     //////////////////////////////////////////////////
     // *
@@ -647,6 +655,7 @@ void Dialog::on_confirmBtn_clicked()
             m_currentSettings.iAdd1rate = ui->add1rateSpn->value();
             m_currentSettings.iAdd2rate = ui->add2rateSpn->value();
             m_currentSettings.iAdd3rate = ui->add3rateSpn->value();
+            m_currentSettings.bIsAdvanceBitEnabled = ui->advBitChk->isChecked();
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////
             // -
@@ -663,6 +672,7 @@ void Dialog::on_confirmBtn_clicked()
             m_currentSettings.iMinus1rate = ui->minus1rateSpn->value();
             m_currentSettings.iMinus2rate = ui->minus2rateSpn->value();
             m_currentSettings.iMinus3rate = ui->minus3rateSpn->value();
+            m_currentSettings.bIsBorrowBitEnabled = ui->borrowBitChk->isChecked();
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////
             // *
@@ -1043,3 +1053,19 @@ const Dialog::settingInfo& Dialog::getCurrentCfg()
 
 
 
+
+void Dialog::on_advBitChk_stateChanged(int iChecked)
+{
+    int percent = (iChecked == Qt::Checked ? 100 : 50);
+    ui->add3rateSpn->setValue(percent);
+    percentageAdjust(ui->add3rateSpn, ui->add1rateSpn, ui->add2rateSpn);
+
+}
+
+void Dialog::on_borrowBitChk_stateChanged(int iChecked)
+{
+    int percent = (iChecked == Qt::Checked ? 100 : 50);
+    ui->minus3rateSpn->setValue(percent);
+    percentageAdjust(ui->minus3rateSpn, ui->minus1rateSpn,ui->minus2rateSpn );
+
+}

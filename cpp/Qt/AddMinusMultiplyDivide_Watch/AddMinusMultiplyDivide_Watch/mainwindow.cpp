@@ -10,6 +10,10 @@
 #include <QUrl>
 #include <settingdialog.h>
 
+
+
+static const int SC_MAX_BITS = 3;
+
 // at most 5.0 second
 static /*const*/ double sc_LIMIT_TIME = 5.0;
 
@@ -960,9 +964,15 @@ void  MainWindow::resetQuestionListByCfg(const Dialog::settingInfo& cfg)
         for(     auto a = cfg.iAdd1RangeMinUIValue; a <= cfg.iAdd1RangeMaxUIValue; ++a ) {
             for( auto b = cfg.iAdd2RangeMinUIValue; b <= cfg.iAdd2RangeMaxUIValue; ++b ) {
                 // auto sum = a + b;
-                ++genCnt;
-                m_plusQuestionList.push_back( qMakePair(a,b) );
-                m_plusQuestionListBackup.push_back( qMakePair(a,b) );
+                if ( !cfg.bIsAdvanceBitEnabled ) { // TODO check advance Bit logic
+                    ++genCnt;
+                    m_plusQuestionList.push_back( qMakePair(a,b) );
+                    m_plusQuestionListBackup.push_back( qMakePair(a,b) );
+                } else if ( util_isAdvanceBitAdditive(a,b) ) {
+                    ++genCnt;
+                    m_plusQuestionList.push_back( qMakePair(a,b) );
+                    m_plusQuestionListBackup.push_back( qMakePair(a,b) );
+                } 
             }
         }
 
@@ -981,10 +991,16 @@ void  MainWindow::resetQuestionListByCfg(const Dialog::settingInfo& cfg)
         for(     auto a = cfg.iMinus1RangeMinUIValue; a <=cfg.iMinus1RangeMaxUIValue; ++a ) {
             for( auto b = cfg.iMinus2RangeMinUIValue; b <=cfg.iMinus2RangeMaxUIValue; ++b ) {
                 auto diffvalue = a - b;
-                if ( diffvalue >=0 || cfg.bIsResultNegativeEnabled ) {
-                    ++genCnt;
-                    m_minusQuestionList.push_back( qMakePair(a,b) );
-                    m_minusQuestionListBackup.push_back( qMakePair(a,b) );
+                if ( diffvalue >=0 || cfg.bIsResultNegativeEnabled  ) {
+                    if ( !cfg.bIsBorrowBitEnabled  ) { // TODO check borrow Bit logic 
+                        ++genCnt;
+                        m_minusQuestionList.push_back( qMakePair(a,b) );
+                        m_minusQuestionListBackup.push_back( qMakePair(a,b) );
+                    } else if ( util_isBorrowBitSubstract(a,b) ) {
+                        ++genCnt;
+                        m_minusQuestionList.push_back( qMakePair(a,b) );
+                        m_minusQuestionListBackup.push_back( qMakePair(a,b) );
+                    }
                 } 
             }
         }
@@ -1137,3 +1153,70 @@ void MainWindow::on_mediaStatusChanged(QMediaPlayer::MediaStatus status)
         m_soundTag = 2;
     }
 }
+
+
+bool MainWindow::util_isBorrowBitSubstract(int a, int b)
+{
+    QString sa = QString("%1").arg(a);
+    QString sb = QString("%1").arg(b);
+    int sa_len = sa.size();
+    int sb_len = sb.size();
+
+    int a_ary[SC_MAX_BITS] = { 0 };
+    int b_ary[SC_MAX_BITS] = { 0 };
+    for( auto i = 2; i>=0; --i ) {
+        int aIdx_bit = sa_len - (SC_MAX_BITS-i);
+        int bIdx_bit = sb_len - (SC_MAX_BITS-i);
+        if ( aIdx_bit >= 0 ) {
+            a_ary[i] = sa.mid( aIdx_bit, 1).toInt();
+        } 
+    
+        if ( bIdx_bit >= 0 ) {
+            b_ary[i] = sb.mid( bIdx_bit, 1).toInt();
+        } 
+    }
+
+    bool bHasBorrowBitFlag = false;
+    for( auto i = SC_MAX_BITS-1; i>=0; --i ) {
+        if ( a_ary[i] < b_ary[i] ) {
+            bHasBorrowBitFlag = true;
+            break;
+        }
+    }
+
+    return bHasBorrowBitFlag;
+}
+
+bool MainWindow::util_isAdvanceBitAdditive(int a, int b)
+{
+    QString sa = QString("%1").arg(a);
+    QString sb = QString("%1").arg(b);
+    int sa_len = sa.size();
+    int sb_len = sb.size();
+
+    int a_ary[SC_MAX_BITS] = { 0 };
+    int b_ary[SC_MAX_BITS] = { 0 };
+    for( auto i = SC_MAX_BITS-1; i>=0; --i ) {
+        int aIdx_bit = sa_len - (SC_MAX_BITS-i);
+        int bIdx_bit = sb_len - (SC_MAX_BITS-i);
+        if ( aIdx_bit >= 0 ) {
+            a_ary[i] = sa.mid( aIdx_bit, 1).toInt();
+        } 
+    
+        if ( bIdx_bit >= 0 ) {
+            b_ary[i] = sb.mid( bIdx_bit, 1).toInt();
+        } 
+    }
+
+    bool bHasAdvanceBitFlag = false;
+    for( auto i = SC_MAX_BITS-1; i>=0; --i ) {
+        if ( a_ary[i] + b_ary[i] >= 10 ) { // advance bit
+            bHasAdvanceBitFlag = true;
+            break;
+        }
+    }
+
+    return bHasAdvanceBitFlag;
+
+}
+

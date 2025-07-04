@@ -68,6 +68,9 @@ protected:
     void updateCurrentResultUI(bool correct);
     void resetQuestionListByCfg(const Dialog::settingInfo& cfg);
 
+    bool util_isBorrowBitSubstract(int a, int b);
+    bool util_isAdvanceBitAdditive(int a, int b);
+
 private slots:
     void on_btnYES_clicked();
 
