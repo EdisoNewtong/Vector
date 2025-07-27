@@ -1,3 +1,5 @@
+
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
@@ -10,8 +12,13 @@
 
 #include <QUrl>
 
+
+
+static const int SC_MAX_BITS = 3;
+
+
 // at most 5.0 second
-static const double sc_LIMIT_TIME = 5.0;
+static /*const*/ double sc_LIMIT_TIME = 5.0;
 
 // static const QString sc_HIGH_LIGHT_STYLE_SHEET(R"(
 //  background-color: #EE82EE;
@@ -47,6 +54,7 @@ MainWindow::MainWindow(QWidget *parent)
     , m_questionIdx( 0 )
     , m_correctCnt(0)
     , m_incorrectCnt(0)
+    , m_intimeCorrectCnt(0)
     , m_321goGif( new QMovie(":/img/321_Go.gif") )
     , m_countDownSoundIdx( 0 )
     , m_countDownSoundMaxCnt( 3 )
@@ -73,6 +81,7 @@ MainWindow::MainWindow(QWidget *parent)
     m_tagStringMap.insert( static_cast<int>(E_INPUT_ANSWER_TAG), "输入答案" );
     m_tagStringMap.insert( static_cast<int>(E_CORRECT_RATE_TAG), "正确率" );
     m_tagStringMap.insert( static_cast<int>(E_INCORRECT_RATE_TAG), "错误率" );
+    m_tagStringMap.insert( static_cast<int>(E_CORRECT_IN_TIME_RATE_TAG), "限定时间-正确率" );
 
     // set sound audio player
     m_pSoundPlayer = new QMediaPlayer( this );
@@ -133,14 +142,15 @@ void MainWindow::initUI()
 
     ui->tableWidget->setHorizontalHeaderLabels(labels);
 
-
-    ui->tableWidget->setColumnWidth(static_cast<int>(E_QUESTION_TAG), 90);
-    ui->tableWidget->setColumnWidth(static_cast<int>(E_YES_NO_UNDECIDE_TAG),64);
-    ui->tableWidget->setColumnWidth(static_cast<int>(E_ANSWER_TAG), 88);
+    ui->tableWidget->setColumnWidth(static_cast<int>(E_QUESTION_TAG), 150 );
+    ui->tableWidget->setColumnWidth(static_cast<int>(E_YES_NO_UNDECIDE_TAG), 100 );
+    ui->tableWidget->setColumnWidth(static_cast<int>(E_ANSWER_TAG), 160 );
     ui->tableWidget->setColumnWidth(static_cast<int>(E_INPUT_ANSWER_TAG), 88);
 
-    ui->tableWidget->setColumnWidth(static_cast<int>(E_CORRECT_RATE_TAG), 100);
-    ui->tableWidget->setColumnWidth(static_cast<int>(E_INCORRECT_RATE_TAG), 100);
+    ui->tableWidget->setColumnWidth(static_cast<int>(E_CORRECT_RATE_TAG), 160);
+    ui->tableWidget->setColumnWidth(static_cast<int>(E_INCORRECT_RATE_TAG), 160);
+
+    ui->tableWidget->setColumnWidth(static_cast<int>(E_CORRECT_IN_TIME_RATE_TAG), 260);
 
     ui->tableWidget->resizeColumnsToContents();
 
@@ -166,6 +176,14 @@ void MainWindow::nextQuestion(bool correct, const QString& input, const QString&
     if ( m_questionIdx > 0 ) {
         if ( correct ) {
             ++m_correctCnt;
+
+            // calculate in-time correct rate
+            double realtime  = (m_tickCount + m_elpTimer.elapsed() ) / 1000.0; 
+            // qDebug() << "#" << m_questionIdx << " used time = " << realtime;
+            if ( realtime <= sc_LIMIT_TIME ) {
+                ++m_intimeCorrectCnt;
+            }
+
         } else {
             ++m_incorrectCnt;
         }
@@ -280,6 +298,8 @@ void MainWindow::on_action_start_triggered()
     m_questionIdx = 0;
     m_correctCnt = 0;
     m_incorrectCnt = 0;
+    m_intimeCorrectCnt = 0;
+
     m_runningState = E_STARTED;
     m_currentAnswer = "";
     m_questionType = 0;
@@ -394,6 +414,8 @@ void MainWindow::on_action_save_triggered()
     fileContent += ( QString("Input").leftJustified(6)     + VLINE  ); //  4: E_INPUT_ANSWER_TAG
     fileContent += ( QString("Correct Rate").leftJustified(12)  + VLINE  ); //  5: E_CORRECT_RATE_TAG
     fileContent += ( QString("Error Rate").leftJustified(12)  + VLINE  ); //  6: E_INCORRECT_RATE_TAG
+    fileContent += ( QString("In-time Correct Rate").leftJustified(20)  + VLINE  ); //  7: E_CORRECT_IN_TIME_RATE_TAG
+                                                                                    
     fileContent += END_LINE;
     fileContent += ( filled.fill( QChar('-'), 100) + END_LINE );
                              
@@ -449,6 +471,12 @@ void MainWindow::on_action_save_triggered()
                     {
                         content = item->text();
                         fileContent += (content.leftJustified(12) + VLINE);
+                    }
+                    break;
+                case E_CORRECT_IN_TIME_RATE_TAG:
+                    {
+                        content = item->text();
+                        fileContent += (content.leftJustified(20) + VLINE);
                     }
                     break;
                 default:
@@ -890,6 +918,14 @@ void MainWindow::on_321goFinished()
         ui->tableWidget->setItem(currentQid , static_cast<int>(E_INCORRECT_RATE_TAG), newItem);
         // ui->tableWidget->scrollToItem( newItem , QAbstractItemView::PositionAtCenter);
     }
+
+    // in-time correct rate
+    {
+        QTableWidgetItem *newItem = new QTableWidgetItem( "" );
+        ui->tableWidget->setItem(currentQid , static_cast<int>(E_CORRECT_IN_TIME_RATE_TAG), newItem);
+        // ui->tableWidget->scrollToItem( newItem , QAbstractItemView::PositionAtCenter);
+    }
+
     ui->tableWidget->scrollToBottom();
     ui->tableWidget->resizeColumnsToContents();
 
@@ -1015,6 +1051,16 @@ void MainWindow::updateCurrentResultUI(bool correct, const QString& inputAnswer,
         }
     }
 
+    // in-time correct rate
+    {
+        auto item = ui->tableWidget->item(currentQid, static_cast<int>(E_CORRECT_IN_TIME_RATE_TAG) );
+        if ( item != nullptr ) {
+            double inTimeRate = (m_intimeCorrectCnt * 1.0 / (currentQid+1) * 100.0);
+            QString str_intimeRate = QString("%1").arg(inTimeRate,5, 'f', 2);
+            item->setText(  QString("%1/%2 = %3%").arg( m_intimeCorrectCnt ).arg( currentQid+1 ).arg( str_intimeRate  ) );
+        }
+    }
+
     ui->tableWidget->resizeColumnsToContents();
 
 }
@@ -1128,15 +1174,24 @@ void  MainWindow::resetQuestionListByCfg(const Dialog::settingInfo& cfg)
     m_4opPossibilities.clear();
     m_4opPossibilitiesBackup.clear();
 
+    sc_LIMIT_TIME = cfg.timelimit;
+
     auto ranMachine = QRandomGenerator::global();
     if ( cfg.bIsAddGrpEnabled && cfg.iAddQuestionsCnt > 0 ) {
         auto genCnt = 0;
         for(     auto a = cfg.iAdd1RangeMinUIValue; a <= cfg.iAdd1RangeMaxUIValue; ++a ) {
             for( auto b = cfg.iAdd2RangeMinUIValue; b <= cfg.iAdd2RangeMaxUIValue; ++b ) {
                 // auto sum = a + b;
-                ++genCnt;
-                m_plusQuestionList.push_back( qMakePair(a,b) );
-                m_plusQuestionListBackup.push_back( qMakePair(a,b) );
+
+                if ( !cfg.bIsAdvanceBitEnabled ) {
+                    ++genCnt;
+                    m_plusQuestionList.push_back( qMakePair(a,b) );
+                    m_plusQuestionListBackup.push_back( qMakePair(a,b) );
+                } else if ( util_isAdvanceBitAdditive(a,b) ) {
+                    ++genCnt;
+                    m_plusQuestionList.push_back( qMakePair(a,b) );
+                    m_plusQuestionListBackup.push_back( qMakePair(a,b) );
+                }
             }
         }
 
@@ -1155,10 +1210,18 @@ void  MainWindow::resetQuestionListByCfg(const Dialog::settingInfo& cfg)
         for(     auto a = cfg.iMinus1RangeMinUIValue; a <=cfg.iMinus1RangeMaxUIValue; ++a ) {
             for( auto b = cfg.iMinus2RangeMinUIValue; b <=cfg.iMinus2RangeMaxUIValue; ++b ) {
                 auto diffvalue = a - b;
-                if ( diffvalue >=0 || cfg.bIsResultNegativeEnabled ) {
-                    ++genCnt;
-                    m_minusQuestionList.push_back( qMakePair(a,b) );
-                    m_minusQuestionListBackup.push_back( qMakePair(a,b) );
+
+                if ( diffvalue >=0 || cfg.bIsResultNegativeEnabled  ) {
+                    if ( !cfg.bIsBorrowBitEnabled  ) { 
+                        ++genCnt;
+                        m_minusQuestionList.push_back( qMakePair(a,b) );
+                        m_minusQuestionListBackup.push_back( qMakePair(a,b) );
+                    } else if ( util_isBorrowBitSubstract(a,b) ) {
+                        ++genCnt;
+                        m_minusQuestionList.push_back( qMakePair(a,b) );
+                        m_minusQuestionListBackup.push_back( qMakePair(a,b) );
+                    }
+
                 } 
             }
         }
@@ -1181,6 +1244,17 @@ void  MainWindow::resetQuestionListByCfg(const Dialog::settingInfo& cfg)
                 ++genCnt;
                 m_multiplyQuestionList.push_back( qMakePair(a,b) );
                 m_multiplyQuestionListBackup.push_back( qMakePair(a,b) );
+
+                if ( !cfg.bIsAdvanceBitEnabled ) {
+                    ++genCnt;
+                    m_plusQuestionList.push_back( qMakePair(a,b) );
+                    m_plusQuestionListBackup.push_back( qMakePair(a,b) );
+                } else if ( util_isAdvanceBitAdditive(a,b) ) {
+                    ++genCnt;
+                    m_plusQuestionList.push_back( qMakePair(a,b) );
+                    m_plusQuestionListBackup.push_back( qMakePair(a,b) );
+                }
+
             }
         }
 
@@ -1311,4 +1385,73 @@ void MainWindow::on_mediaStatusChanged(QMediaPlayer::MediaStatus status)
     }
 }
 
+
+
+
+bool MainWindow::util_isBorrowBitSubstract(int a, int b)
+{
+    QString sa = QString("%1").arg(a);
+    QString sb = QString("%1").arg(b);
+    int sa_len = sa.size();
+    int sb_len = sb.size();
+
+    int a_ary[SC_MAX_BITS] = { 0 };
+    int b_ary[SC_MAX_BITS] = { 0 };
+    for( auto i = 2; i>=0; --i ) {
+        int aIdx_bit = sa_len - (SC_MAX_BITS-i);
+        int bIdx_bit = sb_len - (SC_MAX_BITS-i);
+        if ( aIdx_bit >= 0 ) {
+            a_ary[i] = sa.mid( aIdx_bit, 1).toInt();
+        } 
+    
+        if ( bIdx_bit >= 0 ) {
+            b_ary[i] = sb.mid( bIdx_bit, 1).toInt();
+        } 
+    }
+
+    bool bHasBorrowBitFlag = false;
+    for( auto i = SC_MAX_BITS-1; i>=0; --i ) {
+        if ( a_ary[i] < b_ary[i] ) {
+            bHasBorrowBitFlag = true;
+            break;
+        }
+    }
+
+    return bHasBorrowBitFlag;
+}
+
+
+
+bool MainWindow::util_isAdvanceBitAdditive(int a, int b)
+{
+    QString sa = QString("%1").arg(a);
+    QString sb = QString("%1").arg(b);
+    int sa_len = sa.size();
+    int sb_len = sb.size();
+
+    int a_ary[SC_MAX_BITS] = { 0 };
+    int b_ary[SC_MAX_BITS] = { 0 };
+    for( auto i = SC_MAX_BITS-1; i>=0; --i ) {
+        int aIdx_bit = sa_len - (SC_MAX_BITS-i);
+        int bIdx_bit = sb_len - (SC_MAX_BITS-i);
+        if ( aIdx_bit >= 0 ) {
+            a_ary[i] = sa.mid( aIdx_bit, 1).toInt();
+        }
+    
+        if ( bIdx_bit >= 0 ) {
+            b_ary[i] = sb.mid( bIdx_bit, 1).toInt();
+        }
+    }
+
+    bool bHasAdvanceBitFlag = false;
+    for( auto i = SC_MAX_BITS-1; i>=0; --i ) {
+        if ( a_ary[i] + b_ary[i] >= 10 ) { // advance bit
+            bHasAdvanceBitFlag = true;
+            break;
+        }
+    }
+
+    return bHasAdvanceBitFlag;
+
+}
 

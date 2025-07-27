@@ -42,6 +42,7 @@ Dialog::settingInfo Dialog::s_defaultSettings{
      /*.iAdd1rate = */ 25,  // 25%
      /*.iAdd2rate = */ 25,  // 25%
      /*.iAdd3rate = */ 50,  // 50%
+     /*.bIsAdvanceBitEnabled = */ false,
 
     //////////////////////////////////////////////////
     // -
@@ -66,6 +67,8 @@ Dialog::settingInfo Dialog::s_defaultSettings{
     /*.iMinus1rate = */ 25, // 25%
     /*.iMinus2rate = */ 25, // 25%
     /*.iMinus3rate = */ 50, // 50%
+
+    /*.bIsBorrowBitEnabled = */ false,
 
     //////////////////////////////////////////////////
     // *
@@ -115,6 +118,8 @@ Dialog::settingInfo Dialog::s_defaultSettings{
      /*.iDivide1rate = */ 25, // 25%
      /*.iDivide2rate = */ 25, // 25%
      /*.iDivide3rate = */ 50, // 50%
+
+     /*.timelimit = */ 5.0, // you must answer the question in 5.0 seconds
 
 };
 
@@ -215,6 +220,7 @@ void Dialog::reset_ui(const Dialog::settingInfo& cfg)
     ui->add1rateSpn->setValue( cfg.iAdd1rate );
     ui->add2rateSpn->setValue( cfg.iAdd2rate );
     ui->add3rateSpn->setValue( cfg.iAdd3rate );
+    ui->advBitChk->setChecked( cfg.bIsAdvanceBitEnabled );
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     // -
@@ -235,6 +241,7 @@ void Dialog::reset_ui(const Dialog::settingInfo& cfg)
     ui->minus1rateSpn->setValue( cfg.iMinus1rate );
     ui->minus2rateSpn->setValue( cfg.iMinus2rate );
     ui->minus3rateSpn->setValue( cfg.iMinus3rate );
+    ui->borrowBitChk->setChecked( cfg.bIsBorrowBitEnabled );
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     // *
@@ -276,6 +283,8 @@ void Dialog::reset_ui(const Dialog::settingInfo& cfg)
     ui->divide2rateSpn->setValue( cfg.iDivide2rate );
     ui->divide3rateSpn->setValue( cfg.iDivide3rate );
 
+    ui->timelimitSpinBox->setValue( cfg.timelimit );
+
     updateFocus();
 }
 
@@ -293,11 +302,14 @@ Dialog::~Dialog()
 
 void Dialog::on_loadBtn_clicked()
 {
+    //------------------------------------------------
     // 5 -> Group box checked state
     // 4 -> QCheckBox checked state
     // 3 -> QSpinBox   set minimum Value
     // 2 -> QSpinBox   set maximum Value
     // 1 -> QSpinBox   set current value
+    //------------------------------------------------
+    // 6 -> QDoubleSpinBox   set current value
     static const QMap<QString, QPair<QWidget*,int> > G_keywordsMap{
         { QString("bIsAddGrpEnabled"), qMakePair(ui->addGrp,5) },
         { QString("iAddQuestionsCnt"), qMakePair(ui->addQuestionCntSpn,1) },
@@ -319,6 +331,7 @@ void Dialog::on_loadBtn_clicked()
         { QString("iAdd1rate"), qMakePair(ui->add1rateSpn,1) },
         { QString("iAdd2rate"), qMakePair(ui->add2rateSpn,1) },
         { QString("iAdd3rate"), qMakePair(ui->add3rateSpn,1) },
+        { QString("bIsAdvanceBitEnabled"), qMakePair(ui->advBitChk ,4) },
 
         //////////////////////////////////////////////////
         // -
@@ -343,6 +356,7 @@ void Dialog::on_loadBtn_clicked()
         { QString("iMinus1rate"),  qMakePair(ui->minus1rateSpn, 1) },
         { QString("iMinus2rate"),  qMakePair(ui->minus2rateSpn, 1) },
         { QString("iMinus3rate"),  qMakePair(ui->minus3rateSpn, 1) },
+        { QString("bIsBorrowBitEnabled"), qMakePair(ui->borrowBitChk ,4) },
 
         //////////////////////////////////////////////////
         // *
@@ -391,7 +405,10 @@ void Dialog::on_loadBtn_clicked()
 
         { QString("iDivide1rate"), qMakePair(ui->divide1rateSpn, 1) },
         { QString("iDivide2rate"), qMakePair(ui->divide2rateSpn, 1) },
-        { QString("iDivide3rate"), qMakePair(ui->divide3rateSpn, 1) }
+        { QString("iDivide3rate"), qMakePair(ui->divide3rateSpn, 1) },
+
+        // for time limit  
+        { QString("timelimit"), qMakePair(ui->timelimitSpinBox, 6) },
     };
 
 
@@ -439,11 +456,9 @@ void Dialog::on_loadBtn_clicked()
                         } else {
                             QMessageBox::warning(this, "错误", "check box is nullptr");
                         }
-                    } else if ( widgetType == 3 || widgetType == 2 || widgetType == 1) {
+                    } else if ( widgetType == 3 || widgetType == 2 || widgetType == 1 ) {
                         QSpinBox* spinbox = qobject_cast<QSpinBox*>( widget );
                         if ( spinbox!=nullptr ) {
-
-
                             if ( widgetType == 3) {
                                 spinbox->setMinimum( str_Value.toInt() );
                             } else if ( widgetType == 2 ) {
@@ -455,8 +470,14 @@ void Dialog::on_loadBtn_clicked()
                         } else {
                             QMessageBox::warning(this, "错误", "spinBox is nullptr");
                         }
-
-                    } 
+                    } else if ( widgetType == 6 ) {
+                            QDoubleSpinBox* spinbox = qobject_cast<QDoubleSpinBox*>( widget );
+                            if ( spinbox!=nullptr ) {
+                                spinbox->setValue( str_Value.toDouble() );
+                            } else {
+                                QMessageBox::warning(this, "错误", "doubleSpinBox is nullptr");
+                            }
+                    }
                 }
             }
         }
@@ -504,7 +525,8 @@ void Dialog::on_saveBtn_clicked()
 
     fileContent += QString("\t iAdd1rate = %1\n").arg( ui->add1rateSpn->value() );
     fileContent += QString("\t iAdd2rate = %1\n").arg( ui->add2rateSpn->value()  );
-    fileContent += QString("\t iAdd3rate = %1\n\n\n").arg( ui->add3rateSpn->value() );
+    fileContent += QString("\t iAdd3rate = %1\n").arg( ui->add3rateSpn->value() );
+    fileContent += QString("\t bIsAdvanceBitEnabled = %1\n\n\n").arg( ui->advBitChk->isChecked() ? cstr_true : cstr_false );
 
     //////////////////////////////////////////////////
     // -
@@ -529,7 +551,8 @@ void Dialog::on_saveBtn_clicked()
 
     fileContent += QString("\t  iMinus1rate = %1\n").arg( ui->minus1rateSpn->value() );
     fileContent += QString("\t  iMinus2rate = %1\n").arg(  ui->minus2rateSpn->value() );
-    fileContent += QString("\t  iMinus3rate = %1\n\n\n").arg(  ui->minus3rateSpn->value() );
+    fileContent += QString("\t  iMinus3rate = %1\n").arg(  ui->minus3rateSpn->value() );
+    fileContent += QString("\t  bIsBorrowBitEnabled = %1\n\n\n").arg( ui->borrowBitChk->isChecked() ? cstr_true : cstr_false );
 
     //////////////////////////////////////////////////
     // *
@@ -583,6 +606,9 @@ void Dialog::on_saveBtn_clicked()
     fileContent += QString("\t  iDivide2rate = %1\n").arg( ui->divide2rateSpn->value() );
     fileContent += QString("\t  iDivide3rate = %1\n\n\n").arg( ui->divide3rateSpn->value() );
 
+    fileContent += QString("//////////////////////////////////////////////////\n// Time Limit\n");
+    fileContent += QString("\t  timelimit = %1\n").arg( ui->timelimitSpinBox->value() );
+
     QFile file( saveFileName );
     if ( !file.open(QIODevice::WriteOnly | QIODevice::Text) ) {
         QMessageBox::information(this, "保存[四则运算]的配置文件 失败", "保存失败");
@@ -614,6 +640,7 @@ void Dialog::uiState2Cfg()
     m_currentSettings.iAdd1rate = ui->add1rateSpn->value();
     m_currentSettings.iAdd2rate = ui->add2rateSpn->value();
     m_currentSettings.iAdd3rate = ui->add3rateSpn->value();
+    m_currentSettings.bIsAdvanceBitEnabled = ui->advBitChk->isChecked();
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     // -
@@ -630,6 +657,7 @@ void Dialog::uiState2Cfg()
     m_currentSettings.iMinus1rate = ui->minus1rateSpn->value();
     m_currentSettings.iMinus2rate = ui->minus2rateSpn->value();
     m_currentSettings.iMinus3rate = ui->minus3rateSpn->value();
+    m_currentSettings.bIsBorrowBitEnabled = ui->borrowBitChk->isChecked();
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     // *
@@ -663,6 +691,7 @@ void Dialog::uiState2Cfg()
     m_currentSettings.iDivide2rate = ui->divide2rateSpn->value();
     m_currentSettings.iDivide3rate = ui->divide3rateSpn->value();
 
+    m_currentSettings.timelimit = ui->timelimitSpinBox->value();
 }
 
 void Dialog::on_confirmBtn_clicked()
@@ -1013,6 +1042,27 @@ const Dialog::settingInfo& Dialog::getCurrentCfg()
 }
 
 
+
+
+
+
+
+void Dialog::on_advBitChk_stateChanged(int iChecked)
+{
+    int percent = (iChecked == Qt::Checked ? 100 : 50);
+    ui->add3rateSpn->setValue(percent);
+    percentageAdjust(ui->add3rateSpn, ui->add1rateSpn, ui->add2rateSpn);
+
+}
+
+
+void Dialog::on_borrowBitChk_stateChanged(int iChecked)
+{
+    int percent = (iChecked == Qt::Checked ? 100 : 50);
+    ui->minus3rateSpn->setValue(percent);
+    percentageAdjust(ui->minus3rateSpn, ui->minus1rateSpn,ui->minus2rateSpn );
+
+}
 
 
 

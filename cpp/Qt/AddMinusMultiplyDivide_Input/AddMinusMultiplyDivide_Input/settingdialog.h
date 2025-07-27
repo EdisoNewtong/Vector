@@ -38,6 +38,7 @@ public:
             int  iAdd1rate;
             int  iAdd2rate;
             int  iAdd3rate;
+            bool bIsAdvanceBitEnabled;
 
             //////////////////////////////////////////////////
             // -
@@ -62,6 +63,7 @@ public:
             int  iMinus1rate;
             int  iMinus2rate;
             int  iMinus3rate;
+            bool bIsBorrowBitEnabled;
 
             //////////////////////////////////////////////////
             // *
@@ -111,6 +113,9 @@ public:
             int  iDivide1rate;
             int  iDivide2rate;
             int  iDivide3rate;
+
+            double timelimit;
+
         };
 public:
     explicit Dialog(QWidget *parent = nullptr);
@@ -159,6 +164,9 @@ private slots:
 
     void onErrorMsgTimeout();
     // void on_dummyBtn_clicked();
+
+    void on_advBitChk_stateChanged(int iChecked);
+    void on_borrowBitChk_stateChanged(int iChecked);
 
 private:
     Ui::Dialog *ui;

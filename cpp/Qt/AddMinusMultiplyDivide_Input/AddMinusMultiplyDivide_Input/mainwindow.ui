@@ -361,11 +361,12 @@
        <number>0</number>
       </property>
       <property name="columnCount">
-       <number>7</number>
+       <number>8</number>
       </property>
       <attribute name="horizontalHeaderStretchLastSection">
        <bool>false</bool>
       </attribute>
+      <column/>
       <column/>
       <column/>
       <column/>
