@@ -21,7 +21,7 @@
 
 
 main:my-dynamic-lib/libMyAddMinus.so main.o
-	gcc  --verbose  -Wall  -Wl,-rpath=my-dynamic-lib  -o   main   main.o  -Lmy-dynamic-lib  -lMyAddMinus
+	gcc  -Wall  -Wl,-rpath=my-dynamic-lib  -o   main   main.o  -Lmy-dynamic-lib  -lMyAddMinus
 
 main.o:main.c
 	gcc   -Wall  -c  -o  main.o  main.c
