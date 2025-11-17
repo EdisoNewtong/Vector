@@ -711,7 +711,12 @@ void MainWindow::on_321goFinished()
         ui->op2_Edit->setStyleSheet("");
         ui->op2->show();
         ui->op2->setStyleSheet("");
-        ui->op2->setText( QString("%1").arg(questionPr.second) );
+        if ( questionPr.second < 0 ) {
+            // add a pair of parenthsis surounded a negative number    e.g.    (-1) 
+            ui->op2->setText( QString("(%1)").arg(questionPr.second) );
+        } else {
+            ui->op2->setText( QString("%1").arg(questionPr.second) );
+        }
 
         ui->result_Edit->hide();
         ui->result_Edit->setStyleSheet("");
@@ -802,7 +807,12 @@ void MainWindow::on_321goFinished()
         ui->op2_Edit->setStyleSheet("");
         ui->op2->show();
         ui->op2->setStyleSheet("");
-        ui->op2->setText( QString("%1").arg(questionPr.second) );
+        if (questionPr.second < 0 ) { 
+            // add a pair of parenthsis surounded a negative number    e.g.    (-1) 
+            ui->op2->setText( QString("(%1)").arg(questionPr.second) );
+        } else {
+            ui->op2->setText( QString("%1").arg(questionPr.second) );
+        }
 
         // result is the question
         ui->result_Edit->setStyleSheet( sc_HIGH_LIGHT_STYLE_SHEET );

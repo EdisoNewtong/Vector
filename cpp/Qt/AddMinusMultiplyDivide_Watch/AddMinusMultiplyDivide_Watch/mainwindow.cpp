@@ -660,7 +660,13 @@ void MainWindow::on_321goFinished()
         m_currentAnswer = QString("%1").arg(questionPr.first);
 
         ui->op2->setStyleSheet("");
-        ui->op2->setText( QString("%1").arg(questionPr.second) );
+        // ui->op2->setText( QString("%1").arg(questionPr.second) );
+        if ( questionPr.second < 0 ) {
+            // add a pair of parenthsis surounded a negative number    e.g.    (-1) 
+            ui->op2->setText( QString("(%1)").arg(questionPr.second) );
+        } else {
+            ui->op2->setText( QString("%1").arg(questionPr.second) );
+        }
 
         ui->result->setStyleSheet("");
         ui->result->setText( QString("%1").arg(res) );
@@ -715,7 +721,13 @@ void MainWindow::on_321goFinished()
         ui->op1->setText( QString("%1").arg(questionPr.first) );
 
         ui->op2->setStyleSheet("");
-        ui->op2->setText( QString("%1").arg(questionPr.second) );
+        // ui->op2->setText( QString("%1").arg(questionPr.second) );
+        if ( questionPr.second < 0 ) {
+            // add a pair of parenthsis surounded a negative number    e.g.    (-1) 
+            ui->op2->setText( QString("(%1)").arg(questionPr.second) );
+        } else {
+            ui->op2->setText( QString("%1").arg(questionPr.second) );
+        }
 
         ui->result->setStyleSheet( sc_HIGH_LIGHT_STYLE_SHEET );
         ui->result->setText( "?" );
