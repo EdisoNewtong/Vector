@@ -16,8 +16,8 @@ const unsigned int FNEDCore::sc_bitsInByte  = 8;
 const unsigned int FNEDCore::sc_bitsInShort = 16;
 const          int FNEDCore::sc_maxint      = 0x7FFFFFFF;
 
-const qint64 FNEDCore::sc_ll_threshold = 131072ll;     // 128 KB
-const qint64 FNEDCore::sc_ll_cmpBlockSize =  262144ll; // 256 KB
+const qint64 FNEDCore::sc_ll_threshold    = 4096ll; // 4 KB
+const qint64 FNEDCore::sc_ll_cmpBlockSize = 4096ll; // 4 KB
 
 // static 
 const char           FNEDCore::s_randomDummyCharAry[DUMMY_ARY_SIZE] { 0,1,2,3,4,5,6,7,8,    11,12,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31, 127 };
@@ -78,6 +78,7 @@ const QVector<QString> FNEDCore::s_debugBigLittle { QStringLiteral("BigEnd"), QS
 
     
 const QString FNEDCore::sc_encTest_Suffix("encTest");
+bool FNEDCore::sc_bUseNameChangeFunc = true;
 
 
 
@@ -122,25 +123,26 @@ bool FNEDCore::genNewFileName(const QString& fileAbsPath,  QString& newName, int
     auto bNoSuffixFlag = fInfo.suffix().isEmpty();
     if ( bNoSuffixFlag ) {
         if ( givenArgs == -1 ) {
-            newName = QString("%1/%2_%3").arg( fInfo.absolutePath() ).arg( fInfo.baseName() ).arg( realSuffix );
+            newName = QString("%1/%2_%3").arg( fInfo.absolutePath() ).arg( FNEDCore::changeBaseName(fInfo.baseName(), "", forEncOrDec ) ).arg( realSuffix );
         } else {
-            newName = QString("%1/%2_%3-%4").arg( fInfo.absolutePath() ).arg( fInfo.baseName() ).arg( realSuffix ).arg( QString("Arg%1").arg(givenArgs) );
+            newName = QString("%1/%2_%3-%4").arg( fInfo.absolutePath() ).arg( FNEDCore::changeBaseName(fInfo.baseName(), "", forEncOrDec) ).arg( realSuffix ).arg( QString("Arg%1").arg(givenArgs) );
         }
     } else {
         // originalFileName_enc.???
+        int iMatchFlag = 0;
         if ( givenArgs == -1 ) {
             newName = QString("%1/%2_%3.%4")
                             .arg( fInfo.absolutePath() )
-                            .arg( fInfo.baseName() )
+                            .arg( FNEDCore::changeBaseName( fInfo.baseName(), fInfo.suffix(), forEncOrDec ) )
                             .arg(  realSuffix   )
-                            .arg( fInfo.suffix()  );
+                            .arg( FNEDCore::changeSuffixName( fInfo.suffix(), forEncOrDec, &iMatchFlag)  );
         } else {
             newName = QString("%1/%2_%3-%4.%5")
                             .arg( fInfo.absolutePath() )
-                            .arg( fInfo.baseName() )
+                            .arg( FNEDCore::changeBaseName( fInfo.baseName(), fInfo.suffix(), forEncOrDec ) )
                             .arg(  realSuffix   )
                             .arg(  QString("Arg%1").arg(givenArgs)  )
-                            .arg( fInfo.suffix()  );
+                            .arg( FNEDCore::changeSuffixName( fInfo.suffix(), forEncOrDec, &iMatchFlag)  );
         }
     }
 
@@ -148,32 +150,31 @@ bool FNEDCore::genNewFileName(const QString& fileAbsPath,  QString& newName, int
     if ( tmpfile.exists() ) {
         int i = 1;
         while( 1 ) {
-            // filename =  originalFileName_enc_0
-
             if ( bNoSuffixFlag ) {
                 // absDir/originalFileName_enc_1
                 if ( givenArgs == -1 ) {
-                    newName = QString("%1/%2_%3-%4").arg( fInfo.absolutePath() ).arg( fInfo.baseName() ).arg( realSuffix ).arg(i);
+                    newName = QString("%1/%2_%3-%4").arg( fInfo.absolutePath() ).arg( FNEDCore::changeBaseName( fInfo.baseName(), fInfo.suffix(), forEncOrDec) ).arg( realSuffix ).arg(i);
                 } else {
-                    newName = QString("%1/%2_%3-%4-%5").arg( fInfo.absolutePath() ).arg( fInfo.baseName() ).arg( realSuffix ).arg( QString("Arg%1").arg(givenArgs) ).arg(i);
+                    newName = QString("%1/%2_%3-%4-%5").arg( fInfo.absolutePath() ).arg( FNEDCore::changeBaseName( fInfo.baseName(), fInfo.suffix(), forEncOrDec) ).arg( realSuffix ).arg( QString("Arg%1").arg(givenArgs) ).arg(i);
                 }
             } else {
                 // absDir/originalFileName_enc_1.???
+                int iMatchFlag = 0;
                 if ( givenArgs == -1 ) {
                     newName = QString("%1/%2_%3_%4.%5")
                             .arg( fInfo.absolutePath() )
-                            .arg( fInfo.baseName() )
+                            .arg( FNEDCore::changeBaseName( fInfo.baseName(), fInfo.suffix(), forEncOrDec) )
                             .arg(  realSuffix   )
                             .arg( i )
-                            .arg( fInfo.suffix()  );
+                            .arg( FNEDCore::changeSuffixName( fInfo.suffix(), forEncOrDec, &iMatchFlag)  );
                 } else {
                     newName = QString("%1/%2_%3-%4_%5.%6")
                             .arg( fInfo.absolutePath() )
-                            .arg( fInfo.baseName() )
+                            .arg( FNEDCore::changeBaseName( fInfo.baseName(), fInfo.suffix(), forEncOrDec ) )
                             .arg(  realSuffix   )
                             .arg(  QString("Arg%1").arg(givenArgs)   )
                             .arg( i )
-                            .arg( fInfo.suffix()  );
+                            .arg( FNEDCore::changeSuffixName(fInfo.suffix(), forEncOrDec, &iMatchFlag)  );
                 }
             }
 
@@ -1453,4 +1454,89 @@ int  FNEDCore::genIDByArgs(const EncArgWrap& obj)
     return TO_ENC_ARGS(obj);
 }
 
+
+// static 
+QString FNEDCore::changeBaseName(const QString& baseNameOnly, const QString& suffix, bool bIsEnc)
+{
+    if ( !sc_bUseNameChangeFunc ) {
+        return baseNameOnly;
+    }
+
+    int matchFlag = 0;
+    FNEDCore::changeSuffixName(suffix,bIsEnc, &matchFlag);
+
+    static QString rule0[2] = { "DJI_", "dji_" };
+    QString retStr = baseNameOnly;
+
+    if ( bIsEnc ) {
+        //////////////////////////////////////
+        // Encrypt
+
+        // process BaseName
+        if ( (baseNameOnly!=rule0[0] && baseNameOnly!=rule0[1]) 
+                && baseNameOnly.startsWith(rule0[0], Qt::CaseInsensitive) ) {
+            retStr = baseNameOnly.mid( rule0[0].size() );
+        } 
+    } else {
+        //////////////////////////////////////
+        // Decrypt
+        if ( matchFlag != 0 ) {
+            if ( !baseNameOnly.startsWith(rule0[0], Qt::CaseInsensitive) ) {
+                retStr.prepend( rule0[0] );
+            } 
+        }
+    }
+
+    return retStr;
+}
+
+
+// static 
+QString FNEDCore::changeSuffixName(const QString& suffixOnly, bool bIsEnc, int* pbIsMatched)
+{
+    static QString rule1[2] = { "MP4", "MWV" };
+    static QString rule2[2] = { "DNG", "RAW" };
+    static QString rule3[2] = { "JPG", "webp" };
+
+    // init
+    if ( pbIsMatched!=nullptr ) {
+        *pbIsMatched = 0;
+    }
+
+    if ( suffixOnly.isEmpty() || !sc_bUseNameChangeFunc ) {
+        return suffixOnly;
+    }
+
+    QString retSuffix = suffixOnly;
+    int matchedFlag = 0;
+    if ( bIsEnc ) {
+        if ( suffixOnly == rule1[0] ) {
+            matchedFlag = 1;
+            retSuffix = rule1[1];
+        } else if ( suffixOnly == rule2[0] ) {
+            matchedFlag = 2;
+            retSuffix = rule2[1];
+        } else if ( suffixOnly == rule3[0] ) {
+            matchedFlag = 3;
+            retSuffix = rule3[1];
+        }
+    } else {
+        if ( suffixOnly == rule1[1] ) {
+            matchedFlag = 1;
+            retSuffix = rule1[0];
+        } else if ( suffixOnly == rule2[1] ) {
+            matchedFlag = 2;
+            retSuffix = rule2[0];
+        } else if ( suffixOnly == rule3[1] ) {
+            matchedFlag = 3;
+            retSuffix = rule3[0];
+        }
+    }
+
+    if ( pbIsMatched!=nullptr && matchedFlag !=0 ) {
+        *pbIsMatched = 1;
+    }
+
+    return retSuffix;
+}
 

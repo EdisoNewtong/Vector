@@ -100,7 +100,8 @@ protected:
     static int howMany1InChar(char ch);
     static int getNBit(char ch, int idx);
 
-
+    static QString changeBaseName(const QString& fileNameOnly, const QString& suffix, bool bIsEnc);
+    static QString changeSuffixName(const QString& fileNameOnly, bool bIsEnc, int* bIsMatched);
 
     static const unsigned int sc_bitsInByte;
     static const unsigned int sc_bitsInShort;
@@ -127,6 +128,7 @@ protected:
     static const QVector<QString> s_debugBigLittle;
 
     static const QString sc_encTest_Suffix;
+    static       bool sc_bUseNameChangeFunc;
 
 };
 
