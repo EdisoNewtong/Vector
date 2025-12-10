@@ -54,8 +54,11 @@ Q : 输出结果意味着什么 ?
 **==If the mutex is already locked, the calling thread shall <font color="#FF00FF" size="7">block</font> until the mutex becomes available.==**
 **==This operation shall return with the mutex object referenced by mutex in the locked state with the calling thread as its owner.==**
 
+# 关于 ==**线程被阻塞**== 
+可以编译、运行 ==**backup/mainWithLog.c**== , 然后通过查看打印到终端的日志内容进行分析和研究
 
 
+# 分析 与 结论 
 而当缩减少槽位总个数之后(100个) , #2~#5 ，就不一定有机会参与实际的填充数据的过程了，都被#1 Thread 给填充完了
 与此同时，各个线程之间的切换和协同工作，也**==不一定是按照线程的创建顺序==**来依次执行的
 从打印结果来看 #1 和 #3 执行了，而 #2 #4 #5 **==没有执行的机会==**
@@ -162,3 +165,4 @@ void* produce(void* arg)
 
 }
 ```
+
