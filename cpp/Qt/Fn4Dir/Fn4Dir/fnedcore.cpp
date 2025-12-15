@@ -1497,6 +1497,8 @@ QString FNEDCore::changeSuffixName(const QString& suffixOnly, bool bIsEnc, int* 
     static QString rule1[2] = { "MP4", "MWV" };
     static QString rule2[2] = { "DNG", "RAW" };
     static QString rule3[2] = { "JPG", "webp" };
+    static QString rule4[2] = { "JPEG", "webep" };
+
 
     // init
     if ( pbIsMatched!=nullptr ) {
@@ -1507,29 +1509,36 @@ QString FNEDCore::changeSuffixName(const QString& suffixOnly, bool bIsEnc, int* 
         return suffixOnly;
     }
 
-    QString retSuffix = suffixOnly;
+    // Covert it to Uppercase
+    QString retSuffix = suffixOnly.toUpper();
     int matchedFlag = 0;
     if ( bIsEnc ) {
-        if ( suffixOnly == rule1[0] ) {
+        if ( retSuffix == rule1[0] ) {
             matchedFlag = 1;
             retSuffix = rule1[1];
-        } else if ( suffixOnly == rule2[0] ) {
+        } else if ( retSuffix == rule2[0] ) {
             matchedFlag = 2;
             retSuffix = rule2[1];
-        } else if ( suffixOnly == rule3[0] ) {
+        } else if ( retSuffix == rule3[0] ) {
             matchedFlag = 3;
             retSuffix = rule3[1];
+        } else if ( retSuffix == rule4[0] ) {
+            matchedFlag = 4;
+            retSuffix = rule4[1];
         }
     } else {
-        if ( suffixOnly == rule1[1] ) {
+        if ( retSuffix == rule1[1] ) {
             matchedFlag = 1;
             retSuffix = rule1[0];
-        } else if ( suffixOnly == rule2[1] ) {
+        } else if ( retSuffix == rule2[1] ) {
             matchedFlag = 2;
             retSuffix = rule2[0];
-        } else if ( suffixOnly == rule3[1] ) {
+        } else if ( retSuffix == rule3[1] ) {
             matchedFlag = 3;
             retSuffix = rule3[0];
+        } else if ( retSuffix == rule4[1] ) {
+            matchedFlag = 4;
+            retSuffix = rule4[0];
         }
     }
 
@@ -1539,4 +1548,5 @@ QString FNEDCore::changeSuffixName(const QString& suffixOnly, bool bIsEnc, int* 
 
     return retSuffix;
 }
+
 
