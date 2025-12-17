@@ -29,7 +29,7 @@ mod tests {
         let v1 = vec![1, 2, 3];
         let mut v1_iter = v1.iter();
 
-        /*
+/****************************************************************************************************
 error[E0308]: mismatched types
   --> src\main.rs:73:37
    |
@@ -68,10 +68,37 @@ help: try using `.as_ref()` to convert `Option<{integer}>` to `Option<&{integer}
    |
 75 |         assert_eq!( v1_iter.next(), Some(3).as_ref() );
    |                                            +++++++++
-        */
+*****************************************************************************************************/
         //                          Some(&1) rather than Some(1) => otherwise Compile-time Error 
         assert_eq!( v1_iter.next(), Some(&1) );
         assert_eq!( v1_iter.next(), Some(&2) );
         assert_eq!( v1_iter.next(), Some(&3) );
+    }
+
+    #[test]
+    fn iterator_sum() {
+        let v1         = vec![1, 2, 3];
+        let v1_iter    = v1.iter();
+        // 'v1_iter' with 'sum' function   
+        //           will consume each element until all elements has been swallowed
+        let total: i32 = v1_iter.sum(); 
+
+        assert_eq!(total, 6);
+    }
+
+    #[test]
+    fn iterator_map() {
+        let v1: Vec<i32> = vec![1,2,3];
+        // !!![Note]!!! : iterators are lazy and do nothing unless consumed
+        // after the statement has been executed , 
+        //     v1 will not changed to [2,3,4]
+        v1.iter().map( |x| x+1 );
+
+
+        // collect is a kind of consumed function , it take effect 
+        let v2: Vec<_> = v1.iter().map( |x| x+1 ).collect();
+
+        assert_eq!(v1, vec![1,2,3]); // collect will not change v1's element value
+        assert_eq!(v2, vec![2,3,4]);
     }
 }
