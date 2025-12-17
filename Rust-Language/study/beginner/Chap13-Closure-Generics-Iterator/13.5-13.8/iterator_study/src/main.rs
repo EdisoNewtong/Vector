@@ -103,6 +103,7 @@ help: try using `.as_ref()` to convert `Option<{integer}>` to `Option<&{integer}
     }
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////
 #[derive(PartialEq, Debug)]
 struct Shoe {
     size: u32,
@@ -130,6 +131,70 @@ fn filter_by_size() {
         Shoe { size: 10, style: String::from("Li-Ning"), },
     ] );
 }
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 
+struct Counter {
+    count: u32,
+}
+
+impl Counter {
+    fn new() -> Counter {
+        Counter { count: 0 }
+    }
+}
+
+
+impl Iterator for Counter {
+    type Item = u32;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        // begin from  0 => yield 1
+        if self.count < 5 {
+            self.count += 1;
+
+            // finally when self.count == 4    
+            //         =>  yield   5
+            Some(self.count)
+        } else {
+
+            None
+        }
+    }
+}
+
+#[test]
+fn calling_next_directly() {
+    let mut counter = Counter::new();
+
+    assert_eq!( counter.next(), Some(1) );
+    assert_eq!( counter.next(), Some(2) );
+    assert_eq!( counter.next(), Some(3) );
+    assert_eq!( counter.next(), Some(4) );
+    assert_eq!( counter.next(), Some(5) );
+    assert_eq!( counter.next(), None );
+}
+
+#[test]
+fn using_other_iterator_trait_methods() {
+    /************************************************
+             [start from 2] so skip(1)
+        1 *    2                   = 2
+        2 *    3                   = 6   ( match 6%3 == 0 )
+        3 *    4                   = 12  ( match 12%3 == 0 )
+        4 *    5                   = 20
+        5 *    None                // drop it
+    
+       so (6+12) = 18
+    ************************************************/
+
+
+    let sum: u32 = Counter::new()
+                   .zip( Counter::new().skip(1) ) // zip will wrap 2 element into 1 group
+                   .map( | (a,b) |   a*b)     
+                   .filter(|x| x % 3 == 0)
+                   .sum();
+
+    assert_eq!(18, sum);
+}
