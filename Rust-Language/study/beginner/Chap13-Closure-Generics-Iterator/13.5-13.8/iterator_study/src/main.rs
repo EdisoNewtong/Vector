@@ -102,3 +102,34 @@ help: try using `.as_ref()` to convert `Option<{integer}>` to `Option<&{integer}
         assert_eq!(v2, vec![2,3,4]);
     }
 }
+
+#[derive(PartialEq, Debug)]
+struct Shoe {
+    size: u32,
+    style: String,
+}
+
+fn shoes_fit_my_size(shoes: Vec<Shoe>, shoe_size: u32) -> Vec<Shoe> {
+    // if closure return true => keep the element 
+    //    otherwise drop(kick) it out
+    shoes.into_iter().filter( |x| x.size == shoe_size).collect()
+}
+
+
+#[test]
+fn filter_by_size() {
+    let shoes = vec![
+        Shoe { size: 10, style: String::from("Nike"), },
+        Shoe { size: 13, style: String::from("Addidas"), },
+        Shoe { size: 10, style: String::from("Li-Ning"), },
+    ];
+    let fit_my_size = shoes_fit_my_size(shoes, 10);
+
+    assert_eq!(fit_my_size, vec![
+        Shoe { size: 10, style: String::from("Nike"), },
+        Shoe { size: 10, style: String::from("Li-Ning"), },
+    ] );
+}
+
+
+
