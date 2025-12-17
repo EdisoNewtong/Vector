@@ -67,6 +67,59 @@ fn main() {
     generate_workout( simulated_user_specified_value, simulated_random_number);
 }
 
+#[test]
+fn study_closure_feature() {
+    let x = 4;
+    //                      x is not in the argument list of closure "equal_to_x"
+    //  But the closure can capture the varible in the same scope before its defination 
+    let closureequal_to_x = |z| z==x;
+
+/**********************************************************************
+error[E0434]: can't capture dynamic environment in a fn item
+  --> src\main.rs:99:14
+   |
+99 |         z == x;
+   |              ^
+   |
+   = help: use the `|| { ... }` closure form instead
+
+error[E0308]: mismatched types
+  --> src\main.rs:98:33
+   |
+98 |     fn fn_equal_to_x(z: i32) -> bool {
+   |        -------------            ^^^^ expected `bool`, found `()`
+   |        |
+   |        implicitly returns `()` as its body has no tail or `return` expression
+99 |         z == x;
+   |               - help: remove this semicolon to return this value
+
+Some errors have detailed explanations: E0308, E0434.
+**********************************************************************/
+    // fn fn_equal_to_x(z: i32) -> bool { // [!!!Notes!!!] : a function defined inside another function is allowed by Rust Grammer!
+    //     z == x;
+    // }/*;  [NO] semicolon at the end of its defination is NOT allowed */
+
+    /****************************************************************************************************
+    *****************************************************************************************************/
+    let y = 4;
+    assert!( closureequal_to_x(y) ); // the test will passed without any error
+    // assert!( fn_equal_to_x(y) ); // the test will passed without any error
+}
+
+
+#[test]
+fn study_move_keyword() {
+    let x = vec![1,2,3];
+    let use_move_closure = move |z| z==x;
+    //
+    // Compile time Error, because the varible x has been moved inside the closure's body ( by keyword 'move' )
+    //  x will be drop (dead) after the defination of use_move_closure 
+    println!("can't use x here: {:?}", x);
+
+    let y = vec![1,2,3];
+    assert!( use_move_closure(y) );
+}
+
 
 fn generate_workout(intensity: u32, random_number: u32) {
     // must add a new keyword  mut before the varible name "expensive_closure"
@@ -101,7 +154,7 @@ fn generate_workout(intensity: u32, random_number: u32) {
 mod tests {
 
     #[test]
-    fn call_with_different_valus() {
+    fn call_with_different_values() {
         let mut c = super::Cacher::new(|a| a);
         let v1 = c.value(1);
 
@@ -115,6 +168,4 @@ mod tests {
         assert_eq!( v2, 2 ); 
     }
 }
-
-
 
