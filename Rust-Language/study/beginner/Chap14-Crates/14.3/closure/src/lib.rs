@@ -2,8 +2,6 @@
 //!
 //! A library for modeling artistic concepts.
 
-mod art;
-
 
 pub mod kinds {
     /// The primary colors according to the RYB color model. 
@@ -31,3 +29,4 @@ pub mod utils {
         SecondaryColor::Green
     }
 }
+
