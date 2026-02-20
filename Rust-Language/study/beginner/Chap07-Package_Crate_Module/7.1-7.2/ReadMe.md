@@ -43,7 +43,7 @@ pub fn eat_at_restaurant()
 
 /******************************************************************************************
 
-Verson #1 or #2 ?
+Version #1 or #2 ?
 
 It depends on the way of refactor  :
 - If you will move both the mod and the funtion call ,   #2 is a better choice because of #1 is too verbose

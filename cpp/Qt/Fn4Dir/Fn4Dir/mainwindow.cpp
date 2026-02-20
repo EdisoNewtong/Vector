@@ -8,7 +8,10 @@
 #include <QDebug>
 #include <QStringList>
 #include <exception>
+#include <QCoreApplication>
 using namespace std;
+
+static const QString G_LOGFILE("D:/encFileTimerRecord.txt");
 
 static QString sec2min2hour(double sec)
 {
@@ -50,10 +53,10 @@ void MainWindow::on_encBtn_clicked()
     //  Multiple File
     //
     //////////////////////////////////////////////////
-    QString fName("e:/encFileTimerRecord.txt");
-    QFile eDiskOutput( fName );
+    QFile eDiskOutput( G_LOGFILE );
     if ( !eDiskOutput.open(QIODevice::WriteOnly) ) {
-        // errorMsg = QString("Open file '%1' for record timer failed! ").arg( fName );
+        QString errorMsg = QString("Open file '%1' for record timer failed! ").arg( G_LOGFILE );
+        ui->logWnd->appendPlainText( errorMsg );
         return;
     }
 
@@ -88,28 +91,6 @@ void MainWindow::on_encBtn_clicked()
     eDiskOutput.close();
 
 
-    //  Single File
-    /* 
-    auto sepList = sepFilePath.split( QString("\n") );
-    // Process File Path
-    QString filePath = ui->filePathWnd->toPlainText().trimmed();
-    if ( filePath.endsWith( QStringLiteral(".")  ) ) {
-        ui->logWnd->clear();
-        ui->logWnd->setPlainText( QString("File can't be ends with '.'  ") );
-        return;
-    }
-
-    // qDebug() << "filePath = " << filePath;
-    QFileInfo fInfo(filePath);
-    if ( !fInfo.isFile() && !fInfo.exists() ) {
-        ui->logWnd->clear();
-        ui->logWnd->setPlainText( QString(" It's not a vaild file Path! ") );
-        return;
-    }
-
-    // encode1File_TestCase(filePath);
-    encode_a_GivenFile(filePath);
-    */
 }
 
 
@@ -121,10 +102,10 @@ void MainWindow::on_decBtn_clicked()
     //  Multiple File
     //
     //////////////////////////////////////////////////
-    QString fName("e:/decFileTimerRecord.txt");
-    QFile eDiskOutput( fName );
+    QFile eDiskOutput( G_LOGFILE );
     if ( !eDiskOutput.open(QIODevice::WriteOnly) ) {
-        // errorMsg = QString("Open file '%1' for record timer failed! ").arg( fName );
+        QString errorMsg = QString("Open file '%1' for record timer failed! ").arg( G_LOGFILE );
+        ui->logWnd->appendPlainText( errorMsg );
         return;
     }
 
@@ -158,37 +139,6 @@ void MainWindow::on_decBtn_clicked()
     eDiskOutput.write( totalStr.toUtf8()  );
     eDiskOutput.flush();
     eDiskOutput.close();
-
-
-
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////
-    //
-    //  Single File
-    //
-    ////////////////////////////////////////////////////////////////////////////////////////////////////
-    // QElapsedTimer timer_e;
-    // timer_e.start();
-
-    // QString filePath = ui->filePathWnd->toPlainText().trimmed();
-    // if ( filePath.endsWith( QStringLiteral(".")  ) ) {
-    //     ui->logWnd->clear();
-    //     ui->logWnd->setPlainText( QString("File can't be ends with '.'  ") );
-    //     return;
-    // }
-
-    // // qDebug() << "filePath = " << filePath;
-    // QFileInfo fInfo(filePath);
-    // if ( !fInfo.isFile() && !fInfo.exists() ) {
-    //     ui->logWnd->clear();
-    //     ui->logWnd->setPlainText( QString(" It's not a vaild file Path! ") );
-    //     return;
-    // }
-
-    // ui->logWnd->clear();
-
-    // // decode1File_TestCase(filePath);
-    // decode_a_GivenFile(filePath);
 
 }
 
@@ -238,65 +188,6 @@ void MainWindow::on_encWithArgsBtn_clicked()
 
 void MainWindow::on_cmp2FilesBtn_clicked()
 {
-    QFile bigFile("J:/Mavic3Pro-Video/2025-05-02/DJI_20250502152548_0015_D.MP4");
-    if ( !bigFile.open(QIODevice::ReadOnly) ) {
-        ui->logWnd->appendPlainText("Can't open big file!");
-        bigFile.close();
-        return;
-    }
-    qint64 fileSz = bigFile.size(); fileSz += 0;
-
-    QString arg = ui->logWnd->toPlainText();
-    if ( arg.isEmpty() ) {
-        ui->logWnd->appendPlainText("Array size is empty!");
-        return;
-    }
-
-    auto bFlag = false;
-    qint64 arySz = arg.toLongLong(&bFlag);
-    if ( !bFlag ) {
-        ui->logWnd->appendPlainText( QString("'%1'   Convert Array size failed. ").arg( arg ) );
-        return;
-    }
-
-    QElapsedTimer t1; t1.start();
-    char* bigBuf = nullptr;
-    try {
-        bigBuf = new char[ arySz ];
-    } catch ( ... ) {
-        ui->logWnd->appendPlainText( QString("Catched excpetion when alloc big memory. size = %1").arg( arySz ) );
-    }
-
-    if ( bigBuf == nullptr ) {
-        delete [] bigBuf; bigBuf = nullptr;
-        ui->logWnd->appendPlainText( QString("Alloc '%1' bytes array [ FAILED ].").arg( arySz ) );
-        return;
-    }
-    ui->logWnd->appendPlainText( QString("Alloc large memory [ SUCCESSFUL ] :-) used '%1' .").arg( sec2min2hour(t1.elapsed() / 1000.0 )) );
-
-    /*
-    QElapsedTimer t2; t2.start();
-    qint64 readedSize = bigFile.read(bigBuf, fileSz);
-    if ( readedSize == fileSz ) {
-        ui->logWnd->appendPlainText( QString("Read large file successful used '%1' .").arg( sec2min2hour(t2.elapsed() / 1000.0 ) ) );
-    } else {
-        ui->logWnd->appendPlainText( QString("Read large file [!!! FAILED !!!] used '%1' .").arg( sec2min2hour( t2.elapsed() / 1000.0 ) ) );
-    }
-    */
-
-    QElapsedTimer t3; t3.start();
-    if ( bigBuf!=nullptr ) {
-        delete [] bigBuf;
-        bigBuf = nullptr;
-    }
-    ui->logWnd->appendPlainText( QString("Release large memory used '%1' . [DONE] ").arg( sec2min2hour( t3.elapsed() / 1000.0 ) ) );
-    bigFile.close();
-    return;
-
-
-
-
-    /*
     QElapsedTimer timer_e;
     timer_e.start();
 
@@ -308,9 +199,8 @@ void MainWindow::on_cmp2FilesBtn_clicked()
         return;
     }
 
-
-    qDebug() << "file1 : " << sepList.at(0);
-    qDebug() << "file2 : " << sepList.at(1);
+    // qDebug() << "file1 : " << sepList.at(0);
+    // qDebug() << "file2 : " << sepList.at(1);
 
     QString error;
     ui->logWnd->clear();
@@ -319,7 +209,6 @@ void MainWindow::on_cmp2FilesBtn_clicked()
     } else {
         ui->logWnd->setPlainText( error + QString(", elapsed time : %1 ").arg( timer_e.elapsed() / 1000.0 ) );
     }
-    */
 }
 
 

@@ -1494,11 +1494,9 @@ QString FNEDCore::changeBaseName(const QString& baseNameOnly, const QString& suf
 // static 
 QString FNEDCore::changeSuffixName(const QString& suffixOnly, bool bIsEnc, int* pbIsMatched)
 {
-    static QString rule1[2] = { "MP4", "MWV" };
-    static QString rule2[2] = { "DNG", "RAW" };
-    static QString rule3[2] = { "JPG", "webp" };
-    static QString rule4[2] = { "JPEG", "webep" };
-
+    static QString rule1[2] = { "MP4", "MWV"  };
+    static QString rule2[2] = { "DNG", "RAW"  };
+    static QString rule3[2] = { "JPG", "WEBP" };
 
     // init
     if ( pbIsMatched!=nullptr ) {
@@ -1522,9 +1520,6 @@ QString FNEDCore::changeSuffixName(const QString& suffixOnly, bool bIsEnc, int* 
         } else if ( retSuffix == rule3[0] ) {
             matchedFlag = 3;
             retSuffix = rule3[1];
-        } else if ( retSuffix == rule4[0] ) {
-            matchedFlag = 4;
-            retSuffix = rule4[1];
         }
     } else {
         if ( retSuffix == rule1[1] ) {
@@ -1536,9 +1531,6 @@ QString FNEDCore::changeSuffixName(const QString& suffixOnly, bool bIsEnc, int* 
         } else if ( retSuffix == rule3[1] ) {
             matchedFlag = 3;
             retSuffix = rule3[0];
-        } else if ( retSuffix == rule4[1] ) {
-            matchedFlag = 4;
-            retSuffix = rule4[0];
         }
     }
 
