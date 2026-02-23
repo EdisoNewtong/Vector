@@ -46,3 +46,5 @@ lua/lua_C_Lab/basic/lualib/*.lib
 lua/sourceCodeStudy/xcodeLuaStudy
 
 *.pro.user
+
+Rust-Language/**/Cargo.lock
