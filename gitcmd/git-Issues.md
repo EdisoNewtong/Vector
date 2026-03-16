@@ -25,3 +25,37 @@ Host github.com
     User git
 ```
 
+
+
+
+
+
+# git with VPN Support
+
+git config VPN proxy settings : (关于clone github 中的仓库，一直失败，是因为VPN的代理没有被应用到 git bash的终端，需要进行如下配置的其中某1种 )
+```bash
+     $ git config --global http.proxy    socks5   127.0.0.1:portID
+     $ git config --global https.proxy    socks5   127.0.0.1:portID
+```
+
+or
+
+```bash
+     $ git config --global http.proxy 127.0.0.1:portID
+     $ git config --global https.proxy 127.0.0.1:portID
+```
+
+	 
+目前我的当前设置为 PortID = 10080 ( 非 socks5 协议)
+ 
+## 可以通过以下命令，查看已经配置完成的列表 
+```bash
+        $  git config --global --list
+```
+
+## 查看某一个指定的单项配置
+```bash
+        $ git config --global     --get     https.proxy
+```
+
+
