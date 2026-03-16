@@ -20,6 +20,13 @@ int main(int argc, char* argv[], char* env[])
     ret = my_pow(n_a, n_b); // 1024
     cout << "the return value for util_Pow( " << n_a << "," << n_b << " ) = " << ret << endl;
 
+
+    cout << endl
+         << "--------------------------------------------------" << endl
+         << "    Program End without any ERRORS                " << endl
+         << "--------------------------------------------------" 
+         << endl;
+
     return 0;
 }
 
