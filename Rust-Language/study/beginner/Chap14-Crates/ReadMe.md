@@ -79,4 +79,65 @@ $ cargto test         // it will make a test from the /// document comment
 
 ```
 
+## 14.4    Publish your crates    to the website  crates.io
+```Bash
+#
+#
+# API-token can be generated from the following url :   
+#     [crates.io Official Website](https://crates.io/)    // you must login in the website by your github account )
+#
+####################################################################################################
+#
+# It will store your token in the local disk path : ~/.cargo/credentials 
+#
+####################################################################################################
+$ cargo login <API-token>
+        <font size="10" color="green">Login</font> token for `crates.io` saved 
+
+
+####################################################################################################
+    # Config your project's meta fields 
+    [package]
+    name = "xxxx"  # It must be unique inside the website "crates.io" ( Input the keywords from search bar to query whether it existed or not )
+    description = "....."
+    license = "Apache 2.0 OR MIT OR GNU OR GPLv3 OR GNU AGPLv3"   # visit to [Licenses](https://spdx.org/licenses/) for detail 
+    version = "xx.xx.xx"
+    author = "xxx"
+    edition = "xxx"
+####################################################################################################
+
+# --allow-dirty  means no matter whether your git repo is clean or modified ,  publish your crates forcely
+$ cargo publish      [--allow-dirty]
+
+##########################################################################
+#
+# crate 一旦发布，==**就是永久性的 : 该版本无法覆盖，代码无法删除**==
+#   - 目的: 依赖于该版本的项目可继续正常工作 
+#
+##########################################################################
+
+#
+#   Also see the syntax     [Semantic](http://semver.org)
+# update your crate to a new version 
+version = "xx.xx.xx+1"
+
+
+
+# cargo yank to   backward to your previous version without delete the given version
+$ cargo yank --vers 1.0.1
+
+
+
+- 1.0.1        // Before yank  1.0.1 is the latest version 
+- 1.0.0    <-- // After execute    cargo yank --vers 1.0.1    ver 1.0.1 become the latest version
+
+#
+# <Cancel> the backward action been excuted before 
+#
+$ cargo yank --vers 1.0.1  --undo
+
+
+```
+
+
 
