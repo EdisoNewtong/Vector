@@ -139,5 +139,41 @@ $ cargo yank --vers 1.0.1  --undo
 
 ```
 
+# 14.6     install a given crate from   url   [CRATES.IO](https://crates.io)  and cargo subcommand
+![Install a crate](14.6_1.png) 
+```bash
+##################################################
+#
+#     installed at the pwd path     ./bin/...
+# or  $HOME/.cargo/bin    |      C:\User\<your_name>\.cargo\bin
+#
+##################################################
+$ cargo install <a given binary target crate name>
+
+
+# How to get the environment varible's value inside Windows System ?
+$ echo %HOME%
+
+
+# How to get the environment varible's value inside Linux/Mac System ?
+$ echo ${HOME}  
+$ echo $HOME
+
+
+# cargo sub command introduction :
+
+$ cargo-<some_sub_command>
+
+$ cargo  some_sub_command
+
+
+
+# e.g.
+# binary program "cargo_checkout"  has been existed in  C:\User\<your_name>\.cargo\bin\
+
+$ cargo   checkout // run the cargo_checkout program 
+
+
+```
 
 
