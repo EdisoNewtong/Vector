@@ -59,3 +59,9 @@ or
 ```
 
 
+## 清除某一个指定的已经设置过的单项配置
+```bash
+        $ git config --global     --unset     https.proxy
+```
+
+
