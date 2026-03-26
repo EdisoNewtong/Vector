@@ -48,3 +48,6 @@ lua/sourceCodeStudy/xcodeLuaStudy
 *.pro.user
 
 Rust-Language/**/Cargo.lock
+Rust-Language/**/target
+
+
