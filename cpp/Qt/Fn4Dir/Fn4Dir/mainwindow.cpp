@@ -72,7 +72,7 @@ void MainWindow::on_encBtn_clicked()
         FNEDCore enc;
         QString error;
         QString logInfo;
-        auto fSingle = sepList.at(i);
+        auto fSingle = sepList.at(i).trimmed();
         if ( enc.encryptFile( fSingle, error ) ) {
             logInfo = QString("[DONE] encode the given file %1 Successfully! elapsed time : %2\n").arg( fSingle ).arg( sec2min2hour(timer_i.elapsed() / 1000.0)  );
         } else {
@@ -122,7 +122,7 @@ void MainWindow::on_decBtn_clicked()
         QString error;
         QString logInfo;
         QString newFileName;
-        auto fSingle = sepList.at(i);
+        auto fSingle = sepList.at(i).trimmed();
         if ( enc.decryptFile(fSingle, newFileName,error)  ) {
             logInfo = QString("[DONE] decode the given file %1 -> %2 Successfully! elapsed time : %3\n").arg( fSingle ).arg( newFileName ).arg( sec2min2hour(timer_i.elapsed() / 1000.0)  );
         } else {
