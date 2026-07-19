@@ -576,11 +576,17 @@ bool FNEDCore::readCore10Bytes(QFile& file2read, int additionalExponentFlag, cha
         errorMsg = QString("Combine coredata:fileSze from \"%1\", But it's file size = 0. ").arg( file2read.fileName() );
         return false;
     }
-    
-    if ( read2fileOriginalSz != (originalSz + (sc_bitsInShort << (additionalExponentFlag-4))) ) {
+
+    // maybe the file size is bigger than 4GB ( 4GB = 2^32 = 2^2 * (2^10)^3 = 4 * 1024^3 = 4GB )
+    // icutDown is the real original file content size
+    qint64 iCutDown = read2fileOriginalSz - (sc_bitsInShort << (additionalExponentFlag-4));
+    if (        read2fileOriginalSz != (originalSz + (sc_bitsInShort << (additionalExponentFlag-4)))  
+            && ( (static_cast<unsigned int>(iCutDown) & 0xFFFFFFFFu) != static_cast<unsigned int>(originalSz & 0xFFFFFFFFu) ) ) {
         errorMsg = QString("saved file combine size != originalFile's size. %1 != %2").arg( originalSz ).arg( read2fileOriginalSz );
         return false;
-    }
+    } else {
+        originalSz = iCutDown;
+    } 
 
     int idxAry[6] = { 1,2,3,  5,6,   8 };
     nShiftBitCnt = 0;

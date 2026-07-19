@@ -17,7 +17,7 @@ int main(int argc,char* argv[], char* env[])
 		string outStr;
 		SuperBinaryDisplayUtil::printFileInfo(finfo, outStr, true);
 	} else {
-		cout << "[ERROR] : read file failed " << endl;
+		cout << "[ERROR] : read file failed. ( Maybe the given File is so large ) " << endl;
 	}
 
 

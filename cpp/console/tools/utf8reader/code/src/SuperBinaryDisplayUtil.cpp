@@ -1,5 +1,6 @@
 #include <iostream> 
 #include <iomanip>
+#include <exception>
 // #include <cassert>
 
 #include "SuperBinaryDisplayUtil.h"
@@ -785,8 +786,26 @@ bool readFile_V1(const string& filename, FileInfo& fInfo)
         return true;
     } else {
         // alloc and read all byte from file and fill into Buf-Array
-        fileContentBuf = new char[szOfFile];
-        file.read(fileContentBuf, szOfFile);
+		auto bAllocSuccessful = true;
+        try { 
+            fileContentBuf = new char[szOfFile];
+            file.read(fileContentBuf, szOfFile);
+        } catch( const std::bad_alloc& e ) {
+			(void)e;
+			std::cout << "[ERROR] Alloc Large Memory Failed. " << std::endl;
+			bAllocSuccessful = false;
+		} catch( ... ) {
+			std::cout << "[ERROR] Unknown exception catched " << std::endl;
+			bAllocSuccessful = false;
+		}
+
+		if ( !bAllocSuccessful ) {
+			if ( fileContentBuf!=nullptr ) {
+				delete [] fileContentBuf;
+				fileContentBuf = nullptr;
+			}
+			return false;
+		}
     }
     
     if ( szOfFile >= SIZE_BOM ) {
