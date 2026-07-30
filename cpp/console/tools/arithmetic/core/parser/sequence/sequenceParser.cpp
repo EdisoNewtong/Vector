@@ -1279,6 +1279,7 @@ bool SequenceParser::isValid_Float()
                     ++otherMiscCnt;
                 }
             }
+            (void)dotCnt;
 
             if ( m_float_dotCnt == 1 && numBeforeE > 0 && otherMiscCnt == 0 ) {
                 if ( strAfter_E.empty() ) {

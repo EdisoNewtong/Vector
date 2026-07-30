@@ -571,7 +571,7 @@ int main(int argc, char* argv[], char* env[])
 
 		// Second(s)
 		restTime -= (nMinutes * oneMinute);
-		const std::chrono::seconds oneSecond(1);
+		// const std::chrono::seconds oneSecond(1);
 		auto nSeconds = chrono::duration_cast<std::chrono::seconds>(restTime).count();
 
 		cout << "It takes ";
