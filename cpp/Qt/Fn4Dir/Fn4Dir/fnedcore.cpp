@@ -1,7 +1,7 @@
 #include <QFileInfo>
 #include <QDir>
 #include <QDebug>
-#include <QRandomGenerator> 
+#include <QRandomGenerator>
 #include <QSet>
 #include <QMap>
 #include <QByteArray>
@@ -11,15 +11,15 @@
 
 
 
-// static 
+// static
 const unsigned int FNEDCore::sc_bitsInByte  = 8;
-const unsigned int FNEDCore::sc_bitsInShort = 16;
+const unsigned int FNEDCore::sc_bitsInShort = 16; // insert at less 16 bytes into the origin files
 const          int FNEDCore::sc_maxint      = 0x7FFFFFFF;
 
 const qint64 FNEDCore::sc_ll_threshold    = 4096ll; // 4 KB
 const qint64 FNEDCore::sc_ll_cmpBlockSize = 4096ll; // 4 KB
 
-// static 
+// static
 const char           FNEDCore::s_randomDummyCharAry[DUMMY_ARY_SIZE] { 0,1,2,3,4,5,6,7,8,    11,12,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31, 127 };
 
 
@@ -32,8 +32,8 @@ const SpecialChars   FNEDCore::s_special_ary[SPECIAL_ELEMENTS] {
     {  { static_cast<char>(0xF0), static_cast<char>(0x9F),  static_cast<char>(0x9B), static_cast<char>(0xAA) }, 4 }    // 🛪
 };
 
-    
-// static 
+
+// static
 const QString        FNEDCore::s_special_str_ary[SPECIAL_ELEMENTS] {
     QStringLiteral("𝄞"),
     QStringLiteral("𝄢"),
@@ -43,43 +43,48 @@ const QString        FNEDCore::s_special_str_ary[SPECIAL_ELEMENTS] {
 };
 
 
-// static 
+// static
 const int            FNEDCore::s_aryWithout3[WITHOUT_3_ARY_SZ] { 0,1,2, /* 3 */   4 };
 
 
 // static
 const QVector< QVector<int> > FNEDCore::s_1Cnt_ary {
-    QVector<int>({  1, 2, 4, 8, 16  }),                     //  [0] 5 possibilities   one   1    inside the array's element 
-    QVector<int>({  3, 5, 6, 12, 17, 18, 20, 24  }),        //  [1] 8 possibilities   two   1(s) inside the array's element 
-    QVector<int>({  7, 11, 14, 19, 21, 22, 25, 26, 28  }),  //  [2] 9 possibilities   three 1(s) inside the array's element 
-    QVector<int>({ 15, 23, 27, 29, 30 }),                   //  [3] 5 possibilities   four  1(s) inside the array's element 
-    QVector<int>({ 31 }),                                   //  [4] 1 possibilities   five  1(s) inside the array's element 
+    QVector<int>{  1, 2, 4, 8, 16  },                     //  [0] 5 possibilities   one   1    inside the array's element
+    QVector<int>{  3, 5, 6, 12, 17, 18, 20, 24  },        //  [1] 8 possibilities   two   1(s) inside the array's element
+    QVector<int>{  7, 11, 14, 19, 21, 22, 25, 26, 28  },  //  [2] 9 possibilities   three 1(s) inside the array's element
+    QVector<int>{ 15, 23, 27, 29, 30 },                   //  [3] 5 possibilities   four  1(s) inside the array's element
+    QVector<int>{ 31 },                                   //  [4] 1 possibilities   five  1(s) inside the array's element
 };
 
 // static
 const QVector< QVector<int> > FNEDCore::s_nth1Cnt_ary {
-    QVector<int>({  1, 3, 5,    7, 11, 15, 17, 19, 21, 23, 25, 27, 29, 31,  }),          // The 0th is 1,     14 possibilities
-    QVector<int>({  2, 3, 6,    7, 11, 14, 15, 18, 19, 22, 23, 26, 27, 30, 31,  }),      // The 1st is 1,     15 possibilities
-    QVector<int>({  4, 5, 6,    7, 12, 14, 15, 20, 21, 22, 23, 28, 29, 30, 31,  }),      // The 2nd is 1,     15 possibilities
-    QVector<int>({  8, 11, 12, 14, 15, 24, 25, 26, 27, 28, 29, 30, 31     }),            // The 3rd is 1,     13 possibilities
-    QVector<int>({  16, 17,18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,  }),  // The 4th is 1,     16 possibilities
+    QVector<int>{  1, 3, 5,    7, 11, 15, 17, 19, 21, 23, 25, 27, 29, 31,  },          // The 0th is 1,     14 possibilities
+    QVector<int>{  2, 3, 6,    7, 11, 14, 15, 18, 19, 22, 23, 26, 27, 30, 31,  },      // The 1st is 1,     15 possibilities
+    QVector<int>{  4, 5, 6,    7, 12, 14, 15, 20, 21, 22, 23, 28, 29, 30, 31,  },      // The 2nd is 1,     15 possibilities
+    QVector<int>{  8, 11, 12, 14, 15, 24, 25, 26, 27, 28, 29, 30, 31     },            // The 3rd is 1,     13 possibilities
+    QVector<int>{  16, 17,18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,  },  // The 4th is 1,     16 possibilities
 };
 
 
-// static 
+// static
 const QVector< QVector<int> > FNEDCore::s_nth0Cnt_ary {
-    QVector<int>({ 0, 1, 2, 3, 8, 11, 16, 17, 18, 19, 24, 25, 26, 27 }), // 2nd with 0: 14 counts
-    QVector<int>({ 0, 1, 2, 3, 4, 5, 6, 7, 8, 11, 12, 14, 15 }),         // 4th with 0: 13 counts
+    QVector<int>{ 0, 1, 2, 3, 8, 11, 16, 17, 18, 19, 24, 25, 26, 27 }, // 2nd with 0: 14 counts
+    QVector<int>{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 11, 12, 14, 15 },         // 4th with 0: 13 counts
 };
 
 
 const QVector<QString> FNEDCore::s_debugLR        { QStringLiteral("L"), QStringLiteral("R") };
 const QVector<QString> FNEDCore::s_debugBigLittle { QStringLiteral("BigEnd"), QStringLiteral("LittleEnd") };
 
-    
 const QString FNEDCore::sc_encTest_Suffix("encTest");
 bool FNEDCore::sc_bUseNameChangeFunc = true;
 
+
+bool FNEDCore::s_bUseMapMemOp = true;   // default [USE] Map-Mem operation
+bool FNEDCore::s_bCmpUseMapOp = false;  // default [Use] Seperate a large file with several parts and then compare each part
+
+// Every 1 MB emit (512 is the half value)
+const qint64 FNEDCore::sc_frequency = 512 * 1024;
 
 
 //////////////////////////////////////////////////
@@ -87,22 +92,21 @@ bool FNEDCore::sc_bUseNameChangeFunc = true;
 // ^      ^ ^       ^         ^^^^
 FNEDCore::FNEDCore(QObject *parent) : QObject(parent)
 {
-    /*
-    QString s1("🔒");
-    QByteArray ba;
-    ba.append( char('\xF0') );
-    ba.append( char('\x9F') );
-    ba.append( char('\x94') );
-    ba.append( char('\x92') );
-    QString s2(ba); // ("\xF0\x9F\x94\x92");
+    // QString fileAbsPath("D:/Mavic3Pro/2026/2026-01-07/DJI_20260107162224_0002_D.txt.MP4");
+    // QFileInfo fInfo(fileAbsPath);
 
-    if ( s1 == s2 ) {
-        qDebug() << "s1 == s2. ";
-    } else {
-        qDebug() << "s1 != s2. ";
-    }
-    */
-
+    // fileAbsPath                =  "D:/Mavic3Pro/2026/2026-01-07/DJI_20260107162224_0002_D.MP4.txt"
+    // fInfo.absoluteDir().path() =  "D:/Mavic3Pro/2026/2026-01-07"
+    // fInfo.absoluteFilePath()   =  "D:/Mavic3Pro/2026/2026-01-07/DJI_20260107162224_0002_D.MP4.txt"
+    // fInfo.absolutePath()       =  "D:/Mavic3Pro/2026/2026-01-07"
+    // fInfo.baseName()           =  "DJI_20260107162224_0002_D"
+    // fInfo.completeBaseName()   =  "DJI_20260107162224_0002_D.MP4"
+    // fInfo.dir().path()         =  "D:/Mavic3Pro/2026/2026-01-07"
+    // fInfo.fileName()           =  "DJI_20260107162224_0002_D.MP4.txt"
+    // fInfo.filePath()           =  "D:/Mavic3Pro/2026/2026-01-07/DJI_20260107162224_0002_D.MP4.txt"
+    // fInfo.suffix()             =  "txt"
+    // fInfo.completeSuffix()     =  "MP4.txt"
+    
 }
 
 
@@ -123,9 +127,9 @@ bool FNEDCore::genNewFileName(const QString& fileAbsPath,  QString& newName, int
     auto bNoSuffixFlag = fInfo.suffix().isEmpty();
     if ( bNoSuffixFlag ) {
         if ( givenArgs == -1 ) {
-            newName = QString("%1/%2_%3").arg( fInfo.absolutePath() ).arg( FNEDCore::changeBaseName(fInfo.baseName(), "", forEncOrDec ) ).arg( realSuffix );
+            newName = QString("%1/%2_%3").arg( fInfo.absolutePath() ).arg( FNEDCore::changeBaseName(fInfo.completeBaseName(), "", forEncOrDec ) ).arg( realSuffix );
         } else {
-            newName = QString("%1/%2_%3-%4").arg( fInfo.absolutePath() ).arg( FNEDCore::changeBaseName(fInfo.baseName(), "", forEncOrDec) ).arg( realSuffix ).arg( QString("Arg%1").arg(givenArgs) );
+            newName = QString("%1/%2_%3-%4").arg( fInfo.absolutePath() ).arg( FNEDCore::changeBaseName(fInfo.completeBaseName(), "", forEncOrDec) ).arg( realSuffix ).arg( QString("Arg%1").arg(givenArgs) );
         }
     } else {
         // originalFileName_enc.???
@@ -133,13 +137,13 @@ bool FNEDCore::genNewFileName(const QString& fileAbsPath,  QString& newName, int
         if ( givenArgs == -1 ) {
             newName = QString("%1/%2_%3.%4")
                             .arg( fInfo.absolutePath() )
-                            .arg( FNEDCore::changeBaseName( fInfo.baseName(), fInfo.suffix(), forEncOrDec ) )
+                            .arg( FNEDCore::changeBaseName( fInfo.completeBaseName(), fInfo.suffix(), forEncOrDec ) )
                             .arg(  realSuffix   )
                             .arg( FNEDCore::changeSuffixName( fInfo.suffix(), forEncOrDec, &iMatchFlag)  );
         } else {
             newName = QString("%1/%2_%3-%4.%5")
                             .arg( fInfo.absolutePath() )
-                            .arg( FNEDCore::changeBaseName( fInfo.baseName(), fInfo.suffix(), forEncOrDec ) )
+                            .arg( FNEDCore::changeBaseName( fInfo.completeBaseName(), fInfo.suffix(), forEncOrDec ) )
                             .arg(  realSuffix   )
                             .arg(  QString("Arg%1").arg(givenArgs)  )
                             .arg( FNEDCore::changeSuffixName( fInfo.suffix(), forEncOrDec, &iMatchFlag)  );
@@ -153,9 +157,9 @@ bool FNEDCore::genNewFileName(const QString& fileAbsPath,  QString& newName, int
             if ( bNoSuffixFlag ) {
                 // absDir/originalFileName_enc_1
                 if ( givenArgs == -1 ) {
-                    newName = QString("%1/%2_%3-%4").arg( fInfo.absolutePath() ).arg( FNEDCore::changeBaseName( fInfo.baseName(), fInfo.suffix(), forEncOrDec) ).arg( realSuffix ).arg(i);
+                    newName = QString("%1/%2_%3-%4").arg( fInfo.absolutePath() ).arg( FNEDCore::changeBaseName( fInfo.completeBaseName(), fInfo.suffix(), forEncOrDec) ).arg( realSuffix ).arg(i);
                 } else {
-                    newName = QString("%1/%2_%3-%4-%5").arg( fInfo.absolutePath() ).arg( FNEDCore::changeBaseName( fInfo.baseName(), fInfo.suffix(), forEncOrDec) ).arg( realSuffix ).arg( QString("Arg%1").arg(givenArgs) ).arg(i);
+                    newName = QString("%1/%2_%3-%4-%5").arg( fInfo.absolutePath() ).arg( FNEDCore::changeBaseName( fInfo.completeBaseName(), fInfo.suffix(), forEncOrDec) ).arg( realSuffix ).arg( QString("Arg%1").arg(givenArgs) ).arg(i);
                 }
             } else {
                 // absDir/originalFileName_enc_1.???
@@ -163,14 +167,14 @@ bool FNEDCore::genNewFileName(const QString& fileAbsPath,  QString& newName, int
                 if ( givenArgs == -1 ) {
                     newName = QString("%1/%2_%3_%4.%5")
                             .arg( fInfo.absolutePath() )
-                            .arg( FNEDCore::changeBaseName( fInfo.baseName(), fInfo.suffix(), forEncOrDec) )
+                            .arg( FNEDCore::changeBaseName( fInfo.completeBaseName(), fInfo.suffix(), forEncOrDec) )
                             .arg(  realSuffix   )
                             .arg( i )
                             .arg( FNEDCore::changeSuffixName( fInfo.suffix(), forEncOrDec, &iMatchFlag)  );
                 } else {
                     newName = QString("%1/%2_%3-%4_%5.%6")
                             .arg( fInfo.absolutePath() )
-                            .arg( FNEDCore::changeBaseName( fInfo.baseName(), fInfo.suffix(), forEncOrDec ) )
+                            .arg( FNEDCore::changeBaseName( fInfo.completeBaseName(), fInfo.suffix(), forEncOrDec ) )
                             .arg(  realSuffix   )
                             .arg(  QString("Arg%1").arg(givenArgs)   )
                             .arg( i )
@@ -192,30 +196,25 @@ bool FNEDCore::genNewFileName(const QString& fileAbsPath,  QString& newName, int
     return true;
 }
 
+    
+bool FNEDCore::genNewFileName_dest(const QString& fileAbsPath, const QString& originalDirPath, const QString& destDirPath, QString& newName, QString& errorMsg)
+{
+    QFileInfo fInfo(fileAbsPath);
+    if ( !fInfo.exists() ) {
+        errorMsg = QString("File '%1' doesn't exists! ").arg(fileAbsPath);
+        return false;
+    }
+
+    QDir destDir( destDirPath );
+    QDir parentOfOriginal( originalDirPath ); parentOfOriginal.cdUp(); // to its parent dir
+                             
+    // QString relPath = parentOfOriginal.relativeFilePath( fileAbsPath   );
+    //        destDir.absoluteFilePath( relPath );
+    newName = destDir.absoluteFilePath(  parentOfOriginal.relativeFilePath( fileAbsPath   )  );
+    return true;
+}
 
 
-/******************************************************************************************************
-
-     qDebug() << "fileAbsPath = " << fileAbsPath;
-     qDebug() << "absoluteDir = " << fInfo.absoluteDir().path();
-     qDebug() << "absoluteFilePath = " << fInfo.absoluteFilePath();
-     qDebug() << "absolutePath = " << fInfo.absolutePath();
-     qDebug() << "baseName = " << fInfo.baseName();
-     qDebug() << "canonicalFilePath = " << fInfo.canonicalFilePath();
-     qDebug() << "canonicalPath = " << fInfo.canonicalPath();
-     qDebug() << "completeBaseName = " << fInfo.completeBaseName();
-     qDebug() << "dir = " << fInfo.dir().path();
-     qDebug() << "fileName = " << fInfo.fileName();
-     qDebug() << "filePath = " << fInfo.filePath();
-     qDebug() << "suffix = " << fInfo.suffix();
-
- 
-    absolutePath     =  "D:/Mavic3Pro/2025-09-07"
-    baseName         =  "DJI_20250907074601_0032_D"
-    fileName         =  "DJI_20250907074601_0032_D.MP4"
-    suffix()
-
-******************************************************************************************************/
 bool FNEDCore::encryptFile(const QString& fileAbsPath, QString& errorMsg)
 {
     QString newName;
@@ -271,8 +270,37 @@ bool FNEDCore::encryptFile_withArg(const QString& fileAbsPath, int arg, QString&
         return false;
     }
 
-    return writeEncDataWithArgs(originalFile, illFileSize, newName, arg, errorMsg); 
+    return writeEncDataWithArgs(originalFile, illFileSize, newName, arg, errorMsg);
 }
+
+    
+bool FNEDCore::encryptFile_dest(const QString& fileAbsPath, const QString& oriDirPath, const QString& destDirPath, QString& newName, QString& errorMsg)
+{
+    auto bHasNewFileNameFlag = genNewFileName_dest(fileAbsPath, oriDirPath, destDirPath, newName, errorMsg);
+    if ( !bHasNewFileNameFlag ) {
+        qDebug() << "generate New file name failed :  " << errorMsg;
+        return false;
+    }
+
+
+    //
+    // New file name is not exists , create a new file
+    //
+    // get the real file size in bytes
+    QFile originalFile( fileAbsPath );
+    if ( !originalFile.open(QIODevice::ReadOnly) ) {
+        errorMsg = QString("Open file '%1' for reading failed! ").arg(fileAbsPath);
+        return false;
+    }
+    qint64 illFileSize = originalFile.size();
+    if ( illFileSize <= 1 ) {
+        errorMsg = QString("File size is %1, Do Nothing. ").arg( illFileSize );
+        return false;
+    }
+
+    return writeEncData(originalFile, illFileSize, newName, errorMsg);
+}
+
 
 
 
@@ -291,34 +319,37 @@ bool FNEDCore::encryptFile_TestAll(const QString& fileAbsPath,  QString& errorMs
     QString newName;
 
     EncArgWrap argObj;
-    auto ranMachine = QRandomGenerator::global();
+    // auto ranMachine = QRandomGenerator::global();
     for ( auto i = 4; i<=6; ++i ) { // [4~6]
         for ( auto j = 0; j<=1; ++j ) { // [0,1]   0:Left    1:Right
             for ( auto k = 1; k<=7; ++k ) { // bitshift 1~7
                 for ( auto lit = 0; lit<=1; ++lit ) { // 0:BigEndian   1:LittleEndian
-                    newName = QString("%1/%2_%3-flag%4-%5%6-%7").arg( fInfo.absolutePath() )
-                                                    .arg( fInfo.baseName() )
-                                                    .arg( sc_encTest_Suffix )
-                                                    .arg( i )
-                                                    .arg( FNEDCore::s_debugLR[j] )
-                                                    .arg( k )
-                                                    .arg( FNEDCore::s_debugBigLittle[lit] );
+                    for ( auto charIdx = 0; charIdx < 5; ++charIdx ) {
+                        newName = QString("%1/%2_%3-flag%4-%5%6-%7-ch_%8").arg( fInfo.absolutePath() )
+                                                        .arg( fInfo.completeBaseName() )
+                                                        .arg( sc_encTest_Suffix )
+                                                        .arg( i )
+                                                        .arg( FNEDCore::s_debugLR[j] )
+                                                        .arg( k )
+                                                        .arg( FNEDCore::s_debugBigLittle[lit] )
+                                                        .arg( charIdx );
 
-                    if ( !bNoSuffixFlag ) {
-                        newName += QString(".%1").arg( fInfo.suffix() );
-                    } 
+                        if ( !bNoSuffixFlag ) {
+                            newName += QString(".%1").arg( fInfo.suffix() );
+                        }
 
-                    originalFile.seek( 0 );
+                        originalFile.seek( 0 );
 
+                        argObj.additionalExp = i;
+                        //+// argObj.specialCharIdx = (i==4 ? 3 : s_aryWithout3[ ranMachine->bounded( WITHOUT_3_ARY_SZ ) ] );
+                        argObj.specialCharIdx = charIdx;
+                        argObj.nShiftBits = k;
+                        argObj.bShiftDir = j;
+                        argObj.bBigOrLittle = lit;
 
-                    argObj.additionalExp = i;
-                    argObj.specialCharIdx = (i==4 ? 3 : s_aryWithout3[ ranMachine->bounded( static_cast<int>( sizeof(s_aryWithout3) / sizeof(s_aryWithout3[0]) ) ) ] );
-                    argObj.nShiftBits = k;
-                    argObj.bShiftDir = j;
-                    argObj.bBigOrLittle = lit;
-
-                    if ( !writeEncDataWithArgs(originalFile, illFileSize, newName, genIDByArgs(argObj), errorMsg) ) {
-                        return false;
+                        if ( !writeEncDataWithArgs(originalFile, illFileSize, newName, genIDByArgs(argObj), errorMsg) ) {
+                            return false;
+                        }
                     }
                 }
             }
@@ -332,7 +363,6 @@ bool FNEDCore::encryptFile_TestAll(const QString& fileAbsPath,  QString& errorMs
 
 bool FNEDCore::decryptFile_TestAll_WithCmp(const QString& fileAbsPath,  QString& errorMsg)
 {
-
     QFileInfo fInfo(fileAbsPath);
     QFile originalFile( fileAbsPath );
     if ( !originalFile.open(QIODevice::ReadOnly) ) {
@@ -350,27 +380,30 @@ bool FNEDCore::decryptFile_TestAll_WithCmp(const QString& fileAbsPath,  QString&
         for ( auto j = 0; j<=1; ++j ) { // [0,1]   0:Left    1:Right
             for ( auto k = 1; k<=7; ++k ) { // bitshift 1~7
                 for ( auto lit = 0; lit<=1; ++lit ) { // 0:BigEndian   1:LittleEndian
-                    newName = QString("%1/%2_%3-flag%4-%5%6-%7").arg( fInfo.absolutePath() )
-                                                    .arg( fInfo.baseName() )
-                                                    .arg( sc_encTest_Suffix )
-                                                    .arg( i )
-                                                    .arg( FNEDCore::s_debugLR[j] )
-                                                    .arg( k )
-                                                    .arg( FNEDCore::s_debugBigLittle[lit] );
+                    for ( auto charIdx = 0; charIdx < 5; ++charIdx ) { // charIdx @ [0,5)
+                        newName = QString("%1/%2_%3-flag%4-%5%6-%7-ch_%8").arg( fInfo.absolutePath() )
+                                                        .arg( fInfo.completeBaseName() )
+                                                        .arg( sc_encTest_Suffix )
+                                                        .arg( i )
+                                                        .arg( FNEDCore::s_debugLR[j] )
+                                                        .arg( k )
+                                                        .arg( FNEDCore::s_debugBigLittle[lit] )
+                                                        .arg( charIdx );
 
-                    if ( !bNoSuffixFlag ) {
-                        newName += QString(".%1").arg( fInfo.suffix() );
-                    } 
+                        if ( !bNoSuffixFlag ) {
+                            newName += QString(".%1").arg( fInfo.suffix() );
+                        }
 
-                    originalFile.seek( 0 );
-                    if ( !decryptFile(newName, outputDecName, errorMsg ) ) {
-                        errorMsg += QString(" , decode file failed on [%1]").arg( newName );
-                        return false;
-                    }
+                        originalFile.seek( 0 );
+                        if ( !decryptFile(newName, outputDecName, errorMsg ) ) {
+                            errorMsg += QString(" , decode file failed on [%1]").arg( newName );
+                            return false;
+                        }
 
-                    if ( !FNEDCore::is2FileEqual(fileAbsPath, outputDecName, errorMsg) ) {
-                        errorMsg += QString(" , for the file content [%1] != [%2] ").arg( fileAbsPath).arg( outputDecName );
-                        return false;
+                        if ( !FNEDCore::is2FileEqual(fileAbsPath, outputDecName, errorMsg) ) {
+                            errorMsg += QString(" , for the file content [%1] != [%2] ").arg( fileAbsPath).arg( outputDecName );
+                            return false;
+                        }
                     }
                 }
             }
@@ -388,7 +421,7 @@ bool FNEDCore::writeEncData(QFile& originalFileObj, qint64 originalFileSz, const
 {
     QFile encFile(newFileName);
     if ( !encFile.open( QIODevice::WriteOnly) ) {
-        errorMsg = QString("Can't create the newFile for encrypt").arg( newFileName );
+        errorMsg = QString("Can't create the newFile for encrypt : %1").arg( newFileName );
         return false;
     }
 
@@ -406,7 +439,7 @@ bool FNEDCore::writeEncData(QFile& originalFileObj, qint64 originalFileSz, const
 
     // core core core
     encFile.resize( newFileSize );
-    encFile.flush(); // TODO   comment or not ?
+    encFile.flush(); // save the file with the given size immediately
 
     auto bRet = writeHead3Bytes( encFile, additionalExponentFlag, ranCharIdx)
            &&   writeNextDummyBytes( encFile, additionalExponentFlag )
@@ -439,7 +472,8 @@ bool FNEDCore::writeEncDataWithArgs(QFile& originalFileObj, qint64 originalFileS
         ranCharIdx = static_cast<int>( ((buildArgs>>3) &  ((1<<3)-1) ) );
         if ( ranCharIdx == 3 ) {
             auto rMachine = QRandomGenerator::global();
-            int rIdx   = rMachine->bounded( static_cast<int>( sizeof(s_aryWithout3) / sizeof(s_aryWithout3[0]) ) );
+            // int rIdx   = rMachine->bounded( static_cast<int>( sizeof(s_aryWithout3) / sizeof(s_aryWithout3[0]) ) );
+            int rIdx   = rMachine->bounded( WITHOUT_3_ARY_SZ );
             ranCharIdx = s_aryWithout3[rIdx];
         }
     }
@@ -447,7 +481,7 @@ bool FNEDCore::writeEncDataWithArgs(QFile& originalFileObj, qint64 originalFileS
     // int ranShiftBits      = ranMachine->bounded(sc_maxint) % 7 + 1; // [0,6]  + 1          -> [1,7]
     int ranShiftBits      = static_cast<int>( ((buildArgs>>6) &  ((1<<3)-1) ) );
     // int ranShiftDirection = ranMachine->bounded(sc_maxint) % 2;     // [0,1]  0:<<            1:>>
-    int ranShiftDirection = static_cast<int>( (buildArgs>>7) &  0x1  ); 
+    int ranShiftDirection = static_cast<int>( (buildArgs>>7) &  0x1  );
     // int ranLitterEndian   = ranMachine->bounded(sc_maxint) % 2;     // [0,1]  0:Big Endian    1:Little Endian
     int ranLitterEndian   = static_cast<int>( (buildArgs>>8) &  0x1  );     // [0,1]  0:Big Endian    1:Little Endian
 
@@ -472,6 +506,45 @@ bool FNEDCore::writeEncDataWithArgs(QFile& originalFileObj, qint64 originalFileS
     return bRet;
 }
 
+    
+bool FNEDCore::readDec_Meta(const QString& fileAbsPath, EncArgWrap& outArg, QString& errorMsg)
+{
+    int additionalExponentFlag = 0;
+    char specialCharAry[4] = { 0 };
+    char core10Ary[10] = { 0 };
+    bool bIsBigEndian    = false;
+    bool bRightShiftFlag = false;
+    unsigned int nShiftBits = 0;
+    qint64 originalSz = 0;
+
+    QFile encFile2Read( fileAbsPath );
+    if ( !encFile2Read.open(QIODevice::ReadOnly) ) {
+        errorMsg = QString("Open file '%1' for reading failed! ").arg(fileAbsPath);
+        return false;
+    }
+
+    qint64 illFileSize = encFile2Read.size();
+    if ( illFileSize < 18 ) { // at least 2+16 = 18 bytes
+        errorMsg = QString("file '%1' size is so strange, size = %2").arg(fileAbsPath).arg( illFileSize );
+        return false;
+    }
+
+    auto bRet =     readHead3Bytes(encFile2Read, additionalExponentFlag, specialCharAry, errorMsg)
+                 && readTailKeyBytes(encFile2Read, illFileSize, additionalExponentFlag, specialCharAry, bIsBigEndian, bRightShiftFlag,  errorMsg)
+                 && skipReadDummyBytes(encFile2Read, additionalExponentFlag, errorMsg)
+                 && readCore10Bytes(encFile2Read, additionalExponentFlag, core10Ary, bIsBigEndian, originalSz, illFileSize, nShiftBits, errorMsg);
+
+    if ( !bRet ) {
+        return false;
+    }
+
+    outArg.additionalExp = additionalExponentFlag;
+    outArg.bBigOrLittle = bIsBigEndian ? 0 : 1;
+    outArg.specialCharIdx = 1; // ??
+    outArg.nShiftBits = static_cast<int>( nShiftBits );
+    outArg.bShiftDir = bRightShiftFlag ? 1 : 0;
+    return true;
+}
 
 
 bool FNEDCore::decryptFile(const QString& fileAbsPath, QString& newFileName, QString& errorMsg)
@@ -491,7 +564,7 @@ bool FNEDCore::decryptFile(const QString& fileAbsPath, QString& newFileName, QSt
     }
 
     qint64 illFileSize = encFile2Read.size();
-    if ( illFileSize <= 16 ) {
+    if ( illFileSize < 18 ) { // at least 2+16 = 18 bytes
         errorMsg = QString("file '%1' size is so strange, size = %2").arg(fileAbsPath).arg( illFileSize );
         return false;
     }
@@ -503,6 +576,64 @@ bool FNEDCore::decryptFile(const QString& fileAbsPath, QString& newFileName, QSt
            && genNewFileName(fileAbsPath, newFileName, -1, false, errorMsg)
            && readEncDataAndThenWrite(encFile2Read, newFileName, originalSz, additionalExponentFlag, bRightShiftFlag, nShiftBits, errorMsg);
 
+}
+
+
+bool FNEDCore::decryptFileRestore(const QString& fileAbsPath, QString& errorMsg)
+{
+    int additionalExponentFlag = 0;
+    char specialCharAry[4] = { 0 };
+    char core10Ary[10] = { 0 };
+    bool bIsBigEndian    = false;
+    bool bRightShiftFlag = false;
+    unsigned int nShiftBits = 0;
+    qint64 originalSz = 0;
+    QString newFileName;
+
+    QFile encFile2Read( fileAbsPath );
+    if ( !encFile2Read.open(QIODevice::ReadOnly) ) {
+        errorMsg = QString("Open file '%1' for reading failed! ").arg(fileAbsPath);
+        return false;
+    }
+
+    qint64 illFileSize = encFile2Read.size();
+    if ( illFileSize < 18 ) { // at least 2+16 = 18 bytes
+        errorMsg = QString("file '%1' size is so strange, size = %2").arg(fileAbsPath).arg( illFileSize );
+        return false;
+    }
+
+    QFileInfo fInfo( fileAbsPath );
+    QString   oldFileNameOnly = fInfo.fileName();
+    QDir      fDir( fInfo.absoluteDir().path() );
+    QString   newFilePathOnly;
+    bool      renameRet = false;
+
+    // auto finRet = 
+    return    readHead3Bytes(encFile2Read, additionalExponentFlag, specialCharAry, errorMsg)
+           && readTailKeyBytes(encFile2Read, illFileSize, additionalExponentFlag, specialCharAry, bIsBigEndian, bRightShiftFlag,  errorMsg)
+           && skipReadDummyBytes(encFile2Read, additionalExponentFlag, errorMsg)
+           && readCore10Bytes(encFile2Read, additionalExponentFlag, core10Ary, bIsBigEndian, originalSz, illFileSize, nShiftBits, errorMsg)
+           && genNewFileName(fileAbsPath, newFileName, -1, false, errorMsg)
+           && readEncDataAndThenWrite(encFile2Read, newFileName, originalSz, additionalExponentFlag, bRightShiftFlag, nShiftBits, errorMsg)
+           && ( ((void)encFile2Read.close()),
+                ((void)(errorMsg = QString("Delete file '%1' failed").arg(oldFileNameOnly))),
+                (renameRet = fDir.remove( oldFileNameOnly ) ) 
+              ) // delete old
+           && FNEDCore::absPath2fPath( newFileName, newFilePathOnly )
+           && ( 
+                ( (void)( errorMsg = QString("rename file '%1' -> '%2' failed").arg( newFilePathOnly ).arg(oldFileNameOnly) ) ),
+                ( renameRet = fDir.rename( newFilePathOnly,  oldFileNameOnly ) ) 
+              ); // rename new -> old
+
+}
+
+//          E:/a/b/c/hello.txt   =>  hello.txt
+// static 
+bool FNEDCore::absPath2fPath(const QString& absPath, QString& outFilePath)
+{
+    QFileInfo fInfo( absPath );
+    outFilePath = fInfo.fileName();
+    return true;
 }
 
 
@@ -677,18 +808,69 @@ bool FNEDCore::readEncDataAndThenWrite(QFile& file2read, const QString& newFileN
     }
 
     bool bHasError = false;
-    if ( originalFileSz < (sc_ll_threshold*2) ) {
-        bHasError = !readEncDataAndThenWrite4NormalFile(file2read, outputFile, originalFileSz, bRightShiftFlag, nShiftBits, errorMsg);
+    if ( !FNEDCore::s_bUseMapMemOp ) {
+        if ( originalFileSz < (sc_ll_threshold*2) ) {
+            bHasError = !readEncDataAndThenWrite4NormalFile(file2read, outputFile, originalFileSz, bRightShiftFlag, nShiftBits, errorMsg);
+        } else {
+            bHasError = !readEncDataAndThenWrite4LargeFile(file2read, outputFile, baseIdx, originalFileSz, bRightShiftFlag, nShiftBits, errorMsg);
+        }
     } else {
-        bHasError = !readEncDataAndThenWrite4LargeFile(file2read, outputFile, baseIdx, originalFileSz, bRightShiftFlag, nShiftBits, errorMsg);
+        bHasError = !mapmem_read_and_wt_decFile(file2read, outputFile, originalFileSz, baseIdx,  bRightShiftFlag, nShiftBits, errorMsg);
     }
-    
+
     if ( !bHasError ) {
         outputFile.flush();
     }
 
     return !bHasError;
 }
+
+
+bool FNEDCore::mapmem_read_and_wt_decFile(QFile& file2read, QFile& decFile, qint64 originalFileSz, qint64 baseIdx,  bool bRightShiftFlag, unsigned int nShiftBits, QString& errorMsg)
+{
+    auto mapOption  = QFileDevice::MapPrivateOption; // QFileDevice::NoOptions;
+    uchar* pFileBuf = file2read.map(baseIdx, originalFileSz, mapOption);
+    if ( pFileBuf == nullptr ) {
+        file2read.unmap(pFileBuf);
+
+        errorMsg = QString("Can't alloc enough memory for the given file : [%1] !").arg( file2read.fileName()  );
+        return false;
+    }
+
+    qint64 half = originalFileSz / 2;
+    for( qint64 i = 0; i < half; ++i ) {
+        //                                                   left <--> right  reverse the shift-bit direction
+        // bitShift2(fileBuf[i], fileBuf[(originalFileSz-1)-i], !bRightShiftFlag, nShiftBitCnt);
+        bitShift_uchar( pFileBuf[i], pFileBuf[(originalFileSz-1)-i], !bRightShiftFlag, static_cast<unsigned int>(nShiftBits) );
+        if ( (i+1) % sc_frequency == 0 ) {
+            // under decrypting
+            emit updateFileContent( (i+1) * 2.0f / originalFileSz * 100.0f );
+        }
+    }
+
+    if ( originalFileSz % 2 == 1 ) {
+        //                      left <--> right  reverse the shift-bit direction
+        // bitShift1Char_2( fileBuf[half], !bRightShiftFlag, nShiftBitCnt);
+        bitShift1Char_uchar( pFileBuf[half], !bRightShiftFlag, static_cast<unsigned int>(nShiftBits) );
+    }
+    // decrypting [DONE]
+    emit updateFileContent( 100.0f );
+
+    decFile.seek(0);
+    qint64 wrtBytes = decFile.write( reinterpret_cast<const char*>(pFileBuf), originalFileSz );
+    if ( wrtBytes != originalFileSz ) {
+        file2read.unmap(pFileBuf);
+
+        errorMsg = QString("Can't write enough bytes on decrypt file [%1] , wrote = %2 != %3 .  ").arg( file2read.fileName()  ).arg( wrtBytes ).arg( originalFileSz );
+        return false;
+    }
+    decFile.flush();
+
+    file2read.unmap(pFileBuf);
+    return true;
+}
+
+
 
 bool FNEDCore::readEncDataAndThenWrite4NormalFile(QFile& file2read, QFile& wrtFile, qint64 originalFileSz, bool bRightShiftFlag,unsigned int nShiftBitCnt,  QString& errorMsg )
 {
@@ -697,7 +879,7 @@ bool FNEDCore::readEncDataAndThenWrite4NormalFile(QFile& file2read, QFile& wrtFi
     if ( readedBytes != originalFileSz ) {
         errorMsg = QString("[LargeFile] Can't read enough bytes on original file [%1] , already readed = %2 !").arg( file2read.fileName()  ).arg( readedBytes );
         return false;
-    } 
+    }
 
     qint64 half = originalFileSz / 2;
     for( qint64 i = 0; i < half; ++i ) {
@@ -720,6 +902,66 @@ bool FNEDCore::readEncDataAndThenWrite4NormalFile(QFile& file2read, QFile& wrtFi
 
     return true;
 }
+
+
+bool FNEDCore::mapmem_wt_encFile(QFile& encFile, QFile& originalFile, qint64 originalFileSz, int nShiftBits,bool bRightShiftFlag,  qint64 base, QString& errorMsg)
+{
+    if ( !originalFile.seek(0) ) {
+        errorMsg = QString("Process Normal File : [%1], Can't seek to 0.").arg( originalFile.fileName() );
+        return false;
+    }
+
+    auto mapOption  = QFileDevice::MapPrivateOption; // QFileDevice::NoOptions;
+    uchar* pFileBuf = originalFile.map(0, originalFileSz, mapOption);
+    if ( pFileBuf == nullptr ) {
+        originalFile.unmap(pFileBuf);
+
+        errorMsg = QString("Can't alloc enough memory for the given file : [%1] !").arg( originalFile.fileName()  );
+        // originalFile.close();
+        return false;
+    }
+
+    qint64 readedBytes = originalFileSz;
+    // Core Core Core , do shift-bits
+    qint64 half = readedBytes / 2;
+    for ( qint64 i = 0; i < half; ++i ) {
+        // bitShift2(  allBytes[i], allBytes[(readedBytes-1)-i], bRightShiftFlag, static_cast<unsigned int>(nShiftBits) );
+        bitShift_uchar( pFileBuf[i], pFileBuf[(readedBytes-1)-i], bRightShiftFlag, static_cast<unsigned int>(nShiftBits) );
+        if ( (i+1) % sc_frequency == 0 ) {
+            // under encrypting ...
+            emit updateFileContent( (i+1) * 2.0f / originalFileSz * 100.0f );
+        }
+    }
+
+    // Process the Odd Byte
+    if ( readedBytes % 2 == 1 ) {
+        // bitShift1Char_2( allBytes[half], bRightShiftFlag, static_cast<unsigned int>(nShiftBits) );
+        bitShift1Char_uchar( pFileBuf[half], bRightShiftFlag, static_cast<unsigned int>(nShiftBits) );
+    }
+    // encrypting [DONE]
+    emit updateFileContent( 100.0f );
+
+    qint64 seekIdx = base; // move cursor
+    bool bSeekRet = encFile.seek( seekIdx );
+    if ( !bSeekRet ) {
+        errorMsg = QString("[mapmem NormalFile] Can't seek head position %1 on encrypt file !").arg( seekIdx  );
+        originalFile.unmap(pFileBuf);
+        return false;
+    }
+
+    //                                                    uchar* -> const char*
+    qint64 writtenBytes = encFile.write( reinterpret_cast<const char*>(pFileBuf), originalFileSz);
+    // qint64 writtenBytes = encFile.write( pFileBuf, originalFileSz);
+    if ( writtenBytes != originalFileSz ) {
+        errorMsg = QString("[mapmem NormalFile] Can't write enough bytes @ position %1 on encrypt file , already wrote = %2 !").arg( seekIdx ).arg( writtenBytes );
+        originalFile.unmap(pFileBuf);
+        return false;
+    }
+
+    originalFile.unmap(pFileBuf);
+    return true;
+}
+
 
 bool FNEDCore::readEncDataAndThenWrite4LargeFile(QFile& file2read, QFile& wrtFile, qint64 baseIdx, qint64 originalFileSz, bool bRightShiftFlag, unsigned int nShiftBitCnt, QString& errorMsg )
 {
@@ -875,7 +1117,7 @@ void FNEDCore::bitShift1(char& retLeft, char& retRight, bool bShiftRightFlag, un
     if ( bShiftRightFlag ) {
         cutBits    = iRight & ( (1 << nShiftBits) -1 );
         placedBits = iLeft  & ( (1 << nShiftBits) -1 );
-         
+
         retLeft  = static_cast<char>( (iLeft  >> nShiftBits) | (cutBits    << (sc_bitsInByte - nShiftBits)) );
         retRight = static_cast<char>( (iRight >> nShiftBits) | (placedBits << (sc_bitsInByte - nShiftBits)) );
     } else {
@@ -902,7 +1144,7 @@ void FNEDCore::bitShift2(char& retLeft, char& retRight, bool bShiftRightFlag, un
                    )    & 0xFFFF;
 
     } else {
-        finalRet =  (   (   combineShort << nShiftBits) 
+        finalRet =  (   (   combineShort << nShiftBits)
                       | ( combineShort >> (sc_bitsInShort - nShiftBits) )
                 );   // & 0xFFFF;
     }
@@ -912,8 +1154,31 @@ void FNEDCore::bitShift2(char& retLeft, char& retRight, bool bShiftRightFlag, un
 
 }
 
+void FNEDCore::bitShift_uchar(uchar& retLeft, uchar& retRight, bool bShiftRightFlag, unsigned int nShiftBits )
+{
+    unsigned int iLeft  = static_cast<unsigned int>(retLeft  & 0xFF);
+    unsigned int iRight = static_cast<unsigned int>(retRight & 0xFF);
+    unsigned int combineShort = (iLeft << sc_bitsInByte) | iRight;
 
-// static 
+    unsigned int finalRet = 0u;
+    if ( bShiftRightFlag ) {
+        finalRet = (   (combineShort  >> nShiftBits)
+                     | ( (combineShort   & ((1 << nShiftBits)-1) ) << (sc_bitsInShort - nShiftBits) )
+                   )    & 0xFFFF;
+
+    } else {
+        finalRet =  (   (   combineShort << nShiftBits)
+                      | ( combineShort >> (sc_bitsInShort - nShiftBits) )
+                );   // & 0xFFFF;
+    }
+
+    retLeft  = static_cast<uchar>( (finalRet >> sc_bitsInByte) & 0xFF );
+    retRight = static_cast<uchar>( finalRet & 0xFF );
+}
+
+
+
+// static
 void FNEDCore::bitShift1Char_1(char& ch,  bool bShiftRightFlag, unsigned int nShiftBits )
 {
     unsigned int iCh  = static_cast<unsigned int>(ch & 0xFF);
@@ -930,7 +1195,7 @@ void FNEDCore::bitShift1Char_1(char& ch,  bool bShiftRightFlag, unsigned int nSh
 
 
 
-// static 
+// static
 void FNEDCore::bitShift1Char_2(char& ch,  bool bShiftRightFlag, unsigned int nShiftBits )
 {
     unsigned int iCh  = static_cast<unsigned int>(ch & 0xFF);
@@ -942,6 +1207,22 @@ void FNEDCore::bitShift1Char_2(char& ch,  bool bShiftRightFlag, unsigned int nSh
 
     // ch = static_cast<char>( iCh & 0xFF );
     ch = static_cast<char>( iCh );
+}
+
+
+
+// static
+void FNEDCore::bitShift1Char_uchar(uchar& retCh, bool bShiftRightFlag, unsigned int nShiftBits )
+{
+    unsigned int iCh  = static_cast<unsigned int>(retCh & 0xFF);
+    if ( bShiftRightFlag ) {
+        iCh = (iCh >> nShiftBits) | ( (iCh & (( 1 << nShiftBits)-1)) << (8-nShiftBits) );
+    } else {
+        iCh = (iCh << nShiftBits) | (iCh >> (8-nShiftBits));
+    }
+
+    // ch = static_cast<uchar>( iCh & 0xFF );
+    retCh = static_cast<uchar>( iCh );
 }
 
 
@@ -958,11 +1239,12 @@ bool FNEDCore::writeHead3Bytes(QFile& encFile, int additionalExponentFlag, int& 
     encFile.write(&chByte, 1);
 
     if ( additionalExponentFlag == 4 ) {
-        // [4,6]  -> [2,4]
+        // 4 -> 2
         ranCharIdx = 3;
     } else {
         if ( ranCharIdx == 3 ) {
-           int rIdx   = rMachine->bounded( static_cast<int>( sizeof(s_aryWithout3) / sizeof(s_aryWithout3[0]) ) );
+           // int rIdx   = rMachine->bounded( static_cast<int>( sizeof(s_aryWithout3) / sizeof(s_aryWithout3[0]) ) );
+           int rIdx   = rMachine->bounded( WITHOUT_3_ARY_SZ );
            ranCharIdx = s_aryWithout3[rIdx];
         }
     }
@@ -1012,10 +1294,10 @@ bool FNEDCore::writeCore10Bytes(QFile& encFile, qint64 originalFileSz, int nShif
     // QMap<int,int> szIdxAry2; // [1,2,3   5,6,   8]  are the sub-indices of the 1-bit
     // szIdxAry2.insert(1,0);
     // szIdxAry2.insert(2,0);
-    // szIdxAry2.insert(3,0);    
+    // szIdxAry2.insert(3,0);
     // szIdxAry2.insert(5,0);
-    // szIdxAry2.insert(6,0); 
-    // szIdxAry2.insert(8,0); 
+    // szIdxAry2.insert(6,0);
+    // szIdxAry2.insert(8,0);
 
     // 6 slots
     using namespace std;
@@ -1136,7 +1418,7 @@ bool FNEDCore::writeOriginalEncData_LargeFile(QFile& encFile, QFile& originalFil
         //
         // Core Core Core    Shift bytes
         //
-        //     Shift-Bit 
+        //     Shift-Bit
         //
         ////////////////////////////////////////////////////////////////////////////////////////////////////////
         for ( qint64 j = 0; j < sc_ll_threshold; ++j ) {
@@ -1197,7 +1479,7 @@ bool FNEDCore::writeOriginalEncData_LargeFile(QFile& encFile, QFile& originalFil
             bitShift2(leftPart[i], leftPart[(restCnt-1)-i], bRightShiftFlag, static_cast<unsigned int>(nShiftBits) );
         }
 
-        // Process the Odd Byte 
+        // Process the Odd Byte
         if ( restCnt % 2 == 1 ) {
             // shift the only byte
             bitShift1Char_2( leftPart[half], bRightShiftFlag, static_cast<unsigned int>(nShiftBits) );
@@ -1232,7 +1514,7 @@ bool FNEDCore::writeOriginalEncData_LargeFile(QFile& encFile, QFile& originalFil
 
 bool FNEDCore::writeOriginalEncData_NormalFile(QFile& encFile, QFile& originalFile, qint64 originalFileSz,  int nShiftBits,bool bRightShiftFlag, qint64 base, QString& errorMsg)
 {
-    // to ensure the index will not out of range 
+    // to ensure the index will not out of range
     char allBytes[sc_ll_threshold*2]  = { 0 };
     if ( !originalFile.seek(0) ) {
         errorMsg = QStringLiteral("Process Normal File , Can't seek to 0.");
@@ -1251,12 +1533,12 @@ bool FNEDCore::writeOriginalEncData_NormalFile(QFile& encFile, QFile& originalFi
         bitShift2( allBytes[i], allBytes[(readedBytes-1)-i], bRightShiftFlag, static_cast<unsigned int>(nShiftBits) );
     }
 
-    // Process the Odd Byte 
+    // Process the Odd Byte
     if ( readedBytes % 2 == 1 ) {
         bitShift1Char_2( allBytes[half], bRightShiftFlag, static_cast<unsigned int>(nShiftBits) );
     }
 
-    qint64 seekIdx = base; // move cursor 
+    qint64 seekIdx = base; // move cursor
     bool bSeekRet = encFile.seek( seekIdx );
     if ( !bSeekRet ) {
         errorMsg = QString("[write NormalFile] Can't seek head position %1 on encrypt file !").arg( seekIdx  );
@@ -1290,13 +1572,21 @@ bool FNEDCore::writeOriginalEncData(QFile& encFile, QFile& originalFile, qint64 
     auto bHasError = false;
     qint64 base  = it.value();
 
-    if ( originalFileSz <= sc_ll_threshold ) {
-        bHasError = !writeOriginalEncData_NormalFile(encFile, originalFile, originalFileSz, nShiftBits, bRightShiftFlag, base, errorMsg );
+    if ( !FNEDCore::s_bUseMapMemOp ) {
+        if ( originalFileSz <= sc_ll_threshold ) {
+            bHasError = !writeOriginalEncData_NormalFile(encFile, originalFile, originalFileSz, nShiftBits, bRightShiftFlag, base, errorMsg );
+        } else {
+            // originalFileSz > sc_ll_threshold
+            //                         2 * means   xxxx      ????    xxxx   ( the most left part && the most right part , each part contains sc_ll_threshold bytes )
+            bHasError = !writeOriginalEncData_LargeFile(encFile, originalFile, originalFileSz, nShiftBits, bRightShiftFlag, base,  errorMsg );
+        }
     } else {
-        // originalFileSz > sc_ll_threshold
-        //                         2 * means   xxxx      ????    xxxx   ( the most left part && the most right part , each part contains sc_ll_threshold bytes )
-        bHasError = !writeOriginalEncData_LargeFile(encFile, originalFile, originalFileSz, nShiftBits, bRightShiftFlag, base,  errorMsg );
+        ////////////////////////////////////////////////////////////////////////////////
+        // Core Core Core
+        // use map memory to get the (large) content of a given file
+        bHasError = !mapmem_wt_encFile(encFile, originalFile, originalFileSz, nShiftBits, bRightShiftFlag, base,  errorMsg  );
     }
+
 
     if ( !bHasError ) {
         encFile.flush();
@@ -1332,10 +1622,10 @@ bool FNEDCore::writeTailKeyBytes(QFile& encFile, int additionalExponentFlag, int
     // 1. write bigEndian or LittleEndian  flag
     if ( bIsLittleEndian ) {
         bitIdx = 4;
-        chByte = static_cast<char>( FNEDCore::s_nth1Cnt_ary[bitIdx][ rMachine->bounded( FNEDCore::s_nth1Cnt_ary[bitIdx].size() ) ] & 0xFF );   
+        chByte = static_cast<char>( FNEDCore::s_nth1Cnt_ary[bitIdx][ rMachine->bounded( FNEDCore::s_nth1Cnt_ary[bitIdx].size() ) ] & 0xFF );
     } else {
         bitIdx = 1;
-        chByte = static_cast<char>( FNEDCore::s_nth0Cnt_ary[bitIdx][ rMachine->bounded( FNEDCore::s_nth0Cnt_ary[bitIdx].size() ) ] & 0xFF );   
+        chByte = static_cast<char>( FNEDCore::s_nth0Cnt_ary[bitIdx][ rMachine->bounded( FNEDCore::s_nth0Cnt_ary[bitIdx].size() ) ] & 0xFF );
     }
     encFile.write(&chByte, 1);
 
@@ -1355,10 +1645,10 @@ bool FNEDCore::writeTailKeyBytes(QFile& encFile, int additionalExponentFlag, int
     // 3. write <<   or   >>               flag
     if ( bRightShiftFlag  ) {
         bitIdx = 2;
-        chByte = static_cast<char>( FNEDCore::s_nth1Cnt_ary[bitIdx][ rMachine->bounded( FNEDCore::s_nth1Cnt_ary[bitIdx].size() ) ] & 0xFF );   
+        chByte = static_cast<char>( FNEDCore::s_nth1Cnt_ary[bitIdx][ rMachine->bounded( FNEDCore::s_nth1Cnt_ary[bitIdx].size() ) ] & 0xFF );
     } else {
         bitIdx = 0;
-        chByte = static_cast<char>( FNEDCore::s_nth0Cnt_ary[bitIdx][ rMachine->bounded( FNEDCore::s_nth0Cnt_ary[bitIdx].size() ) ] & 0xFF );   
+        chByte = static_cast<char>( FNEDCore::s_nth0Cnt_ary[bitIdx][ rMachine->bounded( FNEDCore::s_nth0Cnt_ary[bitIdx].size() ) ] & 0xFF );
     }
     encFile.write(&chByte, 1);
 
@@ -1378,15 +1668,22 @@ int FNEDCore::howMany1InChar(char ch)
     return cnt;
 }
 
-// static 
+// static
 int FNEDCore::getNBit(char ch, int idx)
 {
     return ( ( (ch >> idx) & 0x1 ) == 0x1)
         ? 1 : 0;
 }
 
-// static 
+// static
 bool FNEDCore::is2FileEqual(const QString& fname1, const QString& fname2, QString& errorMsg)
+{
+    return FNEDCore::s_bCmpUseMapOp  ? is2FileEqual_MapMem(fname1, fname2, errorMsg)
+                                     : is2FileEqual_Normal(fname1, fname2, errorMsg);
+}
+
+// static 
+bool FNEDCore::is2FileEqual_Normal(const QString& fname1, const QString& fname2, QString& errorMsg)
 {
     qint64 fSz1 = 0;
     qint64 fSz2 = 0;
@@ -1451,19 +1748,90 @@ bool FNEDCore::is2FileEqual(const QString& fname1, const QString& fname2, QStrin
     return bIsSame;
 }
 
-
-
-    
 // static 
+bool FNEDCore::is2FileEqual_MapMem(const QString& fname1, const QString& fname2, QString& errorMsg)
+{
+    qint64 fSz1 = 0;
+    qint64 fSz2 = 0;
+    QFile file1(fname1);
+    if ( !file1.open(QIODevice::ReadOnly) ) {
+        errorMsg = QString("Open file '%1' for reading failed! ").arg( fname1 );
+        return false;
+    }
+    fSz1 = file1.size();
+
+    QFile file2(fname2);
+    if ( !file2.open(QIODevice::ReadOnly) ) {
+        errorMsg = QString("Open file '%1' for reading failed! ").arg( fname2 );
+        return false;
+    }
+    fSz2 = file2.size();
+
+    if ( fSz1 != fSz2 ) {
+        errorMsg = QString("file1.size() != file2.size().   %1 != %2 ").arg( fSz1 ).arg( fSz2 );
+        return false;
+    }
+
+    auto mapOption  = QFileDevice::NoOptions;
+    uchar* buf1 = file1.map(0, fSz1, mapOption);
+    if ( buf1 == nullptr ) {
+        errorMsg = QString("Can't map-alloc enough memory for file#1 : [%1] ").arg( file1.fileName() );
+        file1.unmap(buf1);
+
+        file1.close();
+        file2.close();
+        return false;
+    }
+
+    uchar* buf2 = file2.map(0, fSz2, mapOption);
+    if ( buf2 == nullptr ) {
+        errorMsg = QString("Can't map-alloc enough memory for file#2 : [%1] ").arg( file2.fileName() );
+        file1.unmap(buf1);
+        file2.unmap(buf2);
+
+        file1.close();
+        file2.close();
+        return false;
+    }
+
+    bool bIsSame = true;
+    qint64 missMatchedIdx = 0;
+    for ( qint64 i = 0; i < fSz1; ++i ) {
+        if ( buf1[i] != buf2[i] ) {
+            bIsSame = false;
+            missMatchedIdx = i;
+            break;
+        }
+    }
+
+    if ( !bIsSame ) {
+        errorMsg = QString("Find difference @ position [%1] , %2 != %3 . ").arg( missMatchedIdx ).arg( static_cast<char>( buf1[missMatchedIdx] )  ).arg( static_cast<char>( buf2[missMatchedIdx] ) );
+    }
+
+    file1.unmap(buf1);
+    file2.unmap(buf2);
+    file1.close();
+    file2.close();
+    return bIsSame;
+}
+
+
+
+// static
 int  FNEDCore::genIDByArgs(const EncArgWrap& obj)
 {
     return TO_ENC_ARGS(obj);
 }
 
-
-// static 
+/*
+     DJI_abc.mp4   ->   abc.mp4
+*/
+// static
 QString FNEDCore::changeBaseName(const QString& baseNameOnly, const QString& suffix, bool bIsEnc)
 {
+    static QString rule0[2] = { "DJI_", "dji_" };
+    QString retStr = baseNameOnly;
+
     if ( !sc_bUseNameChangeFunc ) {
         return baseNameOnly;
     }
@@ -1471,25 +1839,22 @@ QString FNEDCore::changeBaseName(const QString& baseNameOnly, const QString& suf
     int matchFlag = 0;
     FNEDCore::changeSuffixName(suffix,bIsEnc, &matchFlag);
 
-    static QString rule0[2] = { "DJI_", "dji_" };
-    QString retStr = baseNameOnly;
-
     if ( bIsEnc ) {
         //////////////////////////////////////
         // Encrypt
 
         // process BaseName
-        if ( (baseNameOnly!=rule0[0] && baseNameOnly!=rule0[1]) 
+        if ( (baseNameOnly!=rule0[0] && baseNameOnly!=rule0[1])
                 && baseNameOnly.startsWith(rule0[0], Qt::CaseInsensitive) ) {
             retStr = baseNameOnly.mid( rule0[0].size() );
-        } 
+        }
     } else {
         //////////////////////////////////////
         // Decrypt
         if ( matchFlag != 0 ) {
             if ( !baseNameOnly.startsWith(rule0[0], Qt::CaseInsensitive) ) {
                 retStr.prepend( rule0[0] );
-            } 
+            }
         }
     }
 
@@ -1497,7 +1862,19 @@ QString FNEDCore::changeBaseName(const QString& baseNameOnly, const QString& suf
 }
 
 
-// static 
+
+
+
+
+/*
+       movie1.mp4  =>  movie1.MWV
+       movie1.MP4  =>  movie1.MWV
+
+       movie1.backup.mp4 =>  movie1.backup.MWV
+       movie1.backup.MP4 =>  movie1.backup.MWV
+
+*/
+// static
 QString FNEDCore::changeSuffixName(const QString& suffixOnly, bool bIsEnc, int* pbIsMatched)
 {
     static QString rule1[2] = { "MP4", "MWV"  };
@@ -1544,7 +1921,21 @@ QString FNEDCore::changeSuffixName(const QString& suffixOnly, bool bIsEnc, int* 
         *pbIsMatched = 1;
     }
 
-    return retSuffix;
+    return (matchedFlag ==0 ? suffixOnly : retSuffix);
 }
 
+
+
+// static   setter
+void FNEDCore::setMapMemFlag(bool bEnableFlag)
+{
+    s_bUseMapMemOp = bEnableFlag;
+}
+
+
+// static   getter
+bool FNEDCore::isEnableMapMem()
+{
+    return s_bUseMapMemOp;
+}
 

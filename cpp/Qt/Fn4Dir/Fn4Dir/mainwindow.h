@@ -2,6 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "workthread.h"
+#include "fnedcore.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -16,21 +18,29 @@ public:
     ~MainWindow();
 
 private slots:
+    void on_goBtn_clicked();
+
     void on_encBtn_clicked();
 
     void on_decBtn_clicked();
 
-    void on_encWithArgsBtn_clicked();
+    void on_cmpBtn_clicked();
 
-    void on_cmp2FilesBtn_clicked();
+
+
+    void on_updateFileListProcessState(const QString& msg);
+    void on_updateFileListPrograssBar(float per);
+    void on_encDecFinished(const QString& msg);
+    void on_updateFileContent(float per);
+    void onThreadDone();
 
 private:
-    void encode1File_TestCase(const QString& filePath);
-    void decode1File_TestCase(const QString& filePath);
+    // method
+    QThread::Priority getThreadPriority();
 
-    void encode_a_GivenFile(const QString& filePath);
-    void decode_a_GivenFile(const QString& filePath);
-
+private:
     Ui::MainWindow *ui;
+    WorkThread *m_pThread;
+    FNEDCore   *m_pEncDecObject;
 };
 #endif // MAINWINDOW_H

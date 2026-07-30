@@ -35,9 +35,15 @@ public:
     explicit FNEDCore(QObject *parent = nullptr);
 
     bool encryptFile(const QString& fileAbsPath,  QString& errorMsg);
+    bool encryptFile_dest(const QString& fileAbsPath, const QString& oriDirPath, const QString& destDirPath, QString& newFileName, QString& errorMsg);
     bool encryptFile_withArg(const QString& fileAbsPath, int arg, QString& errorMsg);
 
     bool decryptFile(const QString& fileAbsPath, QString& newFileName, QString& errorMsg);
+    // bool decryptFile_dest(const QString& fileAbsPath, const QString& destDirPath, QString& errorMsg);
+    bool decryptFileRestore(const QString& fileAbsPath, QString& errorMsg);
+    // bool decryptFile_withArg(const QString& fileAbsPath, int arg, QString& errorMsg);   // no args are required during decrypt 
+
+    bool readDec_Meta(const QString& absFilePath, EncArgWrap& outArg, QString& errorMsg);
 
     bool encryptFile_TestAll(const QString& fileAbsPath,  QString& errorMsg);
     bool decryptFile_TestAll_WithCmp(const QString& fileAbsPath,  QString& errorMsg);
@@ -45,13 +51,20 @@ public:
     // util
     static bool is2FileEqual(const QString& fname1, const QString& fname2, QString& errorMsg);
     static int  genIDByArgs(const EncArgWrap& obj);
+
+    static void setMapMemFlag(bool bEnableFlag);
+    static bool isEnableMapMem();
+
+    static bool absPath2fPath(const QString& absPath, QString& outFilePath);
 signals:
+    void updateFileContent(float percent);
 
 public slots:
 
 protected:
     // Util
     bool genNewFileName(const QString& fileAbsPath,  QString& newName, int givenArg, bool forEncOrDec, QString& errorMsg);
+    bool genNewFileName_dest(const QString& fileAbsPath,  const QString& originalDirPath, const QString& destDirPath, QString& newName, QString& errorMsg);
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     // Write Part
@@ -64,12 +77,21 @@ protected:
      bool writeOriginalEncData_LargeFile(QFile& encFile, QFile& originalFile, qint64 originalFileSz, int nShiftBits,bool bRightShiftFlag,  qint64 base, QString& errorMsg);
      bool writeOriginalEncData_NormalFile(QFile& encFile, QFile& originalFile, qint64 originalFileSz, int nShiftBits,bool bRightShiftFlag, qint64 base, QString& errorMsg);
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    // !!! New New New !!!
+    // new map -> mem api implementation
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    bool mapmem_wt_encFile(QFile& encFile, QFile& originalFile, qint64 originalFileSz, int nShiftBits,bool bRightShiftFlag,  qint64 base, QString& errorMsg);
+
+
+
     bool writeTailDummyBytes(QFile& encFile, int additionalExponentFlag);
     bool writeTailKeyBytes(QFile& encFile, int additionalExponentFlag, int ranCharIdx, bool bIsLittleEndian, bool bRightShiftFlag);
 
 
     bool writeEncData(QFile& originalFileObj, qint64 originalFileSz, const QString& newFileName, QString& errorMsg);
      bool writeEncDataWithArgs(QFile& originalFileObj, qint64 originalFileSz, const QString& newFileName, int buildArgs, QString& errorMsg);
+
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -83,30 +105,42 @@ protected:
     bool readEncDataAndThenWrite(QFile& file2read, const QString& newFileName, qint64 originalFileSz, int additionalExponentFlag, bool bRightShiftFlag, unsigned int nShiftBits, QString& errorMsg);
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
+    // !!! New New New !!!
+    // new map -> mem api implementation
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    bool mapmem_read_and_wt_decFile(QFile& file2read, QFile& decFile, qint64 originalFileSz, qint64 baseIdx, bool bRightShiftFlag, unsigned int nShiftBits, QString& errorMsg);
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
     // Restore to original file content part
     ////////////////////////////////////////////////////////////////////////////////////////////////////
      bool readEncDataAndThenWrite4NormalFile(QFile& file2read, QFile& wrtFile, qint64 originalFileSz, bool bRightShiftFlag,unsigned int nShiftBitCnt,  QString& errorMsg );
      bool readEncDataAndThenWrite4LargeFile(QFile& file2read, QFile& wrtFile, qint64 baseIdx, qint64 originalFileSz, bool bRightShiftFlag, unsigned int nShiftBitCnt, QString& errorMsg );
+
+     static bool is2FileEqual_Normal(const QString& fname1, const QString& fname2, QString& errorMsg);
+     static bool is2FileEqual_MapMem(const QString& fname1, const QString& fname2, QString& errorMsg);
 
 
 
 
     static void bitShift1(char& left, char& right, bool bShiftRightFlag, unsigned int nShiftBits );
     static void bitShift2(char& left, char& right, bool bShiftRightFlag, unsigned int nShiftBits );
+    static void bitShift_uchar(uchar& left, uchar& right, bool bShiftRightFlag, unsigned int nShiftBits );
+
 
     static void bitShift1Char_1(char& ch,  bool bShiftRightFlag, unsigned int nShiftBits );
     static void bitShift1Char_2(char& ch,  bool bShiftRightFlag, unsigned int nShiftBits );
+    static void bitShift1Char_uchar(uchar& retCh, bool bShiftRightFlag, unsigned int nShiftBits );
 
     static int howMany1InChar(char ch);
     static int getNBit(char ch, int idx);
 
     static QString changeBaseName(const QString& fileNameOnly, const QString& suffix, bool bIsEnc);
-    static QString changeSuffixName(const QString& fileNameOnly, bool bIsEnc, int* bIsMatched);
+    static QString changeSuffixName(const QString& suffixOnly, bool bIsEnc, int* bIsMatched);
 
     static const unsigned int sc_bitsInByte;
     static const unsigned int sc_bitsInShort;
     static const          int sc_maxint;
-
 
     static const char           s_randomDummyCharAry[DUMMY_ARY_SIZE];
     static const SpecialChars   s_special_ary[SPECIAL_ELEMENTS];
@@ -129,6 +163,11 @@ protected:
 
     static const QString sc_encTest_Suffix;
     static       bool sc_bUseNameChangeFunc;
+
+    static bool  s_bUseMapMemOp;
+    static bool  s_bCmpUseMapOp;
+
+    static const qint64 sc_frequency;
 
 };
 

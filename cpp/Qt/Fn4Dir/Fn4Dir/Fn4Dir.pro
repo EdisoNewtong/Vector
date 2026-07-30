@@ -18,16 +18,18 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     fnedcore.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    workthread.cpp
 
 HEADERS += \
     fnedcore.h \
-    mainwindow.h
+    mainwindow.h \
+    workthread.h
 
 FORMS += \
     mainwindow.ui
 
-RC_ICONS = FN4Dir.ico
+RC_ICONS = Fn4Dir.ico
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
