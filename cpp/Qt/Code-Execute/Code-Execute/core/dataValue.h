@@ -98,6 +98,7 @@ struct DataValue
     DataValue operator >> ( const DataValue& right);
 
     void doAssignment( const DataValue& right);
+    void doAssignmentFixed( const DataValue& right);
 
 
     //

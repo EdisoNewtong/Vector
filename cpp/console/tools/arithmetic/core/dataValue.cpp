@@ -1954,7 +1954,7 @@ void DataValue::doAssignment(const DataValue& rightVal)
             switch( rightVal.type )
             {
             case E_TP_CHAR:
-                this->value.char_val = static_cast<char>(rightVal.value.char_val);
+                this->value.char_val = rightVal.value.char_val; // Special 
                 break;
             case E_TP_U_CHAR:
                 this->value.char_val = static_cast<char>( rightVal.value.uchar_val );
@@ -2010,7 +2010,7 @@ void DataValue::doAssignment(const DataValue& rightVal)
                 this->value.uchar_val = static_cast<unsigned char>(rightVal.value.char_val);
                 break;
             case E_TP_U_CHAR:
-                this->value.uchar_val = static_cast<unsigned char>( rightVal.value.uchar_val );
+                this->value.uchar_val = rightVal.value.uchar_val; // Special 
                 break;
             case E_TP_S_CHAR:
                 this->value.uchar_val = static_cast<unsigned char>( rightVal.value.schar_val );
@@ -2066,7 +2066,7 @@ void DataValue::doAssignment(const DataValue& rightVal)
                 this->value.schar_val = static_cast<signed char>( rightVal.value.uchar_val );
                 break;
             case E_TP_S_CHAR:
-                this->value.schar_val = static_cast<signed char>( rightVal.value.schar_val );
+                this->value.schar_val = rightVal.value.schar_val; // Special 
                 break;
 
             case E_TP_U_SHORT:
@@ -2125,7 +2125,7 @@ void DataValue::doAssignment(const DataValue& rightVal)
                 break;
 
             case E_TP_U_SHORT:
-                this->value.ushort_val = static_cast<unsigned short>( rightVal.value.ushort_val );
+                this->value.ushort_val = rightVal.value.ushort_val; // Special 
                 break;
             case E_TP_S_SHORT:
                 this->value.ushort_val = static_cast<unsigned short>( rightVal.value.sshort_val );
@@ -2181,7 +2181,7 @@ void DataValue::doAssignment(const DataValue& rightVal)
                 this->value.sshort_val = static_cast<signed short>( rightVal.value.ushort_val );
                 break;
             case E_TP_S_SHORT:
-                this->value.sshort_val = static_cast<signed short>( rightVal.value.sshort_val );
+                this->value.sshort_val = rightVal.value.sshort_val; // Special 
                 break;
 
             case E_TP_U_INT:
@@ -2239,7 +2239,7 @@ void DataValue::doAssignment(const DataValue& rightVal)
                 break;
 
             case E_TP_U_INT:
-                this->value.uint_val = static_cast<unsigned int>( rightVal.value.uint_val );
+                this->value.uint_val = rightVal.value.uint_val; // Special 
                 break;
             case E_TP_S_INT:
                 this->value.uint_val = static_cast<unsigned int>( rightVal.value.sint_val );
@@ -2295,7 +2295,7 @@ void DataValue::doAssignment(const DataValue& rightVal)
                 this->value.sint_val = static_cast<signed int>( rightVal.value.uint_val );
                 break;
             case E_TP_S_INT:
-                this->value.sint_val = static_cast<signed int>( rightVal.value.sint_val );
+                this->value.sint_val = rightVal.value.sint_val; // Special 
                 break;
 
             case E_TP_U_LONG:
@@ -2353,7 +2353,7 @@ void DataValue::doAssignment(const DataValue& rightVal)
                 break;
 
             case E_TP_U_LONG:
-                this->value.ulong_val = static_cast<unsigned long>( rightVal.value.ulong_val );
+                this->value.ulong_val = rightVal.value.ulong_val; // Special 
                 break;
             case E_TP_S_LONG:
                 this->value.ulong_val = static_cast<unsigned long>( rightVal.value.slong_val );
@@ -2409,7 +2409,7 @@ void DataValue::doAssignment(const DataValue& rightVal)
                 this->value.slong_val = static_cast<signed long>( rightVal.value.ulong_val );
                 break;
             case E_TP_S_LONG:
-                this->value.slong_val = static_cast<signed long>( rightVal.value.slong_val );
+                this->value.slong_val = rightVal.value.slong_val; // Special 
                 break;
 
             case E_TP_U_LONG_LONG:
@@ -2467,7 +2467,7 @@ void DataValue::doAssignment(const DataValue& rightVal)
                 break;
 
             case E_TP_U_LONG_LONG:
-                this->value.ulonglong_val = static_cast<unsigned long long>( rightVal.value.ulonglong_val );
+                this->value.ulonglong_val = rightVal.value.ulonglong_val; // Special 
                 break;
             case E_TP_S_LONG_LONG:
                 this->value.ulonglong_val = static_cast<unsigned long long>( rightVal.value.slonglong_val );
@@ -2523,7 +2523,7 @@ void DataValue::doAssignment(const DataValue& rightVal)
                 this->value.slonglong_val = static_cast<signed long long>( rightVal.value.ulonglong_val );
                 break;
             case E_TP_S_LONG_LONG:
-                this->value.slonglong_val = static_cast<signed long long>( rightVal.value.slonglong_val );
+                this->value.slonglong_val = rightVal.value.slonglong_val; // Special 
                 break;
 
             case E_TP_FLOAT:
@@ -2581,7 +2581,7 @@ void DataValue::doAssignment(const DataValue& rightVal)
                 break;
 
             case E_TP_FLOAT:
-                this->value.float_val = static_cast<float>( rightVal.value.float_val );
+                this->value.float_val = rightVal.value.float_val; // Special 
                 break;
             case E_TP_DOUBLE:
                 this->value.float_val = static_cast<float>( rightVal.value.double_val );
@@ -2637,7 +2637,7 @@ void DataValue::doAssignment(const DataValue& rightVal)
                 this->value.double_val = static_cast<double>( rightVal.value.float_val );
                 break;
             case E_TP_DOUBLE:
-                this->value.double_val = static_cast<double>( rightVal.value.double_val );
+                this->value.double_val = rightVal.value.double_val; // Special 
                 break;
             default:
                 break;
@@ -2652,6 +2652,7 @@ void DataValue::doAssignment(const DataValue& rightVal)
     // this->type = rightVal.type;
 
 }
+
 
 
 // static
@@ -3524,5 +3525,708 @@ DataValue DataValue::doForceDataTypeCast(E_DataType cast2Type)
 }
 
 
+void DataValue::doAssignmentFixed(const DataValue& rightVal)
+{
+    switch( this->type )
+    {
+    case E_TP_CHAR:
+        {
+            switch( rightVal.type )
+            {
+            case E_TP_CHAR:
+                this->value.char_val = rightVal.value.char_val; // Special 
+                break;
+            case E_TP_U_CHAR:
+                this->value.char_val = static_cast<char>( rightVal.value.uchar_val );
+                break;
+            case E_TP_S_CHAR:
+                this->value.char_val = static_cast<char>( rightVal.value.schar_val );
+                break;
+
+            case E_TP_U_SHORT:
+                this->value.char_val = static_cast<char>( rightVal.value.ushort_val );
+                break;
+            case E_TP_S_SHORT:
+                this->value.char_val = static_cast<char>( rightVal.value.sshort_val );
+                break;
+
+            case E_TP_U_INT:
+                this->value.char_val = static_cast<char>( rightVal.value.uint_val );
+                break;
+            case E_TP_S_INT:
+                this->value.char_val = static_cast<char>( rightVal.value.sint_val );
+                break;
+
+            case E_TP_U_LONG:
+                this->value.char_val = static_cast<char>( rightVal.value.ulong_val );
+                break;
+            case E_TP_S_LONG:
+                this->value.char_val = static_cast<char>( rightVal.value.slong_val );
+                break;
+
+            case E_TP_U_LONG_LONG:
+                this->value.char_val = static_cast<char>( rightVal.value.ulonglong_val );
+                break;
+            case E_TP_S_LONG_LONG:
+                this->value.char_val = static_cast<char>( rightVal.value.slonglong_val );
+                break;
+
+            case E_TP_FLOAT:
+                this->value.char_val = static_cast<char>( rightVal.value.float_val );
+                break;
+            case E_TP_DOUBLE:
+                this->value.char_val = static_cast<char>( rightVal.value.double_val );
+                break;
+            default:
+                break;
+            }
+        }
+        break;
+    case E_TP_U_CHAR:
+        {
+            switch( rightVal.type )
+            {
+            case E_TP_CHAR:
+                this->value.uchar_val = static_cast<unsigned char>(rightVal.value.char_val);
+                break;
+            case E_TP_U_CHAR:
+                this->value.uchar_val = rightVal.value.uchar_val; // Special 
+                break;
+            case E_TP_S_CHAR:
+                this->value.uchar_val = static_cast<unsigned char>( rightVal.value.schar_val );
+                break;
+
+            case E_TP_U_SHORT:
+                this->value.uchar_val = static_cast<unsigned char>( rightVal.value.ushort_val );
+                break;
+            case E_TP_S_SHORT:
+                this->value.uchar_val = static_cast<unsigned char>( rightVal.value.sshort_val );
+                break;
+
+            case E_TP_U_INT:
+                this->value.uchar_val = static_cast<unsigned char>( rightVal.value.uint_val );
+                break;
+            case E_TP_S_INT:
+                this->value.uchar_val = static_cast<unsigned char>( rightVal.value.sint_val );
+                break;
+
+            case E_TP_U_LONG:
+                this->value.uchar_val = static_cast<unsigned char>( rightVal.value.ulong_val );
+                break;
+            case E_TP_S_LONG:
+                this->value.uchar_val = static_cast<unsigned char>( rightVal.value.slong_val );
+                break;
+
+            case E_TP_U_LONG_LONG:
+                this->value.uchar_val = static_cast<unsigned char>( rightVal.value.ulonglong_val );
+                break;
+            case E_TP_S_LONG_LONG:
+                this->value.uchar_val = static_cast<unsigned char>( rightVal.value.slonglong_val );
+                break;
+
+            case E_TP_FLOAT:
+                this->value.uchar_val = static_cast<unsigned char>( rightVal.value.float_val );
+                break;
+            case E_TP_DOUBLE:
+                this->value.uchar_val = static_cast<unsigned char>( rightVal.value.double_val );
+                break;
+            default:
+                break;
+            }
+        }
+        break;
+    case E_TP_S_CHAR:
+        {
+            switch( rightVal.type )
+            {
+            case E_TP_CHAR:
+                this->value.schar_val = static_cast<signed char>(rightVal.value.char_val);
+                break;
+            case E_TP_U_CHAR:
+                this->value.schar_val = static_cast<signed char>( rightVal.value.uchar_val );
+                break;
+            case E_TP_S_CHAR:
+                this->value.schar_val = rightVal.value.schar_val; // Special 
+                break;
+
+            case E_TP_U_SHORT:
+                this->value.schar_val = static_cast<signed char>( rightVal.value.ushort_val );
+                break;
+            case E_TP_S_SHORT:
+                this->value.schar_val = static_cast<signed char>( rightVal.value.sshort_val );
+                break;
+
+            case E_TP_U_INT:
+                this->value.schar_val = static_cast<signed char>( rightVal.value.uint_val );
+                break;
+            case E_TP_S_INT:
+                this->value.schar_val = static_cast<signed char>( rightVal.value.sint_val );
+                break;
+
+            case E_TP_U_LONG:
+                this->value.schar_val = static_cast<signed char>( rightVal.value.ulong_val );
+                break;
+            case E_TP_S_LONG:
+                this->value.schar_val = static_cast<signed char>( rightVal.value.slong_val );
+                break;
+
+            case E_TP_U_LONG_LONG:
+                this->value.schar_val = static_cast<signed char>( rightVal.value.ulonglong_val );
+                break;
+            case E_TP_S_LONG_LONG:
+                this->value.schar_val = static_cast<signed char>( rightVal.value.slonglong_val );
+                break;
+
+            case E_TP_FLOAT:
+                this->value.schar_val = static_cast<signed char>( rightVal.value.float_val );
+                break;
+            case E_TP_DOUBLE:
+                this->value.schar_val = static_cast<signed char>( rightVal.value.double_val );
+                break;
+            default:
+                break;
+            }
+        }
+
+        break;
+
+    case E_TP_U_SHORT:
+        {
+            switch( rightVal.type )
+            {
+            case E_TP_CHAR:
+                this->value.ushort_val = static_cast<unsigned short>(rightVal.value.char_val);
+                break;
+            case E_TP_U_CHAR:
+                this->value.ushort_val = static_cast<unsigned short>( rightVal.value.uchar_val );
+                break;
+            case E_TP_S_CHAR:
+                this->value.ushort_val = static_cast<unsigned short>( rightVal.value.schar_val );
+                break;
+
+            case E_TP_U_SHORT:
+                this->value.ushort_val = rightVal.value.ushort_val; // Special 
+                break;
+            case E_TP_S_SHORT:
+                this->value.ushort_val = static_cast<unsigned short>( rightVal.value.sshort_val );
+                break;
+
+            case E_TP_U_INT:
+                this->value.ushort_val = static_cast<unsigned short>( rightVal.value.uint_val );
+                break;
+            case E_TP_S_INT:
+                this->value.ushort_val = static_cast<unsigned short>( rightVal.value.sint_val );
+                break;
+
+            case E_TP_U_LONG:
+                this->value.ushort_val = static_cast<unsigned short>( rightVal.value.ulong_val );
+                break;
+            case E_TP_S_LONG:
+                this->value.ushort_val = static_cast<unsigned short>( rightVal.value.slong_val );
+                break;
+
+            case E_TP_U_LONG_LONG:
+                this->value.ushort_val = static_cast<unsigned short>( rightVal.value.ulonglong_val );
+                break;
+            case E_TP_S_LONG_LONG:
+                this->value.ushort_val = static_cast<unsigned short>( rightVal.value.slonglong_val );
+                break;
+
+            case E_TP_FLOAT:
+                this->value.ushort_val = static_cast<unsigned short>( rightVal.value.float_val );
+                break;
+            case E_TP_DOUBLE:
+                this->value.ushort_val = static_cast<unsigned short>( rightVal.value.double_val );
+                break;
+            default:
+                break;
+            }
+        }
+        break;
+    case E_TP_S_SHORT:
+        {
+            switch( rightVal.type )
+            {
+            case E_TP_CHAR:
+                this->value.sshort_val = static_cast<signed short>(rightVal.value.char_val);
+                break;
+            case E_TP_U_CHAR:
+                this->value.sshort_val = static_cast<signed short>( rightVal.value.uchar_val );
+                break;
+            case E_TP_S_CHAR:
+                this->value.sshort_val = static_cast<signed short>( rightVal.value.schar_val );
+                break;
+
+            case E_TP_U_SHORT:
+                this->value.sshort_val = static_cast<signed short>( rightVal.value.ushort_val );
+                break;
+            case E_TP_S_SHORT:
+                this->value.sshort_val = rightVal.value.sshort_val; // Special 
+                break;
+
+            case E_TP_U_INT:
+                this->value.sshort_val = static_cast<signed short>( rightVal.value.uint_val );
+                break;
+            case E_TP_S_INT:
+                this->value.sshort_val = static_cast<signed short>( rightVal.value.sint_val );
+                break;
+
+            case E_TP_U_LONG:
+                this->value.sshort_val = static_cast<signed short>( rightVal.value.ulong_val );
+                break;
+            case E_TP_S_LONG:
+                this->value.sshort_val = static_cast<signed short>( rightVal.value.slong_val );
+                break;
+
+            case E_TP_U_LONG_LONG:
+                this->value.sshort_val = static_cast<signed short>( rightVal.value.ulonglong_val );
+                break;
+            case E_TP_S_LONG_LONG:
+                this->value.sshort_val = static_cast<signed short>( rightVal.value.slonglong_val );
+                break;
+
+            case E_TP_FLOAT:
+                this->value.sshort_val = static_cast<signed short>( rightVal.value.float_val );
+                break;
+            case E_TP_DOUBLE:
+                this->value.sshort_val = static_cast<signed short>( rightVal.value.double_val );
+                break;
+            default:
+                break;
+            }
+        }
+        break;
+
+    case E_TP_U_INT:
+        {
+            switch( rightVal.type )
+            {
+            case E_TP_CHAR:
+                this->value.uint_val = static_cast<unsigned int>(rightVal.value.char_val);
+                break;
+            case E_TP_U_CHAR:
+                this->value.uint_val = static_cast<unsigned int>( rightVal.value.uchar_val );
+                break;
+            case E_TP_S_CHAR:
+                this->value.uint_val = static_cast<unsigned int>( rightVal.value.schar_val );
+                break;
+
+            case E_TP_U_SHORT:
+                this->value.uint_val = static_cast<unsigned int>( rightVal.value.ushort_val );
+                break;
+            case E_TP_S_SHORT:
+                this->value.uint_val = static_cast<unsigned int>( rightVal.value.sshort_val );
+                break;
+
+            case E_TP_U_INT:
+                this->value.uint_val = rightVal.value.uint_val; // Special 
+                break;
+            case E_TP_S_INT:
+                this->value.uint_val = static_cast<unsigned int>( rightVal.value.sint_val );
+                break;
+
+            case E_TP_U_LONG:
+                this->value.uint_val = static_cast<unsigned int>( rightVal.value.ulong_val );
+                break;
+            case E_TP_S_LONG:
+                this->value.uint_val = static_cast<unsigned int>( rightVal.value.slong_val );
+                break;
+
+            case E_TP_U_LONG_LONG:
+                this->value.uint_val = static_cast<unsigned int>( rightVal.value.ulonglong_val );
+                break;
+            case E_TP_S_LONG_LONG:
+                this->value.uint_val = static_cast<unsigned int>( rightVal.value.slonglong_val );
+                break;
+
+            case E_TP_FLOAT:
+                this->value.uint_val = static_cast<unsigned int>( rightVal.value.float_val );
+                break;
+            case E_TP_DOUBLE:
+                this->value.uint_val = static_cast<unsigned int>( rightVal.value.double_val );
+                break;
+            default:
+                break;
+            }
+        }
+        break;
+    case E_TP_S_INT:
+        {
+            switch( rightVal.type )
+            {
+            case E_TP_CHAR:
+                this->value.sint_val = static_cast<signed int>(rightVal.value.char_val);
+                break;
+            case E_TP_U_CHAR:
+                this->value.sint_val = static_cast<signed int>( rightVal.value.uchar_val );
+                break;
+            case E_TP_S_CHAR:
+                this->value.sint_val = static_cast<signed int>( rightVal.value.schar_val );
+                break;
+
+            case E_TP_U_SHORT:
+                this->value.sint_val = static_cast<signed int>( rightVal.value.ushort_val );
+                break;
+            case E_TP_S_SHORT:
+                this->value.sint_val = static_cast<signed int>( rightVal.value.sshort_val );
+                break;
+
+            case E_TP_U_INT:
+                this->value.sint_val = static_cast<signed int>( rightVal.value.uint_val );
+                break;
+            case E_TP_S_INT:
+                this->value.sint_val = rightVal.value.sint_val; // Special 
+                break;
+
+            case E_TP_U_LONG:
+                this->value.sint_val = static_cast<signed int>( rightVal.value.ulong_val );
+                break;
+            case E_TP_S_LONG:
+                this->value.sint_val = static_cast<signed int>( rightVal.value.slong_val );
+                break;
+
+            case E_TP_U_LONG_LONG:
+                this->value.sint_val = static_cast<signed int>( rightVal.value.ulonglong_val );
+                break;
+            case E_TP_S_LONG_LONG:
+                this->value.sint_val = static_cast<signed int>( rightVal.value.slonglong_val );
+                break;
+
+            case E_TP_FLOAT:
+                this->value.sint_val = static_cast<signed int>( rightVal.value.float_val );
+                break;
+            case E_TP_DOUBLE:
+                this->value.sint_val = static_cast<signed int>( rightVal.value.double_val );
+                break;
+            default:
+                break;
+            }
+        }
+        break;
+
+    case E_TP_U_LONG:
+        {
+            switch( rightVal.type )
+            {
+            case E_TP_CHAR:
+                this->value.ulong_val = static_cast<unsigned long>(rightVal.value.char_val);
+                break;
+            case E_TP_U_CHAR:
+                this->value.ulong_val = static_cast<unsigned long>( rightVal.value.uchar_val );
+                break;
+            case E_TP_S_CHAR:
+                this->value.ulong_val = static_cast<unsigned long>( rightVal.value.schar_val );
+                break;
+
+            case E_TP_U_SHORT:
+                this->value.ulong_val = static_cast<unsigned long>( rightVal.value.ushort_val );
+                break;
+            case E_TP_S_SHORT:
+                this->value.ulong_val = static_cast<unsigned long>( rightVal.value.sshort_val );
+                break;
+
+            case E_TP_U_INT:
+                this->value.ulong_val = static_cast<unsigned long>( rightVal.value.uint_val & 0xFFFFFFFFul );
+                break;
+            case E_TP_S_INT:
+                this->value.ulong_val = static_cast<unsigned long>( rightVal.value.sint_val & 0xFFFFFFFFul );
+                break;
+
+            case E_TP_U_LONG:
+                this->value.ulong_val = rightVal.value.ulong_val; // Special 
+                break;
+            case E_TP_S_LONG:
+                this->value.ulong_val = static_cast<unsigned long>( rightVal.value.slong_val );
+                break;
+
+            case E_TP_U_LONG_LONG:
+                this->value.ulong_val = static_cast<unsigned long>( rightVal.value.ulonglong_val );
+                break;
+            case E_TP_S_LONG_LONG:
+                this->value.ulong_val = static_cast<unsigned long>( rightVal.value.slonglong_val );
+                break;
+
+            case E_TP_FLOAT:
+                this->value.ulong_val = static_cast<unsigned long>( rightVal.value.float_val );
+                break;
+            case E_TP_DOUBLE:
+                this->value.ulong_val = static_cast<unsigned long>( rightVal.value.double_val );
+                break;
+            default:
+                break;
+            }
+        }
+        break;
+    case E_TP_S_LONG:
+        {
+            switch( rightVal.type )
+            {
+            case E_TP_CHAR:
+                this->value.slong_val = static_cast<signed long>(rightVal.value.char_val);
+                break;
+            case E_TP_U_CHAR:
+                this->value.slong_val = static_cast<signed long>( rightVal.value.uchar_val );
+                break;
+            case E_TP_S_CHAR:
+                this->value.slong_val = static_cast<signed long>( rightVal.value.schar_val );
+                break;
+
+            case E_TP_U_SHORT:
+                this->value.slong_val = static_cast<signed long>( rightVal.value.ushort_val );
+                break;
+            case E_TP_S_SHORT:
+                this->value.slong_val = static_cast<signed long>( rightVal.value.sshort_val );
+                break;
+
+            case E_TP_U_INT:
+                this->value.slong_val = static_cast<signed long>( rightVal.value.uint_val & 0xFFFFFFFFul );
+                break;
+            case E_TP_S_INT:
+                this->value.slong_val = static_cast<signed long>( rightVal.value.sint_val & 0xFFFFFFFFul );
+                break;
+
+            case E_TP_U_LONG:
+                this->value.slong_val = static_cast<signed long>( rightVal.value.ulong_val );
+                break;
+            case E_TP_S_LONG:
+                this->value.slong_val = rightVal.value.slong_val; // Special 
+                break;
+
+            case E_TP_U_LONG_LONG:
+                this->value.slong_val = static_cast<signed long>( rightVal.value.ulonglong_val );
+                break;
+            case E_TP_S_LONG_LONG:
+                this->value.slong_val = static_cast<signed long>( rightVal.value.slonglong_val );
+                break;
+
+            case E_TP_FLOAT:
+                this->value.slong_val = static_cast<signed long>( rightVal.value.float_val );
+                break;
+            case E_TP_DOUBLE:
+                this->value.slong_val = static_cast<signed long>( rightVal.value.double_val );
+                break;
+            default:
+                break;
+            }
+        }
+        break;
+
+    case E_TP_U_LONG_LONG:
+        {
+            switch( rightVal.type )
+            {
+            case E_TP_CHAR:
+                this->value.ulonglong_val = static_cast<unsigned long long>(rightVal.value.char_val);
+                break;
+            case E_TP_U_CHAR:
+                this->value.ulonglong_val = static_cast<unsigned long long>( rightVal.value.uchar_val );
+                break;
+            case E_TP_S_CHAR:
+                this->value.ulonglong_val = static_cast<unsigned long long>( rightVal.value.schar_val );
+                break;
+
+            case E_TP_U_SHORT:
+                this->value.ulonglong_val = static_cast<unsigned long long>( rightVal.value.ushort_val );
+                break;
+            case E_TP_S_SHORT:
+                this->value.ulonglong_val = static_cast<unsigned long long>( rightVal.value.sshort_val );
+                break;
+
+            case E_TP_U_INT:
+                this->value.ulonglong_val = static_cast<unsigned long long>( rightVal.value.uint_val & 0x0FFFFFFFFull );
+                break;
+            case E_TP_S_INT:
+                this->value.ulonglong_val = static_cast<unsigned long long>( rightVal.value.sint_val & 0x0FFFFFFFFull );
+                break;
+
+            case E_TP_U_LONG:
+                this->value.ulonglong_val = static_cast<unsigned long long>( rightVal.value.ulong_val & 0x0FFFFFFFFull );
+                break;
+            case E_TP_S_LONG:
+                this->value.ulonglong_val = static_cast<unsigned long long>( rightVal.value.slong_val & 0x0FFFFFFFFull );
+                break;
+
+            case E_TP_U_LONG_LONG:
+                this->value.ulonglong_val = rightVal.value.ulonglong_val; // Special 
+                break;
+            case E_TP_S_LONG_LONG:
+                this->value.ulonglong_val = static_cast<unsigned long long>( rightVal.value.slonglong_val );
+                break;
+
+            case E_TP_FLOAT:
+                this->value.ulonglong_val = static_cast<unsigned long long>( rightVal.value.float_val );
+                break;
+            case E_TP_DOUBLE:
+                this->value.ulonglong_val = static_cast<unsigned long long>( rightVal.value.double_val );
+                break;
+            default:
+                break;
+            }
+        }
+        break;
+    case E_TP_S_LONG_LONG:
+        {
+            switch( rightVal.type )
+            {
+            case E_TP_CHAR:
+                this->value.slonglong_val = static_cast<signed long long>(rightVal.value.char_val);
+                break;
+            case E_TP_U_CHAR:
+                this->value.slonglong_val = static_cast<signed long long>( rightVal.value.uchar_val );
+                break;
+            case E_TP_S_CHAR:
+                this->value.slonglong_val = static_cast<signed long long>( rightVal.value.schar_val );
+                break;
+
+            case E_TP_U_SHORT:
+                this->value.slonglong_val = static_cast<signed long long>( rightVal.value.ushort_val );
+                break;
+            case E_TP_S_SHORT:
+                this->value.slonglong_val = static_cast<signed long long>( rightVal.value.sshort_val );
+                break;
+
+            case E_TP_U_INT:
+                this->value.slonglong_val = static_cast<signed long long>( rightVal.value.uint_val & 0x0FFFFFFFFull );
+                break;
+            case E_TP_S_INT:
+                this->value.slonglong_val = static_cast<signed long long>( rightVal.value.sint_val & 0x0FFFFFFFFull );
+                break;
+
+            case E_TP_U_LONG:
+                this->value.slonglong_val = static_cast<signed long long>( rightVal.value.ulong_val & 0x0FFFFFFFFull );
+                break;
+            case E_TP_S_LONG:
+                this->value.slonglong_val = static_cast<signed long long>( rightVal.value.slong_val & 0x0FFFFFFFFull );
+                break;
+
+            case E_TP_U_LONG_LONG:
+                this->value.slonglong_val = static_cast<signed long long>( rightVal.value.ulonglong_val );
+                break;
+            case E_TP_S_LONG_LONG:
+                this->value.slonglong_val = rightVal.value.slonglong_val; // Special 
+                break;
+
+            case E_TP_FLOAT:
+                this->value.slonglong_val = static_cast<signed long long>( rightVal.value.float_val );
+                break;
+            case E_TP_DOUBLE:
+                this->value.slonglong_val = static_cast<signed long long>( rightVal.value.double_val );
+                break;
+            default:
+                break;
+            }
+        }
+        break;
+
+    case E_TP_FLOAT:
+        {
+            switch( rightVal.type )
+            {
+            case E_TP_CHAR:
+                this->value.float_val = static_cast<float>(rightVal.value.char_val);
+                break;
+            case E_TP_U_CHAR:
+                this->value.float_val = static_cast<float>( rightVal.value.uchar_val );
+                break;
+            case E_TP_S_CHAR:
+                this->value.float_val = static_cast<float>( rightVal.value.schar_val );
+                break;
+
+            case E_TP_U_SHORT:
+                this->value.float_val = static_cast<float>( rightVal.value.ushort_val );
+                break;
+            case E_TP_S_SHORT:
+                this->value.float_val = static_cast<float>( rightVal.value.sshort_val );
+                break;
+
+            case E_TP_U_INT:
+                this->value.float_val = static_cast<float>( rightVal.value.uint_val );
+                break;
+            case E_TP_S_INT:
+                this->value.float_val = static_cast<float>( rightVal.value.sint_val );
+                break;
+
+            case E_TP_U_LONG:
+                this->value.float_val = static_cast<float>( rightVal.value.ulong_val );
+                break;
+            case E_TP_S_LONG:
+                this->value.float_val = static_cast<float>( rightVal.value.slong_val );
+                break;
+
+            case E_TP_U_LONG_LONG:
+                this->value.float_val = static_cast<float>( rightVal.value.ulonglong_val );
+                break;
+            case E_TP_S_LONG_LONG:
+                this->value.float_val = static_cast<float>( rightVal.value.slonglong_val );
+                break;
+
+            case E_TP_FLOAT:
+                this->value.float_val = rightVal.value.float_val; // Special 
+                break;
+            case E_TP_DOUBLE:
+                this->value.float_val = static_cast<float>( rightVal.value.double_val );
+                break;
+            default:
+                break;
+            }
+        }
+        break;
+    case E_TP_DOUBLE:
+        {
+            switch( rightVal.type )
+            {
+            case E_TP_CHAR:
+                this->value.double_val = static_cast<double>(rightVal.value.char_val);
+                break;
+            case E_TP_U_CHAR:
+                this->value.double_val = static_cast<double>( rightVal.value.uchar_val );
+                break;
+            case E_TP_S_CHAR:
+                this->value.double_val = static_cast<double>( rightVal.value.schar_val );
+                break;
+
+            case E_TP_U_SHORT:
+                this->value.double_val = static_cast<double>( rightVal.value.ushort_val );
+                break;
+            case E_TP_S_SHORT:
+                this->value.double_val = static_cast<double>( rightVal.value.sshort_val );
+                break;
+
+            case E_TP_U_INT:
+                this->value.double_val = static_cast<double>( rightVal.value.uint_val );
+                break;
+            case E_TP_S_INT:
+                this->value.double_val = static_cast<double>( rightVal.value.sint_val );
+                break;
+
+            case E_TP_U_LONG:
+                this->value.double_val = static_cast<double>( rightVal.value.ulong_val );
+                break;
+            case E_TP_S_LONG:
+                this->value.double_val = static_cast<double>( rightVal.value.slong_val );
+                break;
+
+            case E_TP_U_LONG_LONG:
+                this->value.double_val = static_cast<double>( rightVal.value.ulonglong_val );
+                break;
+            case E_TP_S_LONG_LONG:
+                this->value.double_val = static_cast<double>( rightVal.value.slonglong_val );
+                break;
+
+            case E_TP_FLOAT:
+                this->value.double_val = static_cast<double>( rightVal.value.float_val );
+                break;
+            case E_TP_DOUBLE:
+                this->value.double_val = rightVal.value.double_val; // Special 
+                break;
+            default:
+                break;
+            }
+        }
+        break;
+    default:
+        break;
+    }
+}
 
 

@@ -1748,7 +1748,16 @@ TokenBase* ExpEvaluation::doAssignment(TokenBase* left, TokenBase* right)
     //
     //    leftVal = rightVal;
     //
-    leftVal.doAssignment(rightVal);
+    if ( right->isFixedLiteral() ) {
+        // core code : fix a bug when the right exp is a kind of fixed literal number
+        // e.g.    
+        //         unsigned long long int a = 0xFFFFFFFF;   
+        //  bug     :  a = 18446744073709551615
+        //  correct :  a = 4294967295
+        leftVal.doAssignmentFixed( rightVal );
+    } else {
+        leftVal.doAssignment( rightVal );
+    }
     left->setRealValue( leftVal );
 
     // update varible' value
