@@ -1,7 +1,7 @@
 #pragma once
 
 #include <QThread>
-#include <QList>
+#include <QVector>
 #include <QDir>
 
 class myVisitThread : public QThread
@@ -17,7 +17,7 @@ public:
 
 
     void setType(myVisitThread::E_THREAD_TYPE type);
-    void setVisitedDirs(QList<QDir>* dirs);
+    void setVisitedDirs(QVector<QDir>* dirs);
     void setStartDir(const QDir& t);
     void setTerminateFlag();
 
@@ -30,7 +30,7 @@ private:
 protected:
     myVisitThread::E_THREAD_TYPE m_type;
     QDir         m_targetDir;
-    QList<QDir>* m_pVisitedDirs;
+    QVector<QDir>* m_pVisitedDirs;
     bool         m_bTerminateFlag;
 
 	bool             m_bIsIgnoreDirCaseSensitive;

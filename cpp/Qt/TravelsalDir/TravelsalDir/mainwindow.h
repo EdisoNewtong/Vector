@@ -8,6 +8,7 @@
 #include <QMap>
 #include <QElapsedTimer>
 #include <QTreeWidgetItem>
+#include <QVector>
 
 #include "myVisitThread.h"
 
@@ -83,6 +84,8 @@ private:
     bool                                   m_bIgnoredFileCaseSensitive;
     bool                                   m_bOnlyVisitMatchedExtFiles;
 
+    bool                                   m_bSeperateMultiExtensionFlag;
+
 
     QElapsedTimer                          m_timerTotal;
     QElapsedTimer                          m_timerDirs;
@@ -98,15 +101,18 @@ private:
     myVisitThread*     m_pDirVisitThread;
     myVisitThread*     m_pFileVisitThread;
 
-    QMap<QString, QMap<QString, QList<QFileInfo>> > m_extensionMap;
+    QMap<QString, QMap<QString, QVector<QFileInfo>> > m_extensionMap;
 
 
-    QMap<unsigned long long, QList<QDir> > m_depthDirs;
-    QList<QDir>*                           m_pAllDirs;
+    QMap<unsigned long long, QVector<QDir> > m_depthDirs;
+    QVector<QDir>*                           m_pAllDirs;
 
-    QList<QTreeWidgetItem*>                m_generatedTreeNodeList;
-    QList<QTreeWidgetItem*>                m_searchMatchedResultNodeList;
+    QVector<QTreeWidgetItem*>                m_generatedTreeNodeList;
+    QVector<QTreeWidgetItem*>                m_searchMatchedResultNodeList;
     int                                    m_currentPreviousNextIdx;
+
+    int                                      m_extTypeGroupCnt;
+    int                                      m_extTypeGroupPartCnt;
 
 
     // Resource
@@ -114,6 +120,7 @@ private:
     QIcon*                                  m_treeFileIcon;
     QIcon*                                  m_treeExtIcon;
     QIcon*                                  m_treeDirIcon;
+    QIcon*                                  m_treeMtExtIcon;
 
 };
 #endif // MAINWINDOW_H

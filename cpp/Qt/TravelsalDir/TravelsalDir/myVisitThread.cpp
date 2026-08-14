@@ -117,7 +117,7 @@ void myVisitThread::run() // Q_DECL_OVERRIDE;
     }
 }
 
-void myVisitThread::setVisitedDirs(QList<QDir>* dirs)
+void myVisitThread::setVisitedDirs(QVector<QDir>* dirs)
 {
     m_bTerminateFlag = false;
     m_pVisitedDirs = dirs;
