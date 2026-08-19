@@ -34,3 +34,11 @@ EOF
 -- run the current buffer 
 :luafile % 
 ```
+
+# How to config neovim by lua script ? 
+1. create a new directory named "nvim" at the path ~/.config/nvim  ( $ mkdir -p ~/.config/nvim )
+2. follow the under instructions shown in the image
+
+![NeoVim Config Directory Struct](./neovimCfgDirStruct.png) 
+
+
