@@ -23,6 +23,9 @@ public:
 
 	void setDirIgnoreOption(bool bIsIgnoreCaseSensitive, const QString& strIgnorePattern, bool bPickOnly);
 	void setFileIgnoreOption(bool bIsIgnoreCaseSensitive, const QString& strIgnorePattern, bool bPickOnly);
+
+    void setSkipSymbol_linkDirFlag(bool bFlag);
+    void setSkipSymbol_linkFileFlag(bool bFlag);
 private:
     virtual void run() Q_DECL_OVERRIDE;
             void travelsalDirs(const QDir& d, unsigned long long layer);
@@ -32,6 +35,8 @@ protected:
     QDir         m_targetDir;
     QVector<QDir>* m_pVisitedDirs;
     bool         m_bTerminateFlag;
+    bool         m_bSkipSymbollinkDirFlag;
+    bool         m_bSkipSymbollinkFileFlag;
 
 	bool             m_bIsIgnoreDirCaseSensitive;
     bool             m_bPickDirOnly; // true: ignore folder ,  false: only pick matched folder

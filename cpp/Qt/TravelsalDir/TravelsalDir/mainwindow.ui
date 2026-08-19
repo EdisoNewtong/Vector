@@ -426,8 +426,11 @@
           <property name="selectionBehavior">
            <enum>QAbstractItemView::SelectItems</enum>
           </property>
+          <property name="sortingEnabled">
+           <bool>true</bool>
+          </property>
           <property name="columnCount">
-           <number>2</number>
+           <number>3</number>
           </property>
           <column>
            <property name="text">
@@ -437,6 +440,11 @@
           <column>
            <property name="text">
             <string notr="true">2</string>
+           </property>
+          </column>
+          <column>
+           <property name="text">
+            <string notr="true">3</string>
            </property>
           </column>
          </widget>
@@ -667,7 +675,15 @@
      <addaction name="actionMultiThread"/>
      <addaction name="actionSingleThread"/>
     </widget>
+    <widget class="QMenu" name="menu_3">
+     <property name="title">
+      <string>快捷方法-策略</string>
+     </property>
+     <addaction name="actionSkipDir"/>
+     <addaction name="actionSkipFile"/>
+    </widget>
     <addaction name="menu_2"/>
+    <addaction name="menu_3"/>
    </widget>
    <addaction name="menu"/>
   </widget>
@@ -689,6 +705,22 @@
    </property>
    <property name="text">
     <string>单线程</string>
+   </property>
+  </action>
+  <action name="actionSkipDir">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>跳过 快捷方法目录</string>
+   </property>
+  </action>
+  <action name="actionSkipFile">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>跳过 快捷方法文件</string>
    </property>
   </action>
  </widget>

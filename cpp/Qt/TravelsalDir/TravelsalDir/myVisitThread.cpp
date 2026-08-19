@@ -12,6 +12,8 @@ myVisitThread::myVisitThread(QObject* parent /* = nullptr */)
     , m_targetDir("")
     , m_pVisitedDirs( nullptr )
     , m_bTerminateFlag( false )
+    , m_bSkipSymbollinkDirFlag( true )
+    , m_bSkipSymbollinkFileFlag( true )
 	, m_bIsIgnoreDirCaseSensitive( true )
     , m_bPickDirOnly( false )
 	, m_strIgnoreDirPatternGrp()
@@ -61,7 +63,12 @@ void myVisitThread::run() // Q_DECL_OVERRIDE;
 						break;
 					}
 
-					auto dirInfo = fileList.at(i);
+					auto fileInfo = fileList.at(i);
+                    // if ( m_bSkipSymbollinkFileFlag && fileInfo.isSymLink() ) {
+                    //     continue;
+                    // }
+
+
 					auto isMatched = false;
 					for( auto i = 0; i <  m_strIgnoreFilePatternGrp.size(); ++i )
 					{
@@ -73,15 +80,15 @@ void myVisitThread::run() // Q_DECL_OVERRIDE;
                                 // such as   *.config.backup
                                 QString realSuffix;
                                 if ( ext.contains(G_SC_DOT) ) { // the suffix is more than one '.'
-                                    realSuffix = dirInfo.completeSuffix();
+                                    realSuffix = fileInfo.completeSuffix();
                                 } else {
-                                    realSuffix = dirInfo.suffix();
+                                    realSuffix = fileInfo.suffix();
                                 }
 
                                 isMatched = (realSuffix.compare(ext, (m_bIsIgnoreFileCaseSensitive ? Qt::CaseInsensitive : Qt::CaseSensitive)) == 0);
                             } else {
                                 // use startsWith strategy to compare with file and its pattern
-                                isMatched = ( dirInfo.fileName().startsWith(pattern, (m_bIsIgnoreFileCaseSensitive ? Qt::CaseInsensitive : Qt::CaseSensitive)) );
+                                isMatched = ( fileInfo.fileName().startsWith(pattern, (m_bIsIgnoreFileCaseSensitive ? Qt::CaseInsensitive : Qt::CaseSensitive)) );
                             }
 
                             if ( isMatched ) {
@@ -99,7 +106,7 @@ void myVisitThread::run() // Q_DECL_OVERRIDE;
                     }
 
 					if ( bNeedVisitFile ) {
-						emit visitOneFile( (i+1) ,  dirInfo );
+						emit visitOneFile( (i+1) ,  fileInfo );
 					} else {
 						// skip this file , maybe TODO something
 					}
@@ -109,7 +116,9 @@ void myVisitThread::run() // Q_DECL_OVERRIDE;
 					break;
 				}
 
-                visitOneDirAllFiles( folderIdx+1 );
+                // Why such code can be compiled successfully ? 
+                // visitOneDirAllFiles( folderIdx+1 );    
+                emit visitOneDirAllFiles( folderIdx+1 );
             }
 
             emit visitAllDone();
@@ -145,7 +154,10 @@ void myVisitThread::travelsalDirs(const QDir& d, unsigned long long layer)
             break;
         }
 
-        auto dPath = *it; 
+        auto dPath = *it;
+        if ( m_bSkipSymbollinkDirFlag && dPath.isSymLink() ) {
+            continue;
+        } 
 
 		auto isMatched = false;
 		for( auto i = 0; i < m_strIgnoreDirPatternGrp.size(); ++i )
@@ -216,5 +228,11 @@ void myVisitThread::setFileIgnoreOption(bool bIsIgnoreCaseSensitive, const QStri
         }
     }
 }
+
+
+void myVisitThread::setSkipSymbol_linkDirFlag(bool bflag)  { m_bSkipSymbollinkDirFlag  = bflag; }
+void myVisitThread::setSkipSymbol_linkFileFlag(bool bFlag) { m_bSkipSymbollinkFileFlag = bFlag; }
+
+
 
 

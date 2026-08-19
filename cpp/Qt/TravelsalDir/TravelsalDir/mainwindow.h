@@ -57,6 +57,10 @@ private slots:
 
     void on_displayFileContent();
 
+    void on_actionSkipDir_triggered();
+
+    void on_actionSkipFile_triggered();
+
 private:
     void initUI();
     void refreshFileSystemModel(bool needDeletePrevious);
@@ -67,6 +71,12 @@ private:
     void focusSearchMatched();
     void focusNextBtnMatched();
     void focusPreviousBtnMatched();
+
+    void fill_fileGroupTreeNode();
+    void fill_dirGroupTreeNode();
+
+    // Util function(s)
+    static QString getHumanReadableSize(qint64 fileSz);
 private:
     Ui::MainWindow *ui;
     QFileSystemModel* m_pFileSystemModel;
@@ -91,6 +101,8 @@ private:
     QElapsedTimer                          m_timerDirs;
     QElapsedTimer                          m_timerFiles;
     bool                                   m_bUseMultiThreadMode;
+    bool                                   m_bSkipSymbol_link_dirFlag;
+    bool                                   m_bSkipSymbol_link_fileFlag;
 
     unsigned long long m_visitedDirCnt;
     unsigned long long m_visitedFileCnt;
