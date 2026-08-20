@@ -82,6 +82,5 @@ $ git config --global i18n.commit.encoding utf-8	# 提交信息编码
 $ git config --global i18n.logoutputencoding utf-8	# 输出 log 编码
 $ export LESSCHARSET=utf-8 
 
-\# 最后一条命令是因为 git log 默认使用 less 分页，所以需要 bash 对 less 命令进行 utf-8 编码
-
+// 最后一条命令是因为 git log 默认使用 less 分页，所以需要 bash 对 less 命令进行 utf-8 编码
 
