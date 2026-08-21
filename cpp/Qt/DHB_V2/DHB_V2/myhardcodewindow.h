@@ -176,6 +176,7 @@ protected:
     QString                 m_strColor1; 
     QString                 m_strColor2; 
     QString                 m_strColor3; 
+    QString                 m_strColorHighLight; 
 
     QString                 m_strDetailOutput;
 
