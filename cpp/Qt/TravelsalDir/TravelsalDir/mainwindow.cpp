@@ -1014,6 +1014,9 @@ void MainWindow::focusPreviousBtnMatched()
 
 void MainWindow::on_displayFileContent()
 {
+    //                                  10 MB   =  1 KB     1 MB  * 10 =>  10 MB
+    static const qint64 SC_FILE_READ_LIMIT_10MB = 1024ll * 1024ll * 10;
+
     auto items = ui->visitResultTree->selectedItems();
     if ( items.size() != 1 ) {
         return;
@@ -1035,7 +1038,15 @@ void MainWindow::on_displayFileContent()
                 if ( info.isFile() ) {
                     QFile file( dirOrFile_Path );
                     if ( file.open( QIODevice::ReadOnly | QIODevice::ExistingOnly) ) {
-                        auto byteArray = file.readAll();
+
+                        qint64 ffSz = file.size();
+                        QByteArray byteArray;
+                        if ( ffSz <= SC_FILE_READ_LIMIT_10MB ) {
+                            byteArray = file.readAll();
+                        } else {
+                            // read partially
+                            byteArray = file.read( SC_FILE_READ_LIMIT_10MB );
+                        }
 
                         const QRegExp re(".+\\.(bmp|gif|jpg|png|pbm|pgm|ppm|xbm|xpm|svg)$", Qt::CaseInsensitive);
                         // bool 
@@ -1502,7 +1513,6 @@ void MainWindow::on_actionSkipFile_triggered()
     m_bSkipSymbol_link_fileFlag = !m_bSkipSymbol_link_fileFlag;
     ui->actionSkipFile->setChecked( m_bSkipSymbol_link_fileFlag );
 }
-
 
 
 

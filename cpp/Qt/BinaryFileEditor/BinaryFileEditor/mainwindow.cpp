@@ -82,6 +82,10 @@ void MainWindow::on_clearContentBtn_clicked()
 //
 void MainWindow::on_openFileBtn_clicked()
 {
+    // at most read :               10 MB 
+    static const qint64 SC_FILE_READ_LIMIT_10MB = 1024ll * 1024ll * 10ll;
+
+
     QString errMsg;
     auto bFlag = travelsalBinaryEditor(errMsg);
     if ( !bFlag ) {
@@ -118,15 +122,33 @@ void MainWindow::on_openFileBtn_clicked()
     }
 
     // fileSz != 0
-    QByteArray fileBuffer = file.read(fileSz);
+    auto bReadPartiallyFlag = false;
+    QByteArray fileBuffer;
+    if ( fileSz >= SC_FILE_READ_LIMIT_10MB ) {
+        bReadPartiallyFlag = true;
+        fileBuffer = file.read( SC_FILE_READ_LIMIT_10MB );
+    } else {
+        fileBuffer = file.read(fileSz);
+    }
+
+
     if ( fileBuffer.isEmpty() ) {
         reportOperationResult( QString("File : <%1>    read   0 byte in the content . Nothing to insert !").arg(filename), true );
         return;
     }
     
-    if ( fileSz != fileBuffer.size() ) {
-        reportOperationResult( QString("File : <%1>    read   %2 / %3 byte(s) when reading . ").arg(filename).arg(fileBuffer.size()).arg(fileSz), true );
-        return;
+    if ( bReadPartiallyFlag ) {
+        if ( fileBuffer.size() != SC_FILE_READ_LIMIT_10MB ) {
+            reportOperationResult( QString("File : <%1>  read [Partially] Failed! :(  %2 / %3 byte(s) when reading . ").arg(filename).arg(fileBuffer.size()).arg(SC_FILE_READ_LIMIT_10MB), true );
+            return;
+        } 
+        //  else
+        reportOperationResult( QString("File : <%1>  read [Partially] Successful :)    %2 / %3 byte(s) when reading . ").arg(filename).arg( "10-MB" ).arg( fileSz ), false );
+    } else {
+        if ( fileSz != fileBuffer.size() ) {
+            reportOperationResult( QString("File : <%1>    read   %2 / %3 byte(s) when reading . ").arg(filename).arg(fileBuffer.size()).arg(fileSz), true );
+            return;
+        }
     }
 
     QString insertAllstr;

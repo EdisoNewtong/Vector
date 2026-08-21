@@ -72,6 +72,19 @@
           <bool>false</bool>
          </property>
         </widget>
+        <widget class="QLabel" name="processState">
+         <property name="font">
+          <font>
+           <family>Arial</family>
+           <pointsize>10</pointsize>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>State : Idle</string>
+         </property>
+        </widget>
        </widget>
       </item>
       <item>
