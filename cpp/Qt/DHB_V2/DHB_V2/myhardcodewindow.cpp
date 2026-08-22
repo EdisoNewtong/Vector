@@ -56,6 +56,8 @@ namespace limitedNumber
 }
 
 static const bool SC_NEED_HIGHLIGHT = true;
+// static const QString SC_HIGHLIGHT_SYTLE("QLabel { background-color: #00FFFF }");
+static const QString SC_HIGHLIGHT_SYTLE("QLabel { background-color: #C0C0C0 }");
 
 // explicit
 myhardcodewindow::myhardcodewindow(QWidget* parent /* = nullptr */  )
@@ -136,7 +138,7 @@ myhardcodewindow::myhardcodewindow(QWidget* parent /* = nullptr */  )
     , m_strColor1("#FF0000") // red
     , m_strColor2("#00FF00") // green
     , m_strColor3("#0000FF") // blue
-    , m_strColorHighLight("#00FFFF") // yellow
+    , m_strColorHighLight("#FFFF00") // yellow
     , m_strDetailOutput("")
     , m_pickedInfo(0U)
     , m_errorMsgShowTime(3000)
@@ -368,14 +370,21 @@ void myhardcodewindow::initUI()
         m_pBinVBarAry[i]->setFont(newFnt);
     }
 
+    const float fLarger = 1.5;
     m_pBinIndexHeaderLabel = new QLabel( tr("Binary Index: ") );
     for ( int i = 0; i < sc_binaryCtrlCnt; ++i ) { 
         m_pBinIndexAry[i] = new QLabel( QString("%1").arg(sc_binaryCtrlCnt-i-1) );
-        m_pBinAry[i] = new QLabel( QString("<font color='%1'>%2</font>").arg( (i/4%2) == 0 ? m_strColor3 :  m_strColor1).arg("-") );
+        m_pBinAry[i]      = new QLabel( QString("<font color='%1'>%2</font>").arg( (i/4%2) == 0 ? m_strColor3 :  m_strColor1).arg("-") );
 
         QFont idxNewFnt( m_pBinIndexAry[i]->font() );
-        idxNewFnt.setPointSizeF( idxNewFnt.pointSizeF() * 0.7 );
+        idxNewFnt.setPointSizeF( idxNewFnt.pointSizeF() * fLarger );
+        idxNewFnt.setBold( true );
         m_pBinIndexAry[i]->setFont( idxNewFnt );
+
+        QFont strNewFnt( m_pBinAry[i]->font() );
+        strNewFnt.setPointSizeF( idxNewFnt.pointSizeF() * fLarger );
+        strNewFnt.setBold( true );
+        m_pBinAry[i]->setFont( strNewFnt );
     }
     
     //
@@ -1443,8 +1452,8 @@ void myhardcodewindow::innerBitsUpdate(int nBits)
 
                 if ( SC_NEED_HIGHLIGHT ) {
                     if ( bLeaderNoneZero ) {
-                        m_pBinAry[idx2]->setStyleSheet("QLabel { background-color: black }");
-                        m_pBinAry[idx2]->setText( QString("<b><font color='%1'>%2</font></b>").arg(m_strColorHighLight).arg(strCh) );
+                        m_pBinAry[idx2]->setStyleSheet(SC_HIGHLIGHT_SYTLE);
+                        m_pBinAry[idx2]->setText( QString("<b><font color='%1'>%2</font></b>").arg(colorBin).arg(strCh) );
                     } else {
                         m_pBinAry[idx2]->setStyleSheet("");
                         m_pBinAry[idx2]->setText( QString("<font color='%1'>%2</font>").arg(colorBin).arg(strCh) );
@@ -1458,8 +1467,8 @@ void myhardcodewindow::innerBitsUpdate(int nBits)
 
                 if ( SC_NEED_HIGHLIGHT  ) {
                     if ( bLeaderNoneZero ) {
-                        m_pBinIndexAry[idx2]->setStyleSheet("QLabel { background-color: black }");
-                        m_pBinIndexAry[idx2]->setText( QString("<font color='%1'>%2</font></b>").arg(m_strColorHighLight).arg(extraColorIdx) );
+                        m_pBinIndexAry[idx2]->setStyleSheet(SC_HIGHLIGHT_SYTLE);
+                        m_pBinIndexAry[idx2]->setText( QString("<b><font color='%1'>%2</font></b>").arg( m_strColorHighLight ).arg(extraColorIdx) );
                     } else {
                         m_pBinIndexAry[idx2]->setStyleSheet("");
                         m_pBinIndexAry[idx2]->setText( QString("%1").arg(extraColorIdx) );
@@ -1510,8 +1519,8 @@ void myhardcodewindow::innerBitsUpdate(int nBits)
 
                 if ( SC_NEED_HIGHLIGHT ) {
                     if ( bLeaderNoneZero ) {
-                        m_pOctAry[idx8]->setStyleSheet("QLabel { background-color: black }");
-                        m_pOctAry[idx8]->setText( QString("<font color='%1'>%2</font></b>").arg(m_strColorHighLight).arg(strCh) );
+                        m_pOctAry[idx8]->setStyleSheet(SC_HIGHLIGHT_SYTLE);
+                        m_pOctAry[idx8]->setText( QString("<font color='%1'>%2</font></b>").arg(colorOct).arg(strCh) );
                     } else {
                         m_pOctAry[idx8]->setStyleSheet("");
                         m_pOctAry[idx8]->setText( QString("<font color='%1'>%2</font>").arg(colorOct).arg(strCh) );
@@ -1552,8 +1561,8 @@ void myhardcodewindow::innerBitsUpdate(int nBits)
 
                 if ( SC_NEED_HIGHLIGHT ) {
                     if ( bLeaderNoneZero ) {
-                        m_pHexAry[idx16]->setStyleSheet("QLabel { background-color: black }");
-                        m_pHexAry[idx16]->setText( QString("<b><font color='%1'>%2</font></b>").arg(m_strColorHighLight).arg(strCh) );
+                        m_pHexAry[idx16]->setStyleSheet(SC_HIGHLIGHT_SYTLE);
+                        m_pHexAry[idx16]->setText( QString("<b><font color='%1'>%2</font></b>").arg(colorHex).arg(strCh) );
                     } else {
                         m_pHexAry[idx16]->setStyleSheet("");
                         m_pHexAry[idx16]->setText( QString("<font color='%1'>%2</font>").arg(colorHex).arg(strCh) );
