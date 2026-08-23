@@ -67,6 +67,9 @@ protected:
     void innerBitsUpdate(int nBits);
     void setAllBitsDash();
 
+    void enlargeFontSize(QWidget* w, bool bBoldFlag, qreal rate);
+    void changelargeVerticalSize(QLineEdit* w);
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     // To Fix a bug when converting signed short/int/long/long long while the binary highest bit is '1'
     bool isHightestBit_1(const QString& targetStr, size_t nBits, int baseOpt);

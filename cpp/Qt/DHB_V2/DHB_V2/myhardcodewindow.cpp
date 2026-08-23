@@ -211,6 +211,30 @@ myhardcodewindow::~myhardcodewindow()
 {
 }
 
+
+void myhardcodewindow::enlargeFontSize(QWidget* w, bool bBoldFlag , qreal rate)
+{
+    if ( w == nullptr ) {
+        return;
+    }
+
+    auto fnt2change = w->font();
+    fnt2change.setBold( bBoldFlag );
+    fnt2change.setPointSize( fnt2change.pointSizeF() * (rate > 1.0 ? rate : 1.2) );
+    w->setFont( fnt2change );
+}
+
+void myhardcodewindow::changelargeVerticalSize(QLineEdit* w)
+{
+    if ( w == nullptr ) {
+        return;
+    }
+
+    w->setSizePolicy(w->sizePolicy().horizontalPolicy() , QSizePolicy::Expanding );
+}
+
+
+
 void myhardcodewindow::initUI()
 {
     m_pCenterWidget = new QWidget(this);
@@ -219,14 +243,16 @@ void myhardcodewindow::initUI()
     // m_pChkBoxGrp = new QGroupBox( tr("Options") );
     m_pChkBoxGrp = new QGroupBox();
     m_pHBoxChkBoxGrp = new QHBoxLayout();
+
+    const qreal flargerRate = 1.4;
     //
     // unsigned / signed
     //
-    m_pUnsignedSignedGrp = new QGroupBox( tr("Unsigned / Signed") );
+    m_pUnsignedSignedGrp = new QGroupBox( tr("Unsigned / Signed") );     enlargeFontSize(m_pUnsignedSignedGrp, true, flargerRate);  
     m_pUnsignedSignedBtnsGrp = new QButtonGroup(m_pUnsignedSignedGrp);
     m_pVBoxUnsignedSigned = new QVBoxLayout();
-      m_pUnsignedChkBox  = new QRadioButton( tr("unsigned"));
-      m_pSignedChkBox    = new QRadioButton( tr("signed"));
+      m_pUnsignedChkBox  = new QRadioButton( tr("unsigned"));            enlargeFontSize(m_pUnsignedChkBox, true, flargerRate);
+      m_pSignedChkBox    = new QRadioButton( tr("signed"));              enlargeFontSize(m_pSignedChkBox, true, flargerRate);
 
       m_pVBoxUnsignedSigned->addWidget( m_pUnsignedChkBox);
       m_pVBoxUnsignedSigned->addWidget( m_pSignedChkBox);
@@ -238,14 +264,14 @@ void myhardcodewindow::initUI()
     //
     // char / short / int / long / long long
     //
-    m_pCharShortIntLongLLGrp = new QGroupBox( tr("Data Type") );
+    m_pCharShortIntLongLLGrp = new QGroupBox( tr("Data Type") );               enlargeFontSize( m_pCharShortIntLongLLGrp, true, flargerRate );
     m_pCharShortIntLongLLBtnsGrp = new QButtonGroup(m_pCharShortIntLongLLGrp);
     m_pVBoxDataType = new QVBoxLayout();
-      m_pCharChkBox  = new QRadioButton( tr("char") + QString(" ( %1 bits )").arg(m_charBits) );
-      m_pShortChkBox = new QRadioButton( tr("short") + QString(" ( %1 bits )").arg(m_shortBits) );
-      m_pIntChkBox   = new QRadioButton( tr("int") + QString(" ( %1 bits )").arg(m_intBits) );
-      m_pLongChkBox   = new QRadioButton( tr("long") + QString(" ( %1 bits )").arg(m_longBits) );
-      m_pLongLongChkBox   = new QRadioButton( tr("long long") + QString(" ( %1 bits )").arg(m_longlongBits) );
+      m_pCharChkBox  = new QRadioButton( tr("char") + QString(" ( %1 bits )").arg(m_charBits) );                  enlargeFontSize(m_pCharChkBox, true, flargerRate );
+      m_pShortChkBox = new QRadioButton( tr("short") + QString(" ( %1 bits )").arg(m_shortBits) );                enlargeFontSize(m_pShortChkBox, true, flargerRate );
+      m_pIntChkBox   = new QRadioButton( tr("int") + QString(" ( %1 bits )").arg(m_intBits) );                    enlargeFontSize(m_pIntChkBox,  true, flargerRate );
+      m_pLongChkBox   = new QRadioButton( tr("long") + QString(" ( %1 bits )").arg(m_longBits) );                 enlargeFontSize(m_pLongChkBox,  true, flargerRate );
+      m_pLongLongChkBox   = new QRadioButton( tr("long long") + QString(" ( %1 bits )").arg(m_longlongBits) );    enlargeFontSize(m_pLongLongChkBox,   true, flargerRate );
 
       m_pVBoxDataType->addWidget(m_pCharChkBox);
       m_pVBoxDataType->addWidget(m_pShortChkBox);
@@ -262,13 +288,13 @@ void myhardcodewindow::initUI()
     //
     // Base Radix : Binary / Octal / Hex / Decimal
     //
-    m_pRepresentationBinaryOctHexDecGrp = new QGroupBox( tr("Base") );
+    m_pRepresentationBinaryOctHexDecGrp = new QGroupBox( tr("Base") );                               enlargeFontSize(m_pRepresentationBinaryOctHexDecGrp, true, flargerRate );
     m_pRepresentationBinaryOctHexDecBtnsGrp = new QButtonGroup(m_pRepresentationBinaryOctHexDecGrp);
     m_pVBoxRepresentation = new QVBoxLayout();
-      m_pBinaryChkBox = new QRadioButton( tr("Binary (2)") );
-      m_pOctChkBox = new QRadioButton( tr("Octal (8)") );
-      m_pHexChkBox = new QRadioButton( tr("Hex (16)") );
-      m_pDecimalChkBox = new QRadioButton( tr("Decimal (10)") );
+      m_pBinaryChkBox = new QRadioButton( tr("Binary (2)") );                                        enlargeFontSize(m_pBinaryChkBox, true, flargerRate);
+      m_pOctChkBox = new QRadioButton( tr("Octal (8)") );                                            enlargeFontSize(m_pOctChkBox,    true, flargerRate);
+      m_pHexChkBox = new QRadioButton( tr("Hex (16)") );                                             enlargeFontSize(m_pHexChkBox,    true, flargerRate);
+      m_pDecimalChkBox = new QRadioButton( tr("Decimal (10)") );                                     enlargeFontSize(m_pDecimalChkBox,true, flargerRate);
 
       m_pVBoxRepresentation->addWidget(m_pBinaryChkBox);
       m_pVBoxRepresentation->addWidget(m_pOctChkBox);
@@ -283,11 +309,11 @@ void myhardcodewindow::initUI()
     //
     // Char : Character / Ascii(10)
     //
-    m_pRepresentationCharacterAsciiGrp = new QGroupBox( tr("Char Style") );
+    m_pRepresentationCharacterAsciiGrp = new QGroupBox( tr("Char Style") );                           enlargeFontSize(m_pRepresentationCharacterAsciiGrp, true, flargerRate);
     m_pRepresentationCharacterAsciiBtnsGrp = new QButtonGroup(m_pRepresentationCharacterAsciiGrp);
     m_pVBoxCharRepresentation = new QVBoxLayout();
-      m_pCharacterChkBox = new QRadioButton( tr("Character") );
-      m_pAsciiChkBox = new QRadioButton( tr("Ascii Code (Based on 10)") );
+      m_pCharacterChkBox = new QRadioButton( tr("Character") );                                       enlargeFontSize(m_pCharacterChkBox, true, flargerRate);
+      m_pAsciiChkBox = new QRadioButton( tr("Ascii Code (Based on 10)") );                            enlargeFontSize(m_pAsciiChkBox,     true, flargerRate);
 
       m_pVBoxCharRepresentation->addWidget(m_pCharacterChkBox);
       m_pVBoxCharRepresentation->addWidget(m_pAsciiChkBox);
@@ -307,14 +333,14 @@ void myhardcodewindow::initUI()
     //
     // Range Part
     //
-    m_pRangeBox = new QGroupBox( tr("Range") );
+    m_pRangeBox = new QGroupBox( tr("Range") );                                  enlargeFontSize(m_pRangeBox,      true, flargerRate);
     m_pHBoxRange = new QHBoxLayout();
-    m_pRangeLabel = new QLabel( tr(" Range From : ") );
-    m_pMinNumberText = new QLineEdit( tr("0") );
+    m_pRangeLabel = new QLabel( tr(" Range From : ") );                          enlargeFontSize(m_pRangeLabel,    true, flargerRate);
+    m_pMinNumberText = new QLineEdit( tr("0") );                                 enlargeFontSize(m_pMinNumberText,    true, flargerRate);  changelargeVerticalSize(m_pMinNumberText);
     m_pMinNumberText->setAlignment( Qt::AlignRight );
     m_pMinNumberText->setReadOnly(true);
-    m_pToLabel = new QLabel( tr(" ~ ") );
-    m_pMaxNumberText = new QLineEdit( tr("0") );
+    m_pToLabel = new QLabel( tr(" ~ ") );                                        enlargeFontSize(m_pToLabel,    true, flargerRate);
+    m_pMaxNumberText = new QLineEdit( tr("0") );                                 enlargeFontSize(m_pMaxNumberText,  true, flargerRate);    changelargeVerticalSize(m_pMaxNumberText);
     m_pMaxNumberText->setAlignment( Qt::AlignLeft );
     m_pMaxNumberText->setReadOnly(true);
     m_pHBoxRange->addWidget( m_pRangeLabel );
@@ -324,17 +350,17 @@ void myhardcodewindow::initUI()
     m_pRangeBox->setLayout( m_pHBoxRange );
 
     // Input Part
-    m_pInputGrp = new QGroupBox( tr("Input : ") );
+    m_pInputGrp = new QGroupBox( tr("Input : ") );                               enlargeFontSize(m_pInputGrp,  true, flargerRate);
     m_pHBoxInputParts = new QHBoxLayout();
-    m_pInputPrompt = new QLabel( tr("Number : ") );
-    m_pInputBox = new QLineEdit();
+    m_pInputPrompt = new QLabel( tr("Number : ") );                              enlargeFontSize(m_pInputPrompt, true, flargerRate);
+    m_pInputBox = new QLineEdit();                                               enlargeFontSize(m_pInputBox,  true, 1.75);  changelargeVerticalSize(m_pInputBox);
     m_pInputBox->setAlignment( Qt::AlignLeft );
-    m_pEqualLabel = new QLabel( tr(" = ") );
-    m_pDecialCharDetailBox = new QLineEdit( tr("") );
+    m_pEqualLabel = new QLabel( tr(" = ") );                                     enlargeFontSize(m_pEqualLabel,  true, flargerRate);
+    m_pDecialCharDetailBox = new QLineEdit( tr("") );                            enlargeFontSize(m_pDecialCharDetailBox,  true, flargerRate); changelargeVerticalSize(m_pDecialCharDetailBox);
     m_pDecialCharDetailBox->setReadOnly(true);
-    m_pFormatOutuptDetailBox = new QCheckBox( tr("Format Output Detail") );
+    m_pFormatOutuptDetailBox = new QCheckBox( tr("Format Output Detail") );      enlargeFontSize(m_pFormatOutuptDetailBox,  true, flargerRate);
     m_pFormatOutuptDetailBox->setCheckState( Qt::Unchecked);
-    m_pCopyToClipBoardBtn = new QPushButton( tr("Copy to ClipBoard") );
+    m_pCopyToClipBoardBtn = new QPushButton( tr("Copy to ClipBoard") );          enlargeFontSize(m_pCopyToClipBoardBtn,  true, flargerRate);
     m_pHBoxInputParts->addWidget(m_pInputPrompt);
     m_pHBoxInputParts->addWidget(m_pInputBox);
     m_pHBoxInputParts->addWidget( m_pEqualLabel );
@@ -345,10 +371,10 @@ void myhardcodewindow::initUI()
     
     // Grid Part
     m_pGridLayout = new QGridLayout();
-    m_pDisplayGrp = new QGroupBox( tr("Display") );
+    m_pDisplayGrp = new QGroupBox( tr("Display") );                              enlargeFontSize(m_pDisplayGrp,  true, flargerRate);
     
     // Octal 
-    m_pOctHeaderButton = new QPushButton( tr("Octal   (0): ") );
+    m_pOctHeaderButton = new QPushButton( tr("Octal   (0): ") );                 enlargeFontSize(m_pOctHeaderButton,   true, flargerRate);
     m_pOctHeaderButton->setStyleSheet("QPushButton { text-align: left; }");
     for ( int i = 0; i < sc_octCtrlCnt; ++i ) { 
         // m_pOctAry[i] = new QLabel( QString("<font color='%1'>%2</font>").arg( (i%3==0) ? m_strColor1 : (i%3==1 ? m_strColor3 : m_strColor2)).arg("7") );
@@ -360,7 +386,7 @@ void myhardcodewindow::initUI()
     }
 
     // Binary
-    m_pBinHeaderLabel = new QLabel( tr("Binary      : ") );
+    m_pBinHeaderLabel = new QLabel( tr("Binary      : ") );                         enlargeFontSize(m_pBinHeaderLabel,    true, flargerRate);
     for ( int i = 0; i < sc_byteVBarCnt; ++i ) { 
         m_pBinVBarAry[i] = new QLabel("|"); 
 
@@ -370,19 +396,19 @@ void myhardcodewindow::initUI()
         m_pBinVBarAry[i]->setFont(newFnt);
     }
 
-    const float fLarger = 1.5;
-    m_pBinIndexHeaderLabel = new QLabel( tr("Binary Index: ") );
+    const double dLarger = 1.3;
+    m_pBinIndexHeaderLabel = new QLabel( tr("Binary Index: ") );                    enlargeFontSize(m_pBinIndexHeaderLabel,     true, flargerRate);
     for ( int i = 0; i < sc_binaryCtrlCnt; ++i ) { 
         m_pBinIndexAry[i] = new QLabel( QString("%1").arg(sc_binaryCtrlCnt-i-1) );
         m_pBinAry[i]      = new QLabel( QString("<font color='%1'>%2</font>").arg( (i/4%2) == 0 ? m_strColor3 :  m_strColor1).arg("-") );
 
         QFont idxNewFnt( m_pBinIndexAry[i]->font() );
-        idxNewFnt.setPointSizeF( idxNewFnt.pointSizeF() * fLarger );
+        idxNewFnt.setPointSizeF( idxNewFnt.pointSizeF() * dLarger );
         idxNewFnt.setBold( true );
         m_pBinIndexAry[i]->setFont( idxNewFnt );
 
         QFont strNewFnt( m_pBinAry[i]->font() );
-        strNewFnt.setPointSizeF( idxNewFnt.pointSizeF() * fLarger );
+        strNewFnt.setPointSizeF( idxNewFnt.pointSizeF() * dLarger );
         strNewFnt.setBold( true );
         m_pBinAry[i]->setFont( strNewFnt );
     }
@@ -390,7 +416,7 @@ void myhardcodewindow::initUI()
     //
     // Hex
     //
-    m_pHexHeaderLabel = new QLabel( tr("Hex    (0x): ") );
+    m_pHexHeaderLabel = new QLabel( tr("Hex    (0x): ") );                              enlargeFontSize(m_pHexHeaderLabel,      true, flargerRate);
     for ( int i = 0; i < sc_byteVBarCnt; ++i ) { 
         m_pHexVBarAry[i] = new QLabel("|"); 
 
@@ -483,7 +509,7 @@ void myhardcodewindow::initUI()
     m_pGridLayout->addWidget(m_pHexVBarAry[sc_byteVBarCnt-1], rowIdx, idx);
 
     rowIdx = 4;
-    m_pShowFullBitsChkBox = new QCheckBox( tr("Show Full Bits") );
+    m_pShowFullBitsChkBox = new QCheckBox( tr("Show Full Bits") );                enlargeFontSize(m_pShowFullBitsChkBox,   true, flargerRate);
     m_pShowFullBitsChkBox->setCheckState( Qt::Checked );
     m_pGridLayout->addWidget( m_pShowFullBitsChkBox, rowIdx , 0, 1, 10);
 
