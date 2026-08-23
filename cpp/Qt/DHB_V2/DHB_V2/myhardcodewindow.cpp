@@ -353,7 +353,7 @@ void myhardcodewindow::initUI()
     m_pInputGrp = new QGroupBox( tr("Input : ") );                               enlargeFontSize(m_pInputGrp,  true, flargerRate);
     m_pHBoxInputParts = new QHBoxLayout();
     m_pInputPrompt = new QLabel( tr("Number : ") );                              enlargeFontSize(m_pInputPrompt, true, flargerRate);
-    m_pInputBox = new QLineEdit();                                               enlargeFontSize(m_pInputBox,  true, 1.75);  changelargeVerticalSize(m_pInputBox);
+    m_pInputBox = new QLineEdit();                                               enlargeFontSize(m_pInputBox,  true, 2.0);  changelargeVerticalSize(m_pInputBox);
     m_pInputBox->setAlignment( Qt::AlignLeft );
     m_pEqualLabel = new QLabel( tr(" = ") );                                     enlargeFontSize(m_pEqualLabel,  true, flargerRate);
     m_pDecialCharDetailBox = new QLineEdit( tr("") );                            enlargeFontSize(m_pDecialCharDetailBox,  true, flargerRate); changelargeVerticalSize(m_pDecialCharDetailBox);
