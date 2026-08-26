@@ -21,4 +21,22 @@ HEADERS  += mainwindow.h
 
 FORMS    += mainwindow.ui
 
+##################################################
+# Windows Icon   file extension  is  .ico
+##################################################
 RC_ICONS = DHB.ico
+
+
+
+
+##################################################
+# MacOS Icon      file extension is   .icns
+#
+# Where to download  ???.icons ? 
+#   url : https://macosicons.com
+#
+##################################################
+# ICON = DHB.icns
+
+
+
