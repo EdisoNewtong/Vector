@@ -220,7 +220,7 @@ void myhardcodewindow::enlargeFontSize(QWidget* w, bool bBoldFlag , qreal rate)
 
     auto fnt2change = w->font();
     fnt2change.setBold( bBoldFlag );
-    fnt2change.setPointSize( fnt2change.pointSizeF() * (rate > 1.0 ? rate : 1.2) );
+    fnt2change.setPointSizeF( fnt2change.pointSizeF() * (rate > 1.0 ? rate : 1.2) );
     w->setFont( fnt2change );
 }
 
