@@ -86,7 +86,7 @@ int main(int argc, char* argv[], char* env[])
 // Start of the named varible "s5" defination
 //----------------------------------------------------------------------------------------------------
 
-	auto s5 = R"(aaa
+	auto s5 = R"aaa(
 // int aaa = 5;
    // int  bbb = 7;
        /*
@@ -96,7 +96,7 @@ int main(int argc, char* argv[], char* env[])
 	return a + b;
     */
   }
-*/  bbb)";
+*/  )aaa";
 
 //----------------------------------------------------------------------------------------------------
 // End of the named varible "s5" defination
@@ -124,5 +124,3 @@ int main(int argc, char* argv[], char* env[])
 
 	return 0;
 }
-
-
