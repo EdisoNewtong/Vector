@@ -86,6 +86,8 @@ void test3()
 
 }
 
+
+// dynamic runtime formatter by passed arguments 
 void test4(const string& fmt, const string& a,const string& b)
 {
     cout << fmt::vformat(fmt.c_str(), fmt::make_format_args(a,b)  ) << endl;
@@ -103,3 +105,5 @@ int main(int argc, char* argv[], char* env[])
 
     return 0;
 }
+
+
