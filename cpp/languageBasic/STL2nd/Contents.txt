@@ -14,7 +14,7 @@ Chap03 : New Language Features
     3.1.10   Lambdas
     3.1.11   Keyword decltype
     3.1.12   New Function Declaration Syntax
-    3.1.13   Scoped Enumerations
+    3.1.13   Scoped Enumerations ( new enum declaration )
     3.1.14   New Fundamental Data Types
 
 3.2   Old "New" Language Features
@@ -618,4 +618,3 @@ Chap19 : Allocators
 19.1   Using Allocators as an Application Programmer
 19.2   A User-Defined Allocator
 19.3   Using Allocator as a Library Programmer
-

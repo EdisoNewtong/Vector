@@ -10,4 +10,5 @@
 3.1.10 : c++ 11   Lambdas expression
 3.1.11 : decltype
 3.1.12 : New Function Declartion Syntax
-3.1.13 : Scoped Enumerations
+3.1.13 : Scoped Enumerations ( new enum declaration ) 
+
