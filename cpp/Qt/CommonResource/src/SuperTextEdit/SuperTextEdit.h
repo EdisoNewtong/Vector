@@ -43,6 +43,8 @@ private slots:
     void highlightCurrentLine();
     void updateLineNumberArea(const QRect &, int);
 
+signals:
+    void dropFileResult(const QString& fPath, bool readSuccessful, qint64 readbytes, qint64 fileSize, const QByteArray& fileContent);
 private:
     QWidget *lineNumberArea;
 };

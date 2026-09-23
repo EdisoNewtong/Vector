@@ -126,8 +126,8 @@ void SuperTextEdit::lineNumberAreaPaintEvent(QPaintEvent *event)
 //![extraAreaPaintEvent_1]
     QTextBlock block = firstVisibleBlock();
     int blockNumber = block.blockNumber();
-    int top = (int) blockBoundingGeometry(block).translated(contentOffset()).top();
-    int bottom = top + (int) blockBoundingRect(block).height();
+    int top = static_cast<int>( blockBoundingGeometry(block).translated(contentOffset()).top() );
+    int bottom = static_cast<int>( top + blockBoundingRect(block).height() );
 //![extraAreaPaintEvent_1]
 
 //![extraAreaPaintEvent_2]
@@ -141,7 +141,7 @@ void SuperTextEdit::lineNumberAreaPaintEvent(QPaintEvent *event)
 
         block = block.next();
         top = bottom;
-        bottom = top + (int) blockBoundingRect(block).height();
+        bottom =  static_cast<int>( top + blockBoundingRect(block).height() );
         ++blockNumber;
     }
 }
@@ -152,11 +152,14 @@ void SuperTextEdit::lineNumberAreaPaintEvent(QPaintEvent *event)
 // virtual 
 void SuperTextEdit::dropEvent(QDropEvent* event)  // Q_DECL_OVERRIDE;
 {
+    static const qint64 MB_10 = 1024ull * 1024ull * 10ull;
+
 	// qDebug() << "Drop ";
     QPlainTextEdit::dropEvent(event);
 
 	auto btnState = event->mouseButtons();
-    qDebug() << "Mouse BtnState = " << btnState;
+    Q_UNUSED(btnState)
+    // qDebug() << "Mouse BtnState = " << btnState;
 
     bool hasLeftButtonPressed = true;
 // #ifdef Q_OS_WIN
@@ -175,31 +178,42 @@ void SuperTextEdit::dropEvent(QDropEvent* event)  // Q_DECL_OVERRIDE;
         if( dropData!=nullptr && dropData->hasUrls() ) {
             const auto& url_list = dropData->urls();
 			if( url_list.size() !=1 ) {
-				qDebug() << "Only Support Single File Drag/Drop";
+				// qDebug() << "Only Support Single File Drag/Drop";
 			} else {
 				// == 1
 				auto url_file = url_list.at(0);
 				QString localFileName = url_file.toLocalFile();
 				QFileInfo fi(localFileName);
-				qDebug() << "isSymLink = " << fi.isSymLink();
+				// qDebug() << "isSymLink = " << fi.isSymLink();
 				if( fi.isFile() ) {
 					QString fPath = fi.isSymLink() ? fi.symLinkTarget() : localFileName;
 					QFile readedFile(fPath);
 					if( readedFile.open( QIODevice::ReadOnly) ) {
-						QByteArray contentOfFile = readedFile.readAll();
-						// int fileSize = readedFile.size();
+                        QByteArray contentOfFile;
+						qint64 fileSize = readedFile.size();
+                        auto bReadFull = (fileSize <= MB_10);
+                        if ( bReadFull ) {
+                            // QByteArray's limit is 
+						    contentOfFile = readedFile.readAll();
+                        } else {
+                            contentOfFile = readedFile.read(MB_10);
+                        }
 
 						// read the info and set the content
 						QString strContent(contentOfFile);
 						this->setPlainText(strContent);
+
+                        // emit some read info
+                        emit dropFileResult(fPath, true, (bReadFull ? fileSize : MB_10 ), fileSize, contentOfFile);
 					}
 				} else {
-					qDebug() << "Only Support Single File , Don't Support Dir/Other type ";
+					// qDebug() << "Only Support Single File , Don't Support Dir/Other type ";
+                    emit dropFileResult(QString(""), false, 0ull, 0ull, QByteArray() );
 				}
 			}
 		}
     } else {
-        qDebug() << "Not Mouse-Left-Released ";
+        // qDebug() << "Not Mouse-Left-Released ";
     }
 }
 
