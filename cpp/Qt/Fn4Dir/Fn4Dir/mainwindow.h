@@ -26,13 +26,33 @@ private slots:
 
     void on_cmpBtn_clicked();
 
-
-
     void on_updateFileListProcessState(const QString& msg);
     void on_updateFileListPrograssBar(float per);
     void on_encDecFinished(const QString& msg);
     void on_updateFileContent(float per);
     void onThreadDone();
+
+    void on_mtThreadBtn_stateChanged(int checkState);
+
+    void on_decWithNewNameBtn_stateChanged(int checkState);
+
+    void on_outputFileBtn_clicked();
+
+    // void on_givenFileListBtn_clicked();
+
+    void on_buildDirOnlyBtn_clicked();
+
+    // void on_cmpSplitBtn_clicked();
+
+    void on_decWithNewNameBtn_clicked();
+
+    void on_decWithRenameBtn_clicked();
+
+    void on_givenFileListBtn_stateChanged(int checkState);
+
+    void on_cmpSplitBtn_stateChanged(int checkState);
+
+    void on_printFileList(const QString& fileListSortByLayers);
 
 private:
     // method
@@ -44,3 +64,6 @@ private:
     FNEDCore   *m_pEncDecObject;
 };
 #endif // MAINWINDOW_H
+
+
+

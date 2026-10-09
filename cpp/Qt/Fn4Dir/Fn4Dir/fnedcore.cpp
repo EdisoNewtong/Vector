@@ -9,6 +9,14 @@
 
 #include "fnedcore.h"
 
+static const QString sc_encSuffix("enc");
+static const QString sc_decSuffix("dec");
+
+static const QString ruleTmp[2] = { "MP4", "WMV"  };
+static const QString rule1[2] = { "MP4", "MWV"  };
+static const QString rule2[2] = { "DNG", "RAW"  };
+static const QString rule3[2] = { "JPG", "WEBP" };
+
 
 
 // static
@@ -112,8 +120,6 @@ FNEDCore::FNEDCore(QObject *parent) : QObject(parent)
 
 bool FNEDCore::genNewFileName(const QString& fileAbsPath,  QString& newName, int givenArgs, bool forEncOrDec, QString& errorMsg)
 {
-    static const QString sc_encSuffix("enc");
-    static const QString sc_decSuffix("dec");
     // true: enc     false:dec
     const QString realSuffix = forEncOrDec ? sc_encSuffix : sc_decSuffix;
 
@@ -577,6 +583,39 @@ bool FNEDCore::decryptFile(const QString& fileAbsPath, QString& newFileName, QSt
            && readEncDataAndThenWrite(encFile2Read, newFileName, originalSz, additionalExponentFlag, bRightShiftFlag, nShiftBits, errorMsg);
 
 }
+
+
+bool FNEDCore::decryptFile_dest(const QString& fileAbsPath, const QString& oriDirPath, const QString& destDirPath, QString& newFileName, QString& errorMsg)
+{
+    int additionalExponentFlag = 0;
+    char specialCharAry[4] = { 0 };
+    char core10Ary[10] = { 0 };
+    bool bIsBigEndian    = false;
+    bool bRightShiftFlag = false;
+    unsigned int nShiftBits = 0;
+    qint64 originalSz = 0;
+
+    QFile encFile2Read( fileAbsPath );
+    if ( !encFile2Read.open(QIODevice::ReadOnly) ) {
+        errorMsg = QString("Open file '%1' for reading failed! ").arg(fileAbsPath);
+        return false;
+    }
+
+    qint64 illFileSize = encFile2Read.size();
+    if ( illFileSize < 18 ) { // at least 2+16 = 18 bytes
+        errorMsg = QString("file '%1' size is so strange, size = %2").arg(fileAbsPath).arg( illFileSize );
+        return false;
+    }
+
+    return    readHead3Bytes(encFile2Read, additionalExponentFlag, specialCharAry, errorMsg)
+           && readTailKeyBytes(encFile2Read, illFileSize, additionalExponentFlag, specialCharAry, bIsBigEndian, bRightShiftFlag,  errorMsg)
+           && skipReadDummyBytes(encFile2Read, additionalExponentFlag, errorMsg)
+           && readCore10Bytes(encFile2Read, additionalExponentFlag, core10Ary, bIsBigEndian, originalSz, illFileSize, nShiftBits, errorMsg)
+           && genNewFileName_dest(fileAbsPath, oriDirPath, destDirPath, newFileName, errorMsg) 
+           && readEncDataAndThenWrite(encFile2Read, newFileName, originalSz, additionalExponentFlag, bRightShiftFlag, nShiftBits, errorMsg);
+}    
+
+
 
 
 bool FNEDCore::decryptFileRestore(const QString& fileAbsPath, QString& errorMsg)
@@ -1370,6 +1409,7 @@ bool FNEDCore::writeCore10Bytes(QFile& encFile, qint64 originalFileSz, int nShif
     return true;
 }
 
+
 bool FNEDCore::writeOriginalEncData_LargeFile(QFile& encFile, QFile& originalFile, qint64 originalFileSz, int nShiftBits, bool bRightShiftFlag, qint64 base,QString& errorMsg)
 {
     const qint64 pair_Bytes = (2 * sc_ll_threshold);
@@ -1877,9 +1917,6 @@ QString FNEDCore::changeBaseName(const QString& baseNameOnly, const QString& suf
 // static
 QString FNEDCore::changeSuffixName(const QString& suffixOnly, bool bIsEnc, int* pbIsMatched)
 {
-    static QString rule1[2] = { "MP4", "MWV"  };
-    static QString rule2[2] = { "DNG", "RAW"  };
-    static QString rule3[2] = { "JPG", "WEBP" };
 
     // init
     if ( pbIsMatched!=nullptr ) {
@@ -1925,6 +1962,49 @@ QString FNEDCore::changeSuffixName(const QString& suffixOnly, bool bIsEnc, int* 
 }
 
 
+// static
+bool FNEDCore::revert2OriginalName(const QString& fileAbsPath)
+{
+    QFileInfo fInfo( fileAbsPath );
+    if ( fInfo.exists() ) {
+        QDir dPath( fInfo.absoluteDir() );
+
+        auto oldFileName = fInfo.fileName();
+        auto baseName =  fInfo.baseName();
+        auto change_baseName = baseName;
+
+        auto cmpSuffix = fInfo.completeSuffix();
+        auto changed_cmpSuffix = cmpSuffix;
+
+        if ( cmpSuffix.endsWith( ruleTmp[1] ) ) {
+            changed_cmpSuffix = cmpSuffix.chopped( ruleTmp[1].size() ) + ruleTmp[0];
+        } else if ( cmpSuffix.endsWith( rule1[1] ) ) {
+            changed_cmpSuffix = cmpSuffix.chopped( rule1[1].size() ) + rule1[0];
+        } else if ( cmpSuffix.endsWith( rule2[1] )  ) { 
+            changed_cmpSuffix = cmpSuffix.chopped( rule2[1].size() ) + rule2[0];
+        } else if ( cmpSuffix.endsWith( rule3[1])  ) { 
+            changed_cmpSuffix = cmpSuffix.chopped( rule3[1].size() ) + rule3[0];
+        }
+
+        auto tail_tagstr = QString("_%1").arg(sc_encSuffix);
+        auto tailSz = tail_tagstr.size();
+        if ( baseName.endsWith( tail_tagstr, Qt::CaseSensitive  ) ) {
+            change_baseName = baseName.chopped( tailSz );
+        }
+
+        QString newFullFileName;
+        if ( !change_baseName.isEmpty() && !changed_cmpSuffix.isEmpty() ) {
+            newFullFileName = QString("%1.%2").arg( change_baseName ).arg( changed_cmpSuffix );
+        }
+
+        //                    oldFileName    ->    newFileName
+        return dPath.rename(  oldFileName,         newFullFileName );
+    }
+
+    return false;
+}
+
+
 
 // static   setter
 void FNEDCore::setMapMemFlag(bool bEnableFlag)
@@ -1938,4 +2018,6 @@ bool FNEDCore::isEnableMapMem()
 {
     return s_bUseMapMemOp;
 }
+
+
 

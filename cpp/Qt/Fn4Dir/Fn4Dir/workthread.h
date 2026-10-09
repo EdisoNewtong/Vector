@@ -27,9 +27,16 @@ public:
 
     void setOp(E_OP_TYPE op);
     void setPath(const QString& original,const QString& dest, FNEDCore* pEncDecObj);
+    void fillFileList(const QString& fileListByLine, int subType = 0);
 
+    // Enc
     void setPrintFilesOnlyFlag(bool b);
     void setBuildDirOnly(bool b);
+    void setTake_EncryptActionFlag(bool b);
+
+    // Dec
+    void setDecOnSameFileFlag(bool  b);
+    void setDecAndRenameFileFlag(bool  b);
 
     void singleThreadRun();
 
@@ -38,12 +45,29 @@ protected:
 
     QString m_oriDir;
     QString m_destDir;
+    QString m_targetFiles;
 
+    /****************************************************************************************************
+     
+      m_cmpSubType :
+          0: for enc/dec    
+          1: compare 2 files on 2 lines      
+          2: compare a lot pairs of files , each pair on one line and be seperated by ';' 
+
+    ****************************************************************************************************/
+    int     m_cmpSubType; 
+    
     void visitDir();
 
-    void processEncFileList();
-    void processDecFileList();
-    void processCmpFileList();
+    void do_EncOp();
+    void process_EncTravesalFileList();
+    QString getPrint_EncFileList();
+
+    void do_DecOp();
+    void process_DecTravesalFileList();
+    void process_DecFileList();
+
+    void do_CmpOp();
 
     void buildNewDirsOnDestintion();
 
@@ -59,19 +83,29 @@ protected:
     int m_fileCnt;
 
     QElapsedTimer m_timer_i;
+    QElapsedTimer m_timer_total;
 
     FNEDCore* m_pEncDecObj;
     E_OP_TYPE m_op;
 
+    bool m_bIsTargetFileReady; // Common for ( Enc && Dec )
+    
+    // enc options
     bool m_bPrintFileListOnly;
     bool m_bBuildSameDirStructOnly;
+    bool m_bTakeEncActionFlag;
 
+    // dec options
+    bool m_bDecOnSameFileFlag;
+    bool m_bDecAndRenameFileFlag;
 signals:
     void updateFileListProcessState(const QString& msg);
     void updateFileListPrograssBar(float percent);
 
     void encdecFilesFinished(const QString& msg);
     void aNewFileComes(const QString& fileAbsPath);
+
+    void printDirTree(const QString& fileList);
 
 };
 

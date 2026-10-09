@@ -59,7 +59,7 @@
          <item row="3" column="0">
           <widget class="QCheckBox" name="givenFileListBtn">
            <property name="text">
-            <string>Given Files Only</string>
+            <string>Apply on Given Files Only</string>
            </property>
           </widget>
          </item>
@@ -76,7 +76,7 @@
          <item row="2" column="0">
           <widget class="QCheckBox" name="outputFileBtn">
            <property name="text">
-            <string>List Files Only</string>
+            <string>List Files [Do Nothing]</string>
            </property>
           </widget>
          </item>
@@ -93,28 +93,28 @@
          <item row="0" column="1">
           <widget class="QCheckBox" name="buildDirOnlyBtn">
            <property name="text">
-            <string>Build Dir Only</string>
+            <string>Build Dir Tree</string>
            </property>
           </widget>
          </item>
          <item row="1" column="1">
-          <widget class="QCheckBox" name="cmpMethodBtn">
+          <widget class="QCheckBox" name="cmpSplitBtn">
            <property name="text">
-            <string>Compare Split</string>
+            <string>Compare Split by ;;</string>
            </property>
           </widget>
          </item>
          <item row="2" column="1">
           <widget class="QCheckBox" name="decWithNewNameBtn">
            <property name="text">
-            <string>Decrypt New Name</string>
+            <string>Restore As Original</string>
            </property>
           </widget>
          </item>
          <item row="3" column="1">
-          <widget class="QCheckBox" name="decWithCmpBtn">
+          <widget class="QCheckBox" name="decWithRenameBtn">
            <property name="text">
-            <string>Decrypt &amp;&amp;&amp;&amp; Compare</string>
+            <string>Decrypt &amp;&amp;&amp;&amp; Rename</string>
            </property>
           </widget>
          </item>
@@ -124,7 +124,7 @@
       <item>
        <widget class="QGroupBox" name="threadPrGrp">
         <property name="title">
-         <string>Priority</string>
+         <string>MultiThread Priority</string>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_2">
          <item>
@@ -183,7 +183,7 @@
         <item>
          <widget class="QLabel" name="label">
           <property name="text">
-           <string>   Source  </string>
+           <string>Source Dir</string>
           </property>
          </widget>
         </item>
@@ -197,7 +197,7 @@
         <item>
          <widget class="QLabel" name="label_2">
           <property name="text">
-           <string>Destination</string>
+           <string>Desti  Dir</string>
           </property>
          </widget>
         </item>

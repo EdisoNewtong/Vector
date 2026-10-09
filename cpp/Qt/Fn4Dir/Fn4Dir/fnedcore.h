@@ -39,9 +39,10 @@ public:
     bool encryptFile_withArg(const QString& fileAbsPath, int arg, QString& errorMsg);
 
     bool decryptFile(const QString& fileAbsPath, QString& newFileName, QString& errorMsg);
+    /* [new] */
+    bool decryptFile_dest(const QString& fileAbsPath, const QString& oriDirPath, const QString& destDirPath, QString& newFileName, QString& errorMsg);
     // bool decryptFile_dest(const QString& fileAbsPath, const QString& destDirPath, QString& errorMsg);
     bool decryptFileRestore(const QString& fileAbsPath, QString& errorMsg);
-    // bool decryptFile_withArg(const QString& fileAbsPath, int arg, QString& errorMsg);   // no args are required during decrypt 
 
     bool readDec_Meta(const QString& absFilePath, EncArgWrap& outArg, QString& errorMsg);
 
@@ -56,6 +57,10 @@ public:
     static bool isEnableMapMem();
 
     static bool absPath2fPath(const QString& absPath, QString& outFilePath);
+
+    // MWV -> MP4 | RAW -> DNG | WEBP -> JPG  
+    // [DELETE]  _enc  
+    static bool revert2OriginalName(const QString& fileAbsPath);
 signals:
     void updateFileContent(float percent);
 
