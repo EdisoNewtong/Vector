@@ -24,6 +24,8 @@ ui->decWithNewNameBtn   // Decrypt the source file  -> new destination file ( ra
 ui->decWithRenameBtn    // dji_123_dec.WMV          ->  dji_123.MP4
 
 
+ui->processedFileEdit->setText();
+
 ****************************************************************************************************/
 
 
@@ -58,6 +60,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect( m_pThread, SIGNAL(finished()), this, SLOT( onThreadDone() ) );
 
     connect( m_pEncDecObject, SIGNAL( updateFileContent(float) ), this, SLOT( on_updateFileContent(float) ) );
+    connect( m_pEncDecObject, SIGNAL(update_fileName_processInfo(const QString& ) ), this, SLOT( on_updateProcessingFileName(const QString&) ) );
 
     // update ui state
     on_encBtn_clicked();
@@ -167,6 +170,7 @@ void MainWindow::on_goBtn_clicked()
     } else if ( ui->cmpBtn->isChecked()  ) {
         // Cmp Mode
         m_pThread->setOp( WorkThread::E_CMP_OP );
+        m_pThread->setPath( ui->srcPath->text(), ui->destPath->text(), m_pEncDecObject );
 
         auto bCmpTargetFiles = (ui->givenFileListBtn->checkState() == Qt::Checked);
         // specify target pairs in file-list-inputbox.    
@@ -175,7 +179,6 @@ void MainWindow::on_goBtn_clicked()
         if ( !bCmpTargetFiles ) {
             m_pThread->fillFileList("", 1 );
             // compare 2 dirs corresponding paired files
-            m_pThread->setPath( ui->srcPath->text(), ui->destPath->text(), m_pEncDecObject );
             ui->statusbar->showMessage( QStringLiteral("Compare 2 dirs with corresponding files "), 3500);
         } else {
             auto bUseSemiColonFlag = (ui->cmpSplitBtn->checkState() == Qt::Checked);
@@ -345,8 +348,6 @@ void MainWindow::on_givenFileListBtn_stateChanged(int checkState)
         ui->fileListWnd->setEnabled( isChecked );
     } else if ( ui->cmpBtn->isChecked() ) {
         ui->cmpSplitBtn->setEnabled( isChecked );
-        // ui->cmpSplitBtn->setCheckState( Qt::Unchecked );
-
         ui->fileListWnd->setEnabled( isChecked );
         
         if ( isChecked ) {
@@ -386,5 +387,11 @@ void MainWindow::on_printFileList(const QString& fileListSortByLayers)
 {
     ui->fileListWnd->setPlainText( fileListSortByLayers ); 
 }
+
+void MainWindow::on_updateProcessingFileName(const QString& fileMsg)
+{
+    ui->processedFileEdit->setText( fileMsg );
+}
+
 
 

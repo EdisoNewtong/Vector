@@ -50,7 +50,7 @@ public:
     bool decryptFile_TestAll_WithCmp(const QString& fileAbsPath,  QString& errorMsg);
 
     // util
-    static bool is2FileEqual(const QString& fname1, const QString& fname2, QString& errorMsg);
+    bool is2FileEqual(const QString& fname1, const QString& fname2, QString& errorMsg);
     static int  genIDByArgs(const EncArgWrap& obj);
 
     static void setMapMemFlag(bool bEnableFlag);
@@ -63,6 +63,7 @@ public:
     static bool revert2OriginalName(const QString& fileAbsPath);
 signals:
     void updateFileContent(float percent);
+    void update_fileName_processInfo(const QString& filename);
 
 public slots:
 
@@ -122,8 +123,8 @@ protected:
      bool readEncDataAndThenWrite4NormalFile(QFile& file2read, QFile& wrtFile, qint64 originalFileSz, bool bRightShiftFlag,unsigned int nShiftBitCnt,  QString& errorMsg );
      bool readEncDataAndThenWrite4LargeFile(QFile& file2read, QFile& wrtFile, qint64 baseIdx, qint64 originalFileSz, bool bRightShiftFlag, unsigned int nShiftBitCnt, QString& errorMsg );
 
-     static bool is2FileEqual_Normal(const QString& fname1, const QString& fname2, QString& errorMsg);
-     static bool is2FileEqual_MapMem(const QString& fname1, const QString& fname2, QString& errorMsg);
+     bool is2FileEqual_Normal(const QString& fname1, const QString& fname2, QString& errorMsg);
+     bool is2FileEqual_MapMem(const QString& fname1, const QString& fname2, QString& errorMsg);
 
 
 

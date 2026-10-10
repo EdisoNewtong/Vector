@@ -246,6 +246,9 @@ bool FNEDCore::encryptFile(const QString& fileAbsPath, QString& errorMsg)
         return false;
     }
 
+    QFileInfo fileInfo( fileAbsPath );
+    emit update_fileName_processInfo( QString("[Enc] %1  ...").arg( fileInfo.fileName()  ) );
+
     return writeEncData(originalFile, illFileSize, newName, errorMsg);
 }
 
@@ -276,6 +279,10 @@ bool FNEDCore::encryptFile_withArg(const QString& fileAbsPath, int arg, QString&
         return false;
     }
 
+
+    QFileInfo fileInfo( fileAbsPath );
+    emit update_fileName_processInfo( QString("[Enc] %1  ...").arg( fileInfo.fileName()  ) );
+
     return writeEncDataWithArgs(originalFile, illFileSize, newName, arg, errorMsg);
 }
 
@@ -303,6 +310,9 @@ bool FNEDCore::encryptFile_dest(const QString& fileAbsPath, const QString& oriDi
         errorMsg = QString("File size is %1, Do Nothing. ").arg( illFileSize );
         return false;
     }
+
+    QFileInfo fileInfo( fileAbsPath );
+    emit update_fileName_processInfo( QString("[Enc] %1  ...").arg( fileInfo.fileName()  ) );
 
     return writeEncData(originalFile, illFileSize, newName, errorMsg);
 }
@@ -575,6 +585,9 @@ bool FNEDCore::decryptFile(const QString& fileAbsPath, QString& newFileName, QSt
         return false;
     }
 
+    QFileInfo fileInfo( fileAbsPath );
+    emit update_fileName_processInfo( QString("[Dec] %1  ...").arg( fileInfo.fileName()  ) );
+
     return    readHead3Bytes(encFile2Read, additionalExponentFlag, specialCharAry, errorMsg)
            && readTailKeyBytes(encFile2Read, illFileSize, additionalExponentFlag, specialCharAry, bIsBigEndian, bRightShiftFlag,  errorMsg)
            && skipReadDummyBytes(encFile2Read, additionalExponentFlag, errorMsg)
@@ -606,6 +619,10 @@ bool FNEDCore::decryptFile_dest(const QString& fileAbsPath, const QString& oriDi
         errorMsg = QString("file '%1' size is so strange, size = %2").arg(fileAbsPath).arg( illFileSize );
         return false;
     }
+
+    QFileInfo fInfo( fileAbsPath );
+    emit update_fileName_processInfo( QString("[Dec] %1  ...").arg( fInfo.fileName() ) );
+
 
     return    readHead3Bytes(encFile2Read, additionalExponentFlag, specialCharAry, errorMsg)
            && readTailKeyBytes(encFile2Read, illFileSize, additionalExponentFlag, specialCharAry, bIsBigEndian, bRightShiftFlag,  errorMsg)
@@ -647,7 +664,8 @@ bool FNEDCore::decryptFileRestore(const QString& fileAbsPath, QString& errorMsg)
     QString   newFilePathOnly;
     bool      renameRet = false;
 
-    // auto finRet = 
+    emit update_fileName_processInfo( QString("[Dec Original] %1  ...").arg(oldFileNameOnly) );
+
     return    readHead3Bytes(encFile2Read, additionalExponentFlag, specialCharAry, errorMsg)
            && readTailKeyBytes(encFile2Read, illFileSize, additionalExponentFlag, specialCharAry, bIsBigEndian, bRightShiftFlag,  errorMsg)
            && skipReadDummyBytes(encFile2Read, additionalExponentFlag, errorMsg)
@@ -1718,11 +1736,14 @@ int FNEDCore::getNBit(char ch, int idx)
 // static
 bool FNEDCore::is2FileEqual(const QString& fname1, const QString& fname2, QString& errorMsg)
 {
+    QFileInfo fInfo1( fname1 );
+    QFileInfo fInfo2( fname2 );
+    emit update_fileName_processInfo( QString("%1 VS %2").arg( fInfo1.fileName() ).arg( fInfo2.fileName() ) );
+
     return FNEDCore::s_bCmpUseMapOp  ? is2FileEqual_MapMem(fname1, fname2, errorMsg)
                                      : is2FileEqual_Normal(fname1, fname2, errorMsg);
 }
 
-// static 
 bool FNEDCore::is2FileEqual_Normal(const QString& fname1, const QString& fname2, QString& errorMsg)
 {
     qint64 fSz1 = 0;
@@ -1740,6 +1761,7 @@ bool FNEDCore::is2FileEqual_Normal(const QString& fname1, const QString& fname2,
         return false;
     }
     fSz2 = file2.size();
+
 
     if ( fSz1 != fSz2 ) {
         errorMsg = QString("file1.size() != file2.size().   %1 != %2 ").arg( fSz1 ).arg( fSz2 );
@@ -1765,6 +1787,7 @@ bool FNEDCore::is2FileEqual_Normal(const QString& fname1, const QString& fname2,
             }
         }
 
+        emit updateFileContent( (i+1) * sc_ll_cmpBlockSize * 1.0 / fSz1 * 100.0f );
         if ( !bIsSame ) {
             break;
         }
@@ -1780,15 +1803,18 @@ bool FNEDCore::is2FileEqual_Normal(const QString& fname1, const QString& fname2,
                 errorMsg = QString("2 char are not same. @position %1 , '%2' != %3").arg( (blockCnt*sc_ll_cmpBlockSize) + j ).arg( QString( QByteArray::number(static_cast<int>(buf1[j] & 0xFF), 16).toUpper() ) ).arg(  QString( QByteArray::number(static_cast<int>(buf2[j] & 0xFF), 16).toUpper() )  );
                 break;
             }
+            emit updateFileContent( blockCnt * sc_ll_cmpBlockSize + (j+1) * 1.0 / fSz1 * 100.0f );
         }
     }
+    updateFileContent( 100.0f );
+
     file1.close();
     file2.close();
 
     return bIsSame;
 }
 
-// static 
+
 bool FNEDCore::is2FileEqual_MapMem(const QString& fname1, const QString& fname2, QString& errorMsg)
 {
     qint64 fSz1 = 0;
@@ -1842,7 +1868,10 @@ bool FNEDCore::is2FileEqual_MapMem(const QString& fname1, const QString& fname2,
             missMatchedIdx = i;
             break;
         }
+
+        emit updateFileContent( (i+1) * 1.0f / fSz1 * 100.0f );
     }
+    updateFileContent( 100.0f );
 
     if ( !bIsSame ) {
         errorMsg = QString("Find difference @ position [%1] , %2 != %3 . ").arg( missMatchedIdx ).arg( static_cast<char>( buf1[missMatchedIdx] )  ).arg( static_cast<char>( buf2[missMatchedIdx] ) );

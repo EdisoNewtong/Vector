@@ -53,7 +53,7 @@ private slots:
     void on_cmpSplitBtn_stateChanged(int checkState);
 
     void on_printFileList(const QString& fileListSortByLayers);
-
+    void on_updateProcessingFileName(const QString& fileName);
 private:
     // method
     QThread::Priority getThreadPriority();

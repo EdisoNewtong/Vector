@@ -592,7 +592,7 @@ void WorkThread::do_CmpOp()
         m_timer_i.start();
 
         QString errorMsg;
-        auto b = FNEDCore::is2FileEqual( it->first, it->second, errorMsg);
+        auto b = ( m_pEncDecObj!=nullptr && m_pEncDecObj->is2FileEqual( it->first, it->second, errorMsg) );
         if ( b ) {
             emit updateFileListProcessState( QString("[SUCC] Compared Same files %1 = %2 files! elapsed time : %3.").arg( it->first ).arg( it->second ).arg( sec2min2hour( m_timer_i.elapsed() / 1000.0) ) );
         } else {
