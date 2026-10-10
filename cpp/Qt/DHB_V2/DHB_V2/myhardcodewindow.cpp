@@ -12,7 +12,10 @@
 #include <QGridLayout>
 #include <QPushButton>
 #include <QCheckBox>
-#include <QRegExp>
+
+#include <QRegularExpression>
+#include <QRegularExpressionMatch>
+
 #include <QApplication>
 #include <QClipboard>
 #include <QTextStream> //  for type   QDataStream
@@ -974,16 +977,18 @@ void myhardcodewindow::updateInputPromptInfo()
 
 void myhardcodewindow::doBinaryConvert()
 {
-    static const QRegExp radix2("\\s*[01]+\\s*");
-    static const QRegExp radix8("\\s*[0-7]+\\s*");
-    static const QRegExp radix16("\\s*[0-9a-fA-F]+\\s*");
-    static const QRegExp radix10("\\s*[+-]?[0-9]+\\s*");
-    static const QRegExp* radixAry[] = {
-        &radix2,    // #0
-        &radix8,    // #1
-        &radix16,   // #2
-        &radix10    // #3
+    static const QRegularExpression radix2("\\s*[01]+\\s*");
+    static const QRegularExpression radix8("\\s*[0-7]+\\s*");
+    static const QRegularExpression radix16("\\s*[0-9a-fA-F]+\\s*");
+    static const QRegularExpression radix10("\\s*[+-]?[0-9]+\\s*");
+    static const QRegularExpression* radixAry[] = {
+        &radix2,  // [0]
+        &radix8,  // [1]
+        &radix16, // [2]
+        &radix10  // [3]
     };
+
+
 
     static const QString regexDetailAry[] = {
         "[01]+",
@@ -1022,7 +1027,7 @@ void myhardcodewindow::doBinaryConvert()
         {
             // m_shortBits
             if (  bohd < arysz ) {
-                if( !radixAry[bohd]->exactMatch(inputText) ) {
+                if( !radixAry[bohd]->match(inputText).hasMatch() ) {
                     m_pStatusBar->showMessage( QString("Invalid  Input!!! Format must be %1").arg(regexDetailAry[bohd]), m_errorMsgShowTime );
                     m_pDecialCharDetailBox->setStyleSheet("QLineEdit { color : red }");
                     m_pDecialCharDetailBox->setText( QString("Invalid  Input!!! Format must be %1").arg(regexDetailAry[bohd]));
@@ -1043,7 +1048,7 @@ void myhardcodewindow::doBinaryConvert()
     case 2: // int
         {
             if (  bohd < arysz ) {
-                if( !radixAry[bohd]->exactMatch(inputText) ) {
+                if( !radixAry[bohd]->match(inputText).hasMatch() ) {
                     m_pStatusBar->showMessage( QString("Invalid  Input!!! Format must be %1").arg(regexDetailAry[bohd]), m_errorMsgShowTime );
                     m_pDecialCharDetailBox->setStyleSheet("QLineEdit { color : red }");
                     m_pDecialCharDetailBox->setText( QString("Invalid  Input!!! Format must be %1").arg(regexDetailAry[bohd]));
@@ -1065,7 +1070,7 @@ void myhardcodewindow::doBinaryConvert()
     case 3: // long
         {
             if (  bohd < arysz ) {
-                if( !radixAry[bohd]->exactMatch(inputText) ) {
+                if( !radixAry[bohd]->match(inputText).hasMatch() ) {
                     m_pStatusBar->showMessage( QString("Invalid  Input!!! Format must be %1").arg(regexDetailAry[bohd]), m_errorMsgShowTime );
                     m_pDecialCharDetailBox->setStyleSheet("QLineEdit { color : red }");
                     m_pDecialCharDetailBox->setText( QString("Invalid  Input!!! Format must be %1").arg(regexDetailAry[bohd]));
@@ -1087,7 +1092,7 @@ void myhardcodewindow::doBinaryConvert()
     case 4: // long long
         {
             if ( bohd < arysz ) {
-                if( !radixAry[bohd]->exactMatch(inputText) ) {
+                if( !radixAry[bohd]->match(inputText).hasMatch() ) {
                     m_pStatusBar->showMessage( QString("Invalid  Input!!! Format must be %1").arg(regexDetailAry[bohd]), m_errorMsgShowTime );
                     m_pDecialCharDetailBox->setStyleSheet("QLineEdit { color : red }");
                     m_pDecialCharDetailBox->setText( QString("Invalid  Input!!! Format must be %1").arg(regexDetailAry[bohd]));
