@@ -33,6 +33,7 @@ WorkThread::WorkThread(QObject* parent /* = nullptr */)
     , m_dirs()
     , m_files()
     , m_createdDirs()
+    , m_sampleFileList()
     , m_randomDirVisitProcessNumber(0)
     , m_reached_max_layer(0)
     , m_fileCnt(0)
@@ -134,6 +135,60 @@ void WorkThread::visitDir()
     qDebug() << "m_reached_max_layer = " << m_reached_max_layer;
     qDebug() << "m_fileCnt = " << m_fileCnt;
     // emit travelsalEnd( ... )
+}
+
+
+void WorkThread::visitDirSample()
+{
+    m_sampleFileList.clear();
+
+    // collect files
+    travelsalDirWithLayerSample( m_oriDir, 0 );
+}
+
+void WorkThread::travelsalDirWithLayerSample(const QString& path, int layer)
+{
+    QDir dPath(path);
+
+    QDir::Filters fltFlag =    QDir::AllEntries
+                             | QDir::NoDotAndDotDot
+                             | QDir::Hidden
+                             | QDir::System
+                             | QDir::CaseSensitive;
+
+    // QDir::SortFlag sortFlag = QDir::DirsFirst;
+    QDir::SortFlag sortFlag = QDir::NoSort;
+
+    QFileInfoList children = dPath.entryInfoList(fltFlag, sortFlag);
+    int children_cnt = children.size();
+
+    QDir sourceBase( m_oriDir );
+    for ( auto i = 0; i < children_cnt; ++i ) {
+        auto entry = children.at(i);
+
+        auto bIsDir = entry.isDir();
+        auto bIsFile = entry.isFile();
+        // auto bIsSymlink = entry.isSymLink();
+
+        if ( bIsDir ) {
+            // recursive call
+            travelsalDirWithLayerSample( entry.absoluteFilePath(), layer + 1);
+        } else if ( bIsFile ) {
+            ////////////////////////////////////////////////////////////////////////////////////////////////////
+            // Core Core Core :
+            //
+            //           QDir                        d("F:/Resources");
+            //           auto ret = d.relativeFilePath("F:/Resources/Pictures/MeAvatar/Node.jpg");
+            //           //   ret =                                 "Pictures/MeAvatar/Node.jpg"
+            ////////////////////////////////////////////////////////////////////////////////////////////////////
+            m_sampleFileList.push_back( sourceBase.relativeFilePath( entry.absoluteFilePath() ) );
+        } 
+        /*
+        else {
+            // neither <Dir> Nor <File>
+        }
+        */
+    }
 }
 
 
@@ -503,15 +558,8 @@ void WorkThread::do_CmpOp()
 
     if ( m_cmpSubType == 1 ) {
         // Compare 2 dirs
-        // TODO :
-
-        // Step #0
-        initVaribles();
-
-        // Step #1 : visit original dir and prepare the file list
-        visitDir();
-
-
+        visitDirSample();
+        preparePairsGroup( filePairList );
     } else if ( m_cmpSubType == 2 ) {
         // a lot of pairs to compare , each file with 2 files seperated by ';'
         for( auto it = fileList.cbegin(); it != fileList.cend() ; ++it ) {
@@ -612,6 +660,28 @@ void WorkThread::process_DecTravesalFileList()
     }
 
 }
+
+
+void WorkThread::preparePairsGroup(QVector< QPair<QString,QString> >& refPairGroup)
+{
+    refPairGroup.clear();
+    QString sourceDir = m_oriDir; 
+    if ( sourceDir.endsWith("/") ) {
+        sourceDir.chop(1);
+    }
+
+    QString destDir = m_destDir; 
+    if ( destDir.endsWith("/") ) {
+        destDir.chop(1);
+    }
+
+    for ( auto it = m_sampleFileList.cbegin(); it != m_sampleFileList.cend(); ++it ) {
+        refPairGroup.push_back( qMakePair( QString("%1/%2").arg( sourceDir ).arg(*it), 
+                                           QString("%1/%2").arg( destDir   ).arg(*it) ) 
+                              );
+    }
+}
+
 
 
 

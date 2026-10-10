@@ -330,6 +330,7 @@ void MainWindow::on_givenFileListBtn_stateChanged(int checkState)
 
     ui->srcPath->setEnabled(  !isChecked );
     ui->destPath->setEnabled( !isChecked );
+
     if ( ui->encBtn->isChecked()  ) {
         if ( isChecked ) {
             ui->outputFileBtn->setCheckState( Qt::Unchecked );
@@ -340,10 +341,11 @@ void MainWindow::on_givenFileListBtn_stateChanged(int checkState)
         ui->buildDirOnlyBtn->setEnabled( !isChecked );
         ui->fileListWnd->setEnabled( isChecked );
     } else if ( ui->decBtn->isChecked()  ) {
-        
+
+        ui->fileListWnd->setEnabled( isChecked );
     } else if ( ui->cmpBtn->isChecked() ) {
-        ui->cmpSplitBtn->setEnabled( !isChecked );
-        ui->cmpSplitBtn->setCheckState( Qt::Unchecked );
+        ui->cmpSplitBtn->setEnabled( isChecked );
+        // ui->cmpSplitBtn->setCheckState( Qt::Unchecked );
 
         ui->fileListWnd->setEnabled( isChecked );
         

@@ -58,6 +58,8 @@ protected:
     int     m_cmpSubType; 
     
     void visitDir();
+    void visitDirSample();
+    void preparePairsGroup(QVector< QPair<QString,QString> >& refPairGroup);
 
     void do_EncOp();
     void process_EncTravesalFileList();
@@ -72,11 +74,13 @@ protected:
     void buildNewDirsOnDestintion();
 
     void travelsalDirWithLayer(const QString& path, int layer);
+    void travelsalDirWithLayerSample(const QString& path, int layer);
     void initVaribles();
 
     QMap<int, QSet<QString> > m_dirs;
     QMap<int, QSet<QString> > m_files;
     QSet<QString> m_createdDirs;
+    QStringList               m_sampleFileList;
 
     int m_randomDirVisitProcessNumber;
     int m_reached_max_layer;
