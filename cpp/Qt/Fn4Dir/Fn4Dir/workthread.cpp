@@ -168,21 +168,23 @@ void WorkThread::travelsalDirWithLayerSample(const QString& path, int layer)
 
         auto bIsDir = entry.isDir();
         auto bIsFile = entry.isFile();
-        // auto bIsSymlink = entry.isSymLink();
+        auto bIsSymlink = entry.isSymLink();
 
-        if ( bIsDir ) {
-            // recursive call
-            travelsalDirWithLayerSample( entry.absoluteFilePath(), layer + 1);
-        } else if ( bIsFile ) {
-            ////////////////////////////////////////////////////////////////////////////////////////////////////
-            // Core Core Core :
-            //
-            //           QDir                        d("F:/Resources");
-            //           auto ret = d.relativeFilePath("F:/Resources/Pictures/MeAvatar/Node.jpg");
-            //           //   ret =                                 "Pictures/MeAvatar/Node.jpg"
-            ////////////////////////////////////////////////////////////////////////////////////////////////////
-            m_sampleFileList.push_back( sourceBase.relativeFilePath( entry.absoluteFilePath() ) );
-        } 
+        if ( !bIsSymlink ) {
+            if ( bIsDir ) {
+                // recursive call
+                travelsalDirWithLayerSample( entry.absoluteFilePath(), layer + 1);
+            } else if ( bIsFile ) {
+                ////////////////////////////////////////////////////////////////////////////////////////////////////
+                // Core Core Core :
+                //
+                //           QDir                        d("F:/Resources");
+                //           auto ret = d.relativeFilePath("F:/Resources/Pictures/MeAvatar/Node.jpg");
+                //           //   ret =                                 "Pictures/MeAvatar/Node.jpg"
+                ////////////////////////////////////////////////////////////////////////////////////////////////////
+                m_sampleFileList.push_back( sourceBase.relativeFilePath( entry.absoluteFilePath() ) );
+            } 
+        }
         /*
         else {
             // neither <Dir> Nor <File>
@@ -229,34 +231,35 @@ void WorkThread::travelsalDirWithLayer( const QString& path, int layer )
 
         auto bIsDir = entry.isDir();
         auto bIsFile = entry.isFile();
-        // auto bIsSymlink = entry.isSymLink();
+        auto bIsSymlink = entry.isSymLink();
+        if ( !bIsSymlink ) {
+            if ( bIsDir ) {
+                //////////////////////////////////////////////////
+                //
+                // recursive call
+                //
+                //////////////////////////////////////////////////
+                ++subDirCnt;
+                travelsalDirWithLayer( entry.absoluteFilePath(), layer + 1);
+            } else if ( bIsFile ) {
+                ++subFilesCnt;
+                ++m_fileCnt;
+                // qDebug() << entry.absoluteFilePath();
 
-        if ( bIsDir ) {
-            //////////////////////////////////////////////////
-            //
-            // recursive call
-            //
-            //////////////////////////////////////////////////
-            ++subDirCnt;
-            travelsalDirWithLayer( entry.absoluteFilePath(), layer + 1);
-        } else if ( bIsFile ) {
-            ++subFilesCnt;
-            ++m_fileCnt;
-            // qDebug() << entry.absoluteFilePath();
+                // if ( m_bPrintFileListOnly ) {
+                //     emit aNewFileComes ( entry.absoluteFilePath() );
+                // }
 
-            // if ( m_bPrintFileListOnly ) {
-            //     emit aNewFileComes ( entry.absoluteFilePath() );
-            // }
-
-            // Added into file list
-            auto it =  m_files.find( layer );
-            if ( it == m_files.end() ) {
-                // QSet<QString> files{ entry.absoluteFilePath() };
-                m_files.insert( layer, QSet<QString>{ entry.absoluteFilePath() } ); 
-            } else {
-                it.value().insert( entry.absoluteFilePath()  );
-            }
-        } 
+                // Added into file list
+                auto it =  m_files.find( layer );
+                if ( it == m_files.end() ) {
+                    // QSet<QString> files{ entry.absoluteFilePath() };
+                    m_files.insert( layer, QSet<QString>{ entry.absoluteFilePath() } ); 
+                } else {
+                    it.value().insert( entry.absoluteFilePath()  );
+                }
+            } 
+        }
         /*
         else {
             // neither <Dir> Nor <File>

@@ -242,7 +242,7 @@ bool FNEDCore::encryptFile(const QString& fileAbsPath, QString& errorMsg)
     }
     qint64 illFileSize = originalFile.size();
     if ( illFileSize <= 1 ) {
-        errorMsg = QString("File size is %1, Do Nothing. ").arg( illFileSize );
+        errorMsg = QString("File '%1' size is %2, Do Nothing. ").arg( fileAbsPath ).arg( illFileSize );
         return false;
     }
 
@@ -275,7 +275,7 @@ bool FNEDCore::encryptFile_withArg(const QString& fileAbsPath, int arg, QString&
     }
     qint64 illFileSize = originalFile.size();
     if ( illFileSize <= 1 ) {
-        errorMsg = QString("File size is %1, Do Nothing. ").arg( illFileSize );
+        errorMsg = QString("File '%1' size is %2, Do Nothing. ").arg( fileAbsPath ).arg( illFileSize );
         return false;
     }
 
@@ -307,7 +307,7 @@ bool FNEDCore::encryptFile_dest(const QString& fileAbsPath, const QString& oriDi
     }
     qint64 illFileSize = originalFile.size();
     if ( illFileSize <= 1 ) {
-        errorMsg = QString("File size is %1, Do Nothing. ").arg( illFileSize );
+        errorMsg = QString("File '%1' size is %2, Do Nothing. ").arg( fileAbsPath ).arg( illFileSize );
         return false;
     }
 
@@ -1787,7 +1787,7 @@ bool FNEDCore::is2FileEqual_Normal(const QString& fname1, const QString& fname2,
             }
         }
 
-        emit updateFileContent( (i+1) * sc_ll_cmpBlockSize * 1.0 / fSz1 * 100.0f );
+        emit updateFileContent( (i+1) * sc_ll_cmpBlockSize * 1.0f / fSz1 * 100.0f );
         if ( !bIsSame ) {
             break;
         }
@@ -1803,7 +1803,7 @@ bool FNEDCore::is2FileEqual_Normal(const QString& fname1, const QString& fname2,
                 errorMsg = QString("2 char are not same. @position %1 , '%2' != %3").arg( (blockCnt*sc_ll_cmpBlockSize) + j ).arg( QString( QByteArray::number(static_cast<int>(buf1[j] & 0xFF), 16).toUpper() ) ).arg(  QString( QByteArray::number(static_cast<int>(buf2[j] & 0xFF), 16).toUpper() )  );
                 break;
             }
-            emit updateFileContent( blockCnt * sc_ll_cmpBlockSize + (j+1) * 1.0 / fSz1 * 100.0f );
+            emit updateFileContent( blockCnt * sc_ll_cmpBlockSize + (j+1) * 1.0f / fSz1 * 100.0f );
         }
     }
     updateFileContent( 100.0f );

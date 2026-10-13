@@ -239,7 +239,7 @@ void MainWindow::on_updateFileListProcessState(const QString& msg)
 
 void MainWindow::on_updateFileListPrograssBar(float per)
 {
-
+    // qDebug() << "Need Check total percentage : " << per;
     auto iVal = ui->progressTotalBar->value();
     int  i_percent = static_cast<int>( per );
     if ( i_percent > 100 ) {
@@ -247,6 +247,7 @@ void MainWindow::on_updateFileListPrograssBar(float per)
     }
 
     if ( iVal != i_percent ) {
+        // qDebug() << "Update total percentage : " << i_percent;
         ui->progressTotalBar->setValue( i_percent );
     }
 }
