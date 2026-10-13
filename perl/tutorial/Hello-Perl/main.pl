@@ -1,7 +1,10 @@
 #!/usr/bin/perl 
 
-use strict;
-use warnings;
+
+=pod
+  use strict;
+  use warnings;
+=cut 
 
 
 ####################################################################################################
@@ -16,8 +19,6 @@ use warnings;
      line 3 is commented 
 
 =cut 
-
-
 
 
 
@@ -67,5 +68,4 @@ News N : Content of news #N
 
 
 print("long string #2 = $long_str_2\n");
-
 
