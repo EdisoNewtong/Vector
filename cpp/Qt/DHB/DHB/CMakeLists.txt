@@ -1,4 +1,3 @@
-
 cmake_minimum_required(VERSION 3.16)
 
 project(DHB VERSION 0.1 LANGUAGES CXX)
@@ -15,12 +14,9 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 
 set(PROJECT_SOURCES
         mainwindow.cpp
-main.cpp
-
+        main.cpp
         mainwindow.h
-
         mainwindow.ui
-
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

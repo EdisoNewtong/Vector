@@ -12,15 +12,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core5Compat)
+# find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core5Compat)
 
 set(PROJECT_SOURCES
         myhardcodewindow.cpp
-main.cpp
-
+        main.cpp
         myhardcodewindow.h
-
-        
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -48,7 +45,7 @@ else()
 endif()
 
 target_link_libraries(DHB_V2 PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
-target_link_libraries(DHB_V2 PRIVATE Qt${QT_VERSION_MAJOR}::Core5Compat)
+# target_link_libraries(DHB_V2 PRIVATE Qt${QT_VERSION_MAJOR}::Core5Compat)
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
