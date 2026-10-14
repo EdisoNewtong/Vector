@@ -146,6 +146,7 @@ void MainWindow::on_goBtn_clicked()
         m_pThread->setTake_EncryptActionFlag( bDoEncryptFlag );
         // set args
         if ( ui->givenFileListBtn->checkState() == Qt::Checked ) {
+            m_pThread->setPath( "", "", m_pEncDecObject );
             m_pThread->fillFileList( ui->fileListWnd->toPlainText() );
         } else {
             m_pThread->setPath( ui->srcPath->text(), ui->destPath->text(), m_pEncDecObject );
@@ -160,6 +161,7 @@ void MainWindow::on_goBtn_clicked()
 
         // set args
         if ( ui->givenFileListBtn->checkState() == Qt::Checked ) {
+            m_pThread->setPath( "", "", m_pEncDecObject );
             m_pThread->fillFileList( ui->fileListWnd->toPlainText() );
         } else {
             m_pThread->setPath( ui->srcPath->text(), ui->destPath->text(), m_pEncDecObject );

@@ -13,9 +13,9 @@ static const QString sc_encSuffix("enc");
 static const QString sc_decSuffix("dec");
 
 static const QString ruleTmp[2] = { "MP4", "WMV"  };
-static const QString rule1[2] = { "MP4", "MWV"  };
-static const QString rule2[2] = { "DNG", "RAW"  };
-static const QString rule3[2] = { "JPG", "WEBP" };
+static const QString rule1[2]   = { "MP4", "MWV"  };
+static const QString rule2[2]   = { "DNG", "RAW"  };
+static const QString rule3[2]   = { "JPG", "WEBP" };
 
 
 
