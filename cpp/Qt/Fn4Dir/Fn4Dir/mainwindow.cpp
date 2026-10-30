@@ -300,6 +300,8 @@ void MainWindow::on_decWithNewNameBtn_stateChanged(int checkState)
 void MainWindow::on_outputFileBtn_clicked()
 {
     ui->statusbar->showMessage( QStringLiteral("Travelsal Source Dir and output the scanned files [Only] ."), 5000);
+    // After Click action finished, the widget named "ui->outputFileBtn"'s  check state will be changed 
+    ui->fileListWnd->setEnabled( ui->outputFileBtn->checkState() == Qt::Checked );
 }
 
 // void MainWindow::on_givenFileListBtn_clicked()
