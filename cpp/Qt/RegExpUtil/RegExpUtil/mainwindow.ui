@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1248</width>
+    <width>1250</width>
     <height>1082</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Escaple-Sequence</string>
+   <string>Regular Expression Util</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout" stretch="6,2,2,3,2">
