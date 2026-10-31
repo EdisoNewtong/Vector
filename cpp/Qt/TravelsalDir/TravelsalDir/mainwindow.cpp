@@ -952,6 +952,7 @@ void MainWindow::focusSearchMatched()
             ui->visitResultTree->setCurrentItem(selItem, 0, QItemSelectionModel::ClearAndSelect );
             ui->visitResultTree->scrollToItem( selItem );
 
+            ui->statusbar->showMessage( QString("%1 items matched. Now Focus on %2/%3").arg(sz).arg(m_currentPreviousNextIdx+1).arg(sz) , 3000 );
         }
     }
 }
@@ -1163,8 +1164,6 @@ void MainWindow::on_displayFileContent()
     }
 }
 
-
-
 void MainWindow::fill_fileGroupTreeNode()
 {
     // local storage to prevent it has been changed during the function fill_fileGroupTreeNode() executed.
@@ -1223,6 +1222,8 @@ void MainWindow::fill_fileGroupTreeNode()
                             for ( auto fIt = fileInfoList.begin(); fIt!=fileInfoList.end(); ++fIt ) {
                                 // file Node
                                 QTreeWidgetItem *pFile = new QTreeWidgetItem( subMTextRoot );
+                                m_generatedTreeNodeList.push_back( pFile );
+
                                 auto absInnerPath = fIt->absolutePath();
                                 pFile->setText(0, QString("%1").arg( fIt->fileName() ) ); // fileName only
                                 pFile->setText(1, QString("%1  %2").arg( absInnerPath  ).arg( fIt->fileName() ) ); // file path
@@ -1284,6 +1285,7 @@ void MainWindow::fill_fileGroupTreeNode()
                     auto fList = normalIt.value();
                     for ( auto fIt = fList.begin(); fIt != fList.end() ; ++fIt ) {
                         QTreeWidgetItem *pFile = new QTreeWidgetItem( pFileSubExtTreeRoot );
+                        m_generatedTreeNodeList.push_back( pFile );
 
                         pFile->setText(0, QString("%1").arg( fIt->fileName() ) );
                         pFile->setText(1, QString("%1  %2").arg( fIt->absolutePath() ).arg( fIt->fileName() ) );
@@ -1332,6 +1334,7 @@ void MainWindow::fill_fileGroupTreeNode()
 
             for( auto fIt = fList.begin(); fIt != fList.end(); ++fIt ) {
                 QTreeWidgetItem *pFile = new QTreeWidgetItem( specialRoot1 );
+                m_generatedTreeNodeList.push_back( pFile );
 
                 pFile->setText(0, QString("%1").arg( fIt->fileName() ) );
                 pFile->setText(1, QString("%1  %2").arg( fIt->absolutePath() ).arg( fIt->fileName() ) );
@@ -1379,6 +1382,7 @@ void MainWindow::fill_fileGroupTreeNode()
 
             for( auto fIt = fList.begin(); fIt != fList.end(); ++fIt ) {
                 QTreeWidgetItem *pFile = new QTreeWidgetItem( specialRoot2 );
+                m_generatedTreeNodeList.push_back( pFile );
 
                 pFile->setText(0, QString("%1").arg( fIt->fileName() ) );
                 pFile->setText(1, QString("%1  %2").arg( fIt->absolutePath() ).arg( fIt->fileName() ) );
