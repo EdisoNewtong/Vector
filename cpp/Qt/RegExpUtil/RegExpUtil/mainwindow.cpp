@@ -20,6 +20,8 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
+    test_Study_perl_reg();
+
     init_WidgetAry();
     init_UI();
 }
@@ -275,4 +277,47 @@ QRegularExpression::PatternOptions    MainWindow::getPatternOptions()
 
     return static_cast<QRegularExpression::PatternOptions>( flags ) ;
 }
+
+
+void MainWindow::test_Study_case0()
+{    
+    // The word anchor \b matches a **[Boundary]** between a word character and a non-word character \w\W or \W\w      : 
+    //                          [9,12)
+    //           Matched |<Space>cat| inside catenates 
+    // QString mainString("Housecat catenates house and cat");
+    QString mainString("aaa");
+    //                          [s^^)
+    //                          
+
+    QRegularExpression re("\\bcat");
+    if ( !re.isValid() ) {
+        qDebug() << "\\b is not valid inside a reg : " << re.errorString();
+    } else {
+        auto mthRet = re.match( mainString );
+        qDebug() << "anchor [Boundary]  \\b" << (mthRet.hasMatch() ? " [[ Matched ]] :)" : " [[ NOT ]] Matched!! ");
+        QString capturedstr = mthRet.captured(0);
+        int beg_pos = mthRet.capturedStart(0); // position is included.
+        int end_pos = mthRet.capturedEnd(0);   // position is excluded.
+        qDebug() << "Captured = " << capturedstr << ", " <<  (mthRet.hasPartialMatch() ? " Partial Match " : " [NOT] Partial Match ");
+        qDebug() << QString("1. beg = %1, end = %2").arg(beg_pos).arg(end_pos);
+        qDebug() << "capturedTexts = " << mthRet.capturedTexts();
+    }
+
+
+}
+
+void MainWindow::test_Study_case1()
+{
+}
+    
+void MainWindow::test_Study_perl_reg()
+{
+    // Boundary match
+    test_Study_case0();
+
+    test_Study_case1();
+
+}
+
+
 

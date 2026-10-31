@@ -1,10 +1,10 @@
 #!/usr/bin/perl 
 
-=pod
+# use strict;
+# use strict;
+# use warning;
 
-  # use strict;
-  # use strict;
-  # use warning;
+=pod
 
   use re 'strict';
   use re '/msxx';
@@ -14,10 +14,6 @@
   use re '/x';
 
 =cut
-
-
-
-
 
 $num11  = 123;
 $str11  = "123";
@@ -217,7 +213,7 @@ my $tmpBool_1 = "x}" =~ /x}/;
 my $tmpBool_2 = "x}" =~ /x\}/;
 if ( $tmpBool_1 ) { print("tmpBool_1 = true\n"); } else { print("tmpBool_1 = false\n"); }
 if ( $tmpBool_2 ) { print("tmpBool_2 = true\n"); } else { print("tmpBool_2 = false\n"); }
-
+print("\n");
 
 =pod
 my $sss1 = "kkk 
@@ -234,7 +230,7 @@ if ( $sss2 =~ m/kkk abc/  ) { print("tmpBool_6 = true\n"); } else { print("tmpBo
 =cut
 
 
-
+=pod 
 my $aaa = 3;
 my $bbb = 4;
 my $ssss1 = "abc";
@@ -243,25 +239,61 @@ my $ssss2 = 'abc';
 my $varInfo1 = ref($aaa);    
 print "|", ref(\$aaa), "|\n"; print "\n";    print "ref(varInfo1) = ", ref($varInfo1) , "\n";
 my $varInfo2 = ref($ssss1);  print $varInfo2; print "\n";    print "ref(varInfo2) = ", ref($varInfo2) , "\n";
+=cut
 
 
 
-unless ( $aaa < $bbb ) {
-    print "in unless : if \n";
+my $s_con1 = 'aa' . '\\' . 'bb';
+my $s_con2 = 'aa' . '\\\\' . 'bb';
+print("s_con1 = $s_con1\n");
+print("s_con2 = $s_con2\n");
+
+
+if ( $s_con1 =~ /aa\\\\bb/ ) {
+    print "$s_con1 =~ ! aa\\\\bb !  => true\n";
 } else {
-    print "in unless : else \n";
+    print "$s_con1 =~ ! aa\\\\bb !  => false\n";
+}
+
+if ( $s_con1 =~ /aa\\bb/ ) {
+    print "$s_con1 =~ ! aa\\bb !   => true\n";
+} else {
+    print "$s_con1 =~ ! aa\\bb !   => false\n";
+}
+
+if ( $s_con2 =~ /aa\\\\bb/ ) {
+    print "$s_con2 =~ ! aa\\\\bb !   => true\n";
+} else {
+    print "$s_con2 =~ ! aa\\\\bb !  => false\n";
+}
+
+if ( $s_con2 =~ /aa\\bb/ ) {
+    print "$s_con2 =~ ! aa\\bb !   => true\n";
+} else {
+    print "$s_con2 =~ ! aa\\bb !   => false\n";
 }
 
 
+print "\n\n";
+if ( "aa cc" =~ /aa\bcc/ ) {
+    print "1. Match back-slash B \n";
+} else {
+    print "1. [NOT] match back-slash B \n";
+}
 
 
+if ( "aa cc" =~ /aa\\bcc/ ) {
+    print "2. Match back-slash B \n";
+} else {
+    print "2. [NOT] match back-slash B \n";
+}
 
 
-
-
-
-
-
+if ( "aa-cc" =~ /aa\\bcc/ ) {
+    print "3. Match back-slash B \n";
+} else {
+    print "3. [NOT] match back-slash B  \n";
+}
 
 
 =pod
@@ -305,8 +337,6 @@ $   Match the end of the string                  Not in [], but can
 ####################################################################################################
 
 =cut
-
-
 
 
 

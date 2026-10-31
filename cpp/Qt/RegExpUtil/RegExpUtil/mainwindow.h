@@ -45,13 +45,17 @@ protected:
     void init_UI();
     void init_WidgetAry();
 
+    void test_Study_perl_reg();
+    void test_Study_case0();
+    void test_Study_case1();
+
 private:
     Ui::MainWindow *ui;
 
 protected:
     QPair<QCheckBox*,unsigned int>      m_uiMatchOptWidgetAry[SC_MatchOptCnt];
     QPair<QRadioButton*,unsigned int>   m_uiMatchTypeWidgetAry[SC_MatchTypeCnt];
-    QPair<QCheckBox*,unsigned>          m_uiPatternOptWidgetAry[SC_PatternOptCnt];
+    QPair<QCheckBox*,unsigned int>          m_uiPatternOptWidgetAry[SC_PatternOptCnt];
 
     QRegularExpression::MatchType        getMatchType();
     QRegularExpression::MatchOptions     getMatchOptions();
