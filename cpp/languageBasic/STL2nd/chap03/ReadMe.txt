@@ -3,7 +3,7 @@
 3.1.3  : Uniform Initialization and Initializer Lists
 3.1.4  : Range-Based for Loops
 3.1.5  : Move Semanitcs and RValue References
-3.1.6  : New String Literals
+3.1.6  : New String Literals ( Raw string )
 3.1.7  : keyword noexcept
 3.1.8  : keyword constexpr
 3.1.9  : New Template Features : Variadic(可变的,这里的可变指的是 : 模板的参数的数量 是 可变长的) Template
