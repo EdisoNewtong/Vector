@@ -1,16 +1,23 @@
 use std::fs;
 use std::io::prelude::*;
 
+use std::thread;
+use std::time::Duration;
+
 use std::net::TcpListener;
 use std::net::TcpStream;
 
-
+use web_server::ThreadPool;
 
 
 fn main() {
     // static mut CON_CNT: u32 = 0 as u32;
 
-    let listener = TcpListener::bind("127.0.0.1:12800").unwrap();
+    let listener = TcpListener::bind("localhost:12800").unwrap();
+    // 编译器驱动开发的模式 : 先把希望调用的函数或者类型给写上(无论对错)
+    // 然后根据编译器的错误再逐步完善代码
+    let pool = ThreadPool::new(4);
+
     let mut times: u32 = 0 as u32;
     println!("----------------------------------------------------------------------------------------------------");
     for stream in listener.incoming() {
@@ -19,7 +26,13 @@ fn main() {
         times = times + 1;
         // println!("Connection {} established!", times);
 
-        handle_connection(stream);
+        pool.execute( | | {
+            handle_connection(stream);
+        });
+
+        // thread::spawn( | | {
+        //     handle_connection(stream);
+        // });
     }
 }
 
@@ -50,10 +63,6 @@ fn handle_connection(mut stream: TcpStream) {
     //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
-
-
-
-
     /****************************************************************************************************
      
        request:
@@ -82,13 +91,17 @@ fn handle_connection(mut stream: TcpStream) {
     // Version #3 :
     // println!("c = {}",contents);
     //      'b' stands for the type byte string's prefix
-    let get = b"GET / HTTP/1.1\r\n";
+    let get   = b"GET / HTTP/1.1\r\n";
+    let sleep = b"GET /sleep HTTP/1.1\r\n";
 
     let (status_line, filename) = if buffer.starts_with(get) {
-        println!("in if ");
+        // println!("in if ");
+        ("HTTP/1.1 200 OK\r\n\r\n" , "hello_rust.html")
+    } else if buffer.starts_with(sleep) {
+        thread::sleep( Duration::from_secs(5) );
         ("HTTP/1.1 200 OK\r\n\r\n" , "hello_rust.html")
     } else {
-        println!("in else");
+        // println!("in else");
         ("HTTP/1.1 404 NOT FOUND\r\n\r\n" , "404.html")
     };
 
