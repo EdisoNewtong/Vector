@@ -20,7 +20,9 @@ fn main() {
 
     let mut times: u32 = 0 as u32;
     println!("----------------------------------------------------------------------------------------------------");
-    for stream in listener.incoming() {
+
+    // only process 2 requests at the same time 
+    for stream in listener.incoming().take(2) {
         let stream = stream.unwrap();
 
         times = times + 1;
@@ -34,6 +36,8 @@ fn main() {
         //     handle_connection(stream);
         // });
     }
+
+    println!("Shutting down.");
 }
 
 fn handle_connection(mut stream: TcpStream) {
