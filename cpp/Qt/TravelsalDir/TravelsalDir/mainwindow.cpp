@@ -14,6 +14,10 @@
 #include <QTableWidget>
 #include <QMap>
 
+// QVariant(1) -> file   
+// QVariant(2) -> dir
+
+
 static const bool sc_b_USE_ICON = true;
 
 static const QString sc_STATUS_BAR_SHEET_NONE("");
@@ -71,6 +75,8 @@ MainWindow::MainWindow(QWidget *parent)
     , m_currentPreviousNextIdx( -1 ) 
     , m_extTypeGroupCnt( 0 )
     , m_extTypeGroupPartCnt( 0 )
+    , m_matchedDirsCnt(0)
+    , m_matchedFilesCnt(0)
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     , m_treeFileIcon( new QIcon(":/icons/File.png") )
     , m_treeExtIcon(  new QIcon(":/icons/Ext.png")  )
@@ -307,6 +313,7 @@ void MainWindow::on_scanBtn_clicked()
         fill_ScanResultIntoTreeView( );
 
         ui->visitResultTree->setEnabled( true );
+        ui->visitResultTree->sortByColumn(0, Qt::AscendingOrder );
     } else {
         qDebug() << "Type == 2 :  Use Multi-Thread";
 
@@ -863,6 +870,7 @@ void MainWindow::onVisitAllFileFinished()
 
     fill_ScanResultIntoTreeView();
     ui->visitResultTree->setEnabled( true );
+    ui->visitResultTree->sortByColumn(0, Qt::AscendingOrder );
 }
 
 
@@ -898,6 +906,9 @@ void MainWindow::fill_ScanResultIntoTreeView()
 
 void MainWindow::on_resultFileSearhingInput_returnPressed()
 {
+    m_matchedDirsCnt = 0;
+    m_matchedFilesCnt = 0;
+
     m_searchMatchedResultNodeList.clear();
     m_currentPreviousNextIdx = -1;
     ui->previousBtn->setEnabled(false);
@@ -911,11 +922,21 @@ void MainWindow::on_resultFileSearhingInput_returnPressed()
         return;
     }
 
-
     auto bIsIgnoreSearchResultCaseSensitive = ui->prevNextIgnoreChk->isChecked();
     for ( auto item : m_generatedTreeNodeList ) {
         if ( item!=nullptr ) {
             if ( item->text(0).contains(strSearchWhat, bIsIgnoreSearchResultCaseSensitive ? Qt::CaseInsensitive : Qt::CaseSensitive) ) {
+                auto convertFlag = false;
+                // QVariant(1) -> file   QVariant(2) -> dir
+                int tag = item->data(0, Qt::UserRole).toInt(&convertFlag);
+                if ( convertFlag ) {
+                    if ( tag == 1 ) {
+                        ++m_matchedDirsCnt;
+                    } else if ( tag == 2 ) {
+                        ++m_matchedFilesCnt;
+                    }
+                }
+
                 m_searchMatchedResultNodeList.push_back( item );
             }
         }
@@ -952,7 +973,14 @@ void MainWindow::focusSearchMatched()
             ui->visitResultTree->setCurrentItem(selItem, 0, QItemSelectionModel::ClearAndSelect );
             ui->visitResultTree->scrollToItem( selItem );
 
-            ui->statusbar->showMessage( QString("%1 items matched. Now Focus on %2/%3").arg(sz).arg(m_currentPreviousNextIdx+1).arg(sz) , 3000 );
+            if( m_matchedDirsCnt == 0  ) {
+                ui->statusbar->showMessage( QString("%1 files matched. Now Focus on %2/%1").arg(sz).arg(m_currentPreviousNextIdx+1) , 3000 );
+            } else if ( m_matchedFilesCnt == 0 ) {
+                ui->statusbar->showMessage( QString("%1 dirs matched. Now Focus on %2/%1").arg(sz).arg(m_currentPreviousNextIdx+1) , 3000 );
+            } else {
+                //  fileCnt+ dirCnt  ( both are none-zero )
+                ui->statusbar->showMessage( QString("%1 items (%2 files + %3 dirs) matched. Now Focus on %4/%1").arg(sz).arg( m_matchedFilesCnt ).arg( m_matchedDirsCnt ).arg(m_currentPreviousNextIdx+1) , 3000 );
+            }
         }
     }
 }
@@ -1207,16 +1235,17 @@ void MainWindow::fill_fileGroupTreeNode()
                     // TODO ( Done ? ) , collected by directories    -->  oneMultiExtTreeRootWrap
                     if ( sc_b_USE_ICON ) { oneMultiExtTreeRootWrap->setIcon(0, *m_treeMtExtIcon ); }
 
-                    int subMultiCnt = 0;
+                    int subMultiIdx = 0;
                     for ( auto subIt = maybe_MultiExtTree.begin(); subIt != maybe_MultiExtTree.end(); ++subIt ) {
                         const auto& realext = subIt.key();
                         const auto& fileInfoList = subIt.value();
                         if ( !realext.isEmpty()  ) {
                             ++nKinds;
 
+
                             // Real Node  such as   ".back.txt" 
                             QTreeWidgetItem *subMTextRoot = new QTreeWidgetItem( oneMultiExtTreeRootWrap );
-                            subMTextRoot->setText(0, QString("#%1 %2").arg(subMultiCnt+1).arg(realext) );
+                            subMTextRoot->setText(0, QString("#%1 |  %2").arg(subMultiIdx+1).arg(realext) );
                             QMap<QString, int> subGroups;
                             // fill real file list
                             for ( auto fIt = fileInfoList.begin(); fIt!=fileInfoList.end(); ++fIt ) {
@@ -1264,7 +1293,7 @@ void MainWindow::fill_fileGroupTreeNode()
 
                             subMTextRoot->setText(1, QString("%1 groups : %2").arg( subGroups.size() ).arg( groupSortMsg ) );
                             subMTextRoot->setFlags( subMTextRoot->flags() | Qt::ItemIsEditable );
-                            ++subMultiCnt;
+                            ++subMultiIdx;
                         }
                     }
 
@@ -1470,25 +1499,25 @@ void MainWindow::fill_dirGroupTreeNode()
 QString MainWindow::getHumanReadableSize(qint64 fileSz)
 {
     static const qint64 SC_RATE   = 1024ll;
-    static const qint64 SC_ONE_KB = 1ll * 1024ll;
-    static const qint64 SC_ONE_MB = SC_ONE_KB * SC_RATE;
-    static const qint64 SC_ONE_GB = SC_ONE_MB * SC_RATE;
-    static const qint64 SC_ONE_TB = SC_ONE_GB * SC_RATE;
-    static const qint64 SC_ONE_PB = SC_ONE_TB * SC_RATE;
+    static const qint64 SC_1_KB = 1ll * 1024ll;
+    static const qint64 SC_1_MB = SC_1_KB * SC_RATE;
+    static const qint64 SC_1_GB = SC_1_MB * SC_RATE;
+    static const qint64 SC_1_TB = SC_1_GB * SC_RATE;
+    static const qint64 SC_1_PB = SC_1_TB * SC_RATE;
 
     QString strSZret;
-    if ( fileSz < SC_ONE_KB ) {
+    if ( fileSz < SC_1_KB ) {
         strSZret = QString("%1 bytes").arg( fileSz );
-    } else if ( fileSz < SC_ONE_MB ) {
-        strSZret = QString("%1 KB -> ( %2 bytes )").arg( fileSz * 1.0f / SC_ONE_KB ).arg( fileSz );
-    } else if ( fileSz < SC_ONE_GB ) {
-        strSZret = QString("%1 MB -> ( %2 bytes )").arg( fileSz * 1.0f / SC_ONE_MB ).arg( fileSz );
-    } else if ( fileSz < SC_ONE_TB ) {
-        strSZret = QString("%1 GB -> ( %2 bytes )").arg( fileSz * 1.0f / SC_ONE_GB ).arg( fileSz );
-    } else if ( fileSz < SC_ONE_PB ) {
-        strSZret = QString("%1 TB -> ( %2 bytes )").arg( fileSz * 1.0f / SC_ONE_TB ).arg( fileSz );
+    } else if ( fileSz < SC_1_MB ) {
+        strSZret = QString("%1 KB -> ( %2 bytes )").arg( fileSz * 1.0 / SC_1_KB ).arg( fileSz );
+    } else if ( fileSz < SC_1_GB ) {
+        strSZret = QString("%1 MB -> ( %2 bytes )").arg( fileSz * 1.0 / SC_1_MB ).arg( fileSz );
+    } else if ( fileSz < SC_1_TB ) {
+        strSZret = QString("%1 GB -> ( %2 bytes )").arg( fileSz * 1.0 / SC_1_GB ).arg( fileSz );
+    } else if ( fileSz < SC_1_PB ) {
+        strSZret = QString("%1 TB -> ( %2 bytes )").arg( fileSz * 1.0 / SC_1_TB ).arg( fileSz );
     } else {
-        strSZret = QString("%1 PB -> ( %2 bytes )").arg( fileSz * 1.0f / SC_ONE_PB ).arg( fileSz );
+        strSZret = QString("%1 PB -> ( %2 bytes )").arg( fileSz * 1.0 / SC_1_PB ).arg( fileSz );
     }
 
     return strSZret;

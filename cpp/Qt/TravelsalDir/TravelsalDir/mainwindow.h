@@ -126,6 +126,9 @@ private:
     int                                      m_extTypeGroupCnt;
     int                                      m_extTypeGroupPartCnt;
 
+    int                                      m_matchedDirsCnt;
+    int                                      m_matchedFilesCnt;
+
 
     // Resource
       // --------------------  Icons --------------------

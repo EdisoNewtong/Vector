@@ -11,6 +11,20 @@
 
 /****************************************************************************************************
 
+The following characters are not allowed to name a file:
+
+    1.  \ 
+    2.  / 
+    3.  : 
+    4.  * 
+    5.  ? 
+    6.  " 
+    7.  < 
+    8.  > 
+    9.  |
+
+
+
 xxxx->setEnabled( t | f );
 xxxx->setCheckState( Qt::Checked || Qt::Unchecked);
 

@@ -48,6 +48,7 @@ protected:
     void test_Study_perl_reg();
     void test_Study_case0();
     void test_Study_case1();
+    void test_Study_case2();
 
 private:
     Ui::MainWindow *ui;

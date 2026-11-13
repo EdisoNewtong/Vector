@@ -280,14 +280,37 @@ QRegularExpression::PatternOptions    MainWindow::getPatternOptions()
 
 
 void MainWindow::test_Study_case0()
-{    
+{
+    qDebug() << "=============== test_Study_case #0 Begin ===============";
+    QRegularExpression re("World");
+    QString mainString("Hello World !");
+
+    if ( !re.isValid() ) {
+        qDebug() << "\\b is not valid inside a reg : " << re.errorString();
+    } else {
+        // Core Core Core :
+        //     matched means that pattern "World" can be found inside mainstring "Hello World!" 
+        auto mthRet = re.match( mainString );
+        qDebug() << re.pattern() << (mthRet.hasMatch() ? " [[ Matched ]] " : " [[ NOT ]] Matched ") << " inside target  \"" << mainString << "\"";
+        QString capturedstr = mthRet.captured(0);
+        int beg_pos = mthRet.capturedStart(0); // position is included.
+        int end_pos = mthRet.capturedEnd(0);   // position is excluded.
+        qDebug() << "Captured = " << capturedstr << ", " <<  (mthRet.hasPartialMatch() ? " Partial Match " : " [NOT] Partial Match ");
+        qDebug() << QString("1. beg = %1, end = %2").arg(beg_pos).arg(end_pos);
+        qDebug() << "capturedTexts = " << mthRet.capturedTexts();
+    }
+    qDebug() << "=============== test_Study_case #0 End ===============\n";
+}
+
+void MainWindow::test_Study_case1()
+{
+    qDebug() << "=============== test_Study_case #1 Begin ===============";
     // The word anchor \b matches a **[Boundary]** between a word character and a non-word character \w\W or \W\w      : 
     //                          [9,12)
     //           Matched |<Space>cat| inside catenates 
-    // QString mainString("Housecat catenates house and cat");
-    QString mainString("aaa");
+    QString mainString("Housecat catenates house and cat");
     //                          [s^^)
-    //                          
+
 
     QRegularExpression re("\\bcat");
     if ( !re.isValid() ) {
@@ -303,20 +326,41 @@ void MainWindow::test_Study_case0()
         qDebug() << "capturedTexts = " << mthRet.capturedTexts();
     }
 
-
+    qDebug() << "=============== test_Study_case #1 End ===============\n";
 }
 
-void MainWindow::test_Study_case1()
+void MainWindow::test_Study_case2()
 {
+    qDebug() << "=============== test_Study_case #2 Begin ===============";
+    QRegularExpression re("World");
+    QString mainString("Hello World !");
+
+    if ( !re.isValid() ) {
+        qDebug() << "\\b is not valid inside a reg : " << re.errorString();
+    } else {
+        // Core Core Core Concept :
+        //     matched means that pattern "World" can be found inside mainstring "Hello World!" 
+        auto mthRet = re.match( mainString );
+        qDebug() << re.pattern() << (mthRet.hasMatch() ? " [[ Matched ]] " : " [[ NOT ]] Matched ") << " inside target  \"" << mainString << "\"";
+        QString capturedstr = mthRet.captured(0);
+        int beg_pos = mthRet.capturedStart(0); // position is included.
+        int end_pos = mthRet.capturedEnd(0);   // position is excluded.
+        qDebug() << "Captured = " << capturedstr << ", " <<  (mthRet.hasPartialMatch() ? " Partial Match " : " [NOT] Partial Match ");
+        qDebug() << QString("1. beg = %1, end = %2").arg(beg_pos).arg(end_pos);
+        qDebug() << "capturedTexts = " << mthRet.capturedTexts();
+    }
+    qDebug() << "=============== test_Study_case #2 End ===============\n";
 }
+
     
 void MainWindow::test_Study_perl_reg()
 {
-    // Boundary match
+    // #0 : Core concept for regular expression match principle 
     test_Study_case0();
-
+    // #1 : Boundary match
     test_Study_case1();
 
+    test_Study_case2();
 }
 
 
